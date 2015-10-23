@@ -1,0 +1,22 @@
+{
+  "name": "panjas",
+  "version": "0.0.1",
+  "description": "JavaScript data analysis toolkit inspired by Pandas.",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ashleydavis/Panjas.git"
+  },
+  "author": "ashley@codecapers.com.au",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ashleydavis/Panjas/issues"
+  },
+  "homepage": "https://github.com/ashleydavis/Panjas#readme",
+  "dependencies": {
+    "chai": "^3.4.0"
+  }
+}
