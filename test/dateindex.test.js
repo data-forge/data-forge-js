@@ -1,6 +1,6 @@
 'use strict';
 
-describe('DataIndex', function () {
+describe('DateIndex', function () {
 	
 	var DateIndex = require('../dateindex');
 	
