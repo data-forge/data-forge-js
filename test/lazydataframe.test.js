@@ -21,10 +21,12 @@ describe('LazyDataFrame', function () {
 					new Date(2015, 24, 2),
 				]
 			),
-			[
-				[100, 'foo', 11],
-				[200, 'bar', 22],
-			]
+			function () {
+				return [
+					[100, 'foo', 11],
+					[200, 'bar', 22],
+				];
+			}
 		);		
 	} 
 

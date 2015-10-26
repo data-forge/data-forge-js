@@ -82,18 +82,19 @@ DataFrame.prototype.subset = function (columnNames) {
 		})
 		.toArray();
 
-			
-	var values = E.from(self._values)
-		.select(function (entry) {
-			return E.from(columnIndices)
-				.select(function (columnIndex) {
-					return entry[columnIndex];					
-				})
-				.toArray();
-		})
-		.toArray();
+	var valuesFn = function () {
+		return E.from(self.values())
+			.select(function (entry) {
+				return E.from(columnIndices)
+					.select(function (columnIndex) {
+						return entry[columnIndex];					
+					})
+					.toArray();
+			})
+			.toArray();
+	};
 	
-	return new LazyDataFrame(columnNames, self._index, values);	 
+	return new LazyDataFrame(columnNames, self._index, valuesFn);	 
 };
 
 module.exports = DataFrame;

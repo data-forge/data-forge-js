@@ -10,15 +10,15 @@ var DateIndex = require('./dateindex');
 var assert = require('chai').assert;
 var E = require('linq');
 
-var LazyDataFrame = function (columnNames, index, values) {
+var LazyDataFrame = function (columnNames, index, valuesFn) {
 	assert.isArray(columnNames, "Expected 'columnNames' parameter to LazyDataFrame constructor to be an array.");
 	assert.instanceOf(index, DateIndex, "Expected 'index' parameter to LazyDataFrame constructor be an instance of DateIndex.");
-	assert.isArray(values, "Expected 'values' parameter to LazyDataFrame constructor to be an array.");
+	assert.isFunction(valuesFn, "Expected 'values' parameter to LazyDataFrame constructor to be a function.");
 	
 	var self = this;
 	self._columnNames = columnNames;
 	self._index = index;
-	self._values = values;	
+	self._valuesFn = valuesFn;	
 };
 
 //
@@ -46,7 +46,7 @@ LazyDataFrame.prototype.series = function (columnName) {
 	}
 	
 	// Extract values for the column.
-	var values = E.from(self._values)
+	var values = E.from(self.values())
 		.select(function (entry) {
 			return entry[columnIndex];
 		})
@@ -67,7 +67,7 @@ LazyDataFrame.prototype.columns = function () {
 
 LazyDataFrame.prototype.values = function () {
 	var self = this;
-	return self._values;
+	return self._valuesFn();
 };
 
 LazyDataFrame.prototype.subset = function (columnNames) {
@@ -81,18 +81,19 @@ LazyDataFrame.prototype.subset = function (columnNames) {
 		})
 		.toArray();
 
-			
-	var values = E.from(self._values)
-		.select(function (entry) {
-			return E.from(columnIndices)
-				.select(function (columnIndex) {
-					return entry[columnIndex];					
-				})
-				.toArray();
-		})
-		.toArray();
+	var valuesFn = function () {
+		return E.from(self.values())
+			.select(function (entry) {
+				return E.from(columnIndices)
+					.select(function (columnIndex) {
+						return entry[columnIndex];					
+					})
+					.toArray();
+			})
+			.toArray();
+	};
 	
-	return new LazyDataFrame(columnNames, self._index, values);	 
+	return new LazyDataFrame(columnNames, self._index, valuesFn);	 
 };
 
 module.exports = LazyDataFrame;
