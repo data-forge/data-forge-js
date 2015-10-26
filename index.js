@@ -10,16 +10,16 @@ var DataFrame = function (columnNames, values) {
 
 DataFrame.prototype.series = function (columnName) {
 	if (columnName === 'Value1') {
-		return new Series([
-			[new Date(1975, 24, 2), 100],
-			[new Date(2015, 10, 23), 300],			
-		]);	
+		return new Series(
+				[new Date(1975, 24, 2), new Date(2015, 10, 23)],
+				[100, 300]			
+			);	
 	}
 	else if (columnName === 'Value2') {
-		return new Series([
-			[new Date(1975, 24, 2), 'foo'],
-			[new Date(2015, 10, 23), 'bar'],			
-		]);
+		return new Series(
+				[new Date(1975, 24, 2), new Date(2015, 10, 23)],
+				['foo', 'bar']			
+			);	
 	}
 	else {
 		throw new Error('Bad column name!');
