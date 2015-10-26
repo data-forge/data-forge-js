@@ -20,7 +20,7 @@ describe('csv.integration', function () {
 		});
 		
 		var series1 = dataFrame.series('Value1');
-		expect(series1.index()).to.eql([
+		expect(series1.index().values()).to.eql([
 			new Date(1975, 24, 2),
 			new Date(2015, 10, 23),			
 		]);
@@ -30,7 +30,7 @@ describe('csv.integration', function () {
 		]);
 		
 		var series2 = dataFrame.series('Value2');
-		expect(series2.index()).to.eql([
+		expect(series2.index().values()).to.eql([
 			new Date(1975, 24, 2),
 			new Date(2015, 10, 23),			
 		]);
@@ -39,7 +39,7 @@ describe('csv.integration', function () {
 			'bar',			
 		]);
 		
-		expect(dataFrame.index()).to.eql([
+		expect(dataFrame.index().values()).to.eql([
 			new Date(1975, 24, 2),
 			new Date(2015, 10, 23),			
 		]);
@@ -56,7 +56,7 @@ describe('csv.integration', function () {
 		]);
 		
 		var dataFrame2 = dataFrame.subset(['Value1', 'Value3']); 
-		expect(dataFrame.index()).to.eql([
+		expect(dataFrame.index().values()).to.eql([
 			new Date(1975, 24, 2),
 			new Date(2015, 10, 23),			
 		]);

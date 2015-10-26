@@ -4,13 +4,15 @@
 // Implements a data frame data structure.
 //
 
-var assert = require('chai').assert;
 var Series = require('./series');
+var DateIndex = require('./dateindex');
+
+var assert = require('chai').assert;
 var E = require('linq');
 
 var DataFrame = function (columnNames, index, values) {
 	assert.isArray(columnNames, "Expected 'columnNames' parameter to DataFrame constructor to be an array.");
-	assert.isArray(index, "Expected 'index' parameter to DataFrame constructor to be an array.");
+	assert.instanceOf(index, DateIndex, "Expected 'index' parameter to DataFrame constructor be an instance of DateIndex.");
 	assert.isArray(values, "Expected 'values' parameter to DataFrame constructor to be an array.");
 	
 	var self = this;
