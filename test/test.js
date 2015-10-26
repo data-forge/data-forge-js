@@ -55,7 +55,7 @@ describe('test-suite', function () {
 			[300, "bar", 23],			
 		]);
 		
-		var dataFrame2 = dataFrame.dataFrame(['Value1, Value3']); 
+		var dataFrame2 = dataFrame.subset(['Value1', 'Value3']); 
 		expect(dataFrame.index()).to.eql([
 			new Date(1975, 24, 2),
 			new Date(2015, 10, 23),			
