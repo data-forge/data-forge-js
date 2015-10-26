@@ -1,21 +1,6 @@
 'use strict';
 
-var Series = function (values) {
-	var self = this;
-	self._values = values;	
-};
-
-Series.prototype.index = function () {
-	return [
-		new Date(1975, 24, 2),
-		new Date(2015, 10, 23),			
-	];	
-};
-
-Series.prototype.values = function () {
-	var self = this;
-	return self._values;	
-};
+var Series = require('./series');
 
 var DataFrame = function (columnNames, values) {
 	var self = this;
@@ -26,14 +11,14 @@ var DataFrame = function (columnNames, values) {
 DataFrame.prototype.series = function (columnName) {
 	if (columnName === 'Value1') {
 		return new Series([
-			100,
-			300,			
+			[new Date(1975, 24, 2), 100],
+			[new Date(2015, 10, 23), 300],			
 		]);	
 	}
 	else if (columnName === 'Value2') {
 		return new Series([
-			'foo',
-			'bar',			
+			[new Date(1975, 24, 2), 'foo'],
+			[new Date(2015, 10, 23), 'bar'],			
 		]);
 	}
 	else {
