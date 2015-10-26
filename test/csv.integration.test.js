@@ -1,6 +1,6 @@
 'use strict';
 
-describe('test-suite', function () {
+describe('csv.integration', function () {
 	
 	var expect = require('chai').expect;
 	
