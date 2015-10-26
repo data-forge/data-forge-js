@@ -68,8 +68,28 @@ DataFrame.prototype.values = function () {
 	return self._values;
 };
 
-DataFrame.prototype.dataFrame = function (columnNames) {
-	//todo:
+DataFrame.prototype.subset = function (columnNames) {
+	var self = this;
+	
+	assert.isArray(columnNames, "Expected 'columnName' parameter to 'subset' to be an array.");	
+	
+	var columnIndices = E.from(columnNames)
+		.select(function (columnName) {
+			return self._columnNameToIndex(columnName);
+		})
+		.toArray();
+		
+	var values = E.from(self._values)
+		.select(function (entry) {
+			return E.from(columnIndices)
+				.select(function (columnIndex) {
+					return entry[columnIndex];					
+				})
+				.toArray();
+		})
+		.toArray();
+	
+	return new DataFrame(columnNames, self._index, values);	 
 };
 
 module.exports = DataFrame;

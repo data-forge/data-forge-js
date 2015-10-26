@@ -16,7 +16,7 @@ describe('DataFrame', function () {
 			],			
 			[
 				new Date(1975, 24, 2),
-				new Date(1975, 24, 2),
+				new Date(2015, 24, 2),
 			],
 			[
 				[100, 'foo', 11],
@@ -42,7 +42,7 @@ describe('DataFrame', function () {
 		
 		expect(dataFrame.index()).to.eql([
 			new Date(1975, 24, 2),
-			new Date(1975, 24, 2)
+			new Date(2015, 24, 2)
 		]);		
 	});
 	
@@ -70,7 +70,7 @@ describe('DataFrame', function () {
 		var series1 = dataFrame.series('Value1');
 		expect(series1.index()).to.eql([
 			new Date(1975, 24, 2),
-			new Date(1975, 24, 2)
+			new Date(2015, 24, 2)
 		]);
 		expect(series1.values()).to.eql(			[
 			100,
@@ -80,7 +80,7 @@ describe('DataFrame', function () {
 		var series2 = dataFrame.series('Value2');
 		expect(series2.index()).to.eql([
 			new Date(1975, 24, 2),
-			new Date(1975, 24, 2)
+			new Date(2015, 24, 2)
 		]);
 		expect(series2.values()).to.eql(			[
 			'foo',
@@ -90,11 +90,26 @@ describe('DataFrame', function () {
 		var series3 = dataFrame.series('Value3');
 		expect(series3.index()).to.eql([
 			new Date(1975, 24, 2),
-			new Date(1975, 24, 2)
+			new Date(2015, 24, 2)
 		]);
 		expect(series3.values()).to.eql(			[
 			11,
 			22,
 		]);		
+	});
+	
+	it('can pull column subset as new dataframe', function () 
+	{
+		var dataFrame = initExampleDataFrame();
+		var subsetDataFrame = dataFrame.subset(['Value3', 'Value1']);
+		expect(dataFrame).not.to.equal(subsetDataFrame); 
+		expect(subsetDataFrame.index()).to.eql([
+			new Date(1975, 24, 2),
+			new Date(2015, 24, 2)
+		]);		
+		expect(subsetDataFrame.values()).to.eql(			[
+			[11, 100],
+			[22, 200],
+		]);
 	});
 });
