@@ -1,20 +1,19 @@
 'use strict';
 
 //
-// Implements a data frame data structure.
+// Implements a lazily evaluated data frame.
 //
 
 var Series = require('./series');
 var DateIndex = require('./dateindex');
-var LazyDataFrame = require('./lazydataframe');
 
 var assert = require('chai').assert;
 var E = require('linq');
 
-var DataFrame = function (columnNames, index, values) {
-	assert.isArray(columnNames, "Expected 'columnNames' parameter to DataFrame constructor to be an array.");
-	assert.instanceOf(index, DateIndex, "Expected 'index' parameter to DataFrame constructor be an instance of DateIndex.");
-	assert.isArray(values, "Expected 'values' parameter to DataFrame constructor to be an array.");
+var LazyDataFrame = function (columnNames, index, values) {
+	assert.isArray(columnNames, "Expected 'columnNames' parameter to LazyDataFrame constructor to be an array.");
+	assert.instanceOf(index, DateIndex, "Expected 'index' parameter to LazyDataFrame constructor be an instance of DateIndex.");
+	assert.isArray(values, "Expected 'values' parameter to LazyDataFrame constructor to be an array.");
 	
 	var self = this;
 	self._columnNames = columnNames;
@@ -26,7 +25,7 @@ var DataFrame = function (columnNames, index, values) {
 // Maps a column name to an array index.
 // Returns -1 if the requested column was not found.
 //
-DataFrame.prototype._columnNameToIndex = function (columnName) {
+LazyDataFrame.prototype._columnNameToIndex = function (columnName) {
 	assert.isString(columnName, "Expected 'columnName' parameter to _columnNameToIndex to be a non-empty string.");
 	
 	var self = this;
@@ -39,7 +38,7 @@ DataFrame.prototype._columnNameToIndex = function (columnName) {
 	return -1;
 };
 
-DataFrame.prototype.series = function (columnName) {
+LazyDataFrame.prototype.series = function (columnName) {
 	var self = this;
 	var columnIndex = self._columnNameToIndex(columnName);
 	if (columnIndex < 0) {
@@ -56,22 +55,22 @@ DataFrame.prototype.series = function (columnName) {
 	return new Series(self._index, values);
 };
 
-DataFrame.prototype.index = function () {
+LazyDataFrame.prototype.index = function () {
 	var self = this;
 	return self._index;	
 };
 
-DataFrame.prototype.columns = function () {
+LazyDataFrame.prototype.columns = function () {
 	var self = this;
 	return self._columnNames;
 };
 
-DataFrame.prototype.values = function () {
+LazyDataFrame.prototype.values = function () {
 	var self = this;
 	return self._values;
 };
 
-DataFrame.prototype.subset = function (columnNames) {
+LazyDataFrame.prototype.subset = function (columnNames) {
 	var self = this;
 	
 	assert.isArray(columnNames, "Expected 'columnName' parameter to 'subset' to be an array.");	
@@ -96,4 +95,4 @@ DataFrame.prototype.subset = function (columnNames) {
 	return new LazyDataFrame(columnNames, self._index, values);	 
 };
 
-module.exports = DataFrame;
+module.exports = LazyDataFrame;
