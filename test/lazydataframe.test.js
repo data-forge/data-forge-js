@@ -123,4 +123,23 @@ describe('LazyDataFrame', function () {
 		expect(lazyDataFrame).not.to.equal(bakedDataFrame)
 		expect(bakedDataFrame).to.be.an.instanceOf(DataFrame);		
 	});
+	
+	it('can output data frame', function () {
+		
+		var dataFrame = initExampleLazyDataFrame();
+		var filePath = 'some-file';
+		var options = {};
+		var promise = {};
+		
+		var plugin = {
+			to: function (outputDataFrame, outputFilePath, outputOptions) {
+				expect(outputDataFrame).to.equal(dataFrame);
+				expect(outputFilePath).to.equal(filePath);
+				expect(outputOptions).to.equal(options);
+				return promise;				
+			},
+		};
+		
+		expect(dataFrame.to(plugin, filePath, options)).to.equal(promise);
+	});
 });

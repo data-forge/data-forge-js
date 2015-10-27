@@ -122,4 +122,23 @@ describe('DataFrame', function () {
 		expect(dataFrame.bake()).to.equal(dataFrame);
 	});
 	
+	it('can output data frame', function () {
+		
+		var dataFrame = initExampleDataFrame();
+		var filePath = 'some-file';
+		var options = {};
+		var promise = {};
+		
+		var plugin = {
+			to: function (outputDataFrame, outputFilePath, outputOptions) {
+				expect(outputDataFrame).to.equal(dataFrame);
+				expect(outputFilePath).to.equal(filePath);
+				expect(outputOptions).to.equal(options);
+				return promise;				
+			},
+		};
+		
+		expect(dataFrame.to(plugin, filePath, options)).to.equal(promise);
+	});
+	
 });

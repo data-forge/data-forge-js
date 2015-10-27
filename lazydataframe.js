@@ -113,7 +113,7 @@ LazyDataFrame.prototype.bake = function () {
 //
 LazyDataFrame.prototype.to = function (plugin, filePath, options) {
 	assert.isObject(plugin, "Expected 'plugin' parameter to 'DataFrame.to' to be an object.");
-	assert.isFunction(plugin.from, "Expected 'plugin' parameter to 'DataFrame.to' to be an object with a 'to' function.");
+	assert.isFunction(plugin.to, "Expected 'plugin' parameter to 'DataFrame.to' to be an object with a 'to' function.");
 	assert.isString(filePath, "Expected 'filePath' parameter to 'DataFrame.to' to be a string.");
 
 	var self = this;
