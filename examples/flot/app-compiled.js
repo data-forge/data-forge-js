@@ -1945,6 +1945,7 @@ module.exports = DateIndex;
 'use strict'
 
 var panjas = require('../../index.js');
+var E = require('linq');
 
 $(function() {
 	
@@ -1952,13 +1953,23 @@ $(function() {
 	for (var i = 0; i < 14; i += 0.5) {
 		series.push([i, Math.sin(i)]);
 	}
+	
+	var index = new panjas.NumberIndex(E.range(0, 14).toArray());
+	var values = E
+		.range(0, 14)
+		.select(function (i) {
+			return [Math.sin(i), Math.cos(i)];
+		})
+		.toArray();
 
+	var dataFrame = new DataFrame(["Sin", "Cos"], index, values);		
+	
 	$.plot("#placeholder", [ series ]);
 });
 
 console.log('panjas');
 console.dir(panjas);
-},{"../../index.js":9}],9:[function(require,module,exports){
+},{"../../index.js":9,"linq":48}],9:[function(require,module,exports){
 'use strict';
 
 var assert = require('chai').assert;
