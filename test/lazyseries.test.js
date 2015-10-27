@@ -3,18 +3,16 @@
 
 describe('LazySeries', function () {
 	
-	var LazySeries = require('../lazyseries');
-	var Series = require('../series');
-	var DateIndex = require('../dateindex');
+	var panjas = require('../index');
 	
 	var expect = require('chai').expect; 
 	
 	var initExampleSeries = function () {
-		var index = new DateIndex([new Date(1975, 24, 2), new Date(1975, 24, 2)]);
+		var index = new panjas.DateIndex([new Date(1975, 24, 2), new Date(1975, 24, 2)]);
 		var valuesFn = function () {
 			return [100, 200];
 		};
-		return new LazySeries(index, valuesFn);		
+		return new panjas.LazySeries(index, valuesFn);		
 	};
 	
 	/* Can't really do this check, it will break lazy evaluation.
@@ -57,6 +55,6 @@ describe('LazySeries', function () {
 		var lazySeries = initExampleSeries();		
 		var bakedSeries = lazySeries.bake();
 		expect(lazySeries).not.to.equal(bakedSeries)
-		expect(bakedSeries).to.be.an.instanceOf(Series);		
+		expect(bakedSeries).to.be.an.instanceOf(panjas.Series);		
 	});
 });

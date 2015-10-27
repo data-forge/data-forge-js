@@ -3,19 +3,18 @@
 
 describe('DataFrame', function () {
 	
-	var DataFrame = require('../dataframe');
-	var DateIndex = require('../dateindex');
+	var panjas = require('../index');	
 	
 	var expect = require('chai').expect;
 	
 	var initExampleDataFrame = function () {
-		return new DataFrame(
+		return new panjas.DataFrame(
 			[
 				"Value1",
 				"Value2",
 				"Value3",
 			],
-			new DateIndex(			
+			new panjas.DateIndex(			
 				[
 					new Date(1975, 24, 2),
 					new Date(2015, 24, 2),

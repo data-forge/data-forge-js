@@ -2,9 +2,7 @@
 
 describe('csv.integration', function () {
 	
-	var pj = require('../index.js');
-	var DataFrame = require('../dataframe');
-	var DateIndex = require('../dateindex');
+	var panjas = require('../index.js');
 	var csv = require('../fmt/csv');
 
 	var expect = require('chai').expect;
@@ -12,13 +10,13 @@ describe('csv.integration', function () {
 	var moment = require('moment');	
 	
 	var initExampleDataFrame = function () {
-		return new DataFrame(
+		return new panjas.DataFrame(
 			[
 				"Value1",
 				"Value2",
 				"Value3",
 			],
-			new DateIndex(			
+			new panjas.DateIndex(			
 				[
 					new Date(1975, 24, 2),
 					new Date(2015, 24, 2),
@@ -40,7 +38,7 @@ describe('csv.integration', function () {
 			"2015-10-23, 300, bar, 23"
 		);
 		
-		return pj.from(csv, testFile, {
+		return panjas.from(csv, testFile, {
 				parse_dates: ['Date'],			
 			})
 			.then(function (dataFrame) {
@@ -68,7 +66,7 @@ describe('csv.integration', function () {
 			"2015-10-23, 300, bar, 23"
 		);
 		
-		return pj.from(csv, testFile, {
+		return panjas.from(csv, testFile, {
 				index_col: 'Date',
 				parse_dates: ['Date',],			
 			})

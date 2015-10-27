@@ -2,13 +2,13 @@
 
 describe('NumberIndex', function () {
 	
-	var NumberIndex = require('../numberindex');
+	var panjas = require('../index');
 	
 	var expect = require('chai').expect;
 	
 	it('can get index values', function () {
 		
-		var dateIndex = new NumberIndex(
+		var dateIndex = new panjas.NumberIndex(
 			[
 				101,
 				532,			

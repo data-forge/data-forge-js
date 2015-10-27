@@ -15,8 +15,10 @@ module.exports = {
 		return plugin.from(filePath, options);
 	},
 	
-	DataFrame: require('./dataframe'),
-	LazyDataFrame: require('./lazydataframe'),
-	Series: require('./series'),
-	LazySeries: require('./lazyseries'),
+	DataFrame: require('./src/dataframe'),
+	LazyDataFrame: require('./src/lazydataframe'),
+	Series: require('./src/series'),
+	LazySeries: require('./src/lazyseries'),
+	DateIndex: require('./src/dateindex'),
+	NumberIndex: require('./src/numberindex'),
 };

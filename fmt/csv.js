@@ -4,9 +4,7 @@
 // Implements input/output for the CSV format.
 //
 
-var DataFrame = require('../dataframe');
-var DateIndex = require('../dateindex');
-var NumberIndex = require('../numberindex');
+var panjas = require('../index');
 
 var fs = require('fs');
 var E = require('linq');
@@ -111,7 +109,7 @@ module.exports = {
 						throw new Error("Index column '" + options.index_col + "' doesn't exist in columns: " + columnNames.join(', '));
 					}
 					
-					index = new DateIndex( //todo: DateIndex shoud be optional!
+					index = new panjas.DateIndex( //todo: DateIndex shoud be optional!
 						E
 							.from(values)
 							.select(function (row) {
@@ -143,10 +141,10 @@ module.exports = {
 				}
 				else {
 					//todo: this could be a LazyNumberIndex based on a range.
-					index = new NumberIndex(E.range(0, values.length).toArray());
+					index = new panjas.NumberIndex(E.range(0, values.length).toArray());
 				}
 				
-				var dataFrame = new DataFrame(columnNames, index, values);
+				var dataFrame = new panjas.DataFrame(columnNames, index, values);
 				resolve(dataFrame);
 			});
 		});	

@@ -3,20 +3,18 @@
 
 describe('LazyDataFrame', function () {
 	
-	var LazyDataFrame = require('../lazydataframe');
-	var DataFrame = require('../dataframe');
-	var DateIndex = require('../dateindex');
+	var panjas = require('../index');
 	
 	var expect = require('chai').expect;
 	
 	var initExampleLazyDataFrame = function () {
-		return new LazyDataFrame(
+		return new panjas.LazyDataFrame(
 			[
 				"Value1",
 				"Value2",
 				"Value3",
 			],
-			new DateIndex(			
+			new panjas.DateIndex(			
 				[
 					new Date(1975, 24, 2),
 					new Date(2015, 24, 2),
@@ -105,7 +103,7 @@ describe('LazyDataFrame', function () {
 	{
 		var lazyDataFrame = initExampleLazyDataFrame();
 		var subsetLazyDataFrame = lazyDataFrame.subset(['Value3', 'Value1']);
-		expect(LazyDataFrame).not.to.equal(subsetLazyDataFrame); 
+		expect(lazyDataFrame).not.to.equal(subsetLazyDataFrame); 
 		expect(subsetLazyDataFrame.index().values()).to.eql([
 			new Date(1975, 24, 2),
 			new Date(2015, 24, 2)
@@ -121,7 +119,7 @@ describe('LazyDataFrame', function () {
 		var lazyDataFrame = initExampleLazyDataFrame();
 		var bakedDataFrame = lazyDataFrame.bake();
 		expect(lazyDataFrame).not.to.equal(bakedDataFrame)
-		expect(bakedDataFrame).to.be.an.instanceOf(DataFrame);		
+		expect(bakedDataFrame).to.be.an.instanceOf(panjas.DataFrame);		
 	});
 	
 	it('can output data frame', function () {
