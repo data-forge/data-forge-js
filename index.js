@@ -9,6 +9,9 @@ var moment = require('moment');
 
 module.exports = {
 	
+	//
+	// Read a DataFrame from a csv file.
+	//
 	read_csv: function (filePath) {
 		var csvData = fs.readFileSync(filePath, 'utf-8');
 		var lines = csvData.split('\n');

@@ -3,10 +3,32 @@
 describe('csv.integration', function () {
 	
 	var pj = require('../index.js');
+	var DataFrame = require('../dataframe');
+	var DateIndex = require('../dateindex');
 
 	var expect = require('chai').expect;
 	var fs = require('fs');
 	var moment = require('moment');	
+	
+	var initExampleDataFrame = function () {
+		return new DataFrame(
+			[
+				"Value1",
+				"Value2",
+				"Value3",
+			],
+			new DateIndex(			
+				[
+					new Date(1975, 24, 2),
+					new Date(2015, 24, 2),
+				]
+			),
+			[
+				['100', 'foo', '11'], //todo: use integer data here.
+				['200', 'bar', '22'],
+			]
+		);		
+	}; 
 	
 	it('can read data frame from CSV', function () {
 		
@@ -76,6 +98,25 @@ describe('csv.integration', function () {
 		
 		fs.unlink(testFile);
 				
+	});
+	
+	it('can write csv to file', function () {
+		
+		var testFile = 'test.csv';
+		var dataFrame = initExampleDataFrame();
+		dataFrame.to_csv(testFile);
+		
+		var data = fs.readFileSync(testFile, 'utf8');
+		var loadedDataFrame = pj.read_csv(testFile, {
+			index_col: 'Date',
+			parse_dates: ['Date',],			
+		});		
+		
+		expect(loadedDataFrame.index().values()).to.eql(dataFrame.index().values());
+		expect(loadedDataFrame.columns()).to.eql(dataFrame.columns());
+		expect(loadedDataFrame.values()).to.eql(dataFrame.values());
+		
+		fs.unlink(testFile);	
 	});
 	
 });

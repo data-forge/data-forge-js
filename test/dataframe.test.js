@@ -26,7 +26,7 @@ describe('DataFrame', function () {
 				[200, 'bar', 22],
 			]
 		);		
-	} 
+	}; 
 
 	it('can get columns', function () {
 		
