@@ -117,7 +117,7 @@ DataFrame.prototype.to = function (plugin, filePath, options) {
 	assert.isString(filePath, "Expected 'filePath' parameter to 'DataFrame.to' to be a string.");
 
 	var self = this;
-	plugin.to(self, filePath, options);	
+	return plugin.to(self, filePath, options);	
 };
 
 module.exports = DataFrame;
