@@ -97,4 +97,12 @@ DataFrame.prototype.subset = function (columnNames) {
 	return new LazyDataFrame(columnNames, self._index, valuesFn);	 
 };
 
+//
+// For compatability with LazyDataFrame. A DataFrame is already baked, so just return self. 
+//
+DataFrame.prototype.bake = function () {
+	var self = this;
+	return self;
+};
+
 module.exports = DataFrame;

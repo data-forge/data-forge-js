@@ -115,4 +115,11 @@ describe('DataFrame', function () {
 			[22, 200],
 		]);
 	});
+	
+	it('baking data frame returns self', function () {
+		
+		var dataFrame = initExampleDataFrame();
+		expect(dataFrame.bake()).to.equal(dataFrame);
+	});
+	
 });
