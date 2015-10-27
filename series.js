@@ -7,7 +7,6 @@
 var DateIndex = require('./dateindex');
 
 var assert = require('chai').assert;
-var E = require('linq'); 
 
 var Series = function (index, values) {
 	assert.instanceOf(index, DateIndex, "Expected 'index' parameter to Series constructor be an instance of DateIndex.");
