@@ -5,14 +5,13 @@
 //
 
 var LazySeries = require('./lazyseries');
-var DateIndex = require('./dateindex');
 
 var assert = require('chai').assert;
 var E = require('linq');
 
 var LazyDataFrame = function (columnNames, index, valuesFn) {
 	assert.isArray(columnNames, "Expected 'columnNames' parameter to LazyDataFrame constructor to be an array.");
-	assert.instanceOf(index, DateIndex, "Expected 'index' parameter to LazyDataFrame constructor be an instance of DateIndex.");
+	assert.isObject(index, "Expected 'index' parameter to LazyDataFrame constructor be an index object.");
 	assert.isFunction(valuesFn, "Expected 'values' parameter to LazyDataFrame constructor to be a function.");
 	
 	var self = this;

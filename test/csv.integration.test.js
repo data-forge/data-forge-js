@@ -31,6 +31,34 @@ describe('csv.integration', function () {
 		);		
 	}; 
 	
+	it('index defaults to numbers when not specified', function () {
+		
+		var testFile = 'test.csv';
+		fs.writeFileSync(testFile, 
+			"Date, Value1, Value2, Value3\n" +
+			"1975-2-24, 100, foo, 22\n" +
+			"2015-10-23, 300, bar, 23"
+		);
+		
+		return pj.from(csv, testFile, {
+				parse_dates: ['Date'],			
+			})
+			.then(function (dataFrame) {
+				expect(dataFrame.index().values()).to.eql([
+					0,
+					1,
+				]);
+				
+				var series1 = dataFrame.series('Date');
+				expect(series1.values()).to.eql([
+					moment('1975-2-24').toDate(),
+					moment('2015-10-23').toDate(),
+				]);
+				
+				fs.unlink(testFile);				
+			});	
+	});
+	
 	it('can read data frame from CSV', function () {
 		
 		var testFile = 'test.csv';
