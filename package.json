@@ -18,6 +18,8 @@
   "homepage": "https://github.com/ashleydavis/Panjas#readme",
   "dependencies": {
     "chai": "^3.4.0",
-    "linq": "^3.0.5"
+    "csv": "^0.4.6",
+    "linq": "^3.0.5",
+    "moment": "^2.10.6"
   }
 }

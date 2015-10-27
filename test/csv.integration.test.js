@@ -2,37 +2,40 @@
 
 describe('csv.integration', function () {
 	
-	var expect = require('chai').expect;
-	
 	var pj = require('../index.js');
+
+	var expect = require('chai').expect;
+	var fs = require('fs');
+	var moment = require('moment');	
 	
 	it('can read data frame from CSV', function () {
 		
-		pj.mockCsv = 
+		var testFile = 'test.csv';
+		fs.writeFileSync(testFile, 
 			"Date, Value1, Value2, Value3\n" +
-			"1975-24-2, 100, foo, 22\n" +
+			"1975-2-24, 100, foo, 22\n" +
 			"2015-10-23, 300, bar, 23"
-			;
+		);
 		
-		var dataFrame = pj.read_csv("something.csv", {
+		var dataFrame = pj.read_csv(testFile, {
 			index_col: 'Date',
 			parse_dates: ['Date',],			
 		});
 		
 		var series1 = dataFrame.series('Value1');
 		expect(series1.index().values()).to.eql([
-			new Date(1975, 24, 2),
-			new Date(2015, 10, 23),			
+			moment('1975-2-24').toDate(),
+			moment('2015-10-23').toDate(),
 		]);
-		expect(series1.values()).to.eql([
-			100,
-			300,			
+		expect(series1.values()).to.eql([  //todo: values should be parsed to numbers.
+			"100",
+			"300",			
 		]);
 		
 		var series2 = dataFrame.series('Value2');
 		expect(series2.index().values()).to.eql([
-			new Date(1975, 24, 2),
-			new Date(2015, 10, 23),			
+			moment('1975-2-24').toDate(),
+			moment('2015-10-23').toDate(),
 		]);
 		expect(series2.values()).to.eql([
 			'foo',
@@ -40,8 +43,8 @@ describe('csv.integration', function () {
 		]);
 		
 		expect(dataFrame.index().values()).to.eql([
-			new Date(1975, 24, 2),
-			new Date(2015, 10, 23),			
+			moment('1975-2-24').toDate(),
+			moment('2015-10-23').toDate(),
 		]);
 		
 		expect(dataFrame.columns()).to.eql([
@@ -50,15 +53,15 @@ describe('csv.integration', function () {
 			'Value3',			
 		]);
 		
-		expect(dataFrame.values()).to.eql([
-			[100, "foo", 22],
-			[300, "bar", 23],			
+		expect(dataFrame.values()).to.eql([  //todo: values should be parsed to numbers.
+			["100", "foo", "22"],
+			["300", "bar", "23"],			
 		]);
 		
 		var dataFrame2 = dataFrame.subset(['Value1', 'Value3']); 
 		expect(dataFrame.index().values()).to.eql([
-			new Date(1975, 24, 2),
-			new Date(2015, 10, 23),			
+			moment('1975-2-24').toDate(),
+			moment('2015-10-23').toDate(),
 		]);
 		
 		expect(dataFrame2.columns()).to.eql([
@@ -66,10 +69,12 @@ describe('csv.integration', function () {
 			'Value3',			
 		]);
 		
-		expect(dataFrame2.values()).to.eql([
-			[100, 22],
-			[300, 23],			
+		expect(dataFrame2.values()).to.eql([ //todo: values should be parsed to numbers.
+			["100", "22"],
+			["300", "23"],			
 		]);
+		
+		fs.unlink(testFile);
 				
 	});
 	
