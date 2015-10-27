@@ -13,6 +13,21 @@ var moment = require('moment');
 var assert = require('chai').assert;
 var Q = require('q');
 
+//
+// http://pietschsoft.com/post/2008/01/14/javascript-inttryparse-equivalent
+//
+function tryParseInt(str, defaultValue) {
+     var retValue = defaultValue;
+     if(str !== null) {
+         if(str.length > 0) {
+             if (!isNaN(str)) {
+                 retValue = parseInt(str);
+             }
+         }
+     }
+     return retValue;
+}
+
 module.exports = {
 	
 	//
@@ -34,8 +49,17 @@ module.exports = {
 					.select(function (line) {
 						return E
 							.from(line.split(','))
-							.select(function (row) {
-								return row.trim();
+							.select(function (col) {
+								return col.trim();
+							})
+							.select(function (col) {
+								var val = tryParseInt(col, null);
+								if (val == null) {
+									return col;
+								}
+								else {
+									return val;
+								}
 							})
 							.toArray();					
 					})
