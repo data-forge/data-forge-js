@@ -27,4 +27,12 @@ Series.prototype.values = function () {
 	return self._values;
 };
 
+//
+// For compatability with LazySeries. A Series is already baked, so just return self. 
+//
+Series.prototype.bake = function () {
+	var self = this;
+	return self;
+};
+
 module.exports = Series;

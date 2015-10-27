@@ -27,4 +27,15 @@ LazySeries.prototype.values = function () {
 	return self._valuesFn();
 };
 
+//
+// Bake the lazy series to a normal seris. 
+//
+LazySeries.prototype.bake = function () {
+	var Series = require('./series'); // Local require, to prevent circular reference.
+	
+	var self = this;
+	return new Series(self._index, self.values());
+};
+
+
 module.exports = LazySeries;

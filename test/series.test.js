@@ -48,4 +48,10 @@ describe('Series', function () {
 			200			
 		]);		
 	});
+
+	it('baking series returns self', function () {
+		
+		var series = initExampleSeries();
+		expect(series.bake()).to.equal(series);
+	});
 });

@@ -4,6 +4,7 @@
 describe('LazySeries', function () {
 	
 	var LazySeries = require('../lazyseries');
+	var Series = require('../series');
 	var DateIndex = require('../dateindex');
 	
 	var expect = require('chai').expect; 
@@ -49,5 +50,13 @@ describe('LazySeries', function () {
 			100,
 			200			
 		]);		
+	});
+
+	it('can bake lazy series', function () {
+		
+		var lazySeries = initExampleSeries();		
+		var bakedSeries = lazySeries.bake();
+		expect(lazySeries).not.to.equal(bakedSeries)
+		expect(bakedSeries).to.be.an.instanceOf(Series);		
 	});
 });
