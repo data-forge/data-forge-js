@@ -4,7 +4,7 @@
 // Implements a data frame data structure.
 //
 
-var Series = require('./series');
+var LazySeries = require('./lazyseries');
 var DateIndex = require('./dateindex');
 var LazyDataFrame = require('./lazydataframe');
 
@@ -47,13 +47,15 @@ DataFrame.prototype.series = function (columnName) {
 	}
 	
 	// Extract values for the column.
-	var values = E.from(self._values)
-		.select(function (entry) {
-			return entry[columnIndex];
-		})
-		.toArray();
+	var valuesFn = function () {
+		return E.from(self._values)
+			.select(function (entry) {
+				return entry[columnIndex];
+			})
+			.toArray();
+	};
 	
-	return new Series(self._index, values);
+	return new LazySeries(self._index, valuesFn);
 };
 
 DataFrame.prototype.index = function () {
