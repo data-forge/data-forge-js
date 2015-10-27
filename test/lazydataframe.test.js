@@ -4,6 +4,7 @@
 describe('LazyDataFrame', function () {
 	
 	var LazyDataFrame = require('../lazydataframe');
+	var DataFrame = require('../dataframe');
 	var DateIndex = require('../dateindex');
 	
 	var expect = require('chai').expect;
@@ -115,4 +116,11 @@ describe('LazyDataFrame', function () {
 		]);
 	});
 	
+	it('can bake lazy data frame', function () {
+		
+		var lazyDataFrame = initExampleLazyDataFrame();
+		var bakedDataFrame = lazyDataFrame.bake();
+		expect(lazyDataFrame).not.to.equal(bakedDataFrame)
+		expect(bakedDataFrame).to.be.an.instanceOf(DataFrame);		
+	});
 });
