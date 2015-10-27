@@ -108,4 +108,16 @@ LazyDataFrame.prototype.bake = function () {
 	return new DataFrame(self._columnNames,	self._index, self.values());
 };
 
+//
+// Save the data frame via plugable output.
+//
+LazyDataFrame.prototype.to = function (plugin, filePath, options) {
+	assert.isObject(plugin, "Expected 'plugin' parameter to 'DataFrame.to' to be an object.");
+	assert.isFunction(plugin.from, "Expected 'plugin' parameter to 'DataFrame.to' to be an object with a 'to' function.");
+	assert.isString(filePath, "Expected 'filePath' parameter to 'DataFrame.to' to be a string.");
+
+	var self = this;
+	return plugin.to(self, filePath, options);	
+};
+
 module.exports = LazyDataFrame;
