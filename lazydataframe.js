@@ -4,7 +4,7 @@
 // Implements a lazily evaluated data frame.
 //
 
-var Series = require('./series');
+var LazySeries = require('./lazyseries');
 var DateIndex = require('./dateindex');
 
 var assert = require('chai').assert;
@@ -46,13 +46,15 @@ LazyDataFrame.prototype.series = function (columnName) {
 	}
 	
 	// Extract values for the column.
-	var values = E.from(self.values())
-		.select(function (entry) {
-			return entry[columnIndex];
-		})
-		.toArray();
+	var valuesFn = function () {
+		return E.from(self.values())
+			.select(function (entry) {
+				return entry[columnIndex];
+			})
+			.toArray();
+	};
 	
-	return new Series(self._index, values);
+	return new LazySeries(self._index, valuesFn);
 };
 
 LazyDataFrame.prototype.index = function () {
