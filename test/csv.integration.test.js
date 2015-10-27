@@ -5,6 +5,7 @@ describe('csv.integration', function () {
 	var pj = require('../index.js');
 	var DataFrame = require('../dataframe');
 	var DateIndex = require('../dateindex');
+	var csv = require('../fmt/csv');
 
 	var expect = require('chai').expect;
 	var fs = require('fs');
@@ -39,7 +40,7 @@ describe('csv.integration', function () {
 			"2015-10-23, 300, bar, 23"
 		);
 		
-		var dataFrame = pj.from.csv(testFile, {
+		var dataFrame = pj.from(csv, testFile, {
 			index_col: 'Date',
 			parse_dates: ['Date',],			
 		});
@@ -104,10 +105,10 @@ describe('csv.integration', function () {
 		
 		var testFile = 'test.csv';
 		var dataFrame = initExampleDataFrame();
-		dataFrame.to.csv(testFile);
+		dataFrame.to(csv, testFile);
 		
 		var data = fs.readFileSync(testFile, 'utf8');
-		var loadedDataFrame = pj.from.csv(testFile, {
+		var loadedDataFrame = pj.from(csv, testFile, {
 			index_col: 'Date',
 			parse_dates: ['Date',],			
 		});		

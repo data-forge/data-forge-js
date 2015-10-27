@@ -21,28 +21,6 @@ var DataFrame = function (columnNames, index, values) {
 	self._columnNames = columnNames;
 	self._index = index;
 	self._values = values;
-	
-	//
-	// Output the data frame to a csv file.
-	//
-	self.to = {
-		csv: function (filePath) {
-			assert.isString(filePath, "Expected 'filePath' parameter to 'to.csv' to be a string.");
-			
-			var header = ['Index'].concat(self.columns()).join(',');
-			var rows = E.from(self.index().values())
-					.zip(self.values(), function (index, values) {
-						return [index].concat(values);
-					})
-					.select(function (row) {
-						return row.join(',');
-					})
-					.toArray();
-			var data = [header].concat(rows).join('\n');	
-			fs.writeFileSync(filePath, data);
-		},
-	};
-		
 };
 
 //
@@ -128,6 +106,18 @@ DataFrame.prototype.subset = function (columnNames) {
 DataFrame.prototype.bake = function () {
 	var self = this;
 	return self;
+};
+
+//
+// Save the data frame via plugable output.
+//
+DataFrame.prototype.to = function (plugin, filePath, options) {
+	assert.isObject(plugin, "Expected 'plugin' parameter to 'DataFrame.to' to be an object.");
+	assert.isFunction(plugin.from, "Expected 'plugin' parameter to 'DataFrame.to' to be an object with a 'to' function.");
+	assert.isString(filePath, "Expected 'filePath' parameter to 'DataFrame.to' to be a string.");
+
+	var self = this;
+	plugin.to(self, filePath, options);	
 };
 
 module.exports = DataFrame;
