@@ -20,7 +20,29 @@ var DataFrame = function (columnNames, index, values) {
 	var self = this;
 	self._columnNames = columnNames;
 	self._index = index;
-	self._values = values;	
+	self._values = values;
+	
+	//
+	// Output the data frame to a csv file.
+	//
+	self.to = {
+		csv: function (filePath) {
+			assert.isString(filePath, "Expected 'filePath' parameter to 'to.csv' to be a string.");
+			
+			var header = ['Index'].concat(self.columns()).join(',');
+			var rows = E.from(self.index().values())
+					.zip(self.values(), function (index, values) {
+						return [index].concat(values);
+					})
+					.select(function (row) {
+						return row.join(',');
+					})
+					.toArray();
+			var data = [header].concat(rows).join('\n');	
+			fs.writeFileSync(filePath, data);
+		},
+	};
+		
 };
 
 //
@@ -106,26 +128,6 @@ DataFrame.prototype.subset = function (columnNames) {
 DataFrame.prototype.bake = function () {
 	var self = this;
 	return self;
-};
-
-//
-// Output the data frame to a csv file.
-//
-DataFrame.prototype.to_csv = function (filePath) {
-	assert.isString(filePath, "Expected 'filePath' parameter to 'to_csv' to be a string.");
-	
-	var self = this;	
-	var header = ['Index'].concat(self.columns()).join(',');
-	var rows = E.from(self.index().values())
-			.zip(self.values(), function (index, values) {
-				return [index].concat(values);
-			})
-			.select(function (row) {
-				return row.join(',');
-			})
-			.toArray();
-	var data = [header].concat(rows).join('\n');	
-	fs.writeFileSync(filePath, data);
 };
 
 module.exports = DataFrame;

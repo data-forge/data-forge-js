@@ -39,7 +39,7 @@ describe('csv.integration', function () {
 			"2015-10-23, 300, bar, 23"
 		);
 		
-		var dataFrame = pj.read_csv(testFile, {
+		var dataFrame = pj.from.csv(testFile, {
 			index_col: 'Date',
 			parse_dates: ['Date',],			
 		});
@@ -104,10 +104,10 @@ describe('csv.integration', function () {
 		
 		var testFile = 'test.csv';
 		var dataFrame = initExampleDataFrame();
-		dataFrame.to_csv(testFile);
+		dataFrame.to.csv(testFile);
 		
 		var data = fs.readFileSync(testFile, 'utf8');
-		var loadedDataFrame = pj.read_csv(testFile, {
+		var loadedDataFrame = pj.from.csv(testFile, {
 			index_col: 'Date',
 			parse_dates: ['Date',],			
 		});		
