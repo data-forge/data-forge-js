@@ -49,4 +49,20 @@ LazySeries.prototype.rows = function () {
 		.toArray();
 };
 
+//
+// Skip a number of rows in the series.
+//
+LazySeries.prototype.skip = function (numRows) {
+	var self = this;
+	return new LazySeries(
+		self.index().skip(numRows),
+		function () {
+			return E
+				.from(self.values())
+				.skip(numRows)
+				.toArray();			
+		}
+	); 	
+};
+
 module.exports = LazySeries;

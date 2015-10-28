@@ -15,6 +15,15 @@ describe('LazySeries', function () {
 		return new panjas.LazySeries(index, valuesFn);		
 	};
 	
+	var initExampleSeries2 = function () {
+		var index = new panjas.DateIndex([new Date(1975, 2, 24), new Date(2011, 2, 28), new Date(2012, 2, 28), new Date(2015, 2, 28)]);
+		var valuesFn = function () {
+			return [100, 300, 200, 5];
+		};
+		return new panjas.LazySeries(index, valuesFn);		
+	};
+	
+	
 	/* Can't really do this check, it will break lazy evaluation.
 	it('throws exception when index and values arrays do not have equal length', function () {
 		
@@ -64,5 +73,14 @@ describe('LazySeries', function () {
 				[new Date(1975, 2, 24), 100],
 				[new Date(2015, 2, 28), 200],
 		]);
+	});
+
+	it('can skip', function () {
+		var series = initExampleSeries2();
+		var skipSeries = series.skip(2);		
+		expect(skipSeries.index().values()).to.eql(
+			[new Date(2012, 2, 28), new Date(2015, 2, 28)]		
+		);
+		expect(skipSeries.values()).to.eql([200, 5]);		
 	});
 });
