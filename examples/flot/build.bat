@@ -1,1 +1,1 @@
-browserify app.js -o app-compiled.js 
+browserify panjas.js -o panjas-compiled.js 

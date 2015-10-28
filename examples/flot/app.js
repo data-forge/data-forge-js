@@ -1,8 +1,5 @@
 'use strict'
 
-var panjas = require('../../index.js');
-var E = require('linq');
-
 $(function() {
 	
 	var series = [];
@@ -22,8 +19,5 @@ $(function() {
 	
 	//todo: plot the data frame		
 	
-	$.plot("#placeholder", [ series ]);
+	$.plot("#placeholder", [ dataFrame.series("Sin").rows(), dataFrame.series("Cos").rows() ]);
 });
-
-console.log('panjas');
-console.dir(panjas);
