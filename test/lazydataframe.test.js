@@ -57,107 +57,12 @@ describe('LazyDataFrame', function () {
 		]);		
 	});
 	
-	it('throws expection when pulling a non-existing column name', function () {
-		
-		expect(function () {
-			var lazyDataFrame = initExampleLazyDataFrame();
-			lazyDataFrame.series('non-existing column name');			
-		}).to.throw(Error).with.property('message').that.equals("In call to 'series' failed to find column with name 'non-existing column name'.");
-	});
-
-	it('can pull column as series', function () {
-		
-		var lazyDataFrame = initExampleLazyDataFrame();
-		var series1 = lazyDataFrame.series('Value1');
-		expect(series1.index().values()).to.eql([
-			new Date(1975, 24, 2),
-			new Date(2015, 24, 2)
-		]);
-		expect(series1.values()).to.eql(			[
-			100,
-			200,
-		]);		
-		
-		var series2 = lazyDataFrame.series('Value2');
-		expect(series2.index().values()).to.eql([
-			new Date(1975, 24, 2),
-			new Date(2015, 24, 2)
-		]);
-		expect(series2.values()).to.eql(			[
-			'foo',
-			'bar',
-		]);			
-		
-		var series3 = lazyDataFrame.series('Value3');
-		expect(series3.index().values()).to.eql([
-			new Date(1975, 24, 2),
-			new Date(2015, 24, 2)
-		]);
-		expect(series3.values()).to.eql(			[
-			11,
-			22,
-		]);		
-	});
-	
-	it('can pull column subset as new LazyDataFrame', function () 
-	{
-		var lazyDataFrame = initExampleLazyDataFrame();
-		var subsetLazyDataFrame = lazyDataFrame.subset(['Value3', 'Value1']);
-		expect(lazyDataFrame).not.to.equal(subsetLazyDataFrame); 
-		expect(subsetLazyDataFrame.index().values()).to.eql([
-			new Date(1975, 24, 2),
-			new Date(2015, 24, 2)
-		]);		
-		expect(subsetLazyDataFrame.values()).to.eql(			[
-			[11, 100],
-			[22, 200],
-		]);
-	});
-	
 	it('can bake lazy data frame', function () {
 		
 		var lazyDataFrame = initExampleLazyDataFrame();
 		var bakedDataFrame = lazyDataFrame.bake();
 		expect(lazyDataFrame).not.to.equal(bakedDataFrame)
 		expect(bakedDataFrame).to.be.an.instanceOf(panjas.DataFrame);		
-	});
-	
-	it('can output data frame', function () {
-		
-		var dataFrame = initExampleLazyDataFrame();
-		var dataSourceOptions = {};
-		var formatOptions = {};
-		var formattedText = "some-text";
-		var promise = {};
-
-		var dataFormatPlugin = {
-			to: function (outputDataFrame, options) {
-				expect(outputDataFrame).to.equal(dataFrame);
-				expect(options).to.equal(formatOptions);
-				return formattedText;				
-			},
-		};
-		
-		var dataSourcePlugin = {
-			write: function (textData, options) {
-				expect(textData).to.equal(formattedText);
-				expect(options).to.equal(dataSourceOptions);
-				return promise;				
-			},
-		};
-		
-		var result = dataFrame
-			.as(dataFormatPlugin, formatOptions)
-			.to(dataSourcePlugin, dataSourceOptions);
-		expect(result).to.equal(promise);
-	});
-	
-	it('can get rows', function () {
-		var dataFrame = initExampleLazyDataFrame();
-		expect(dataFrame.rows()).to.eql([
-				[new Date(1975, 24, 2), 100, 'foo', 11],
-				[new Date(2015, 24, 2), 200, 'bar', 22],
-		]);
 	});
 	
 });
