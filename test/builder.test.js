@@ -82,4 +82,40 @@ describe('builder', function () {
 		]);
 	});
 	
+	it('number columns are passed through as is', function () {
+		
+		var data = [
+			['Col1'],
+			[1],
+			[15],			
+		];
+		
+		var dataFrame = panjas.builder(data);
+		
+		expect(dataFrame).to.be.an.instanceof(panjas.DataFrame);
+		expect(dataFrame.values()).to.eql([
+			[1],
+			[15],			
+		]);
+	});
+
+	it('date columns are passed through as is', function () {
+		
+		var date1 = new Date(1975, 2, 24);
+		var date2 = new Date(2015, 10, 28);
+		
+		var data = [
+			['Col1'],
+			[date1],
+			[date2],			
+		];
+		
+		var dataFrame = panjas.builder(data);
+		
+		expect(dataFrame).to.be.an.instanceof(panjas.DataFrame);
+		expect(dataFrame.values()).to.eql([
+			[date1],
+			[date2],			
+		]);
+	});
 });
