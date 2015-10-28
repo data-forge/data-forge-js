@@ -1,10 +1,8 @@
 'use strict';
 
 // 
-// Base class for index classes.
+// Base class for series classes.
 //
-
-var LazySeries = require('./lazyseries');
 
 var assert = require('chai').assert; 
 var E = require('linq');
@@ -31,6 +29,8 @@ BaseSeries.prototype.rows = function () {
 // Skip a number of rows in the series.
 //
 BaseSeries.prototype.skip = function (numRows) {
+	var LazySeries = require('./lazyseries'); // Require here to prevent circular ref.
+	
 	var self = this;
 	return new LazySeries(
 		self.index().skip(numRows),

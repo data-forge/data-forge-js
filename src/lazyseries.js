@@ -4,8 +4,11 @@
 // Implements a time series data structure.
 //
 
+var BaseSeries = require('./baseseries');
+
 var assert = require('chai').assert;
 var E = require('linq');
+var inherit = require('./inherit');
 
 var LazySeries = function (index, valuesFn) {
 	assert.isObject(index, "Expected 'index' parameter to LazySeries constructor be an index object.");
@@ -15,6 +18,8 @@ var LazySeries = function (index, valuesFn) {
 	self._index = index;
 	self._valuesFn = valuesFn;	
 };
+
+var parent = inherit(LazySeries, BaseSeries);
 
 LazySeries.prototype.index = function () {
 	var self = this;
