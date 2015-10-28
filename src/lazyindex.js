@@ -4,8 +4,6 @@
 // A lazyily evaluated index.
 //
 
-//todo: test me
-
 var assert = require('chai').assert;
 var E = require('linq');
 var BaseIndex = require('./baseindex');

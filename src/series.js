@@ -4,8 +4,6 @@
 // Implements a time series data structure.
 //
 
-var LazySeries = require('./lazyseries');
-
 var assert = require('chai').assert;
 var E = require('linq');
 
@@ -34,35 +32,6 @@ Series.prototype.values = function () {
 Series.prototype.bake = function () {
 	var self = this;
 	return self;
-};
-
-//
-// Get all data as an array of arrays (includes index and values).
-//
-Series.prototype.rows = function () {
-	var self = this;
-	return E
-		.from(self._index.values())
-		.zip(self.values(), function (index, value) {
-			return [index, value];
-		})
-		.toArray();
-};
-
-//
-// Skip a number of rows in the series.
-//
-Series.prototype.skip = function (numRows) {
-	var self = this;
-	return new LazySeries(
-		self.index().skip(numRows),
-		function () {
-			return E
-				.from(self.values())
-				.skip(numRows)
-				.toArray();			
-		}
-	); 	
 };
 
 module.exports = Series;

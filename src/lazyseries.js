@@ -36,33 +36,4 @@ LazySeries.prototype.bake = function () {
 	return new Series(self._index, self.values());
 };
 
-//
-// Get all data as an array of arrays (includes index and values).
-//
-LazySeries.prototype.rows = function () {
-	var self = this;
-	return E
-		.from(self._index.values())
-		.zip(self.values(), function (index, value) {
-			return [index, value];
-		})
-		.toArray();
-};
-
-//
-// Skip a number of rows in the series.
-//
-LazySeries.prototype.skip = function (numRows) {
-	var self = this;
-	return new LazySeries(
-		self.index().skip(numRows),
-		function () {
-			return E
-				.from(self.values())
-				.skip(numRows)
-				.toArray();			
-		}
-	); 	
-};
-
 module.exports = LazySeries;

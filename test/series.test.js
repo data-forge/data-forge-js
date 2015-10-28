@@ -19,23 +19,6 @@ describe('Series', function () {
 		return new panjas.Series(index, values);		
 	};
 		
-	/* Can't really do this check, it will break lazy evaluation.
-	it('throws exception when index and values arrays do not have equal length', function () {
-		
-		expect(function () {
-			var index = [new Date(1975, 24, 2)];
-			var values = [100, 200];
-			new Series(index, values);			
-		}).to.throw();
-
-		expect(function () {
-			var index = [new Date(1975, 24, 2), new Date(1975, 24, 2)];
-			var values = [100];
-			new Series(index, values);			
-		}).to.throw();
-	});
-	*/
-	
 	it('can get series index', function () {
 		
 		var series = initExampleSeries();
@@ -60,20 +43,4 @@ describe('Series', function () {
 		expect(series.bake()).to.equal(series);
 	});
 
-	it('can get rows', function () {
-		var series = initExampleSeries();
-		expect(series.rows()).to.eql([
-				[new Date(1975, 2, 24), 100],
-				[new Date(2015, 2, 28), 200],
-		]);
-	});
-	
-	it('can skip', function () {
-		var series = initExampleSeries2();
-		var skipSeries = series.skip(2);		
-		expect(skipSeries.index().values()).to.eql(
-			[new Date(2012, 2, 28), new Date(2015, 2, 28)]		
-		);
-		expect(skipSeries.values()).to.eql([200, 5]);		
-	});
 });
