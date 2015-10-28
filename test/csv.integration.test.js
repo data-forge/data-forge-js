@@ -4,6 +4,7 @@ describe('csv.integration', function () {
 	
 	var panjas = require('../index.js');
 	var csv = require('../fmt/csv');
+	var file = require('../datasource/file');
 
 	var expect = require('chai').expect;
 	var fs = require('fs');
@@ -38,9 +39,13 @@ describe('csv.integration', function () {
 			"2015-10-23, 300, bar, 23"
 		);
 		
-		return panjas.from(csv, testFile, {
-				parse_dates: ['Date'],			
-			})
+		var csvOptions = {
+			parse_dates: ['Date'],			
+		};
+		
+		return panjas
+			.from(file, testFile)
+			.as(csv, csvOptions)
 			.then(function (dataFrame) {
 				expect(dataFrame.index().values()).to.eql([
 					0,
@@ -66,10 +71,14 @@ describe('csv.integration', function () {
 			"2015-10-23, 300, bar, 23"
 		);
 		
-		return panjas.from(csv, testFile, {
-				index_col: 'Date',
-				parse_dates: ['Date',],			
-			})
+		var csvOptions = {
+			index_col: 'Date',
+			parse_dates: ['Date',],			
+		};
+		
+		return panjas
+			.from(file, testFile)
+			.as(csv, csvOptions)
 			.then(function (dataFrame) {
 				var series1 = dataFrame.series('Value1');
 				expect(series1.index().values()).to.eql([
@@ -131,7 +140,9 @@ describe('csv.integration', function () {
 		
 		var testFile = 'test.csv';
 		var dataFrame = initExampleDataFrame();
-		dataFrame.to(csv, testFile)
+		dataFrame
+			.as(csv)
+			.to(file, testFile)
 			.then(function () {
 				var data = fs.readFileSync(testFile, 'utf8');
 				var loadedDataFrame = pj.from(csv, testFile, {

@@ -7,12 +7,21 @@ module.exports = {
 	//
 	// Read a DataFrame from a plugable source.
 	//
-	from: function (plugin, filePath, options) {
-		assert.isObject(plugin, "Expected 'plugin' parameter to 'panjas.from' to be an object.");
-		assert.isFunction(plugin.from, "Expected 'plugin' parameter to 'panjas.from' to be an object with a 'from' function.");
-		assert.isString(filePath, "Expected 'filePath' parameter to 'panjas.from' to be a string.");
+	from: function (dataSourcePlugin, sourceOptions) {
+		assert.isObject(dataSourcePlugin, "Expected 'dataSourcePlugin' parameter to 'panjas.from' to be an object.");
+		assert.isFunction(dataSourcePlugin.read, "Expected 'dataSourcePlugin' parameter to 'panjas.from' to be an object with a 'read' function.");
 		
-		return plugin.from(filePath, options);
+		return {
+			as: function (formatPlugin, formatOptions) {
+				assert.isObject(formatPlugin, "Expected 'formatPlugin' parameter to 'panjas.from' to be an object.");
+				assert.isFunction(formatPlugin.from, "Expected 'formatPlugin' parameter to 'panjas.from' to be an object with a 'from' function.");
+				
+				return dataSourcePlugin.read(sourceOptions)
+					.then(function (textData) {
+						return formatPlugin.from(textData, formatOptions);						
+					});		
+			},		
+		};
 	},
 	
 	DataFrame: require('./src/dataframe'),

@@ -125,20 +125,31 @@ describe('LazyDataFrame', function () {
 	it('can output data frame', function () {
 		
 		var dataFrame = initExampleLazyDataFrame();
-		var filePath = 'some-file';
-		var options = {};
+		var dataSourceOptions = {};
+		var formatOptions = {};
+		var formattedText = "some-text";
 		var promise = {};
-		
-		var plugin = {
-			to: function (outputDataFrame, outputFilePath, outputOptions) {
+
+		var dataFormatPlugin = {
+			to: function (outputDataFrame, options) {
 				expect(outputDataFrame).to.equal(dataFrame);
-				expect(outputFilePath).to.equal(filePath);
-				expect(outputOptions).to.equal(options);
+				expect(options).to.equal(formatOptions);
+				return formattedText;				
+			},
+		};
+		
+		var dataSourcePlugin = {
+			write: function (textData, options) {
+				expect(textData).to.equal(formattedText);
+				expect(options).to.equal(dataSourceOptions);
 				return promise;				
 			},
 		};
 		
-		expect(dataFrame.to(plugin, filePath, options)).to.equal(promise);
+		var result = dataFrame
+			.as(dataFormatPlugin, formatOptions)
+			.to(dataSourcePlugin, dataSourceOptions);
+		expect(result).to.equal(promise);
 	});
 	
 	it('can get rows', function () {

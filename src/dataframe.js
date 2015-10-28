@@ -123,13 +123,20 @@ DataFrame.prototype.rows = function () {
 //
 // Save the data frame via plugable output.
 //
-DataFrame.prototype.to = function (plugin, filePath, options) {
-	assert.isObject(plugin, "Expected 'plugin' parameter to 'DataFrame.to' to be an object.");
-	assert.isFunction(plugin.to, "Expected 'plugin' parameter to 'DataFrame.to' to be an object with a 'to' function.");
-	assert.isString(filePath, "Expected 'filePath' parameter to 'DataFrame.to' to be a string.");
+DataFrame.prototype.as = function (formatPlugin, formatOptions) {
+	assert.isObject(formatPlugin, "Expected 'formatPlugin' parameter to 'DataFrame.as' to be an object.");
+	assert.isFunction(formatPlugin.to, "Expected 'formatPlugin' parameter to 'DataFrame.as' to be an object with a 'to' function.");
 
-	var self = this;
-	return plugin.to(self, filePath, options);	
+	var self = this;	
+	return {
+		to: function (dataSourcePlugin, dataSourceOptions) {
+			assert.isObject(dataSourcePlugin, "Expected 'dataSourcePlugin' parameter to 'DataFrame.as.to' to be an object.");
+			assert.isFunction(dataSourcePlugin.write, "Expected 'dataSourcePlugin' parameter to 'DataFrame.as.to' to be an object with a 'write' function.");
+			
+			var textData = formatPlugin.to(self, formatOptions);
+			return dataSourcePlugin.write(textData, dataSourceOptions);		
+		},		
+	};
 };
 
 module.exports = DataFrame;
