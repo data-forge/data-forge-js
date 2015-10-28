@@ -21,4 +21,5 @@ module.exports = {
 	LazySeries: require('./src/lazyseries'),
 	DateIndex: require('./src/dateindex'),
 	NumberIndex: require('./src/numberindex'),
+	builder: require('./src/builder'),
 };
