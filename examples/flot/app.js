@@ -8,7 +8,10 @@ $(function() {
 	var plot = function (id, dataFrame) {
 		var flotSeries = E.from(dataFrame.columns())
 			.select(function (columnName) {
-				return dataFrame.series(columnName).rows();
+				return {
+					label: columnName,
+					data: dataFrame.series(columnName).rows(),
+				};
 			})
 			.toArray()
 		
