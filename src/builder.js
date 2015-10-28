@@ -9,14 +9,75 @@ var DataFrame = require('./dataframe');
 var NumberIndex = require('./numberindex');
 
 var E = require('linq');
+var moment = require('moment');
+
+//
+// http://pietschsoft.com/post/2008/01/14/javascript-inttryparse-equivalent
+//
+function tryParseInt(str, defaultValue) {
+     var retValue = defaultValue;
+     if(str !== null) {
+         if(str.length > 0) {
+             if (!isNaN(str)) {
+                 retValue = parseInt(str);
+             }
+         }
+     }
+     return retValue;
+}
 
 module.exports = function (rows, options) {
+	
+	if (!options) {
+		options = {};
+	}
+	if (!options.parse_dates) {
+		options.parse_dates = [];		
+	}
 	
 	var columnNames = rows[0];
 	var values = E 
 		.from(rows)
 		.skip(1) // Skip header.
 		.toArray();	
+		
+	var parseDates = E
+		.from(columnNames)
+		.select(function (columnName) {
+			return options.parse_dates.indexOf(columnName) >= 0;
+		})	
+		.toArray();				
+	var values = E 
+		.from(rows)
+		.skip(1) // Skip header.
+		.select(function (row) {
+			return E
+				.from(row)
+				.select(function (col) { // Auto-parse numbers.
+					var val = tryParseInt(col, null);
+					if (val == null) {
+						return col;
+					}
+					else {
+						return val;
+					}					
+				})
+				.toArray();					
+		})
+		.select(function (row) { // Parse requested dates.
+			var out = [];
+			for (var i = 0; i < row.length; ++i) {
+				if (parseDates[i]) {
+					out.push(moment(row[i]).toDate());	
+				}
+				else {
+					out.push(row[i]);
+				}						
+			} 			
+			return out;			
+		})
+		.toArray();	
+		
 	var index = new NumberIndex(E.range(0, values.length).toArray());
 	return new DataFrame(columnNames, index, values); 
 };
