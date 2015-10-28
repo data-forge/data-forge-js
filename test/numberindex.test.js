@@ -23,17 +23,4 @@ describe('NumberIndex', function () {
 		);
 	});
 	
-	it('can skip', function () {
-		var dateIndex = new panjas.NumberIndex(
-			[
-				101,
-				532,
-				30,
-				50			
-			]
-		);
-		
-		var skipIndex = dateIndex.skip(2);		
-		expect(skipIndex.values()).to.eql([30, 50]);
-	});	
 });
