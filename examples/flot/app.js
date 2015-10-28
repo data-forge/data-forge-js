@@ -2,6 +2,22 @@
 
 $(function() {
 	
+	//
+	// Helper function for plotting.
+	//
+	var plot = function (id, dataFrame) {
+		var flotSeries = E.from(dataFrame.columns())
+			.select(function (columnName) {
+				return dataFrame.series(columnName).rows();
+			})
+			.toArray()
+		
+		$.plot(id, flotSeries);
+	};
+	
+	// 
+	// Create a data frame.
+	//
 	var series = [];
 	for (var i = 0; i < 14; i += 0.5) {
 		series.push([i, Math.sin(i)]);
@@ -17,7 +33,8 @@ $(function() {
 
 	var dataFrame = new panjas.DataFrame(["Sin", "Cos"], index, values);
 	
-	//todo: plot the data frame		
-	
-	$.plot("#placeholder", [ dataFrame.series("Sin").rows(), dataFrame.series("Cos").rows() ]);
+	//
+	// Plot the data frame.
+	//
+	plot('#placeholder', dataFrame);
 });
