@@ -8,7 +8,7 @@ describe('Series', function () {
 	var expect = require('chai').expect; 
 	
 	var initExampleSeries = function () {
-		var index = new panjas.DateIndex([new Date(1975, 24, 2), new Date(1975, 24, 2)]);
+		var index = new panjas.DateIndex([new Date(1975, 2, 24), new Date(2015, 2, 28)]);
 		var values = [100, 200];
 		return new panjas.Series(index, values);		
 	};
@@ -32,10 +32,10 @@ describe('Series', function () {
 	
 	it('can get series index', function () {
 		
-		var series = initExampleSeries();		
+		var series = initExampleSeries();
 		expect(series.index().values()).to.eql([			
-			new Date(1975, 24, 2),
-			new Date(1975, 24, 2)			
+			new Date(1975, 2, 24),
+			new Date(2015, 2, 28)
 		]);		
 	});
 	
@@ -52,5 +52,13 @@ describe('Series', function () {
 		
 		var series = initExampleSeries();
 		expect(series.bake()).to.equal(series);
+	});
+
+	it('can get rows', function () {
+		var series = initExampleSeries();
+		expect(series.rows()).to.eql([
+				[new Date(1975, 2, 24), 100],
+				[new Date(2015, 2, 28), 200],
+		]);
 	});
 });

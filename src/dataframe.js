@@ -108,6 +108,19 @@ DataFrame.prototype.bake = function () {
 };
 
 //
+// Get all data as an array of arrays (includes index and values).
+//
+DataFrame.prototype.rows = function () {
+	var self = this;
+	return E
+		.from(self._index.values())
+		.zip(self.values(), function (index, values) {
+			return [index].concat(values);
+		})
+		.toArray();
+};
+
+//
 // Save the data frame via plugable output.
 //
 DataFrame.prototype.to = function (plugin, filePath, options) {

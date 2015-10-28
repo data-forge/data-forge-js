@@ -119,4 +119,17 @@ LazyDataFrame.prototype.to = function (plugin, filePath, options) {
 	return plugin.to(self, filePath, options);	
 };
 
+//
+// Get all data as an array of arrays (includes index and values).
+//
+LazyDataFrame.prototype.rows = function () {
+	var self = this;
+	return E
+		.from(self._index.values())
+		.zip(self.values(), function (index, values) {
+			return [index].concat(values);
+		})
+		.toArray();
+};
+
 module.exports = LazyDataFrame;

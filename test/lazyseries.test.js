@@ -8,7 +8,7 @@ describe('LazySeries', function () {
 	var expect = require('chai').expect; 
 	
 	var initExampleSeries = function () {
-		var index = new panjas.DateIndex([new Date(1975, 24, 2), new Date(1975, 24, 2)]);
+		var index = new panjas.DateIndex([new Date(1975, 2, 24), new Date(2015, 2, 28)]);
 		var valuesFn = function () {
 			return [100, 200];
 		};
@@ -36,8 +36,8 @@ describe('LazySeries', function () {
 		
 		var series = initExampleSeries();		
 		expect(series.index().values()).to.eql([			
-			new Date(1975, 24, 2),
-			new Date(1975, 24, 2)			
+			new Date(1975, 2, 24),
+			new Date(2015, 2, 28)			
 		]);		
 	});
 	
@@ -56,5 +56,13 @@ describe('LazySeries', function () {
 		var bakedSeries = lazySeries.bake();
 		expect(lazySeries).not.to.equal(bakedSeries)
 		expect(bakedSeries).to.be.an.instanceOf(panjas.Series);		
+	});
+
+	it('can get rows', function () {
+		var series = initExampleSeries();
+		expect(series.rows()).to.eql([
+				[new Date(1975, 2, 24), 100],
+				[new Date(2015, 2, 28), 200],
+		]);
 	});
 });

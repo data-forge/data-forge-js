@@ -140,4 +140,13 @@ describe('LazyDataFrame', function () {
 		
 		expect(dataFrame.to(plugin, filePath, options)).to.equal(promise);
 	});
+	
+	it('can get rows', function () {
+		var dataFrame = initExampleLazyDataFrame();
+		expect(dataFrame.rows()).to.eql([
+				[new Date(1975, 24, 2), 100, 'foo', 11],
+				[new Date(2015, 24, 2), 200, 'bar', 22],
+		]);
+	});
+	
 });
