@@ -118,7 +118,7 @@ module.exports = {
 							.toArray()
 					);
 					
-					// Pull the index column out of the values.
+					// Remove the index column from the column names.
 					columnNames = E
 						.from(columnNames)
 						.take(indexColIndex)
@@ -127,6 +127,7 @@ module.exports = {
 						)
 						.toArray();
 					
+					// Remove the index column from the values.
 					values = E.from(values)
 						.select(function (row) {
 							return E

@@ -7,9 +7,11 @@
 
 var DataFrame = require('./dataframe');
 var NumberIndex = require('./numberindex');
+var DateIndex = require('./dateindex');
 
 var E = require('linq');
 var moment = require('moment');
+require('sugar');
 
 //
 // http://pietschsoft.com/post/2008/01/14/javascript-inttryparse-equivalent
@@ -78,6 +80,59 @@ module.exports = function (rows, options) {
 		})
 		.toArray();	
 		
-	var index = new NumberIndex(E.range(0, values.length).toArray());
-	return new DataFrame(columnNames, index, values); 
+		var index = null;
+		
+		if (options.index_col) {
+			var indexColIndex = columnNames.indexOf(options.index_col);
+			if (indexColIndex < 0) {
+				//todo: test error condition.
+				throw new Error("Index column '" + options.index_col + "' doesn't exist in columns: " + columnNames.join(', '));
+			}
+
+			// Extract index column from data.
+			var indexValues = E
+				.from(values)
+				.select(function (row) {
+					return row[indexColIndex];
+				})
+				.toArray()
+			
+			if (Object.isDate(indexValues[0])) {
+				index = new DateIndex(indexValues);
+			}
+			else if (Object.isNumber(indexValues[0])) {
+				index = new NumberIndex(indexValues);
+			}
+			else {
+				//todo: throw excetpoin.
+			}
+			
+			// Remove the index column from the column names.
+			columnNames = E
+				.from(columnNames)
+				.take(indexColIndex)
+				.concat(
+					E.from(columnNames).skip(indexColIndex+1)
+				)
+				.toArray();
+			
+			// Remove the index column from the values.
+			values = E.from(values)
+				.select(function (row) {
+					return E
+						.from(row)
+						.take(indexColIndex)
+						.concat(
+							E.from(row).skip(indexColIndex+1)
+						)
+						.toArray();
+				}) 
+				.toArray();					 
+		}
+		else {
+			//todo: this could be a LazyNumberIndex based on a range.
+			index = new NumberIndex(E.range(0, values.length).toArray());
+		}
+		
+		return new DataFrame(columnNames, index, values); 
 };
