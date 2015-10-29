@@ -9,17 +9,21 @@ describe('LazyDataFrame', function () {
 	
 	var initExampleLazyDataFrame = function () {
 		return new panjas.LazyDataFrame(
-			[
-				"Value1",
-				"Value2",
-				"Value3",
-			],
-			new panjas.DateIndex(			
-				[
-					new Date(1975, 24, 2),
-					new Date(2015, 24, 2),
-				]
-			),
+			function () {
+				return [
+					"Value1",
+					"Value2",
+					"Value3",
+				];
+			},
+			function () {
+				return new panjas.DateIndex(			
+					[
+						new Date(1975, 24, 2),
+						new Date(2015, 24, 2),
+					]
+				);
+			},
 			function () {
 				return [
 					[100, 'foo', 11],

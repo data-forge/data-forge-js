@@ -43,16 +43,18 @@ BaseDataFrame.prototype.series = function (columnName) {
 		throw new Error("In call to 'series' failed to find column with name '" + columnName + "'.");
 	}
 	
-	// Extract values for the column.
-	var valuesFn = function () {
-		return E.from(self.values())
-			.select(function (entry) {
-				return entry[columnIndex];
-			})
-			.toArray();
-	};
-	
-	return new LazySeries(self.index(), valuesFn);
+	return new LazySeries(
+		function () {
+			return self.index()
+		},
+		function () {
+			return E.from(self.values())
+				.select(function (entry) {
+					return entry[columnIndex];
+				})
+				.toArray();
+		}
+	);
 };
 
 //
@@ -65,25 +67,31 @@ BaseDataFrame.prototype.subset = function (columnNames) {
 	
 	assert.isArray(columnNames, "Expected 'columnName' parameter to 'subset' to be an array.");	
 	
-	var columnIndices = E.from(columnNames)
-		.select(function (columnName) {
-			return self._columnNameToIndex(columnName);
-		})
-		.toArray();
-
-	var valuesFn = function () {
-		return E.from(self.values())
-			.select(function (entry) {
-				return E.from(columnIndices)
-					.select(function (columnIndex) {
-						return entry[columnIndex];					
-					})
-					.toArray();
-			})
-			.toArray();
-	};
-	
-	return new LazyDataFrame(columnNames, self.index(), valuesFn);	 
+	return new LazyDataFrame(
+		function () {
+			return columnNames; 
+		},
+		function () {
+			return self.index();	
+		}, 
+		function () {
+			var columnIndices = E.from(columnNames)
+				.select(function (columnName) {
+					return self._columnNameToIndex(columnName);
+				})
+				.toArray();
+			
+			return E.from(self.values())
+				.select(function (entry) {
+					return E.from(columnIndices)
+						.select(function (columnIndex) {
+							return entry[columnIndex];					
+						})
+						.toArray();
+				})
+				.toArray();
+		}
+	);	 
 };
 
 //
@@ -117,6 +125,7 @@ BaseDataFrame.prototype.as = function (formatPlugin, formatOptions) {
 		},		
 	};
 };
+
 //
 // Interface functions.
 //

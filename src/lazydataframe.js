@@ -11,14 +11,14 @@ var assert = require('chai').assert;
 var E = require('linq');
 var inherit = require('./inherit');
 
-var LazyDataFrame = function (columnNames, index, valuesFn) {
-	assert.isArray(columnNames, "Expected 'columnNames' parameter to LazyDataFrame constructor to be an array.");
-	assert.isObject(index, "Expected 'index' parameter to LazyDataFrame constructor be an index object.");
+var LazyDataFrame = function (columnNamesFn, indexFn, valuesFn) {
+	assert.isFunction(columnNamesFn, "Expected 'columnNamesFn' parameter to LazyDataFrame constructor to be a function.");
+	assert.isFunction(indexFn, "Expected 'indexFn' parameter to LazyDataFrame constructor to be a function.");
 	assert.isFunction(valuesFn, "Expected 'values' parameter to LazyDataFrame constructor to be a function.");
 	
 	var self = this;
-	self._columnNames = columnNames;
-	self._index = index;
+	self._columnNamesFn = columnNamesFn;
+	self._indexFn = indexFn;
 	self._valuesFn = valuesFn;	
 };
 
@@ -26,12 +26,12 @@ var parent = inherit(LazyDataFrame, BaseDataFrame);
 
 LazyDataFrame.prototype.index = function () {
 	var self = this;
-	return self._index;	
+	return self._indexFn();	
 };
 
 LazyDataFrame.prototype.columns = function () {
 	var self = this;
-	return self._columnNames;
+	return self._columnNamesFn();
 };
 
 LazyDataFrame.prototype.values = function () {
@@ -46,7 +46,7 @@ LazyDataFrame.prototype.bake = function () {
 	var DataFrame = require('./dataframe'); // Local require, to prevent circular reference.
 	
 	var self = this;
-	return new DataFrame(self._columnNames,	self._index, self.values());
+	return new DataFrame(self.columns(), self.index(), self.values());
 };
 
 module.exports = LazyDataFrame;

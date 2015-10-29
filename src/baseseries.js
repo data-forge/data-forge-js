@@ -39,7 +39,9 @@ BaseSeries.prototype.skip = function (numRows) {
 	
 	var self = this;
 	return new LazySeries(
-		self.index().skip(numRows),
+		function () {
+			return self.index().skip(numRows);	
+		},		
 		function () {
 			return E
 				.from(self.values())

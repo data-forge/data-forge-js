@@ -8,19 +8,23 @@ describe('LazySeries', function () {
 	var expect = require('chai').expect; 
 	
 	var initExampleSeries = function () {
-		var index = new panjas.DateIndex([new Date(1975, 2, 24), new Date(2015, 2, 28)]);
+		var indexFn = function () {
+			return new panjas.DateIndex([new Date(1975, 2, 24), new Date(2015, 2, 28)]);
+		};
 		var valuesFn = function () {
 			return [100, 200];
 		};
-		return new panjas.LazySeries(index, valuesFn);		
+		return new panjas.LazySeries(indexFn, valuesFn);		
 	};
 	
 	var initExampleSeries2 = function () {
-		var index = new panjas.DateIndex([new Date(1975, 2, 24), new Date(2011, 2, 28), new Date(2012, 2, 28), new Date(2015, 2, 28)]);
+		var indexFn = function () {
+			return new panjas.DateIndex([new Date(1975, 2, 24), new Date(2011, 2, 28), new Date(2012, 2, 28), new Date(2015, 2, 28)]);
+		};
 		var valuesFn = function () {
 			return [100, 300, 200, 5];
 		};
-		return new panjas.LazySeries(index, valuesFn);		
+		return new panjas.LazySeries(indexFn, valuesFn);		
 	};
 	
 	
