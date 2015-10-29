@@ -54,7 +54,7 @@ BaseSeries.prototype.skip = function (numRows) {
 /**
  * Orders a series based on values in asscending order.
  */
-BaseSeries.prototype.orderAscending = function () {
+BaseSeries.prototype.order = function () {
 	var LazySeries = require('./lazyseries'); // Require here to prevent circular ref.
 	var LazyIndex = require('./lazyindex'); // Require here to prevent circular ref.
 	

@@ -54,7 +54,7 @@ describe('BaseSeries', function () {
 	it('can sort values ascending', function () {
 		
 		var series = initExampleSeries2();
-		var sorted = series.orderAscending();
+		var sorted = series.order();
 		expect(sorted.index().values()).to.eql([
 			new Date(2015, 2, 28),
 			new Date(1975, 2, 24),
