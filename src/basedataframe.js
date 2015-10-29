@@ -127,12 +127,11 @@ BaseDataFrame.prototype.as = function (formatPlugin, formatOptions) {
 };
 
 /**
- * Sorts a data frame based on a single column or list of columns.
+ * Sorts a data frame based on a single column (ascending). 
  * 
  * @param {string|array} columnName - Column to sort by.
- * @param {bool|array} [descending] - Pass true to sort descending or false (the default) to sort ascending. 
  */
-BaseDataFrame.prototype.orderBy = function (columnName, descending) {
+BaseDataFrame.prototype.orderBy = function (columnName) {
 	
 	var self = this;
 	
@@ -144,22 +143,55 @@ BaseDataFrame.prototype.orderBy = function (columnName, descending) {
 		throw new Error("In call to 'series' failed to find column with name '" + columnName + "'.");
 	}
 	
-	var sorted; 
+	var sorted = E.from(self.rows())
+		.orderBy(function (row) {
+			return row[columnIndex+1];			
+		})
+		.toArray();
+		
+	var newIndex = E.from(sorted)
+		.select(function (row) {
+			return row[0];
+		})
+		.toArray();
+		
+	var newValues = E.from(sorted)
+		.select(function (row) {
+			return E.from(row).skip(1).toArray();
+		})
+		.toArray();
+		
+	return new DataFrame( //todo: this should be lazy
+		self.columns(),
+		new LazyIndex(function () {
+			return newIndex;
+		}),
+		newValues
+	);
+};
+
+/**
+ * Sorts a data frame based on a single column (descending). 
+ * 
+ * @param {string|array} columnName - Column to sort by.
+ */
+BaseDataFrame.prototype.orderByDescending = function (columnName) {
 	
-	if (descending) {
-		sorted = E.from(self.rows())
-			.orderByDescending(function (row) {
-				return row[columnIndex+1];			
-			})
-			.toArray();
+	var self = this;
+	
+	var DataFrame = require('./dataframe');
+	var LazyIndex = require('./lazyindex');
+	
+	var columnIndex = self._columnNameToIndex(columnName);
+	if (columnIndex < 0) {
+		throw new Error("In call to 'series' failed to find column with name '" + columnName + "'.");
 	}
-	else {
-		sorted = E.from(self.rows())
-			.orderBy(function (row) {
-				return row[columnIndex+1];			
-			})
-			.toArray();
-	}
+	
+	var sorted = E.from(self.rows())
+		.orderByDescending(function (row) {
+			return row[columnIndex+1];			
+		})
+		.toArray();
 		
 	var newIndex = E.from(sorted)
 		.select(function (row) {

@@ -188,7 +188,7 @@ describe('BaseDataFrame', function () {
 	it('can sort by single column descending', function () {
 		
 		var dataFrame = initExampleDataFrame2();
-		var sorted = dataFrame.orderBy('Value3', true);
+		var sorted = dataFrame.orderByDescending('Value3', true);
 		expect(sorted.rows()).to.eql([
 			[new Date(2013, 24, 2),20, 'c', 22],
 			[new Date(2015, 24, 2),100, 'd', 4],
