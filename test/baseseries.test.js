@@ -50,4 +50,43 @@ describe('BaseSeries', function () {
 		);
 		expect(skipSeries.values()).to.eql([200, 5]);		
 	});
+
+	it('can sort values ascending', function () {
+		
+		var series = initExampleSeries2();
+		var sorted = series.sort(false);
+		expect(sorted.index().values()).to.eql([
+			new Date(2015, 2, 28),
+			new Date(1975, 2, 24),
+			new Date(2012, 2, 28),
+			new Date(2011, 2, 28)			
+		]);
+		expect(sorted.values()).to.eql([5, 100, 200, 300]);
+	});
+	
+	it('sort defaults to ascending', function () {
+		
+		var series = initExampleSeries2();
+		var sorted = series.sort();
+		expect(sorted.index().values()).to.eql([
+			new Date(2015, 2, 28),
+			new Date(1975, 2, 24),
+			new Date(2012, 2, 28),
+			new Date(2011, 2, 28)			
+		]);
+		expect(sorted.values()).to.eql([5, 100, 200, 300]);
+	});
+	
+	it('can sort values descending', function () {
+		
+		var series = initExampleSeries2();
+		var sorted = series.sort(true);
+		expect(sorted.index().values()).to.eql([
+			new Date(2011, 2, 28),
+			new Date(2012, 2, 28),
+			new Date(1975, 2, 24),
+			new Date(2015, 2, 28),		
+		]);
+		expect(sorted.values()).to.eql([300, 200, 100, 5]);
+	});
 });
