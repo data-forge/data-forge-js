@@ -51,16 +51,15 @@ BaseSeries.prototype.skip = function (numRows) {
 	); 	
 };
 
-/**
- * Orders a series based on values in asscending order.
- */
-BaseSeries.prototype.order = function () {
+//
+// Orders a series based on values in asscending order.
+//
+var order = function (self, sortMethod) {
 	var LazySeries = require('./lazyseries'); // Require here to prevent circular ref.
 	var LazyIndex = require('./lazyindex'); // Require here to prevent circular ref.
 	
 	//todo: would be nice to sort both arrays independently.
 	
-	var self = this;
 	var cachedSorted = null;
 	
 	var sorted = function () {
@@ -69,7 +68,7 @@ BaseSeries.prototype.order = function () {
 				.zip(E.from(self.values()), function (index, value) {
 					return [index, value];
 				})
-				.orderBy(function (pair) {
+				[sortMethod](function (pair) {
 					return pair[1];
 				})
 				.toArray();
@@ -100,58 +99,24 @@ BaseSeries.prototype.order = function () {
 			
 		}
 	);
-}
+};
+
+
+/**
+ * Orders a series based on values in asscending order.
+ */
+BaseSeries.prototype.order = function () {
+	var self = this;
+	return order(self, 'orderBy');
+};
 
 /**
  * Orders a series based on values in descending order.
  */
 BaseSeries.prototype.orderDescending = function () {
-	var LazySeries = require('./lazyseries'); // Require here to prevent circular ref.
-	var LazyIndex = require('./lazyindex'); // Require here to prevent circular ref.
-	
-	//todo: would be nice to sort both arrays independently.
-	
 	var self = this;
-	var cachedSorted = null;
-	
-	var sorted = function () {
-		if (!cachedSorted) {
-			cachedSorted = E.from(self.index().values())
-				.zip(E.from(self.values()), function (index, value) {
-					return [index, value];
-				})
-				.orderByDescending(function (pair) {
-					return pair[1];
-				})
-				.toArray();		
-		}
-		
-		return cachedSorted;
-	}
-	
-	return new LazySeries(
-		function () {
-			return new LazyIndex(
-				function () {
-					return E.from(sorted())
-						.select(function (row) {
-							return row[0];
-						})
-						.toArray();
-					
-				}				
-			);
-		},
-		function () {
-			return E.from(sorted())
-				.select(function (row) {
-					return row[1];
-				})
-				.toArray();
-			
-		}
-	);
-}
+	return order(self, 'orderByDescending');
+};
 
 // Interface functions.
 //
