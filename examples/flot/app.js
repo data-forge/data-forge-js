@@ -13,7 +13,7 @@ $(function() {
 					data: dataFrame.series(columnName).rows(),
 				};
 			})
-			.toArray()
+			.toArray();
 		
 		$.plot(id, flotSeries);
 	};
@@ -21,11 +21,6 @@ $(function() {
 	// 
 	// Create a data frame.
 	//
-	var series = [];
-	for (var i = 0; i < 14; i += 0.5) {
-		series.push([i, Math.sin(i)]);
-	}
-	
 	var index = new panjas.NumberIndex(E.range(0, 14).toArray());
 	var values = E
 		.range(0, 14)
