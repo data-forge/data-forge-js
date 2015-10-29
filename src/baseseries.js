@@ -52,11 +52,9 @@ BaseSeries.prototype.skip = function (numRows) {
 };
 
 /**
- * Sorts a series based on the values.
- * 
- * @param {bool|array} [descending] - true to sort descending, false to sort ascending. Default to ascending. 
+ * Orders a series based on values in asscending order.
  */
-BaseSeries.prototype.sort = function (descending) {
+BaseSeries.prototype.orderAscending = function () {
 	var LazySeries = require('./lazyseries'); // Require here to prevent circular ref.
 	var LazyIndex = require('./lazyindex'); // Require here to prevent circular ref.
 	
@@ -67,26 +65,14 @@ BaseSeries.prototype.sort = function (descending) {
 	
 	var sorted = function () {
 		if (!cachedSorted) {
-			if (descending) {
-				cachedSorted = E.from(self.index().values())
-					.zip(E.from(self.values()), function (index, value) {
-						return [index, value];
-					})
-					.orderByDescending(function (pair) {
-						return pair[1];
-					})
-					.toArray();		
-			}
-			else {
-				cachedSorted = E.from(self.index().values())
-					.zip(E.from(self.values()), function (index, value) {
-						return [index, value];
-					})
-					.orderBy(function (pair) {
-						return pair[1];
-					})
-					.toArray();
-			}
+			cachedSorted = E.from(self.index().values())
+				.zip(E.from(self.values()), function (index, value) {
+					return [index, value];
+				})
+				.orderBy(function (pair) {
+					return pair[1];
+				})
+				.toArray();
 		}
 		
 		return cachedSorted;
@@ -116,6 +102,56 @@ BaseSeries.prototype.sort = function (descending) {
 	);
 }
 
+/**
+ * Orders a series based on values in descending order.
+ */
+BaseSeries.prototype.orderDescending = function () {
+	var LazySeries = require('./lazyseries'); // Require here to prevent circular ref.
+	var LazyIndex = require('./lazyindex'); // Require here to prevent circular ref.
+	
+	//todo: would be nice to sort both arrays independently.
+	
+	var self = this;
+	var cachedSorted = null;
+	
+	var sorted = function () {
+		if (!cachedSorted) {
+			cachedSorted = E.from(self.index().values())
+				.zip(E.from(self.values()), function (index, value) {
+					return [index, value];
+				})
+				.orderByDescending(function (pair) {
+					return pair[1];
+				})
+				.toArray();		
+		}
+		
+		return cachedSorted;
+	}
+	
+	return new LazySeries(
+		function () {
+			return new LazyIndex(
+				function () {
+					return E.from(sorted())
+						.select(function (row) {
+							return row[0];
+						})
+						.toArray();
+					
+				}				
+			);
+		},
+		function () {
+			return E.from(sorted())
+				.select(function (row) {
+					return row[1];
+				})
+				.toArray();
+			
+		}
+	);
+}
 
 // Interface functions.
 //
