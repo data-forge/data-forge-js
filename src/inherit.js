@@ -4,7 +4,7 @@
 // http://oli.me.uk/2013/06/01/prototypical-inheritance-done-right/
 //
 
-/**
+/*
  * Extends one class with another.
  *
  * @param {Function} destination The class that should be inheriting things.
@@ -16,5 +16,6 @@ function inherit(destination, source) {
     destination.prototype.constructor = destination;
     return source.prototype;
 }
+
 
 module.exports = inherit;
