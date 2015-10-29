@@ -126,14 +126,10 @@ BaseDataFrame.prototype.as = function (formatPlugin, formatOptions) {
 	};
 };
 
-/**
- * Sorts a data frame based on a single column (ascending). 
- * 
- * @param {string|array} columnName - Column to sort by.
- */
-BaseDataFrame.prototype.orderBy = function (columnName) {
-	
-	var self = this;
+//
+// Order by values in a partcular column, either ascending or descending
+//
+var orderBy = function (self, sortMethod, columnName) {
 	
 	var LazyDataFrame = require('./lazydataframe');
 	var LazyIndex = require('./lazyindex');
@@ -151,7 +147,7 @@ BaseDataFrame.prototype.orderBy = function (columnName) {
 		}
 		
 		cachedSorted = E.from(self.rows())
-			.orderBy(function (row) {
+			[sortMethod](function (row) {
 				return row[columnIndex+1];			
 			})
 			.toArray();
@@ -181,6 +177,18 @@ BaseDataFrame.prototype.orderBy = function (columnName) {
 	);
 };
 
+
+/**
+ * Sorts a data frame based on a single column (ascending). 
+ * 
+ * @param {string|array} columnName - Column to sort by.
+ */
+BaseDataFrame.prototype.orderBy = function (columnName) {
+	
+	var self = this;
+	return orderBy(self, 'orderBy', columnName);
+};
+
 /**
  * Sorts a data frame based on a single column (descending). 
  * 
@@ -189,40 +197,7 @@ BaseDataFrame.prototype.orderBy = function (columnName) {
 BaseDataFrame.prototype.orderByDescending = function (columnName) {
 	
 	var self = this;
-	
-	var DataFrame = require('./dataframe');
-	var LazyIndex = require('./lazyindex');
-	
-	var columnIndex = self._columnNameToIndex(columnName);
-	if (columnIndex < 0) {
-		throw new Error("In call to 'series' failed to find column with name '" + columnName + "'.");
-	}
-	
-	var sorted = E.from(self.rows())
-		.orderByDescending(function (row) {
-			return row[columnIndex+1];			
-		})
-		.toArray();
-		
-	var newIndex = E.from(sorted)
-		.select(function (row) {
-			return row[0];
-		})
-		.toArray();
-		
-	var newValues = E.from(sorted)
-		.select(function (row) {
-			return E.from(row).skip(1).toArray();
-		})
-		.toArray();
-		
-	return new DataFrame( //todo: this should be lazy
-		self.columns(),
-		new LazyIndex(function () {
-			return newIndex;
-		}),
-		newValues
-	);
+	return orderBy(self, 'orderByDescending', columnName);
 };
 
 //
