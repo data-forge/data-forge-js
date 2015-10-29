@@ -135,7 +135,7 @@ BaseDataFrame.prototype.orderBy = function (columnName) {
 	
 	var self = this;
 	
-	var DataFrame = require('./dataframe');
+	var LazyDataFrame = require('./lazydataframe');
 	var LazyIndex = require('./lazyindex');
 	
 	var columnIndex = self._columnNameToIndex(columnName);
@@ -143,30 +143,41 @@ BaseDataFrame.prototype.orderBy = function (columnName) {
 		throw new Error("In call to 'series' failed to find column with name '" + columnName + "'.");
 	}
 	
-	var sorted = E.from(self.rows())
-		.orderBy(function (row) {
-			return row[columnIndex+1];			
-		})
-		.toArray();
+	var cachedSorted = null;
+	
+	var sorted = function () {
+		if (cachedSorted) {
+			return cachedSorted;
+		}
 		
-	var newIndex = E.from(sorted)
-		.select(function (row) {
-			return row[0];
-		})
-		.toArray();
+		cachedSorted = E.from(self.rows())
+			.orderBy(function (row) {
+				return row[columnIndex+1];			
+			})
+			.toArray();
+		return cachedSorted;
+	};
 		
-	var newValues = E.from(sorted)
-		.select(function (row) {
-			return E.from(row).skip(1).toArray();
-		})
-		.toArray();
-		
-	return new DataFrame( //todo: this should be lazy
-		self.columns(),
-		new LazyIndex(function () {
-			return newIndex;
-		}),
-		newValues
+	return new LazyDataFrame(
+		function () {
+			return self.columns();
+		},
+		function () {
+			return new LazyIndex(function () {
+				return E.from(sorted())
+					.select(function (row) {
+						return row[0];
+					})
+					.toArray();
+			});		
+		},
+		function () {
+			return E.from(sorted())
+				.select(function (row) {
+					return E.from(row).skip(1).toArray();
+				})
+				.toArray();	
+		}		
 	);
 };
 
