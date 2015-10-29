@@ -34,6 +34,36 @@ describe('BaseDataFrame', function () {
 		return dataFrame;
 	}; 
 
+	var initExampleDataFrame2 = function () {
+		var dataFrame = new BaseDataFrame();
+		dataFrame.columns = function () {
+			return [
+				"Value1",
+				"Value2",
+				"Value3",
+			]; 
+		};
+		dataFrame.index = function () {
+			return new panjas.DateIndex(
+				[
+					new Date(1975, 24, 2),
+					new Date(2011, 24, 2),
+					new Date(2013, 24, 2),
+					new Date(2015, 24, 2),
+				]
+			);			
+		};
+		dataFrame.values = function () {
+			return [
+				[200, 'b', 1],
+				[300, 'c', 3],
+				[20, 'c', 22],
+				[100, 'd', 4],
+			];
+		};
+		return dataFrame;
+	}; 
+	
 	it('throws expection when pulling a non-existing column name', function () {
 		
 		expect(function () {
@@ -129,4 +159,55 @@ describe('BaseDataFrame', function () {
 		]);
 	});
 	
+	it('can sort by single column ascending', function () {
+		
+		var dataFrame = initExampleDataFrame2();
+		var sorted = dataFrame.orderBy('Value1');
+		expect(sorted.rows()).to.eql([
+			[new Date(2013, 24, 2),20, 'c', 22],
+			[new Date(2015, 24, 2),100, 'd', 4],
+			[new Date(1975, 24, 2), 200, 'b', 1],
+			[new Date(2011, 24, 2), 300, 'c', 3],
+		]);
+	});
+	
+	/*todo:
+	it('can sort by multiple columns ascending', function () {
+		
+		var dataFrame = initExampleDataFrame2();
+		var sorted = dataFrame.orderBy('Value2').thenBy('Value1');
+		expect(sorted.rows()).to.eql([
+			[new Date(1975, 24, 2), 200, 'b', 1],
+			[new Date(2013, 24, 2),20, 'c', 22],
+			[new Date(2011, 24, 2), 300, 'c', 3],
+			[new Date(2015, 24, 2),100, 'd', 4],
+		]);
+	});
+	*/
+
+	it('can sort by single column descending', function () {
+		
+		var dataFrame = initExampleDataFrame2();
+		var sorted = dataFrame.orderBy('Value3', true);
+		expect(sorted.rows()).to.eql([
+			[new Date(2013, 24, 2),20, 'c', 22],
+			[new Date(2015, 24, 2),100, 'd', 4],
+			[new Date(2011, 24, 2), 300, 'c', 3],
+			[new Date(1975, 24, 2), 200, 'b', 1],
+		]);
+	});
+
+	/*todo:
+	it('can sort by multiple column descending', function () {
+		
+		var dataFrame = initExampleDataFrame2();
+		var sorted = dataFrame.orderBy('Value2', true).thenBy('Value3', true);
+		expect(sorted.rows()).to.eql([
+			[new Date(2015, 24, 2),100, 'd', 4],
+			[new Date(2013, 24, 2),20, 'c', 22],
+			[new Date(2011, 24, 2), 300, 'c', 3],
+			[new Date(1975, 24, 2), 200, 'b', 1],
+		]);
+	});
+	*/
 });
