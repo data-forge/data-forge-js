@@ -130,6 +130,9 @@ BaseDataFrame.prototype.as = function (formatPlugin, formatOptions) {
 // Order by values in a partcular column, either ascending or descending
 //
 var orderBy = function (self, sortMethod, columnName) {
+	assert.isObject(self);
+	assert.isString(sortMethod);
+	assert.isString(columnName);
 	
 	var LazyDataFrame = require('./lazydataframe');
 	var LazyIndex = require('./lazyindex');
@@ -154,7 +157,7 @@ var orderBy = function (self, sortMethod, columnName) {
 		return cachedSorted;
 	};
 		
-	return new LazyDataFrame(
+	var sortedDataFrame = new LazyDataFrame(
 		function () {
 			return self.columns();
 		},
@@ -175,6 +178,74 @@ var orderBy = function (self, sortMethod, columnName) {
 				.toArray();	
 		}		
 	);
+	
+	sortedDataFrame.thenBy = orderThenBy(self, sortMethod, columnIndex, 'thenBy');
+	sortedDataFrame.thenByDescending = orderThenBy(self, sortMethod, columnIndex, 'thenByDescending');
+	
+	return sortedDataFrame;
+};
+
+var orderThenBy = function (self, firstSortMethod, firstColumnIndex, nextSortMethod) {
+	assert.isObject(self);
+	assert.isString(firstSortMethod);
+	assert.isNumber(firstColumnIndex);
+	assert.isString(nextSortMethod);
+	
+	return function (nextColumnName) {
+		assert.isString(nextColumnName);
+				
+		var LazyDataFrame = require('./lazydataframe');
+		var LazyIndex = require('./lazyindex');
+		
+		var nextColumnIndex = self._columnNameToIndex(nextColumnName);
+		if (nextColumnIndex < 0) {
+			throw new Error("In call to 'series' failed to find column with name '" + nextColumnName + "'.");
+		}
+		
+		var cachedSorted = null;
+		
+		var sorted = function () {
+			if (cachedSorted) {
+				return cachedSorted;
+			}
+			
+			cachedSorted = E.from(self.rows())
+				[firstSortMethod](function (row) {
+					return row[firstColumnIndex+1];			
+				})
+				[nextSortMethod](function (row) {
+					return row[nextColumnIndex+1];			
+				})
+				.toArray();
+			return cachedSorted;
+		};
+			
+		var sortedDataFrame = new LazyDataFrame(
+			function () {
+				return self.columns();
+			},
+			function () {
+				return new LazyIndex(function () {
+					return E.from(sorted())
+						.select(function (row) {
+							return row[0];
+						})
+						.toArray();
+				});		
+			},
+			function () {
+				return E.from(sorted())
+					.select(function (row) {
+						return E.from(row).skip(1).toArray();
+					})
+					.toArray();	
+			}		
+		);
+		
+		//todo: sortedDataFrame.thenBy = orderThenBy(self, sortMethod, columnName)();
+		
+		return sortedDataFrame;
+	};	
 };
 
 
@@ -184,6 +255,7 @@ var orderBy = function (self, sortMethod, columnName) {
  * @param {string|array} columnName - Column to sort by.
  */
 BaseDataFrame.prototype.orderBy = function (columnName) {
+	assert.isString(columnName);
 	
 	var self = this;
 	return orderBy(self, 'orderBy', columnName);
@@ -195,6 +267,7 @@ BaseDataFrame.prototype.orderBy = function (columnName) {
  * @param {string|array} columnName - Column to sort by.
  */
 BaseDataFrame.prototype.orderByDescending = function (columnName) {
+	assert.isString(columnName);
 	
 	var self = this;
 	return orderBy(self, 'orderByDescending', columnName);

@@ -171,7 +171,6 @@ describe('BaseDataFrame', function () {
 		]);
 	});
 	
-	/*todo:
 	it('can sort by multiple columns ascending', function () {
 		
 		var dataFrame = initExampleDataFrame2();
@@ -183,12 +182,11 @@ describe('BaseDataFrame', function () {
 			[new Date(2015, 24, 2),100, 'd', 4],
 		]);
 	});
-	*/
 
 	it('can sort by single column descending', function () {
 		
 		var dataFrame = initExampleDataFrame2();
-		var sorted = dataFrame.orderByDescending('Value3', true);
+		var sorted = dataFrame.orderByDescending('Value3');
 		expect(sorted.rows()).to.eql([
 			[new Date(2013, 24, 2),20, 'c', 22],
 			[new Date(2015, 24, 2),100, 'd', 4],
@@ -197,11 +195,10 @@ describe('BaseDataFrame', function () {
 		]);
 	});
 
-	/*todo:
 	it('can sort by multiple column descending', function () {
 		
 		var dataFrame = initExampleDataFrame2();
-		var sorted = dataFrame.orderBy('Value2', true).thenBy('Value3', true);
+		var sorted = dataFrame.orderByDescending('Value2').thenByDescending('Value3');
 		expect(sorted.rows()).to.eql([
 			[new Date(2015, 24, 2),100, 'd', 4],
 			[new Date(2013, 24, 2),20, 'c', 22],
@@ -209,5 +206,5 @@ describe('BaseDataFrame', function () {
 			[new Date(1975, 24, 2), 200, 'b', 1],
 		]);
 	});
-	*/
+
 });
