@@ -57,52 +57,63 @@ BaseSeries.prototype.skip = function (numRows) {
  * @param {bool|array} [descending] - true to sort descending, false to sort ascending. Default to ascending. 
  */
 BaseSeries.prototype.sort = function (descending) {
-	var Series = require('./series'); // Require here to prevent circular ref.
+	var LazySeries = require('./lazyseries'); // Require here to prevent circular ref.
+	var LazyIndex = require('./lazyindex'); // Require here to prevent circular ref.
 	
-	//todo: should return lazy!!!
 	//todo: would be nice to sort both arrays independently.
 	
 	var self = this;
+	var cachedSorted = null;
 	
-	var sorted;
-	
-	if (descending) {
-		sorted = E.from(self.index().values())
-			.zip(E.from(self.values()), function (index, value) {
-				return [index, value];
-			})
-			.orderByDescending(function (pair) {
-				return pair[1];
-			})
-			.toArray();		
-	}
-	else {
-		sorted = E.from(self.index().values())
-			.zip(E.from(self.values()), function (index, value) {
-				return [index, value];
-			})
-			.orderBy(function (pair) {
-				return pair[1];
-			})
-			.toArray();
-	}
+	var sorted = function () {
+		if (!cachedSorted) {
+			if (descending) {
+				cachedSorted = E.from(self.index().values())
+					.zip(E.from(self.values()), function (index, value) {
+						return [index, value];
+					})
+					.orderByDescending(function (pair) {
+						return pair[1];
+					})
+					.toArray();		
+			}
+			else {
+				cachedSorted = E.from(self.index().values())
+					.zip(E.from(self.values()), function (index, value) {
+						return [index, value];
+					})
+					.orderBy(function (pair) {
+						return pair[1];
+					})
+					.toArray();
+			}
+		}
 		
-	//todo: can't just assume number index.
-	var index = new NumberIndex(
-			E.from(sorted)
-				.select(function (row) {
-					return row[0];
-				})
-				.toArray()
-		);
-			
-	var values = E.from(sorted)
-		.select(function (row) {
-			return row[1];
-		})
-		.toArray();
+		return cachedSorted;
+	}
 	
-	return new Series(index, values);	
+	return new LazySeries(
+		function () {
+			return new LazyIndex(
+				function () {
+					return E.from(sorted())
+						.select(function (row) {
+							return row[0];
+						})
+						.toArray();
+					
+				}				
+			);
+		},
+		function () {
+			return E.from(sorted())
+				.select(function (row) {
+					return row[1];
+				})
+				.toArray();
+			
+		}
+	);
 }
 
 
