@@ -54,22 +54,27 @@ BaseSeries.prototype.skip = function (numRows) {
 //
 // Orders a series based on values in asscending order.
 //
-var order = function (self, sortMethod) {
-	var LazySeries = require('./lazyseries'); // Require here to prevent circular ref.
-	var LazyIndex = require('./lazyindex'); // Require here to prevent circular ref.
-	
-	//todo: would be nice to sort both arrays independently.
+var order = function (self, sortMethod, columnIndex) {
+
+	assert.isObject(self);
+	assert.isString(sortMethod);
+	assert(sortMethod === 'orderBy' || sortMethod === 'orderByDescending');
+	assert.isNumber(columnIndex);
+	assert(columnIndex == 0 || columnIndex == 1); // Only two columns in a series, index and value.
 	
 	var cachedSorted = null;
 	
-	var sorted = function () {
+	//
+	// Lazily execute the sort when needed.
+	//
+	var executeLazySort = function () {
 		if (!cachedSorted) {
 			cachedSorted = E.from(self.index().values())
 				.zip(E.from(self.values()), function (index, value) {
 					return [index, value];
 				})
 				[sortMethod](function (pair) {
-					return pair[1];
+					return pair[columnIndex];
 				})
 				.toArray();
 		}
@@ -77,11 +82,15 @@ var order = function (self, sortMethod) {
 		return cachedSorted;
 	}
 	
+	var LazySeries = require('./lazyseries'); // Require here to prevent circular ref.
+
 	return new LazySeries(
 		function () {
+			var LazyIndex = require('./lazyindex'); // Require here to prevent circular ref.
+
 			return new LazyIndex(
 				function () {
-					return E.from(sorted())
+					return E.from(executeLazySort())
 						.select(function (row) {
 							return row[0];
 						})
@@ -91,7 +100,7 @@ var order = function (self, sortMethod) {
 			);
 		},
 		function () {
-			return E.from(sorted())
+			return E.from(executeLazySort())
 				.select(function (row) {
 					return row[1];
 				})
@@ -101,13 +110,28 @@ var order = function (self, sortMethod) {
 	);
 };
 
+/**
+ * Orders a series based on the index in ascending order.
+ */
+BaseSeries.prototype.orderByIndex = function () {
+	var self = this;
+	return order(self, 'orderBy', 0);
+};
+
+/**
+ * Orders a series based on the index in descending order.
+ */
+BaseSeries.prototype.orderByIndexDescending = function () {
+	var self = this;
+	return order(self, 'orderByDescending', 0);
+};
 
 /**
  * Orders a series based on values in asscending order.
  */
 BaseSeries.prototype.order = function () {
 	var self = this;
-	return order(self, 'orderBy');
+	return order(self, 'orderBy', 1);
 };
 
 /**
@@ -115,7 +139,7 @@ BaseSeries.prototype.order = function () {
  */
 BaseSeries.prototype.orderDescending = function () {
 	var self = this;
-	return order(self, 'orderByDescending');
+	return order(self, 'orderByDescending', 1);
 };
 
 // Interface functions.
