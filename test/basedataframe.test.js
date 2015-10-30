@@ -46,8 +46,8 @@ describe('BaseDataFrame', function () {
 		dataFrame.index = function () {
 			return new panjas.DateIndex(
 				[
-					new Date(1975, 24, 2),
 					new Date(2011, 24, 2),
+					new Date(1975, 24, 2),
 					new Date(2013, 24, 2),
 					new Date(2015, 24, 2),
 				]
@@ -55,8 +55,8 @@ describe('BaseDataFrame', function () {
 		};
 		dataFrame.values = function () {
 			return [
-				[200, 'b', 1],
 				[300, 'c', 3],
+				[200, 'b', 1],
 				[20, 'c', 22],
 				[100, 'd', 4],
 			];
@@ -223,6 +223,30 @@ describe('BaseDataFrame', function () {
 		
 		var dataFrame = initExampleDataFrame2();
 		var sorted = dataFrame.orderByDescending('Value2').thenByDescending('Value3').thenByDescending('Value1');
+		expect(sorted.rows()).to.eql([
+			[new Date(2015, 24, 2),100, 'd', 4],
+			[new Date(2013, 24, 2),20, 'c', 22],
+			[new Date(2011, 24, 2), 300, 'c', 3],
+			[new Date(1975, 24, 2), 200, 'b', 1],
+		]);
+	});
+
+	it('can sort by index ascending', function () {
+		
+		var dataFrame = initExampleDataFrame2();
+		var sorted = dataFrame.orderByIndex();
+		expect(sorted.rows()).to.eql([
+			[new Date(1975, 24, 2), 200, 'b', 1],
+			[new Date(2011, 24, 2), 300, 'c', 3],
+			[new Date(2013, 24, 2),20, 'c', 22],
+			[new Date(2015, 24, 2),100, 'd', 4],
+		]);
+	});
+
+	it('can sort by index descending', function () {
+		
+		var dataFrame = initExampleDataFrame2();
+		var sorted = dataFrame.orderByIndexDescending();
 		expect(sorted.rows()).to.eql([
 			[new Date(2015, 24, 2),100, 'd', 4],
 			[new Date(2013, 24, 2),20, 'c', 22],

@@ -158,30 +158,17 @@ var executeOrderBy = function (self, batch) {
 			return cachedSorted;
 		}
 
-		batch = E.from(batch) // Convert column names to indices.
-			.select(function (orderCmd) {
-				assert.isObject(orderCmd);
-				assert.isString(orderCmd.columnName);
-				validateSortMethod(orderCmd.sortMethod);
-
-				var columnName = orderCmd.columnName;
-				var columnIndex = self._columnNameToIndex(columnName);
-				if (columnIndex < 0) {
-					throw new Error("In call to 'executeOrder' failed to find column with name '" + columnName + "'.");
-				}
-
-				return {
-					columnIndex: columnIndex,
-					columnName: columnName,
-					sortMethod: orderCmd.sortMethod,
-				};
-			})
-			.toArray();
+		batch.forEach(function (orderCmd) {
+			assert.isObject(orderCmd);
+			assert.isNumber(orderCmd.columnIndex); // columnIndex starts at 0 for the index
+			assert(orderCmd.columnIndex >= 0);
+			validateSortMethod(orderCmd.sortMethod);
+		});
 
 		cachedSorted = E.from(batch)
 			.aggregate(E.from(self.rows()), function (unsorted, orderCmd) {
 				return unsorted[orderCmd.sortMethod](function (row) {
-					return row[orderCmd.columnIndex+1]; // Add 1 to account for the index, which is also sorted.
+					return row[orderCmd.columnIndex];
 				}); 
 			})
 			.toArray();
@@ -218,15 +205,16 @@ var executeOrderBy = function (self, batch) {
 
 //
 // Order by values in a partcular column, either ascending or descending
+// columnIndex starts at 0 for the index
 //
-var orderBy = function (self, sortMethod, columnName) {
+var orderBy = function (self, sortMethod, columnIndex) {
 	assert.isObject(self);
 	validateSortMethod(sortMethod);
-	assert.isString(columnName);
+	assert.isNumber(columnIndex);
 
 	var batchOrder = [
 		{ 
-			columnName: columnName, 
+			columnIndex: columnIndex, 
 			sortMethod: sortMethod 
 		}
 	];
@@ -251,13 +239,17 @@ var orderThenBy = function (self, batch, nextSortMethod) {
 	return function (nextColumnName) {
 		assert.isString(nextColumnName);
 
+		var nextColumnIndex = self._columnNameToIndex(nextColumnName);
+		if (nextColumnIndex < 0) {
+			throw new Error("In call to 'thenBy' failed to find column with name '" + nextColumnName + "'.");
+		}
+
 		var extendedBatch = batch.concat([
 			{
-				columnName: nextColumnName,
+				columnIndex: nextColumnIndex+1,
 				sortMethod: nextSortMethod,
 			},
 		]);
-
 
 		var sortedDataFrame = executeOrderBy(self, extendedBatch);
 
@@ -268,6 +260,24 @@ var orderThenBy = function (self, batch, nextSortMethod) {
 	};	
 };
 
+/**
+ * Sorts a data frame based on the index (ascending). 
+ */
+BaseDataFrame.prototype.orderByIndex = function () {
+	var self = this;
+	return orderBy(self, 'orderBy', 0);
+};
+
+/**
+ * Sorts a data frame based on the index (descending). 
+ * 
+ * @param {string|array} columnName - Column to sort by.
+ */
+BaseDataFrame.prototype.orderByIndexDescending = function () {
+	var self = this;
+	return orderBy(self, 'orderByDescending', 0);
+	return self;
+};
 
 /**
  * Sorts a data frame based on a single column (ascending). 
@@ -278,7 +288,13 @@ BaseDataFrame.prototype.orderBy = function (columnName) {
 	assert.isString(columnName);
 	
 	var self = this;
-	return orderBy(self, 'orderBy', columnName);
+
+	var columnIndex = self._columnNameToIndex(columnName);
+	if (columnIndex < 0) {
+		throw new Error("In call to 'orderBy' failed to find column with name '" + columnName + "'.");
+	}
+
+	return orderBy(self, 'orderBy', columnIndex+1);
 };
 
 /**
@@ -290,7 +306,13 @@ BaseDataFrame.prototype.orderByDescending = function (columnName) {
 	assert.isString(columnName);
 	
 	var self = this;
-	return orderBy(self, 'orderByDescending', columnName);
+
+	var columnIndex = self._columnNameToIndex(columnName);
+	if (columnIndex < 0) {
+		throw new Error("In call to 'orderByDescending' failed to find column with name '" + columnName + "'.");
+	}
+
+	return orderBy(self, 'orderByDescending', columnIndex+1);
 };
 
 //
