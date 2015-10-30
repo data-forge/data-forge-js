@@ -148,33 +148,46 @@ var executeOrderBy = function (self, batch) {
 	assert.isArray(batch);
 	assert(batch.length > 0);
 
-	batch = E.from(batch) // Convert column names to indices.
-		.select(function (orderCmd) {
-			assert.isObject(orderCmd);
-			assert.isString(orderCmd.columnName);
-			validateSortMethod(orderCmd.sortMethod);
+	var cachedSorted = null;
 
-			var columnName = orderCmd.columnName;
-			var columnIndex = self._columnNameToIndex(columnName);
-			if (columnIndex < 0) {
-				throw new Error("In call to 'executeOrder' failed to find column with name '" + columnName + "'.");
-			}
+	//
+	// Don't invoke the sort until we really know what we need.
+	//
+	var executeLazySort = function () {
+		if (cachedSorted) {
+			return cachedSorted;
+		}
 
-			return {
-				columnIndex: columnIndex,
-				columnName: columnName,
-				sortMethod: orderCmd.sortMethod,
-			};
-		})
-		.toArray();
+		batch = E.from(batch) // Convert column names to indices.
+			.select(function (orderCmd) {
+				assert.isObject(orderCmd);
+				assert.isString(orderCmd.columnName);
+				validateSortMethod(orderCmd.sortMethod);
 
-	var sorted = E.from(batch)
-		.aggregate(E.from(self.rows()), function (unsorted, orderCmd) {
-			return unsorted[orderCmd.sortMethod](function (row) {
-				return row[orderCmd.columnIndex+1]; // Add 1 to account for the index, which is also sorted.
-			}); 
-		})
-		.toArray();
+				var columnName = orderCmd.columnName;
+				var columnIndex = self._columnNameToIndex(columnName);
+				if (columnIndex < 0) {
+					throw new Error("In call to 'executeOrder' failed to find column with name '" + columnName + "'.");
+				}
+
+				return {
+					columnIndex: columnIndex,
+					columnName: columnName,
+					sortMethod: orderCmd.sortMethod,
+				};
+			})
+			.toArray();
+
+		cachedSorted = E.from(batch)
+			.aggregate(E.from(self.rows()), function (unsorted, orderCmd) {
+				return unsorted[orderCmd.sortMethod](function (row) {
+					return row[orderCmd.columnIndex+1]; // Add 1 to account for the index, which is also sorted.
+				}); 
+			})
+			.toArray();
+
+		return cachedSorted;
+	};
 
 	var LazyDataFrame = require('./lazydataframe');
 
@@ -186,17 +199,17 @@ var executeOrderBy = function (self, batch) {
 			var LazyIndex = require('./lazyindex');
 
 			return new LazyIndex(function () {
-				return E.from(sorted)
+				return E.from(executeLazySort()) // Lazily execute the sort.
 					.select(function (row) {
-						return row[0];
+						return row[0]; // Extract the index from the sorted data.
 					})
 					.toArray();
 			});		
 		},
 		function () {
-			return E.from(sorted)
+			return E.from(executeLazySort()) // Lazily execute the sort.
 				.select(function (row) {
-					return E.from(row).skip(1).toArray();
+					return E.from(row).skip(1).toArray(); // Extract all but the index from the sorted data.
 				})
 				.toArray();	
 		}		
