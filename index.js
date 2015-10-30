@@ -1,6 +1,8 @@
 'use strict';
 
 var assert = require('chai').assert;
+var E = require('linq');
+var dropElement = require('./src/utils').dropElement;
 
 /**
  * Main namespace for Panjas.
@@ -18,14 +20,27 @@ var assert = require('chai').assert;
  * 		<script language="javascript" type="text/javascript" src="bower_components/panjas.js"></script>
  */
 var panjas = {
-	//
-	// Read a DataFrame from a plugable source.
-	//
+	
+	DataFrame: require('./src/dataframe'),
+	LazyDataFrame: require('./src/lazydataframe'),
+	Series: require('./src/series'),
+	LazySeries: require('./src/lazyseries'),
+	DateIndex: require('./src/dateindex'),
+	NumberIndex: require('./src/numberindex'),
+	LazyIndex: require('./src/lazyindex'),
+	builder: require('./src/builder'),	
+
+	/**
+	 * Read a DataFrame from a plugable data source.
+	 */
 	from: function (dataSourcePlugin, sourceOptions) {
 		assert.isObject(dataSourcePlugin, "Expected 'dataSourcePlugin' parameter to 'panjas.from' to be an object.");
 		assert.isFunction(dataSourcePlugin.read, "Expected 'dataSourcePlugin' parameter to 'panjas.from' to be an object with a 'read' function.");
 		
 		return {
+			/**
+			 * Convert DataFrame from a particular data format using a plugable format.
+			 */
 			as: function (formatPlugin, formatOptions) {
 				assert.isObject(formatPlugin, "Expected 'formatPlugin' parameter to 'panjas.from' to be an object.");
 				assert.isFunction(formatPlugin.from, "Expected 'formatPlugin' parameter to 'panjas.from' to be an object with a 'from' function.");
@@ -37,15 +52,65 @@ var panjas = {
 			},		
 		};
 	},
-	
-	DataFrame: require('./src/dataframe'),
-	LazyDataFrame: require('./src/lazydataframe'),
-	Series: require('./src/series'),
-	LazySeries: require('./src/lazyseries'),
-	DateIndex: require('./src/dateindex'),
-	NumberIndex: require('./src/numberindex'),
-	LazyIndex: require('./src/lazyindex'),
-	builder: require('./src/builder'),	
+
+	/**
+	 * Merge data frames by index or a particular column.
+	 * 
+	 * @param {DataFrame} leftDataFrame - One data frame to merge.
+	 * @param {DataFrame} rightDataFrame - The other data frame to merge.
+	 * @param {string} [columnName] - The name of the column to merge on. Optional, when not specified merge is based on the index.
+	 */
+	merge: function (leftDataFrame, rightDataFrame, columnName) {
+		var LazyDataFrame = require('./src/lazydataframe'); //todo: don't included this way.
+
+		assert.isObject(leftDataFrame, "Expected 'leftDataFrame' parameter to 'merge' to be an object.");
+		assert.isObject(rightDataFrame, "Expected 'rightDataFrame' parameter to 'merge' to be an object.");
+
+		if (columnName) {
+			assert.isString(columnName, "Expected optional 'columnName' parameter to 'merge' to be a string.");
+		}
+
+		var leftColumnIndex = leftDataFrame._columnNameToIndex(columnName);
+		if (leftColumnIndex < 0) {
+			throw new Error("Column with name '" + columnName + "' doesn't exist in 'leftDataFrame'.");
+		}
+
+		var rightColumnIndex = rightDataFrame._columnNameToIndex(columnName);
+		if (rightColumnIndex < 0) {
+			throw new Error("Column with name '" + columnName + "' doesn't exist in 'rightColumnIndex'.");
+		}
+
+		var leftRows = leftDataFrame.values();
+		var rightRows = rightDataFrame.values();
+
+		var mergedValues = E.from(leftRows) // Merge values, drop index.
+			.selectMany(function (leftRow) {
+				return E
+					.from(rightRows)
+					.where(function (rightRow) {
+						return leftRow[leftColumnIndex] === rightRow[rightColumnIndex];
+					})
+					.select(function (rightRow) {
+						var left = dropElement(leftRow, leftColumnIndex);
+						var right = dropElement(rightRow, rightColumnIndex);
+						return [leftRow[leftColumnIndex]].concat(left).concat(right);
+					});
+			})
+			.toArray();
+
+		return new LazyDataFrame(
+			function () {
+				return ['key', 'lval', 'rval'];
+			},
+			function () {
+				var NumberIndex = require('./src/numberindex'); //todo: don't included this way.
+				return new NumberIndex(E.range(0, mergedValues.length).toArray());
+			},
+			function () {
+				return mergedValues;
+			}
+		);
+	},
 };
 
 module.exports = panjas;

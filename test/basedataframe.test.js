@@ -7,6 +7,25 @@ describe('BaseDataFrame', function () {
 	var BaseDataFrame = require('../src/basedataframe');
 	
 	var expect = require('chai').expect;
+	var assert = require('chai').assert;
+
+	var initDataFrame = function (columns, index, values) {
+		assert.isArray(columns);
+		assert.isObject(index);
+		assert.isArray(values);
+
+		var dataFrame = new BaseDataFrame();
+		dataFrame.columns = function () {
+			return columns;
+		};
+		dataFrame.index = function () {
+			return index;
+		};
+		dataFrame.values = function () {
+			return values;
+		};
+		return dataFrame;
+	};
 	
 	var initExampleDataFrame = function () {
 		var dataFrame = new BaseDataFrame();
