@@ -52,7 +52,6 @@ describe('BaseDataFrame', function () {
 		);
 
 		var merged = panjas.merge(left, right, 'key');
-		console.log(merged.rows());
 		expect(merged.columns()).to.eql([
 			'key',
 			'lval',
