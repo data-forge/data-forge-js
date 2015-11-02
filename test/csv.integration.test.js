@@ -13,54 +13,17 @@ describe('csv.integration', function () {
 	var initExampleDataFrame = function () {
 		return new panjas.DataFrame(
 			[
+				"Date",
 				"Value1",
 				"Value2",
 				"Value3",
 			],
-			new panjas.DateIndex(			
-				[
-					new Date(1975, 24, 2),
-					new Date(2015, 24, 2),
-				]
-			),
 			[
-				['100', 'foo', '11'], //todo: use integer data here.
-				['200', 'bar', '22'],
+				[new Date(1975, 24, 2), '100', 'foo', '11'], //todo: use integer data here.
+				[new Date(2015, 24, 2), '200', 'bar', '22'],
 			]
 		);		
 	}; 
-	
-	it('index defaults to numbers when not specified', function () {
-		
-		var testFile = 'test.csv';
-		fs.writeFileSync(testFile, 
-			"Date, Value1, Value2, Value3\n" +
-			"1975-2-24, 100, foo, 22\n" +
-			"2015-10-23, 300, bar, 23"
-		);
-		
-		var csvOptions = {
-			parse_dates: ['Date'],			
-		};
-		
-		return panjas
-			.from(file, testFile)
-			.as(csv, csvOptions)
-			.then(function (dataFrame) {
-				expect(dataFrame.index().values()).to.eql([
-					0,
-					1,
-				]);
-				
-				var series1 = dataFrame.series('Date');
-				expect(series1.values()).to.eql([
-					moment('1975-2-24').toDate(),
-					moment('2015-10-23').toDate(),
-				]);
-				
-				fs.unlink(testFile);				
-			});	
-	});
 	
 	it('can read data frame from CSV', function () {
 		
@@ -81,46 +44,30 @@ describe('csv.integration', function () {
 			.as(csv, csvOptions)
 			.then(function (dataFrame) {
 				var series1 = dataFrame.series('Value1');
-				expect(series1.index().values()).to.eql([
-					moment('1975-2-24').toDate(),
-					moment('2015-10-23').toDate(),
-				]);
 				expect(series1.values()).to.eql([
 					100,
 					300,			
 				]);
 				
 				var series2 = dataFrame.series('Value2');
-				expect(series2.index().values()).to.eql([
-					moment('1975-2-24').toDate(),
-					moment('2015-10-23').toDate(),
-				]);
 				expect(series2.values()).to.eql([
 					'foo',
 					'bar',			
 				]);
 				
-				expect(dataFrame.index().values()).to.eql([
-					moment('1975-2-24').toDate(),
-					moment('2015-10-23').toDate(),
-				]);
-				
 				expect(dataFrame.columns()).to.eql([
+					"Date",
 					'Value1',
 					'Value2',
 					'Value3',			
 				]);
 				
 				expect(dataFrame.values()).to.eql([
-					[100, "foo", 22],
-					[300, "bar", 23],			
+					[moment('1975-2-24').toDate(), 100, "foo", 22],
+					[moment('2015-10-23').toDate(), 300, "bar", 23],			
 				]);
 				
 				var dataFrame2 = dataFrame.subset(['Value1', 'Value3']); 
-				expect(dataFrame.index().values()).to.eql([
-					moment('1975-2-24').toDate(),
-					moment('2015-10-23').toDate(),
-				]);
 				
 				expect(dataFrame2.columns()).to.eql([
 					'Value1',

@@ -8,26 +8,13 @@ describe('Series', function () {
 	var expect = require('chai').expect; 
 	
 	var initExampleSeries = function () {
-		var index = new panjas.DateIndex([new Date(1975, 2, 24), new Date(2015, 2, 28)]);
-		var values = [100, 200];
-		return new panjas.Series(index, values);		
+		return new panjas.Series([100, 200]);
 	};
 	
 	var initExampleSeries2 = function () {
-		var index = new panjas.DateIndex([new Date(1975, 2, 24), new Date(2011, 2, 28), new Date(2012, 2, 28), new Date(2015, 2, 28)]);
-		var values = [100, 300, 200, 5];
-		return new panjas.Series(index, values);		
+		return new panjas.Series(index, [100, 300, 200, 5]);
 	};
 		
-	it('can get series index', function () {
-		
-		var series = initExampleSeries();
-		expect(series.index().values()).to.eql([			
-			new Date(1975, 2, 24),
-			new Date(2015, 2, 28)
-		]);		
-	});
-	
 	it('can get series values', function () {
 		
 		var series = initExampleSeries();		

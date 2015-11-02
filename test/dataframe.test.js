@@ -10,19 +10,14 @@ describe('DataFrame', function () {
 	var initExampleDataFrame = function () {
 		return new panjas.DataFrame(
 			[
+				"Date",
 				"Value1",
 				"Value2",
 				"Value3",
 			],
-			new panjas.DateIndex(			
-				[
-					new Date(1975, 24, 2),
-					new Date(2015, 24, 2),
-				]
-			),
 			[
-				[100, 'foo', 11],
-				[200, 'bar', 22],
+				[new Date(1975, 24, 2), 100, 'foo', 11],
+				[new Date(2015, 24, 2), 200, 'bar', 22],
 			]
 		);		
 	}; 
@@ -32,19 +27,10 @@ describe('DataFrame', function () {
 		var dataFrame = initExampleDataFrame();
 		
 		expect(dataFrame.columns()).to.eql([
+			"Date",
 			"Value1",
 			"Value2",
 			"Value3",
-		]);		
-	});
-	
-	it('can get index', function () {
-		
-		var dataFrame = initExampleDataFrame();
-		
-		expect(dataFrame.index().values()).to.eql([
-			new Date(1975, 24, 2),
-			new Date(2015, 24, 2)
 		]);		
 	});
 	
@@ -53,8 +39,8 @@ describe('DataFrame', function () {
 		var dataFrame = initExampleDataFrame();
 		
 		expect(dataFrame.values()).to.eql(			[
-			[100, 'foo', 11],
-			[200, 'bar', 22],
+			[new Date(1975, 24, 2), 100, 'foo', 11],
+			[new Date(2015, 24, 2), 200, 'bar', 22],
 		]);		
 	});
 	

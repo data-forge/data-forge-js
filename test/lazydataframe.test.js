@@ -17,17 +17,9 @@ describe('LazyDataFrame', function () {
 				];
 			},
 			function () {
-				return new panjas.DateIndex(			
-					[
-						new Date(1975, 24, 2),
-						new Date(2015, 24, 2),
-					]
-				);
-			},
-			function () {
 				return [
-					[100, 'foo', 11],
-					[200, 'bar', 22],
+					[new Date(1975, 24, 2), 100, 'foo', 11],
+					[new Date(2015, 24, 2), 200, 'bar', 22],
 				];
 			}
 		);		
@@ -43,21 +35,12 @@ describe('LazyDataFrame', function () {
 		]);		
 	});
 	
-	it('can get index', function () {
-		
-		var lazyDataFrame = initExampleLazyDataFrame();		
-		expect(lazyDataFrame.index().values()).to.eql([
-			new Date(1975, 24, 2),
-			new Date(2015, 24, 2)
-		]);		
-	});
-	
 	it('can get values', function () {
 		
 		var lazyDataFrame = initExampleLazyDataFrame();		
 		expect(lazyDataFrame.values()).to.eql(			[
-			[100, 'foo', 11],
-			[200, 'bar', 22],
+			[new Date(1975, 24, 2), 100, 'foo', 11],
+			[new Date(2015, 24, 2), 200, 'bar', 22],
 		]);		
 	});
 	

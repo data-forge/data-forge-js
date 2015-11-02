@@ -10,21 +10,14 @@ var assert = require('chai').assert;
 var E = require('linq');
 var inherit = require('./inherit');
 
-var LazySeries = function (indexFn, valuesFn) {
-	assert.isFunction(indexFn, "Expected 'indexFn' parameter to LazySeries constructor be a function.");
+var LazySeries = function (valuesFn) {
 	assert.isFunction(valuesFn, "Expected 'valuesFn' parameter to LazySeries constructor be a function.");
 
 	var self = this;
-	self._indexFn = indexFn;
 	self._valuesFn = valuesFn;	
 };
 
 var parent = inherit(LazySeries, BaseSeries);
-
-LazySeries.prototype.index = function () {
-	var self = this;
-	return self._indexFn();
-};
 
 LazySeries.prototype.values = function () {
 	var self = this;
@@ -38,7 +31,7 @@ LazySeries.prototype.bake = function () {
 	var Series = require('./series'); // Local require, to prevent circular reference.
 	
 	var self = this;
-	return new Series(self.index(), self.values());
+	return new Series(self.values());
 };
 
 module.exports = LazySeries;

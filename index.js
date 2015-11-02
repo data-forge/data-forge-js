@@ -25,9 +25,6 @@ var panjas = {
 	LazyDataFrame: require('./src/lazydataframe'),
 	Series: require('./src/series'),
 	LazySeries: require('./src/lazyseries'),
-	DateIndex: require('./src/dateindex'),
-	NumberIndex: require('./src/numberindex'),
-	LazyIndex: require('./src/lazyindex'),
 	builder: require('./src/builder'),	
 
 	/**
@@ -101,10 +98,6 @@ var panjas = {
 		return new LazyDataFrame(
 			function () {
 				return ['key', 'lval', 'rval'];
-			},
-			function () {
-				var NumberIndex = require('./src/numberindex'); //todo: don't included this way.
-				return new NumberIndex(E.range(0, mergedValues.length).toArray());
 			},
 			function () {
 				return mergedValues;

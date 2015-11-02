@@ -46,10 +46,7 @@ module.exports = {
 	to: function (dataFrame, csvOptions) {
 		
 		var header = ['Index'].concat(dataFrame.columns()).join(',');
-		var rows = E.from(dataFrame.index().values())
-				.zip(dataFrame.values(), function (index, values) {
-					return [index].concat(values);
-				})
+		var rows = E.from(dataFrame.values())
 				.select(function (row) {
 					return row.join(',');
 				})

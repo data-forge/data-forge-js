@@ -18,10 +18,6 @@ describe('builder', function () {
 		var dataFrame = panjas.builder(data);
 		
 		expect(dataFrame).to.be.an.instanceof(panjas.DataFrame);
-		expect(dataFrame.index().values()).to.eql([
-			0,
-			1,			
-		]);		
 		expect(dataFrame.columns()).to.eql([
 			'Col1',
 			'Col2',
@@ -49,10 +45,6 @@ describe('builder', function () {
 			parse_dates: ['Col1', 'Col3'],
 		});
 		
-		expect(dataFrame.index().values()).to.eql([
-			0,
-			1,			
-		]);		
 		expect(dataFrame.columns()).to.eql([
 			'Col1',
 			'Col2',
@@ -114,53 +106,5 @@ describe('builder', function () {
 			[date2],			
 		]);
 	});
-	
-	it('can extract integer column as index', function () {
-		
-		var data = [
-			['Col1', 'col2'],
-			[100, 'hello'],
-			[200, 'computer'],			
-		];
-		
-		var dataFrame = panjas.builder(data, { 
-			index_col: 'Col1'
-		});
 
-		expect(dataFrame.index()).to.be.an.instanceof(panjas.NumberIndex);
-		expect(dataFrame.index().values()).to.eql([
-			100,
-			200,			
-		]);		
-		expect(dataFrame.values()).to.eql([
-			['hello'],
-			['computer'],			
-		]);
-	});	
-	
-	it('can extract date column as index', function () {
-		
-		var date1 = new Date(1975, 2, 24);
-		var date2 = new Date(2015, 10, 28);
-		
-		var data = [
-			['Col1', 'col2'],
-			[date1, 'hello'],
-			[date2, 'computer'],			
-		];
-		
-		var dataFrame = panjas.builder(data, { 
-			index_col: 'Col1'
-		});
-
-		expect(dataFrame.index()).to.be.an.instanceof(panjas.DateIndex);
-		expect(dataFrame.index().values()).to.eql([
-			date1,
-			date2,			
-		]);		
-		expect(dataFrame.values()).to.eql([
-			['hello'],
-			['computer'],			
-		]);
-	});	
 });

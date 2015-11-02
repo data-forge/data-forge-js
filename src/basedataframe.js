@@ -45,9 +45,6 @@ BaseDataFrame.prototype.series = function (columnName) {
 	
 	return new LazySeries(
 		function () {
-			return self.index()
-		},
-		function () {
 			return E.from(self.values())
 				.select(function (entry) {
 					return entry[columnIndex];
@@ -72,9 +69,6 @@ BaseDataFrame.prototype.subset = function (columnNames) {
 			return columnNames; 
 		},
 		function () {
-			return self.index();	
-		}, 
-		function () {
 			var columnIndices = E.from(columnNames)
 				.select(function (columnName) {
 					return self._columnNameToIndex(columnName);
@@ -92,19 +86,6 @@ BaseDataFrame.prototype.subset = function (columnNames) {
 				.toArray();
 		}
 	);	 
-};
-
-//
-// Get all data as an array of arrays (includes index and values).
-//
-BaseDataFrame.prototype.rows = function () {
-	var self = this;
-	return E
-		.from(self.index().values())
-		.zip(self.values(), function (index, values) {
-			return [index].concat(values);
-		})
-		.toArray();
 };
 
 //
@@ -136,7 +117,8 @@ var validateSortMethod = function (sortMethod) {
 	   sortMethod === 'orderByDescending' ||
 	   sortMethod === 'thenBy' ||
 	   sortMethod === 'thenByDescending', 
-	   "Expected 'sortMethod' to be one of 'orderBy', 'orderByDescending', 'thenBy' or 'thenByDescending', instead it is '" + sortMethod + "'.");
+	   "Expected 'sortMethod' to be one of 'orderBy', 'orderByDescending', 'thenBy' or 'thenByDescending', instead it is '" + sortMethod + "'."
+   );
 };
 
 //
@@ -160,13 +142,13 @@ var executeOrderBy = function (self, batch) {
 
 		batch.forEach(function (orderCmd) {
 			assert.isObject(orderCmd);
-			assert.isNumber(orderCmd.columnIndex); // columnIndex starts at 0 for the index
+			assert.isNumber(orderCmd.columnIndex);
 			assert(orderCmd.columnIndex >= 0);
 			validateSortMethod(orderCmd.sortMethod);
 		});
 
 		cachedSorted = E.from(batch)
-			.aggregate(E.from(self.rows()), function (unsorted, orderCmd) {
+			.aggregate(E.from(self.values()), function (unsorted, orderCmd) {
 				return unsorted[orderCmd.sortMethod](function (row) {
 					return row[orderCmd.columnIndex];
 				}); 
@@ -183,29 +165,13 @@ var executeOrderBy = function (self, batch) {
 			return self.columns();
 		},
 		function () {
-			var LazyIndex = require('./lazyindex');
-
-			return new LazyIndex(function () {
-				return E.from(executeLazySort()) // Lazily execute the sort.
-					.select(function (row) {
-						return row[0]; // Extract the index from the sorted data.
-					})
-					.toArray();
-			});		
-		},
-		function () {
-			return E.from(executeLazySort()) // Lazily execute the sort.
-				.select(function (row) {
-					return E.from(row).skip(1).toArray(); // Extract all but the index from the sorted data.
-				})
-				.toArray();	
+			return executeLazySort();	
 		}		
 	);
 };
 
 //
 // Order by values in a partcular column, either ascending or descending
-// columnIndex starts at 0 for the index
 //
 var orderBy = function (self, sortMethod, columnIndex) {
 	assert.isObject(self);
@@ -246,7 +212,7 @@ var orderThenBy = function (self, batch, nextSortMethod) {
 
 		var extendedBatch = batch.concat([
 			{
-				columnIndex: nextColumnIndex+1,
+				columnIndex: nextColumnIndex,
 				sortMethod: nextSortMethod,
 			},
 		]);
@@ -258,25 +224,6 @@ var orderThenBy = function (self, batch, nextSortMethod) {
 		
 		return sortedDataFrame;
 	};	
-};
-
-/**
- * Sorts a data frame based on the index (ascending). 
- */
-BaseDataFrame.prototype.orderByIndex = function () {
-	var self = this;
-	return orderBy(self, 'orderBy', 0);
-};
-
-/**
- * Sorts a data frame based on the index (descending). 
- * 
- * @param {string|array} columnName - Column to sort by.
- */
-BaseDataFrame.prototype.orderByIndexDescending = function () {
-	var self = this;
-	return orderBy(self, 'orderByDescending', 0);
-	return self;
 };
 
 /**
@@ -294,7 +241,7 @@ BaseDataFrame.prototype.orderBy = function (columnName) {
 		throw new Error("In call to 'orderBy' failed to find column with name '" + columnName + "'.");
 	}
 
-	return orderBy(self, 'orderBy', columnIndex+1);
+	return orderBy(self, 'orderBy', columnIndex);
 };
 
 /**
@@ -312,7 +259,7 @@ BaseDataFrame.prototype.orderByDescending = function (columnName) {
 		throw new Error("In call to 'orderByDescending' failed to find column with name '" + columnName + "'.");
 	}
 
-	return orderBy(self, 'orderByDescending', columnIndex+1);
+	return orderBy(self, 'orderByDescending', columnIndex);
 };
 
 //

@@ -10,21 +10,14 @@ var assert = require('chai').assert;
 var E = require('linq');
 var inherit = require('./inherit');
 
-var Series = function (index, values) {
-	assert.isObject(index, "Expected 'index' parameter to Series constructor be an index object.");
+var Series = function (values) {
 	assert.isArray(values, "Expected 'values' parameter to Series constructor be an array.");
 
 	var self = this;
-	self._index = index;
 	self._values = values;	
 };
 
 var parent = inherit(Series, BaseSeries);
-
-Series.prototype.index = function () {
-	var self = this;
-	return self._index;
-};
 
 Series.prototype.values = function () {
 	var self = this;

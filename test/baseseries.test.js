@@ -9,95 +9,36 @@ describe('BaseSeries', function () {
 	var expect = require('chai').expect; 
 	
 	var initExampleSeries = function () {
-		var index = new panjas.DateIndex([new Date(1975, 2, 24), new Date(2015, 2, 28)]);
-		var values = [100, 200];
 		var series = new BaseSeries();
-		series.index = function () {
-			return index;
-		};
 		series.values = function () {
-			return values;
+			return [100, 200];
 		}
 		return series;		
 	};
 	
 	var initExampleSeries2 = function () {
-		var index = new panjas.DateIndex([new Date(1975, 2, 24), new Date(2011, 2, 28), new Date(2012, 2, 28), new Date(2015, 2, 28)]);
-		var values = [100, 300, 200, 5];
 		var series = new BaseSeries();
-		series.index = function () {
-			return index;
-		};
 		series.values = function () {
-			return values;
+			return [100, 300, 200, 5];
 		}
 		return series;		
 	};
 
-	it('can get rows', function () {
-		var series = initExampleSeries();
-		expect(series.rows()).to.eql([
-				[new Date(1975, 2, 24), 100],
-				[new Date(2015, 2, 28), 200],
-		]);
-	});
-	
 	it('can skip', function () {
 		var series = initExampleSeries2();
 		var skipSeries = series.skip(2);		
-		expect(skipSeries.index().values()).to.eql(
-			[new Date(2012, 2, 28), new Date(2015, 2, 28)]		
-		);
 		expect(skipSeries.values()).to.eql([200, 5]);		
 	});
 
-	it('can sort values ascending', function () {
-		
+	it('can sort values ascending', function () {		
 		var series = initExampleSeries2();
 		var sorted = series.order();
-		expect(sorted.index().values()).to.eql([
-			new Date(2015, 2, 28),
-			new Date(1975, 2, 24),
-			new Date(2012, 2, 28),
-			new Date(2011, 2, 28)			
-		]);
 		expect(sorted.values()).to.eql([5, 100, 200, 300]);
 	});
 	
-	it('can sort values descending', function () {
-		
+	it('can sort values descending', function () {		
 		var series = initExampleSeries2();
 		var sorted = series.orderDescending();
-		expect(sorted.index().values()).to.eql([
-			new Date(2011, 2, 28),
-			new Date(2012, 2, 28),
-			new Date(1975, 2, 24),
-			new Date(2015, 2, 28),		
-		]);
 		expect(sorted.values()).to.eql([300, 200, 100, 5]);
-	});
-
-	it ('can sort by index ascending', function () {
-		var series = initExampleSeries2();
-		var sorted = series.orderByIndex();
-		expect(sorted.index().values()).to.eql([
-			new Date(1975, 2, 24),
-			new Date(2011, 2, 28),
-			new Date(2012, 2, 28),
-			new Date(2015, 2, 28),		
-		]);
-		expect(sorted.values()).to.eql([100, 300, 200, 5]);
-	});
-
-	it ('can sort by index descending', function () {
-		var series = initExampleSeries2();
-		var sorted = series.orderByIndexDescending();
-		expect(sorted.index().values()).to.eql([
-			new Date(2015, 2, 28),		
-			new Date(2012, 2, 28),
-			new Date(2011, 2, 28),
-			new Date(1975, 2, 24),
-		]);
-		expect(sorted.values()).to.eql([5, 200, 300, 100]);
 	});
 });
