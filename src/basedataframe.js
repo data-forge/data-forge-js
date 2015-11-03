@@ -36,16 +36,26 @@ BaseDataFrame.prototype._columnNameToIndex = function (columnName) {
 /*
  * Retreive a named column from the DataFrame.
  *
+ * @param {string|int} columnNameOrIndex - Name or index of the column to retreive.
  */
-BaseDataFrame.prototype.getColumn = function (columnName) {
+BaseDataFrame.prototype.getColumn = function (columnNameOrIndex) {
 	var self = this;
-	var columnIndex = self._columnNameToIndex(columnName);
-	if (columnIndex < 0) {
-		throw new Error("In call to 'series' failed to find column with name '" + columnName + "'.");
+
+	var columnIndex;
+	if (Object.isString(columnNameOrIndex)) {
+		columnIndex = self._columnNameToIndex(columnNameOrIndex);
+		if (columnIndex < 0) {
+			throw new Error("In call to 'getColumn' failed to find column '" + columnNameOrIndex + "'.");
+		}
+	}
+	else {
+		assert.isNumber(columnNameOrIndex, "Expected 'columnNameOrIndex' parameter to 'getColumn' to be either a string or index that specifies the column to retreive.");
+
+		columnIndex = columnNameOrIndex;
 	}
 	
 	return new LazyColumn(
-		columnName,
+		self.columnNames()[columnIndex],
 		function () {
 			return E.from(self.values())
 				.select(function (entry) {

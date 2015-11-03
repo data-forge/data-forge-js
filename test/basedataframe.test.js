@@ -54,26 +54,48 @@ describe('BaseDataFrame', function () {
 		expect(function () {
 			var dataFrame = initExampleDataFrame();
 			dataFrame.getColumn('non-existing column name');			
-		}).to.throw(Error).with.property('message').that.equals("In call to 'series' failed to find column with name 'non-existing column name'.");
+		}).to.throw(Error).with.property('message').that.equals("In call to 'getColumn' failed to find column 'non-existing column name'.");
 	});
 
-	it('can retreive column', function () {
+	it('can retreive column by name', function () {
 		
 		var dataFrame = initExampleDataFrame();
-		var series1 = dataFrame.getColumn('Value1');
-		expect(series1.values()).to.eql(			[
+		var column1 = dataFrame.getColumn('Value1');
+		expect(column1.values()).to.eql([
 			100,
 			200,
 		]);		
 		
-		var series2 = dataFrame.getColumn('Value2');
-		expect(series2.values()).to.eql(			[
+		var column2 = dataFrame.getColumn('Value2');
+		expect(column2.values()).to.eql([
 			'foo',
 			'bar',
 		]);			
 		
-		var series3 = dataFrame.getColumn('Value3');
-		expect(series3.values()).to.eql(			[
+		var column3 = dataFrame.getColumn('Value3');
+		expect(column3.values()).to.eql([
+			11,
+			22,
+		]);		
+	});
+
+	it('can retreive column by index', function () {
+		
+		var dataFrame = initExampleDataFrame();
+		var column1 = dataFrame.getColumn(1);
+		expect(column1.values()).to.eql([
+			100,
+			200,
+		]);		
+		
+		var column2 = dataFrame.getColumn(2);
+		expect(column2.values()).to.eql([
+			'foo',
+			'bar',
+		]);			
+		
+		var column3 = dataFrame.getColumn(3);
+		expect(column3.values()).to.eql([
 			11,
 			22,
 		]);		
