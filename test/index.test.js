@@ -59,4 +59,31 @@ describe('BaseDataFrame', function () {
 		]);
 	});
 
+	it('merging with bad column name throws exception', function () {
+
+		var left = initDataFrame(
+			[
+				'key',
+				'lval',
+			],
+			[
+				['foo', 1],
+				['foo', 2],
+			]
+		);
+		var right = initDataFrame(
+			[
+				'key',
+				'rval',
+			],
+			[
+				['foo', 4],
+				['foo', 5],
+			]
+		);
+
+		expect(function () {
+			panjas.merge(left, right, 'bad-column');
+		}).to.throw(Error);
+	});
 });
