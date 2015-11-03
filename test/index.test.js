@@ -59,11 +59,11 @@ describe('BaseDataFrame', function () {
 		]);
 	});
 
-	it('merging with bad column name throws exception', function () {
+	it('merging with column that doesnt exist in left data frame throws exception', function () {
 
 		var left = initDataFrame(
 			[
-				'key',
+				'left-key',
 				'lval',
 			],
 			[
@@ -73,7 +73,7 @@ describe('BaseDataFrame', function () {
 		);
 		var right = initDataFrame(
 			[
-				'key',
+				'right-key',
 				'rval',
 			],
 			[
@@ -83,7 +83,35 @@ describe('BaseDataFrame', function () {
 		);
 
 		expect(function () {
-			panjas.merge(left, right, 'bad-column');
+			panjas.merge(left, right, 'right-key');
+		}).to.throw(Error);
+	});
+
+	it('merging with column that doesnt exist in right data frame throws exception', function () {
+
+		var left = initDataFrame(
+			[
+				'left-key',
+				'lval',
+			],
+			[
+				['foo', 1],
+				['foo', 2],
+			]
+		);
+		var right = initDataFrame(
+			[
+				'right-key',
+				'rval',
+			],
+			[
+				['foo', 4],
+				['foo', 5],
+			]
+		);
+
+		expect(function () {
+			panjas.merge(left, right, 'left-key');
 		}).to.throw(Error);
 	});
 });
