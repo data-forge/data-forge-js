@@ -262,7 +262,6 @@ BaseDataFrame.prototype.orderByDescending = function (columnName) {
 	return orderBy(self, 'orderByDescending', columnIndex);
 };
 
-
 /**
  * Create a new data frame with the requested column or columns dropped.
  *
@@ -314,6 +313,79 @@ BaseDataFrame.prototype.dropColumn = function (columnOrColumns) {
 			return rows;			
 		}		
 	);
+};
+
+/**
+ * Create a new data frame with and additional or replaced column.
+ *
+ * @param {string} columnName - The name of the column to add or replace.
+ * @param {array|column} data - Array of data or column that contains data.
+ */
+BaseDataFrame.prototype.setColumn = function (columnName, data) {
+	assert.isString(columnName, "Expected 'columnName' parameter to 'setColumn' to be a string.");
+
+	var self = this;
+
+	if (!Object.isArray(data)) {
+		assert.isObject(data, "Expected 'data' parameter to 'setColumn' to be either an array or a column.");
+		assert.isFunction(data.values, "Expected 'data' parameter to 'setColumn' to have a 'values' function that returns the values of the column.");
+
+		data = data.values();
+	}
+
+	var LazyDataFrame = require('./lazydataframe');
+
+	var columnIndex = self._columnNameToIndex(columnName);
+	if (columnIndex < 0) {
+		
+		// Add new column.
+		return new LazyDataFrame(
+			function () {
+				return self.columns().concat([columnName]);
+			},
+			function () {
+				return E.from(self.values())
+					.select(function (row, rowIndex) {
+						return row.concat([data[rowIndex]]);
+					})
+					.toArray();
+			}		
+		);
+	}
+	else {
+
+		// Replace existing column.
+		return new LazyDataFrame(
+			function () {
+				return E.from(self.columns())
+					.select(function (thisColumnName, thisColumnIndex) {
+						if (thisColumnIndex === columnIndex) {
+							return columnName;
+						}
+						else { 
+							return thisColumnName;
+						}
+					})
+					.toArray();
+			},
+			function () {
+				return E.from(self.values())
+					.select(function (row, rowIndex) {
+						return E.from(row)
+							.select(function (column, thisColumnIndex) {
+								if (thisColumnIndex === columnIndex) {
+									return data[rowIndex];
+								}
+								else {
+									return column;
+								}
+							})
+							.toArray();
+					})
+					.toArray();
+			}		
+		);
+	}
 };
 
 //

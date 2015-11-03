@@ -215,4 +215,55 @@ describe('BaseDataFrame', function () {
 			[100, 4],
 		]);
 	});
+
+	it('can add column', function () {
+		
+		var dataFrame = initExampleDataFrame2();
+		var modified = dataFrame.setColumn('Value4', [1, 2, 3, 4]);
+		expect(modified.columns()).to.eql([
+			"Date",
+			"Value1",
+			"Value2",
+			"Value3",
+			"Value4",
+		]);
+		expect(modified.values()).to.eql([
+			[new Date(2011, 24, 2), 300, 'c', 3, 1],
+			[new Date(1975, 24, 2), 200, 'b', 1, 2],
+			[new Date(2013, 24, 2), 20, 'c', 22, 3],
+			[new Date(2015, 24, 2), 100, 'd', 4, 4],
+		]);
+	});
+
+	it('can overwrite column', function () {
+		
+		var dataFrame = initExampleDataFrame2();
+		var modified = dataFrame.setColumn('Value1', [1, 2, 3, 4]);
+		expect(modified.values()).to.eql([
+			[new Date(2011, 24, 2), 1, 'c', 3],
+			[new Date(1975, 24, 2), 2, 'b', 1],
+			[new Date(2013, 24, 2), 3, 'c', 22],
+			[new Date(2015, 24, 2), 4, 'd', 4],		
+		]);
+	});
+
+	it('can add column from other data frame', function () {
+		
+		var dataFrame1 = initExampleDataFrame();
+		var dataFrame2 = initExampleDataFrame2();
+		var modified = dataFrame2.setColumn('Value4', dataFrame1.series('Value2'));
+		expect(modified.columns()).to.eql([
+			"Date",
+			"Value1",
+			"Value2",
+			"Value3",
+			"Value4",
+		]);
+		expect(modified.values()).to.eql([
+			[new Date(2011, 24, 2), 300, 'c', 3, 'foo'],
+			[new Date(1975, 24, 2), 200, 'b', 1, 'bar'],
+			[new Date(2013, 24, 2), 20, 'c', 22, undefined],
+			[new Date(2015, 24, 2), 100, 'd', 4, undefined],
+		]);
+	});
 });
