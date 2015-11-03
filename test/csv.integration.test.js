@@ -9,6 +9,8 @@ describe('csv.integration', function () {
 	var expect = require('chai').expect;
 	var fs = require('fs');
 	var moment = require('moment');	
+
+	var testFile = 'test.csv';
 	
 	var initExampleDataFrame = function () {
 		return new panjas.DataFrame(
@@ -19,15 +21,20 @@ describe('csv.integration', function () {
 				"Value3",
 			],
 			[
-				[new Date(1975, 24, 2), '100', 'foo', '11'], //todo: use integer data here.
-				[new Date(2015, 24, 2), '200', 'bar', '22'],
+				[new Date(1975, 24, 2), 100, 'foo', 11],
+				[new Date(2015, 24, 2), 200, 'bar', 22],
 			]
 		);		
 	}; 
+
+	afterEach(function () {
+		if (fs.existsSync(testFile)) {
+			fs.unlink(testFile);						
+		}
+	});
 	
 	it('can read data frame from CSV', function () {
 		
-		var testFile = 'test.csv';
 		fs.writeFileSync(testFile, 
 			"Date, Value1, Value2, Value3\n" +
 			"1975-2-24, 100, foo, 22\n" +
@@ -85,23 +92,22 @@ describe('csv.integration', function () {
 	
 	it('can write csv to file', function () {
 		
-		var testFile = 'test.csv';
 		var dataFrame = initExampleDataFrame();
-		dataFrame
+		return dataFrame
 			.as(csv)
 			.to(file, testFile)
 			.then(function () {
 				var data = fs.readFileSync(testFile, 'utf8');
-				var loadedDataFrame = pj.from(csv, testFile, {
-					index_col: 'Date',
-					parse_dates: ['Date',],			
-				});		
-				
-				expect(loadedDataFrame.index().values()).to.eql(dataFrame.index().values());
+				return panjas
+					.from(file, testFile)
+					.as(csv, {
+						parse_dates: ['Date',],			
+					});
+			})
+			.then(function (loadedDataFrame) {
 				expect(loadedDataFrame.columnNames()).to.eql(dataFrame.columnNames());
 				expect(loadedDataFrame.values()).to.eql(dataFrame.values());
 				
-				fs.unlink(testFile);
 			});
 	});
 });
