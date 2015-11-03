@@ -262,10 +262,63 @@ BaseDataFrame.prototype.orderByDescending = function (columnName) {
 	return orderBy(self, 'orderByDescending', columnIndex);
 };
 
+
+/**
+ * Create a new data frame with the requested column or columns dropped.
+ *
+ * @param {string|array} columnOrColumns - Specifies the column name (a string) or columns (array of column names) to drop.
+ */
+BaseDataFrame.prototype.dropColumn = function (columnOrColumns) {
+	if (!Object.isArray(columnOrColumns)) {
+		assert.isString(columnOrColumns, "'dropColumn' expected either a string or an array or strings.");
+
+		columnOrColumns = [columnOrColumns]; // Convert to array for coding convenience.
+	}
+
+	var self = this;
+
+	var LazyDataFrame = require('./lazydataframe');
+
+	var columnIndices = E.from(columnOrColumns)
+		.select(function (columnName)  {
+			assert.isString(columnName);
+			var columnIndex = self._columnNameToIndex(columnName);
+			if (columnIndex < 0) {
+				throw new Error("In call to 'dropColumn' failed to find column '" + columnName + "'.");
+			}
+			return columnIndex;
+		})
+		.toArray();
+
+	var columns = E.from(self.columns())
+		.where(function (columnName, columnIndex) {
+			return columnIndices.indexOf(columnIndex) < 0;
+		})
+		.toArray();
+
+	var rows = E.from(self.values())
+		.select(function (row) {
+			return E.from(row)
+				.where(function (column, columnIndex) {
+					return columnIndices.indexOf(columnIndex) < 0;
+				})
+				.toArray();
+		})
+		.toArray();
+
+	return new LazyDataFrame(
+		function () {
+			return columns;			
+		},
+		function () {
+			return rows;			
+		}		
+	);
+};
+
 //
 // Interface functions.
 //
-// index - Get the index for the data frame.
 // columns - Get the columns for the data frame.
 // values - Get the values for the data frame.
 // bake - Force lazy evaluation to complete.

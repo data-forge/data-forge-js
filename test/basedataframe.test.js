@@ -192,4 +192,27 @@ describe('BaseDataFrame', function () {
 		]);
 	});
 
+	it('can drop column', function () {
+		
+		var dataFrame = initExampleDataFrame2();
+		var modified = dataFrame.dropColumn('Date');
+		expect(modified.values()).to.eql([
+			[300, 'c', 3],
+			[200, 'b', 1],
+			[20, 'c', 22],
+			[100, 'd', 4],
+		]);
+	});
+
+	it('can drop multiple columns', function () {
+		
+		var dataFrame = initExampleDataFrame2();
+		var modified = dataFrame.dropColumn(['Date', 'Value2'])
+		expect(modified.values()).to.eql([
+			[300, 3],
+			[200, 1],
+			[20, 22],
+			[100, 4],
+		]);
+	});
 });
