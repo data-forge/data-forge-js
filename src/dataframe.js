@@ -22,7 +22,7 @@ var DataFrame = function (columnNames, values) {
 
 var parent = inherit(DataFrame, BaseDataFrame);
 
-DataFrame.prototype.columns = function () {
+DataFrame.prototype.columnNames = function () {
 	var self = this;
 	return self._columnNames;
 };

@@ -18,7 +18,7 @@ describe('builder', function () {
 		var dataFrame = panjas.builder(data);
 		
 		expect(dataFrame).to.be.an.instanceof(panjas.DataFrame);
-		expect(dataFrame.columns()).to.eql([
+		expect(dataFrame.columnNames()).to.eql([
 			'Col1',
 			'Col2',
 		])
@@ -45,7 +45,7 @@ describe('builder', function () {
 			parse_dates: ['Col1', 'Col3'],
 		});
 		
-		expect(dataFrame.columns()).to.eql([
+		expect(dataFrame.columnNames()).to.eql([
 			'Col1',
 			'Col2',
 			'Col3',

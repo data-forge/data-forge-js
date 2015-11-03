@@ -22,7 +22,7 @@ var LazyDataFrame = function (columnNamesFn, valuesFn) {
 
 var parent = inherit(LazyDataFrame, BaseDataFrame);
 
-LazyDataFrame.prototype.columns = function () {
+LazyDataFrame.prototype.columnNames = function () {
 	var self = this;
 	return self._columnNamesFn();
 };
@@ -39,7 +39,7 @@ LazyDataFrame.prototype.bake = function () {
 	var DataFrame = require('./dataframe'); // Local require, to prevent circular reference.
 	
 	var self = this;
-	return new DataFrame(self.columns(), self.values());
+	return new DataFrame(self.columnNames(), self.values());
 };
 
 module.exports = LazyDataFrame;

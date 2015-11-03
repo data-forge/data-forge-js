@@ -22,7 +22,7 @@ BaseDataFrame.prototype._columnNameToIndex = function (columnName) {
 	assert.isString(columnName, "Expected 'columnName' parameter to _columnNameToIndex to be a non-empty string.");
 	
 	var self = this;	
-	var columnNames = self.columns();
+	var columnNames = self.columnNames();
 	
 	for (var i = 0; i < columnNames.length; ++i) {
 		if (columnName == columnNames[i]) {
@@ -162,7 +162,7 @@ var executeOrderBy = function (self, batch) {
 
 	return new LazyDataFrame(
 		function () {
-			return self.columns();
+			return self.columnNames();
 		},
 		function () {
 			return executeLazySort();	
@@ -289,7 +289,7 @@ BaseDataFrame.prototype.dropColumn = function (columnOrColumns) {
 		})
 		.toArray();
 
-	var columns = E.from(self.columns())
+	var columns = E.from(self.columnNames())
 		.where(function (columnName, columnIndex) {
 			return columnIndices.indexOf(columnIndex) < 0;
 		})
@@ -341,7 +341,7 @@ BaseDataFrame.prototype.setColumn = function (columnName, data) {
 		// Add new column.
 		return new LazyDataFrame(
 			function () {
-				return self.columns().concat([columnName]);
+				return self.columnNames().concat([columnName]);
 			},
 			function () {
 				return E.from(self.values())
@@ -357,7 +357,7 @@ BaseDataFrame.prototype.setColumn = function (columnName, data) {
 		// Replace existing column.
 		return new LazyDataFrame(
 			function () {
-				return E.from(self.columns())
+				return E.from(self.columnNames())
 					.select(function (thisColumnName, thisColumnIndex) {
 						if (thisColumnIndex === columnIndex) {
 							return columnName;
@@ -391,7 +391,7 @@ BaseDataFrame.prototype.setColumn = function (columnName, data) {
 //
 // Interface functions.
 //
-// columns - Get the columns for the data frame.
+// columnNames - Get the columns for the data frame.
 // values - Get the values for the data frame.
 // bake - Force lazy evaluation to complete.
 //

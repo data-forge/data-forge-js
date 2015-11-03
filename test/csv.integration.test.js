@@ -55,7 +55,7 @@ describe('csv.integration', function () {
 					'bar',			
 				]);
 				
-				expect(dataFrame.columns()).to.eql([
+				expect(dataFrame.columnNames()).to.eql([
 					"Date",
 					'Value1',
 					'Value2',
@@ -69,7 +69,7 @@ describe('csv.integration', function () {
 				
 				var dataFrame2 = dataFrame.subset(['Value1', 'Value3']); 
 				
-				expect(dataFrame2.columns()).to.eql([
+				expect(dataFrame2.columnNames()).to.eql([
 					'Value1',
 					'Value3',			
 				]);
@@ -98,7 +98,7 @@ describe('csv.integration', function () {
 				});		
 				
 				expect(loadedDataFrame.index().values()).to.eql(dataFrame.index().values());
-				expect(loadedDataFrame.columns()).to.eql(dataFrame.columns());
+				expect(loadedDataFrame.columnNames()).to.eql(dataFrame.columnNames());
 				expect(loadedDataFrame.values()).to.eql(dataFrame.values());
 				
 				fs.unlink(testFile);

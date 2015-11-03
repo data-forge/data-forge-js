@@ -26,7 +26,7 @@ describe('DataFrame', function () {
 		
 		var dataFrame = initExampleDataFrame();
 		
-		expect(dataFrame.columns()).to.eql([
+		expect(dataFrame.columnNames()).to.eql([
 			"Date",
 			"Value1",
 			"Value2",
