@@ -4,7 +4,7 @@
 // Base class for data frame classes.
 //
 
-var LazySeries = require('./lazyseries');
+var LazyColumn = require('./lazycolumn');
 
 var assert = require('chai').assert; 
 var E = require('linq');
@@ -43,7 +43,7 @@ BaseDataFrame.prototype.series = function (columnName) {
 		throw new Error("In call to 'series' failed to find column with name '" + columnName + "'.");
 	}
 	
-	return new LazySeries(
+	return new LazyColumn(
 		function () {
 			return E.from(self.values())
 				.select(function (entry) {

@@ -23,8 +23,8 @@ var panjas = {
 	
 	DataFrame: require('./src/dataframe'),
 	LazyDataFrame: require('./src/lazydataframe'),
-	Series: require('./src/series'),
-	LazySeries: require('./src/lazyseries'),
+	Column: require('./src/column'),
+	LazyColumn: require('./src/lazycolumn'),
 	builder: require('./src/builder'),	
 
 	/**

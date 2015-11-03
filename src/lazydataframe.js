@@ -4,7 +4,7 @@
 // Implements a lazily evaluated data frame.
 //
 
-var LazySeries = require('./lazyseries');
+var LazyColumn = require('./lazycolumn');
 var BaseDataFrame = require('./basedataframe');
 
 var assert = require('chai').assert;

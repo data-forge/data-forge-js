@@ -7,23 +7,16 @@ describe('LazySeries', function () {
 	
 	var expect = require('chai').expect; 
 	
-	var initExampleSeries = function () {
+	var initExampleColumn = function () {
 		var valuesFn = function () {
 			return [100, 200];
 		};
-		return new panjas.LazySeries(valuesFn);
-	};
-	
-	var initExampleSeries2 = function () {
-		var valuesFn = function () {
-			return [100, 300, 200, 5];
-		};
-		return new panjas.LazySeries(valuesFn);
+		return new panjas.LazyColumn(valuesFn);
 	};
 	
 	it('can get series values', function () {
 		
-		var series = initExampleSeries();		
+		var series = initExampleColumn();		
 		expect(series.values()).to.eql([			
 			100,
 			200			
@@ -32,10 +25,10 @@ describe('LazySeries', function () {
 
 	it('can bake lazy series', function () {
 		
-		var lazySeries = initExampleSeries();		
+		var lazySeries = initExampleColumn();		
 		var bakedSeries = lazySeries.bake();
 		expect(lazySeries).not.to.equal(bakedSeries)
-		expect(bakedSeries).to.be.an.instanceOf(panjas.Series);		
+		expect(bakedSeries).to.be.an.instanceOf(panjas.Column);		
 	});
 
 });

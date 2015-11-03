@@ -1,7 +1,7 @@
 'use strict';
 
 // 
-// Base class for series classes.
+// Base class for columns classes.
 //
 
 var assert = require('chai').assert; 
@@ -9,9 +9,9 @@ var E = require('linq');
 
 
 /**
- * Base class for series.
+ * Base class for columns.
  */
-var BaseSeries = function () {
+var BaseColumn = function () {
 	
 	
 };
@@ -19,11 +19,11 @@ var BaseSeries = function () {
 //
 // Skip a number of rows in the series.
 //
-BaseSeries.prototype.skip = function (numRows) {
-	var LazySeries = require('./lazyseries'); // Require here to prevent circular ref.
+BaseColumn.prototype.skip = function (numRows) {
+	var LazyColumn = require('./lazycolumn'); // Require here to prevent circular ref.
 	
 	var self = this;
-	return new LazySeries(
+	return new LazyColumn(
 		function () {
 			return E
 				.from(self.values())
@@ -59,9 +59,9 @@ var order = function (self, sortMethod) {
 		return cachedSorted;
 	}
 	
-	var LazySeries = require('./lazyseries'); // Require here to prevent circular ref.
+	var LazyColumn = require('./lazycolumn'); // Require here to prevent circular ref.
 
-	return new LazySeries(
+	return new LazyColumn(
 		function () {
 			return executeLazySort();			
 		}
@@ -71,7 +71,7 @@ var order = function (self, sortMethod) {
 /**
  * Orders a series based on values in asscending order.
  */
-BaseSeries.prototype.order = function () {
+BaseColumn.prototype.order = function () {
 	var self = this;
 	return order(self, 'orderBy');
 };
@@ -79,7 +79,7 @@ BaseSeries.prototype.order = function () {
 /**
  * Orders a series based on values in descending order.
  */
-BaseSeries.prototype.orderDescending = function () {
+BaseColumn.prototype.orderDescending = function () {
 	var self = this;
 	return order(self, 'orderByDescending');
 };
@@ -91,4 +91,4 @@ BaseSeries.prototype.orderDescending = function () {
 // bake - Force lazy evaluation to complete.
 //
 
-module.exports = BaseSeries;
+module.exports = BaseColumn;

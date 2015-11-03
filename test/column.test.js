@@ -8,11 +8,11 @@ describe('Series', function () {
 	var expect = require('chai').expect; 
 	
 	var initExampleSeries = function () {
-		return new panjas.Series([100, 200]);
+		return new panjas.Column([100, 200]);
 	};
 	
-	var initExampleSeries2 = function () {
-		return new panjas.Series(index, [100, 300, 200, 5]);
+	var initExampleColumn = function () {
+		return new panjas.Column(index, [100, 300, 200, 5]);
 	};
 		
 	it('can get series values', function () {
