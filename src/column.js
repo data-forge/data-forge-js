@@ -37,12 +37,4 @@ Column.prototype.values = function () {
 	return self._values;
 };
 
-//
-// For compatability with LazyColumn. A Column is already baked, so just return self. 
-//
-Column.prototype.bake = function () {
-	var self = this;
-	return self;
-};
-
 module.exports = Column;

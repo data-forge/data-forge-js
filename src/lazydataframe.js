@@ -32,14 +32,4 @@ LazyDataFrame.prototype.values = function () {
 	return self._valuesFn();
 };
 
-//
-// Bake the lazy data frame to a normal data frame. 
-//
-LazyDataFrame.prototype.bake = function () {
-	var DataFrame = require('./dataframe'); // Local require, to prevent circular reference.
-	
-	var self = this;
-	return new DataFrame(self.columnNames(), self.values());
-};
-
 module.exports = LazyDataFrame;

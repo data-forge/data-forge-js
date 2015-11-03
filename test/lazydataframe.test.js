@@ -43,13 +43,4 @@ describe('LazyDataFrame', function () {
 			[new Date(2015, 24, 2), 200, 'bar', 22],
 		]);		
 	});
-	
-	it('can bake lazy data frame', function () {
-		
-		var lazyDataFrame = initExampleLazyDataFrame();
-		var bakedDataFrame = lazyDataFrame.bake();
-		expect(lazyDataFrame).not.to.equal(bakedDataFrame)
-		expect(bakedDataFrame).to.be.an.instanceOf(panjas.DataFrame);		
-	});
-	
 });

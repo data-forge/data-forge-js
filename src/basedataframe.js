@@ -409,7 +409,6 @@ BaseDataFrame.prototype.setColumn = function (columnName, data) {
 //
 // columnNames - Get the columns for the data frame.
 // values - Get the values for the data frame.
-// bake - Force lazy evaluation to complete.
 //
 
 module.exports = BaseDataFrame;

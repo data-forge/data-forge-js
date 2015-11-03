@@ -23,12 +23,4 @@ describe('LazySeries', function () {
 		]);		
 	});
 
-	it('can bake lazy series', function () {
-		
-		var lazySeries = initExampleColumn();		
-		var bakedSeries = lazySeries.bake();
-		expect(lazySeries).not.to.equal(bakedSeries)
-		expect(bakedSeries).to.be.an.instanceOf(panjas.Column);		
-	});
-
 });

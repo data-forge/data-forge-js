@@ -20,10 +20,4 @@ describe('Series', function () {
 		]);		
 	});
 
-	it('baking column returns self', function () {
-		
-		var column = initExampleColumn();
-		expect(column.bake()).to.equal(column);
-	});
-
 });

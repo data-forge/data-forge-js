@@ -89,9 +89,8 @@ BaseColumn.prototype.orderDescending = function () {
 //
 // Interface functions.
 //
-// name - Get the name of the column.
+// getName - Get the name of the column.
 // values - Get the values for each entry in the series.
-// bake - Force lazy evaluation to complete.
 //
 
 module.exports = BaseColumn;

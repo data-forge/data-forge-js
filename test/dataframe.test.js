@@ -44,12 +44,4 @@ describe('DataFrame', function () {
 		]);		
 	});
 	
-	it('baking data frame returns self', function () {
-		
-		var dataFrame = initExampleDataFrame();
-		expect(dataFrame.bake()).to.equal(dataFrame);
-	});
-	
-
-	
 });

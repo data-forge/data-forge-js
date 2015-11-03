@@ -32,12 +32,4 @@ DataFrame.prototype.values = function () {
 	return self._values;
 };
 
-//
-// For compatability with LazyDataFrame. A DataFrame is already baked, so just return self. 
-//
-DataFrame.prototype.bake = function () {
-	var self = this;
-	return self;
-};
-
 module.exports = DataFrame;
