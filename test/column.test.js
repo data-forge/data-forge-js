@@ -7,27 +7,23 @@ describe('Series', function () {
 	
 	var expect = require('chai').expect; 
 	
-	var initExampleSeries = function () {
-		return new panjas.Column([100, 200]);
+	var initExampleColumn = function () {
+		return new panjas.Column('some-column', [100, 200]);
 	};
 	
-	var initExampleColumn = function () {
-		return new panjas.Column(index, [100, 300, 200, 5]);
-	};
+	it('can get column values', function () {
 		
-	it('can get series values', function () {
-		
-		var series = initExampleSeries();		
-		expect(series.values()).to.eql([			
+		var column = initExampleColumn();		
+		expect(column.values()).to.eql([			
 			100,
 			200			
 		]);		
 	});
 
-	it('baking series returns self', function () {
+	it('baking column returns self', function () {
 		
-		var series = initExampleSeries();
-		expect(series.bake()).to.equal(series);
+		var column = initExampleColumn();
+		expect(column.bake()).to.equal(column);
 	});
 
 });

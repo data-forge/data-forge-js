@@ -24,6 +24,7 @@ BaseColumn.prototype.skip = function (numRows) {
 	
 	var self = this;
 	return new LazyColumn(
+		self.getName(),
 		function () {
 			return E
 				.from(self.values())
@@ -62,6 +63,7 @@ var order = function (self, sortMethod) {
 	var LazyColumn = require('./lazycolumn'); // Require here to prevent circular ref.
 
 	return new LazyColumn(
+		self.getName(),
 		function () {
 			return executeLazySort();			
 		}
@@ -87,6 +89,7 @@ BaseColumn.prototype.orderDescending = function () {
 //
 // Interface functions.
 //
+// name - Get the name of the column.
 // values - Get the values for each entry in the series.
 // bake - Force lazy evaluation to complete.
 //

@@ -33,9 +33,10 @@ BaseDataFrame.prototype._columnNameToIndex = function (columnName) {
 	return -1;
 };
 
-//
-// Pull a column out of the DataFrame.
-//
+/*
+ * Retreive a named column from the DataFrame.
+ *
+ */
 BaseDataFrame.prototype.getColumn = function (columnName) {
 	var self = this;
 	var columnIndex = self._columnNameToIndex(columnName);
@@ -44,6 +45,7 @@ BaseDataFrame.prototype.getColumn = function (columnName) {
 	}
 	
 	return new LazyColumn(
+		columnName,
 		function () {
 			return E.from(self.values())
 				.select(function (entry) {
@@ -52,6 +54,20 @@ BaseDataFrame.prototype.getColumn = function (columnName) {
 				.toArray();
 		}
 	);
+};
+
+/** 
+ * Retreive a collection of all columns.
+ */
+BaseDataFrame.prototype.getColumns = function () {
+
+	var self = this;
+
+	return E.from(self.columnNames())
+		.select(function (columnName) {
+			return self.getColumn(columnName);
+		})
+		.toArray();
 };
 
 //

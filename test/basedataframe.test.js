@@ -57,7 +57,7 @@ describe('BaseDataFrame', function () {
 		}).to.throw(Error).with.property('message').that.equals("In call to 'series' failed to find column with name 'non-existing column name'.");
 	});
 
-	it('can pull column as series', function () {
+	it('can retreive column', function () {
 		
 		var dataFrame = initExampleDataFrame();
 		var series1 = dataFrame.getColumn('Value1');
@@ -78,8 +78,21 @@ describe('BaseDataFrame', function () {
 			22,
 		]);		
 	});
+
+	it('can retreive columns', function () {
+		
+		var dataFrame = initExampleDataFrame();
+		var columns = dataFrame.getColumns();
+		expect(columns.length).to.eql(4);
+
+		expect(columns[0].getName()).to.eql('Date');
+		expect(columns[0].values()).to.eql([new Date(1975, 24, 2), new Date(2015, 24, 2)]);
+
+		expect(columns[2].getName()).to.eql('Value2');
+		expect(columns[2].values()).to.eql(['foo', 'bar']);
+	});
 	
-	it('can pull column subset as new dataframe', function () 
+	it('can retreive column subset as new dataframe', function () 
 	{
 		var dataFrame = initExampleDataFrame();
 		var subsetDataFrame = dataFrame.subset(['Value3', 'Value1']);
