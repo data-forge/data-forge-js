@@ -34,9 +34,9 @@ BaseDataFrame.prototype._columnNameToIndex = function (columnName) {
 };
 
 //
-// Pull a column out of the DataFrame as a time series.
+// Pull a column out of the DataFrame.
 //
-BaseDataFrame.prototype.series = function (columnName) {
+BaseDataFrame.prototype.getColumn = function (columnName) {
 	var self = this;
 	var columnIndex = self._columnNameToIndex(columnName);
 	if (columnIndex < 0) {

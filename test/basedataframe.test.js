@@ -53,26 +53,26 @@ describe('BaseDataFrame', function () {
 		
 		expect(function () {
 			var dataFrame = initExampleDataFrame();
-			dataFrame.series('non-existing column name');			
+			dataFrame.getColumn('non-existing column name');			
 		}).to.throw(Error).with.property('message').that.equals("In call to 'series' failed to find column with name 'non-existing column name'.");
 	});
 
 	it('can pull column as series', function () {
 		
 		var dataFrame = initExampleDataFrame();
-		var series1 = dataFrame.series('Value1');
+		var series1 = dataFrame.getColumn('Value1');
 		expect(series1.values()).to.eql(			[
 			100,
 			200,
 		]);		
 		
-		var series2 = dataFrame.series('Value2');
+		var series2 = dataFrame.getColumn('Value2');
 		expect(series2.values()).to.eql(			[
 			'foo',
 			'bar',
 		]);			
 		
-		var series3 = dataFrame.series('Value3');
+		var series3 = dataFrame.getColumn('Value3');
 		expect(series3.values()).to.eql(			[
 			11,
 			22,
@@ -251,7 +251,7 @@ describe('BaseDataFrame', function () {
 		
 		var dataFrame1 = initExampleDataFrame();
 		var dataFrame2 = initExampleDataFrame2();
-		var modified = dataFrame2.setColumn('Value4', dataFrame1.series('Value2'));
+		var modified = dataFrame2.setColumn('Value4', dataFrame1.getColumn('Value2'));
 		expect(modified.columnNames()).to.eql([
 			"Date",
 			"Value1",

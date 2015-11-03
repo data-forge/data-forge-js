@@ -50,13 +50,13 @@ describe('csv.integration', function () {
 			.from(file, testFile)
 			.as(csv, csvOptions)
 			.then(function (dataFrame) {
-				var series1 = dataFrame.series('Value1');
+				var series1 = dataFrame.getColumn('Value1');
 				expect(series1.values()).to.eql([
 					100,
 					300,			
 				]);
 				
-				var series2 = dataFrame.series('Value2');
+				var series2 = dataFrame.getColumn('Value2');
 				expect(series2.values()).to.eql([
 					'foo',
 					'bar',			
