@@ -59,6 +59,43 @@ describe('BaseDataFrame', function () {
 		]);
 	});
 
+	it('can merge on columns that have different indices', function () {
+
+		var left = initDataFrame(
+			[
+				'lval',
+				'key',
+			],
+			[
+				[1, 'foo'],
+				[2, 'foo'],
+			]
+		);
+		var right = initDataFrame(
+			[
+				'key',
+				'rval',
+			],
+			[
+				['foo', 4],
+				['foo', 5],
+			]
+		);
+
+		var merged = panjas.merge(left, right, 'key');
+		expect(merged.columns()).to.eql([
+			'key',
+			'lval',
+			'rval',
+		]);
+		expect(merged.values()).to.eql([
+			['foo', 1, 4],
+			['foo', 1, 5],
+			['foo', 2, 4],
+			['foo', 2, 5],
+		]);
+	});
+
 	it('merging with column that doesnt exist in left data frame throws exception', function () {
 
 		var left = initDataFrame(
