@@ -414,6 +414,16 @@ BaseDataFrame.prototype.setColumn = function (columnName, data) {
 	}
 };
 
+/**
+ * Execute code over a moving window to produce a new data frame.
+ *
+ * @param {integer} period - The number of entries to include in the window.
+ * @param {function} fn - The function to invoke on each window.
+ */
+BaseDataFrame.prototype.rollingWindow = function (period, fn) {
+
+}
+
 //
 // Interface functions.
 //
