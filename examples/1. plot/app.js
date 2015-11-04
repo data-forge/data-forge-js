@@ -5,12 +5,22 @@ $(function() {
 	//
 	// Helper function for plotting.
 	//
-	var plot = function (id, dataFrame) {
-		var flotSeries = E.from(dataFrame.columns())
-			.select(function (columnName) {
+	var plot = function (id, indexColumnName, dataFrame) {
+		var index = dataFrame.getColumn("index").values();
+		var remainingColumns = dataFrame.dropColumn("index").getColumns();
+
+		var flotSeries = E.from(remainingColumns)
+			.select(function (column) {
+				var name = column.getName();
+				var data = E.from(index)
+					.zip(column.values(), function (index, value) {
+						return [index, value];
+					})
+					.toArray();
+				
 				return {
-					label: columnName,
-					data: dataFrame.series(columnName).rows(),
+					label: name,
+					data: data,
 				};
 			})
 			.toArray();
@@ -21,18 +31,17 @@ $(function() {
 	// 
 	// Create a data frame.
 	//
-	var index = new panjas.NumberIndex(E.range(0, 14).toArray());
 	var values = E
 		.range(0, 14)
 		.select(function (i) {
-			return [Math.sin(i), Math.cos(i)];
+			return [i, Math.sin(i), Math.cos(i)];
 		})
 		.toArray();
 
-	var dataFrame = new panjas.DataFrame(["Sin", "Cos"], index, values);
+	var dataFrame = new panjas.DataFrame(["index", "Sin", "Cos"], values);
 	
 	//
 	// Plot the data frame.
 	//
-	plot('#placeholder', dataFrame);
+	plot('#placeholder', "index", dataFrame);
 });
