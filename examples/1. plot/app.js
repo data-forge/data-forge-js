@@ -6,8 +6,8 @@ $(function() {
 	// Helper function for plotting.
 	//
 	var plot = function (id, indexColumnName, dataFrame) {
-		var index = dataFrame.getColumn("index").values();
-		var remainingColumns = dataFrame.dropColumn("index").getColumns();
+		var index = dataFrame.getColumn(indexColumnName).values();
+		var remainingColumns = dataFrame.dropColumn(indexColumnName).getColumns();
 
 		var flotSeries = E.from(remainingColumns)
 			.select(function (column) {
@@ -29,7 +29,7 @@ $(function() {
 	};
 	
 	// 
-	// Create a data frame.
+	// Create a simple data frame.
 	//
 	var values = E
 		.range(0, 14)
