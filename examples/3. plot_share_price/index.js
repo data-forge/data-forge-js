@@ -21,13 +21,14 @@ var loadFile = function (filePath) {
 //
 // Plot a graph from the data frame.
 //
-var plot = function (dataFrame, outputFilePath) {
+var plot = function (dataFrame, columnNames, outputFilePath) {
 	assert.isObject(dataFrame);
+	assert.isArray(columnNames);
 	assert.isString(outputFilePath);
 
 	return new Promise(function (resolve, reject) {
 
-		var data = E.from(dataFrame.subset(['Date', 'Close']).values())
+		var data = E.from(dataFrame.subset(columnNames).values())
 			.select(function (entry) {
 				return [entry[0].getTime(), entry[1]];
 			})
@@ -70,7 +71,7 @@ var plot = function (dataFrame, outputFilePath) {
 
 loadFile('share_prices.csv')
 	.then(function (dataFrame) {
-		return plot(dataFrame, 'output.png');		
+		return plot(dataFrame, ['Date', 'Close'], 'output.png');		
 	})
 	.catch(function (err) {
 		console.error(err.stack);
