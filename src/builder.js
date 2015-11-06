@@ -14,12 +14,12 @@ require('sugar');
 //
 // http://pietschsoft.com/post/2008/01/14/javascript-inttryparse-equivalent
 //
-function tryParseInt(str, defaultValue) {
+function tryParseFloat(str, defaultValue) {
      var retValue = defaultValue;
      if(str !== null) {
          if(str.length > 0) {
              if (!isNaN(str)) {
-                 retValue = parseInt(str);
+                 retValue = parseFloat(str);
              }
          }
      }
@@ -54,7 +54,7 @@ module.exports = function (rows, options) {
 			return E
 				.from(row)
 				.select(function (col) { // Auto-parse numbers.
-					var val = tryParseInt(col, null);
+					var val = tryParseFloat(col, null);
 					if (val == null) {
 						return col;
 					}
