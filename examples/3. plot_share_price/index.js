@@ -15,7 +15,7 @@ var highcharts = require('node-highcharts');
 var loadFile = function (filePath) {
 	assert.isString(filePath);
 	
-	return panjas.from(file, filePath).as(csv);
+	return panjas.from(file(filePath)).as(csv());
 };
 
 //

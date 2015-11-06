@@ -14,7 +14,7 @@ var assert = require('chai').assert;
 var loadSharePricesFile = function (filePath) {
 	assert.isString(filePath);
 	
-	return panjas.from(file, filePath).as(csv);
+	return panjas.from(file(filePath)).as(csv());
 };
 
 //
@@ -40,7 +40,7 @@ var saveSharePricesFile = function (dataFrame, filePath) {
 	assert.isObject(dataFrame);
 	assert.isString(filePath);
 
-	return dataFrame.as(csv).to(file, filePath);
+	return dataFrame.as(csv()).to(file(filePath));
 };
 
 loadSharePrices()

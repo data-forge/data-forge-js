@@ -15,7 +15,7 @@ var fs = require('fs');
 var loadFile = function (filePath) {
 	assert.isString(filePath);
 	
-	return panjas.from(file, filePath).as(csv);
+	return panjas.from(file(filePath)).as(csv());
 };
 
 //
@@ -50,7 +50,7 @@ var saveFile = function (dataFrame, filePath) {
 	assert.isObject(dataFrame);
 	assert.isString(filePath);
 
-	return dataFrame.as(csv).to(file, filePath);
+	return dataFrame.as(csv()).to(file(filePath));
 };
 
 loadFile('dividends.csv') // Open dividends for a single company.
