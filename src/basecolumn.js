@@ -86,6 +86,31 @@ BaseColumn.prototype.orderDescending = function () {
 	return order(self, 'orderByDescending');
 };
 
+/**
+ * Get a subset of rows from the column.
+ *
+ * @param {int} index - Index where the slice starts.
+ * @param {int} count - Number of rows to include in the slice.
+ */
+BaseColumn.prototype.getRowsSubset = function (index, count) {
+	assert.isNumber(index, "Expected 'index' parameter to getRowsSubset to be an integer.");
+	assert.isNumber(index, "Expected 'count' parameter to getRowsSubset to be an integer.");
+
+	var self = this;
+
+	var LazyColumn = require('./lazycolumn'); // Require here to prevent circular ref.
+
+	return new LazyColumn(
+		self.getName(),
+		function () {
+			return E.from(self.getValues())
+				.skip(index)
+				.take(count)
+				.toArray();
+		}
+	);
+};
+
 //
 // Interface functions.
 //

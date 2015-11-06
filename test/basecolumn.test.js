@@ -36,4 +36,11 @@ describe('BaseColumn', function () {
 		var sorted = column.orderDescending();
 		expect(sorted.getValues()).to.eql([300, 200, 100, 5]);
 	});
+
+	it('can get slice of data', function () {
+
+		var column = initExampleColumn();
+		var subset = column.getRowsSubset(1, 2);
+		expect(subset.getValues()).to.eql([300, 200]);
+	});
 });
