@@ -415,6 +415,33 @@ BaseDataFrame.prototype.setColumn = function (columnName, data) {
 };
 
 /**
+ * Get a subset of rows from the data frame.
+ *
+ * @param {int} index - Index where the subset starts.
+ * @param {int} count - Number of rows to include in the subset.
+ */
+BaseDataFrame.prototype.getRowsSubset = function (index, count) {
+	assert.isNumber(index, "Expected 'index' parameter to getRowsSubset to be an integer.");
+	assert.isNumber(index, "Expected 'count' parameter to getRowsSubset to be an integer.");
+
+	var self = this;
+
+	var LazyDataFrame = require('./lazydataframe'); // Require here to prevent circular ref.
+
+	return new LazyDataFrame(
+		function () {
+			return self.columnNames();
+		},
+		function () {
+			return E.from(self.getValues())
+				.skip(index)
+				.take(count)
+				.toArray();
+		}
+	);
+};
+
+/** todo:
  * Execute code over a moving window to produce a new data frame.
  *
  * @param {integer} period - The number of entries to include in the window.

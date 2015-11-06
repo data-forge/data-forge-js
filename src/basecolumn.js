@@ -89,8 +89,8 @@ BaseColumn.prototype.orderDescending = function () {
 /**
  * Get a subset of rows from the column.
  *
- * @param {int} index - Index where the slice starts.
- * @param {int} count - Number of rows to include in the slice.
+ * @param {int} index - Index where the subset starts.
+ * @param {int} count - Number of rows to include in the subset.
  */
 BaseColumn.prototype.getRowsSubset = function (index, count) {
 	assert.isNumber(index, "Expected 'index' parameter to getRowsSubset to be an integer.");

@@ -37,7 +37,7 @@ describe('BaseColumn', function () {
 		expect(sorted.getValues()).to.eql([300, 200, 100, 5]);
 	});
 
-	it('can get slice of data', function () {
+	it('can get slice of rows', function () {
 
 		var column = initExampleColumn();
 		var subset = column.getRowsSubset(1, 2);

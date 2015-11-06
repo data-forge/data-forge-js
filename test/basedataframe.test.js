@@ -301,4 +301,14 @@ describe('BaseDataFrame', function () {
 			[new Date(2015, 24, 2), 100, 'd', 4, undefined],
 		]);
 	});
+
+	it('can get slice of rows', function () {
+
+		var dataFrame = initExampleDataFrame2();
+		var subset = dataFrame.getRowsSubset(1, 2);
+		expect(subset.getValues()).to.eql([
+			[new Date(1975, 24, 2), 200, 'b', 1],
+			[new Date(2013, 24, 2), 20, 'c', 22],
+		]);
+	});
 });
