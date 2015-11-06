@@ -30,7 +30,7 @@ var panjas = {
 	/**
 	 * Read a DataFrame from a plugable data source.
 	 */
-	from: function (dataSourcePlugin, sourceOptions) {
+	from: function (dataSourcePlugin) {
 		assert.isObject(dataSourcePlugin, "Expected 'dataSourcePlugin' parameter to 'panjas.from' to be an object.");
 		assert.isFunction(dataSourcePlugin.read, "Expected 'dataSourcePlugin' parameter to 'panjas.from' to be an object with a 'read' function.");
 		
@@ -38,13 +38,13 @@ var panjas = {
 			/**
 			 * Convert DataFrame from a particular data format using a plugable format.
 			 */
-			as: function (formatPlugin, formatOptions) {
+			as: function (formatPlugin) {
 				assert.isObject(formatPlugin, "Expected 'formatPlugin' parameter to 'panjas.from' to be an object.");
 				assert.isFunction(formatPlugin.from, "Expected 'formatPlugin' parameter to 'panjas.from' to be an object with a 'from' function.");
 				
-				return dataSourcePlugin.read(sourceOptions)
+				return dataSourcePlugin.read()
 					.then(function (textData) {
-						return formatPlugin.from(textData, formatOptions);						
+						return formatPlugin.from(textData);
 					});		
 			},		
 		};

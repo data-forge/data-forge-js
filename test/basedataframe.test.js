@@ -133,25 +133,31 @@ describe('BaseDataFrame', function () {
 		var formattedText = "some-text";
 		var promise = {};
 
-		var dataFormatPlugin = {
-			to: function (outputDataFrame, options) {
-				expect(outputDataFrame).to.equal(dataFrame);
-				expect(options).to.equal(formatOptions);
-				return formattedText;				
-			},
+		var dataFormatPlugin = function (options) {			
+			expect(options).to.equal(formatOptions);
+
+			return {
+				to: function (outputDataFrame) {
+					expect(outputDataFrame).to.equal(dataFrame);
+					return formattedText;				
+				},
+			};
 		};
 		
-		var dataSourcePlugin = {
-			write: function (textData, options) {
-				expect(textData).to.equal(formattedText);
-				expect(options).to.equal(dataSourceOptions);
-				return promise;				
-			},
+		var dataSourcePlugin = function (options) {
+			expect(options).to.equal(options);
+
+			return {
+				write: function (textData, options) {
+					expect(textData).to.equal(formattedText);					
+					return promise;				
+				},
+			};
 		};
 		
 		var result = dataFrame
-			.as(dataFormatPlugin, formatOptions)
-			.to(dataSourcePlugin, dataSourceOptions);
+			.as(dataFormatPlugin(formatOptions))
+			.to(dataSourcePlugin(dataSourceOptions));
 		expect(result).to.equal(promise);
 	});
 	

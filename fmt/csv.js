@@ -9,48 +9,51 @@ var panjas = require('../index');
 var E = require('linq');
 var assert = require('chai').assert;
 
-module.exports = {
-	
-	//
-	// Load a DataFrame from CSV text data.
-	//
-	from: function (csvData, options) {
-		assert.isString(csvData, "Expected 'csvData' parameter to 'csv.from' to be a string.");
-		
-		if (!options) {
-			options = {};
-		}
-		if (!options.parse_dates) {
-			options.parse_dates = [];			
-		}
-		
-		var lines = csvData.split('\n');
-		var rows = E
-			.from(lines)
-			.select(function (line) {
-				return E
-					.from(line.split(','))
-					.select(function (col) {
-						return col.trim();
-					})
-					.toArray();					
-			})
-			.toArray();
-				
-		return panjas.builder(rows, options);
-	},
-	
-	//
-	// Write DataFrame to csv text data.
-	//
-	to: function (dataFrame, csvOptions) {
-		
-		var header = dataFrame.getColumnNames().join(',');
-		var rows = E.from(dataFrame.getValues())
-				.select(function (row) {
-					return row.join(',');
+module.exports = function (options) {
+
+	if (!options) {
+		options = {};
+	}
+	if (!options.parse_dates) {
+		options.parse_dates = [];			
+	}
+
+	return {
+
+		//
+		// Load a DataFrame from CSV text data.
+		//
+		from: function (csvData) {
+			assert.isString(csvData, "Expected 'csvData' parameter to 'csv.from' to be a string.");
+			
+			var lines = csvData.split('\n');
+			var rows = E
+				.from(lines)
+				.select(function (line) {
+					return E
+						.from(line.split(','))
+						.select(function (col) {
+							return col.trim();
+						})
+						.toArray();					
 				})
 				.toArray();
-		return [header].concat(rows).join('\n');	
-	},	
+					
+			return panjas.builder(rows, options);
+		},
+		
+		//
+		// Write DataFrame to csv text data.
+		//
+		to: function (dataFrame) {
+			
+			var header = dataFrame.getColumnNames().join(',');
+			var rows = E.from(dataFrame.getValues())
+					.select(function (row) {
+						return row.join(',');
+					})
+					.toArray();
+			return [header].concat(rows).join('\n');	
+		},	
+	};
 };

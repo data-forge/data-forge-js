@@ -47,8 +47,8 @@ describe('csv.integration', function () {
 		};
 		
 		return panjas
-			.from(file, testFile)
-			.as(csv, csvOptions)
+			.from(file(testFile))
+			.as(csv(csvOptions))
 			.then(function (dataFrame) {
 				var series1 = dataFrame.getColumn('Value1');
 				expect(series1.getValues()).to.eql([
@@ -94,15 +94,15 @@ describe('csv.integration', function () {
 		
 		var dataFrame = initExampleDataFrame();
 		return dataFrame
-			.as(csv)
-			.to(file, testFile)
+			.as(csv())
+			.to(file(testFile))
 			.then(function () {
 				var data = fs.readFileSync(testFile, 'utf8');
 				return panjas
-					.from(file, testFile)
-					.as(csv, {
+					.from(file(testFile))
+					.as(csv({
 						parse_dates: ['Date',],			
-					});
+					}));
 			})
 			.then(function (loadedDataFrame) {
 				expect(loadedDataFrame.getColumnNames()).to.eql(dataFrame.getColumnNames());

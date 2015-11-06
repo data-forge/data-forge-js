@@ -117,18 +117,18 @@ BaseDataFrame.prototype.getColumnsSubset = function (columnNames) {
 //
 // Save the data frame via plugable output.
 //
-BaseDataFrame.prototype.as = function (formatPlugin, formatOptions) {
+BaseDataFrame.prototype.as = function (formatPlugin) {
 	assert.isObject(formatPlugin, "Expected 'formatPlugin' parameter to 'DataFrame.as' to be an object.");
 	assert.isFunction(formatPlugin.to, "Expected 'formatPlugin' parameter to 'DataFrame.as' to be an object with a 'to' function.");
 
 	var self = this;	
 	return {
-		to: function (dataSourcePlugin, dataSourceOptions) {
+		to: function (dataSourcePlugin) {
 			assert.isObject(dataSourcePlugin, "Expected 'dataSourcePlugin' parameter to 'DataFrame.as.to' to be an object.");
 			assert.isFunction(dataSourcePlugin.write, "Expected 'dataSourcePlugin' parameter to 'DataFrame.as.to' to be an object with a 'write' function.");
 			
-			var textData = formatPlugin.to(self, formatOptions);
-			return dataSourcePlugin.write(textData, dataSourceOptions);		
+			var textData = formatPlugin.to(self);
+			return dataSourcePlugin.write(textData);
 		},		
 	};
 };
