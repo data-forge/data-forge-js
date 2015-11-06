@@ -8,6 +8,7 @@ var glob = require('glob');
 var E = require('linq');
 var assert = require('chai').assert;
 var highcharts = require('node-highcharts');
+var moment = require('moment');
 
 //
 // Load as single CSV file containing share prices.
@@ -30,7 +31,7 @@ var plot = function (dataFrame, columnNames, outputFilePath) {
 
 		var data = E.from(dataFrame.getColumnsSubset(columnNames).getValues())
 			.select(function (entry) {
-				return [entry[0].getTime(), entry[1]];
+				return [moment(entry[0]).toDate().getTime(), entry[1]]; //todo: use automated date parsing.
 			})
 			.toArray();
 
