@@ -38,7 +38,7 @@ describe('DataFrame', function () {
 		
 		var dataFrame = initExampleDataFrame();
 		
-		expect(dataFrame.values()).to.eql(			[
+		expect(dataFrame.getValues()).to.eql(			[
 			[new Date(1975, 24, 2), 100, 'foo', 11],
 			[new Date(2015, 24, 2), 200, 'bar', 22],
 		]);		

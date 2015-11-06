@@ -17,7 +17,7 @@ describe('LazySeries', function () {
 	it('can get series values', function () {
 		
 		var series = initExampleColumn();		
-		expect(series.values()).to.eql([			
+		expect(series.getValues()).to.eql([			
 			100,
 			200			
 		]);		

@@ -22,7 +22,7 @@ describe('builder', function () {
 			'Col1',
 			'Col2',
 		])
-		expect(dataFrame.values()).to.eql([
+		expect(dataFrame.getValues()).to.eql([
 			['foo', 'bar'],
 			['hello', 'computer'],			
 		]);
@@ -50,7 +50,7 @@ describe('builder', function () {
 			'Col2',
 			'Col3',
 		])
-		expect(dataFrame.values()).to.eql([
+		expect(dataFrame.getValues()).to.eql([
 			[date1AsDate, 'foo', date2AsDate],
 			[date2AsDate, 'hello', date1AsDate],			
 		]);
@@ -66,7 +66,7 @@ describe('builder', function () {
 		
 		var dataFrame = panjas.builder(data);
 		
-		expect(dataFrame.values()).to.eql([
+		expect(dataFrame.getValues()).to.eql([
 			[1],
 			[15],			
 		]);
@@ -82,7 +82,7 @@ describe('builder', function () {
 		
 		var dataFrame = panjas.builder(data);
 		
-		expect(dataFrame.values()).to.eql([
+		expect(dataFrame.getValues()).to.eql([
 			[1],
 			[15],			
 		]);
@@ -101,7 +101,7 @@ describe('builder', function () {
 		
 		var dataFrame = panjas.builder(data);
 		
-		expect(dataFrame.values()).to.eql([
+		expect(dataFrame.getValues()).to.eql([
 			[date1],
 			[date2],			
 		]);

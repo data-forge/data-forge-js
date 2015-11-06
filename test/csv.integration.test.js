@@ -51,13 +51,13 @@ describe('csv.integration', function () {
 			.as(csv, csvOptions)
 			.then(function (dataFrame) {
 				var series1 = dataFrame.getColumn('Value1');
-				expect(series1.values()).to.eql([
+				expect(series1.getValues()).to.eql([
 					100,
 					300,			
 				]);
 				
 				var series2 = dataFrame.getColumn('Value2');
-				expect(series2.values()).to.eql([
+				expect(series2.getValues()).to.eql([
 					'foo',
 					'bar',			
 				]);
@@ -69,7 +69,7 @@ describe('csv.integration', function () {
 					'Value3',			
 				]);
 				
-				expect(dataFrame.values()).to.eql([
+				expect(dataFrame.getValues()).to.eql([
 					[moment('1975-2-24').toDate(), 100, "foo", 22],
 					[moment('2015-10-23').toDate(), 300, "bar", 23],			
 				]);
@@ -81,7 +81,7 @@ describe('csv.integration', function () {
 					'Value3',			
 				]);
 				
-				expect(dataFrame2.values()).to.eql([
+				expect(dataFrame2.getValues()).to.eql([
 					[100, 22],
 					[300, 23],			
 				]);
@@ -106,7 +106,7 @@ describe('csv.integration', function () {
 			})
 			.then(function (loadedDataFrame) {
 				expect(loadedDataFrame.columnNames()).to.eql(dataFrame.columnNames());
-				expect(loadedDataFrame.values()).to.eql(dataFrame.values());
+				expect(loadedDataFrame.getValues()).to.eql(dataFrame.getValues());
 				
 			});
 	});

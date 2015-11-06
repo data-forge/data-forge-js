@@ -1879,8 +1879,8 @@ var panjas = {
 			throw new Error("Column with name '" + columnName + "' doesn't exist in 'rightColumnIndex'.");
 		}
 
-		var leftRows = leftDataFrame.values();
-		var rightRows = rightDataFrame.values();
+		var leftRows = leftDataFrame.getValues();
+		var rightRows = rightDataFrame.getValues();
 
 		var mergedValues = E.from(leftRows) // Merge values, drop index.
 			.selectMany(function (leftRow) {
@@ -23274,7 +23274,7 @@ BaseColumn.prototype.skip = function (numRows) {
 		self.getName(),
 		function () {
 			return E
-				.from(self.values())
+				.from(self.getValues())
 				.skip(numRows)
 				.toArray();			
 		}
@@ -23297,7 +23297,7 @@ var order = function (self, sortMethod) {
 	//
 	var executeLazySort = function () {
 		if (!cachedSorted) {
-			cachedSorted = E.from(self.values())
+			cachedSorted = E.from(self.getValues())
 				[sortMethod](function (value) {
 					return value;
 				})
@@ -23337,7 +23337,7 @@ BaseColumn.prototype.orderDescending = function () {
 // Interface functions.
 //
 // getName - Get the name of the column.
-// values - Get the values for each entry in the series.
+// getValues - Get the values for each entry in the series.
 //
 
 module.exports = BaseColumn;
@@ -23401,7 +23401,7 @@ BaseDataFrame.prototype.getColumn = function (columnNameOrIndex) {
 	return new LazyColumn(
 		self.columnNames()[columnIndex],
 		function () {
-			return E.from(self.values())
+			return E.from(self.getValues())
 				.select(function (entry) {
 					return entry[columnIndex];
 				})
@@ -23445,7 +23445,7 @@ BaseDataFrame.prototype.subset = function (columnNames) {
 				})
 				.toArray();
 			
-			return E.from(self.values())
+			return E.from(self.getValues())
 				.select(function (entry) {
 					return E.from(columnIndices)
 						.select(function (columnIndex) {
@@ -23518,7 +23518,7 @@ var executeOrderBy = function (self, batch) {
 		});
 
 		cachedSorted = E.from(batch)
-			.aggregate(E.from(self.values()), function (unsorted, orderCmd) {
+			.aggregate(E.from(self.getValues()), function (unsorted, orderCmd) {
 				return unsorted[orderCmd.sortMethod](function (row) {
 					return row[orderCmd.columnIndex];
 				}); 
@@ -23665,7 +23665,7 @@ BaseDataFrame.prototype.dropColumn = function (columnOrColumns) {
 		})
 		.toArray();
 
-	var rows = E.from(self.values())
+	var rows = E.from(self.getValues())
 		.select(function (row) {
 			return E.from(row)
 				.where(function (column, columnIndex) {
@@ -23698,9 +23698,9 @@ BaseDataFrame.prototype.setColumn = function (columnName, data) {
 
 	if (!Object.isArray(data)) {
 		assert.isObject(data, "Expected 'data' parameter to 'setColumn' to be either an array or a column.");
-		assert.isFunction(data.values, "Expected 'data' parameter to 'setColumn' to have a 'values' function that returns the values of the column.");
+		assert.isFunction(data.getValues, "Expected 'data' parameter to 'setColumn' to have a 'getValues' function that returns the values of the column.");
 
-		data = data.values();
+		data = data.getValues();
 	}
 
 	var LazyDataFrame = require('./lazydataframe');
@@ -23714,7 +23714,7 @@ BaseDataFrame.prototype.setColumn = function (columnName, data) {
 				return self.columnNames().concat([columnName]);
 			},
 			function () {
-				return E.from(self.values())
+				return E.from(self.getValues())
 					.select(function (row, rowIndex) {
 						return row.concat([data[rowIndex]]);
 					})
@@ -23739,7 +23739,7 @@ BaseDataFrame.prototype.setColumn = function (columnName, data) {
 					.toArray();
 			},
 			function () {
-				return E.from(self.values())
+				return E.from(self.getValues())
 					.select(function (row, rowIndex) {
 						return E.from(row)
 							.select(function (column, thisColumnIndex) {
@@ -23894,7 +23894,7 @@ Column.prototype.getName = function () {
 /*
  * Retreive the values of the column.
  */
-Column.prototype.values = function () {
+Column.prototype.getValues = function () {
 	var self = this;
 	return self._values;
 };
@@ -23930,7 +23930,7 @@ DataFrame.prototype.columnNames = function () {
 	return self._columnNames;
 };
 
-DataFrame.prototype.values = function () {
+DataFrame.prototype.getValues = function () {
 	var self = this;
 	return self._values;
 };
@@ -23993,7 +23993,7 @@ LazyColumn.prototype.getName = function () {
 /*
  * Retreive the values of the column.
  */
-LazyColumn.prototype.values = function () {
+LazyColumn.prototype.getValues = function () {
 	var self = this;
 	return self._valuesFn();
 };
@@ -24005,7 +24005,7 @@ LazyColumn.prototype.bake = function () {
 	var Column = require('./column'); // Local require, to prevent circular reference.
 	
 	var self = this;
-	return new Column(self.getName(), self.values());
+	return new Column(self.getName(), self.getValues());
 };
 
 module.exports = LazyColumn;
@@ -24039,7 +24039,7 @@ LazyDataFrame.prototype.columnNames = function () {
 	return self._columnNamesFn();
 };
 
-LazyDataFrame.prototype.values = function () {
+LazyDataFrame.prototype.getValues = function () {
 	var self = this;
 	return self._valuesFn();
 };

@@ -27,7 +27,7 @@ DataFrame.prototype.columnNames = function () {
 	return self._columnNames;
 };
 
-DataFrame.prototype.values = function () {
+DataFrame.prototype.getValues = function () {
 	var self = this;
 	return self._values;
 };

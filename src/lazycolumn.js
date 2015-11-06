@@ -32,7 +32,7 @@ LazyColumn.prototype.getName = function () {
 /*
  * Retreive the values of the column.
  */
-LazyColumn.prototype.values = function () {
+LazyColumn.prototype.getValues = function () {
 	var self = this;
 	return self._valuesFn();
 };
@@ -44,7 +44,7 @@ LazyColumn.prototype.bake = function () {
 	var Column = require('./column'); // Local require, to prevent circular reference.
 	
 	var self = this;
-	return new Column(self.getName(), self.values());
+	return new Column(self.getName(), self.getValues());
 };
 
 module.exports = LazyColumn;

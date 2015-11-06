@@ -27,7 +27,7 @@ LazyDataFrame.prototype.columnNames = function () {
 	return self._columnNamesFn();
 };
 
-LazyDataFrame.prototype.values = function () {
+LazyDataFrame.prototype.getValues = function () {
 	var self = this;
 	return self._valuesFn();
 };

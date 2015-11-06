@@ -51,7 +51,7 @@ describe('BaseDataFrame', function () {
 			'lval',
 			'rval',
 		]);
-		expect(merged.values()).to.eql([
+		expect(merged.getValues()).to.eql([
 			['foo', 1, 4],
 			['foo', 1, 5],
 			['foo', 2, 4],
@@ -88,7 +88,7 @@ describe('BaseDataFrame', function () {
 			'lval',
 			'rval',
 		]);
-		expect(merged.values()).to.eql([
+		expect(merged.getValues()).to.eql([
 			['foo', 1, 4],
 			['foo', 1, 5],
 			['foo', 2, 4],

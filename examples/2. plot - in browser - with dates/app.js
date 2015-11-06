@@ -12,7 +12,7 @@ $(function() {
 			.select(function (columnName) {
 				var seriesData = dataFrame
 					.subset([indexColumnName, columnName])
-					.values();
+					.getValues();
 				seriesData = E.from(seriesData)
 					.select(function (entry) {
 						return [entry[0].getTime(), entry[1]];

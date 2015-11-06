@@ -77,8 +77,8 @@ var panjas = {
 			throw new Error("Column with name '" + columnName + "' doesn't exist in 'rightColumnIndex'.");
 		}
 
-		var leftRows = leftDataFrame.values();
-		var rightRows = rightDataFrame.values();
+		var leftRows = leftDataFrame.getValues();
+		var rightRows = rightDataFrame.getValues();
 
 		var mergedValues = E.from(leftRows) // Merge values, drop index.
 			.selectMany(function (leftRow) {

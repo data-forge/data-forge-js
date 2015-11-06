@@ -32,7 +32,7 @@ Column.prototype.getName = function () {
 /*
  * Retreive the values of the column.
  */
-Column.prototype.values = function () {
+Column.prototype.getValues = function () {
 	var self = this;
 	return self._values;
 };

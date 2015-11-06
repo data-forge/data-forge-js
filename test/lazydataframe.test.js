@@ -38,7 +38,7 @@ describe('LazyDataFrame', function () {
 	it('can get values', function () {
 		
 		var lazyDataFrame = initExampleLazyDataFrame();		
-		expect(lazyDataFrame.values()).to.eql(			[
+		expect(lazyDataFrame.getValues()).to.eql(			[
 			[new Date(1975, 24, 2), 100, 'foo', 11],
 			[new Date(2015, 24, 2), 200, 'bar', 22],
 		]);		

@@ -27,7 +27,7 @@ BaseColumn.prototype.skip = function (numRows) {
 		self.getName(),
 		function () {
 			return E
-				.from(self.values())
+				.from(self.getValues())
 				.skip(numRows)
 				.toArray();			
 		}
@@ -50,7 +50,7 @@ var order = function (self, sortMethod) {
 	//
 	var executeLazySort = function () {
 		if (!cachedSorted) {
-			cachedSorted = E.from(self.values())
+			cachedSorted = E.from(self.getValues())
 				[sortMethod](function (value) {
 					return value;
 				})
@@ -90,7 +90,7 @@ BaseColumn.prototype.orderDescending = function () {
 // Interface functions.
 //
 // getName - Get the name of the column.
-// values - Get the values for each entry in the series.
+// getValues - Get the values for each entry in the series.
 //
 
 module.exports = BaseColumn;

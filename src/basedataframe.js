@@ -57,7 +57,7 @@ BaseDataFrame.prototype.getColumn = function (columnNameOrIndex) {
 	return new LazyColumn(
 		self.columnNames()[columnIndex],
 		function () {
-			return E.from(self.values())
+			return E.from(self.getValues())
 				.select(function (entry) {
 					return entry[columnIndex];
 				})
@@ -101,7 +101,7 @@ BaseDataFrame.prototype.subset = function (columnNames) {
 				})
 				.toArray();
 			
-			return E.from(self.values())
+			return E.from(self.getValues())
 				.select(function (entry) {
 					return E.from(columnIndices)
 						.select(function (columnIndex) {
@@ -174,7 +174,7 @@ var executeOrderBy = function (self, batch) {
 		});
 
 		cachedSorted = E.from(batch)
-			.aggregate(E.from(self.values()), function (unsorted, orderCmd) {
+			.aggregate(E.from(self.getValues()), function (unsorted, orderCmd) {
 				return unsorted[orderCmd.sortMethod](function (row) {
 					return row[orderCmd.columnIndex];
 				}); 
@@ -321,7 +321,7 @@ BaseDataFrame.prototype.dropColumn = function (columnOrColumns) {
 		})
 		.toArray();
 
-	var rows = E.from(self.values())
+	var rows = E.from(self.getValues())
 		.select(function (row) {
 			return E.from(row)
 				.where(function (column, columnIndex) {
@@ -354,9 +354,9 @@ BaseDataFrame.prototype.setColumn = function (columnName, data) {
 
 	if (!Object.isArray(data)) {
 		assert.isObject(data, "Expected 'data' parameter to 'setColumn' to be either an array or a column.");
-		assert.isFunction(data.values, "Expected 'data' parameter to 'setColumn' to have a 'values' function that returns the values of the column.");
+		assert.isFunction(data.getValues, "Expected 'data' parameter to 'setColumn' to have a 'getValues' function that returns the values of the column.");
 
-		data = data.values();
+		data = data.getValues();
 	}
 
 	var LazyDataFrame = require('./lazydataframe');
@@ -370,7 +370,7 @@ BaseDataFrame.prototype.setColumn = function (columnName, data) {
 				return self.columnNames().concat([columnName]);
 			},
 			function () {
-				return E.from(self.values())
+				return E.from(self.getValues())
 					.select(function (row, rowIndex) {
 						return row.concat([data[rowIndex]]);
 					})
@@ -395,7 +395,7 @@ BaseDataFrame.prototype.setColumn = function (columnName, data) {
 					.toArray();
 			},
 			function () {
-				return E.from(self.values())
+				return E.from(self.getValues())
 					.select(function (row, rowIndex) {
 						return E.from(row)
 							.select(function (column, thisColumnIndex) {

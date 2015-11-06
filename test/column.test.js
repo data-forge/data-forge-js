@@ -14,7 +14,7 @@ describe('Series', function () {
 	it('can get column values', function () {
 		
 		var column = initExampleColumn();		
-		expect(column.values()).to.eql([			
+		expect(column.getValues()).to.eql([			
 			100,
 			200			
 		]);		
