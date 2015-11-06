@@ -28,7 +28,7 @@ var plot = function (dataFrame, columnNames, outputFilePath) {
 
 	return new Promise(function (resolve, reject) {
 
-		var data = E.from(dataFrame.subset(columnNames).getValues())
+		var data = E.from(dataFrame.getColumnsSubset(columnNames).getValues())
 			.select(function (entry) {
 				return [entry[0].getTime(), entry[1]];
 			})

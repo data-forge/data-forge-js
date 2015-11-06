@@ -11,7 +11,7 @@ $(function() {
 		var flotSeries = E.from(remainingColumnNames)
 			.select(function (columnName) {
 				var seriesData = dataFrame
-					.subset([indexColumnName, columnName])
+					.getColumnsSubset([indexColumnName, columnName])
 					.getValues();
 				seriesData = E.from(seriesData)
 					.select(function (entry) {

@@ -117,7 +117,7 @@ describe('BaseDataFrame', function () {
 	it('can retreive column subset as new dataframe', function () 
 	{
 		var dataFrame = initExampleDataFrame();
-		var subsetDataFrame = dataFrame.subset(['Value3', 'Value1']);
+		var subsetDataFrame = dataFrame.getColumnsSubset(['Value3', 'Value1']);
 		expect(dataFrame).not.to.equal(subsetDataFrame); 
 		expect(subsetDataFrame.getValues()).to.eql(			[
 			[11, 100],

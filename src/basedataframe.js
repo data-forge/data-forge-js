@@ -83,7 +83,7 @@ BaseDataFrame.prototype.getColumns = function () {
 //
 // Retreive a subset of the data frame's columns as a new data frame.
 //
-BaseDataFrame.prototype.subset = function (columnNames) {
+BaseDataFrame.prototype.getColumnsSubset = function (columnNames) {
 	var LazyDataFrame = require('./lazydataframe'); // Local require to prevent circular ref.
 
 	var self = this;
