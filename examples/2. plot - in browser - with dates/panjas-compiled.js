@@ -1832,7 +1832,7 @@ var panjas = {
 	/**
 	 * Read a DataFrame from a plugable data source.
 	 */
-	from: function (dataSourcePlugin, sourceOptions) {
+	from: function (dataSourcePlugin) {
 		assert.isObject(dataSourcePlugin, "Expected 'dataSourcePlugin' parameter to 'panjas.from' to be an object.");
 		assert.isFunction(dataSourcePlugin.read, "Expected 'dataSourcePlugin' parameter to 'panjas.from' to be an object with a 'read' function.");
 		
@@ -1840,13 +1840,13 @@ var panjas = {
 			/**
 			 * Convert DataFrame from a particular data format using a plugable format.
 			 */
-			as: function (formatPlugin, formatOptions) {
+			as: function (formatPlugin) {
 				assert.isObject(formatPlugin, "Expected 'formatPlugin' parameter to 'panjas.from' to be an object.");
 				assert.isFunction(formatPlugin.from, "Expected 'formatPlugin' parameter to 'panjas.from' to be an object with a 'from' function.");
 				
-				return dataSourcePlugin.read(sourceOptions)
+				return dataSourcePlugin.read()
 					.then(function (textData) {
-						return formatPlugin.from(textData, formatOptions);						
+						return formatPlugin.from(textData);
 					});		
 			},		
 		};
@@ -23333,6 +23333,31 @@ BaseColumn.prototype.orderDescending = function () {
 	return order(self, 'orderByDescending');
 };
 
+/**
+ * Get a subset of rows from the column.
+ *
+ * @param {int} index - Index where the subset starts.
+ * @param {int} count - Number of rows to include in the subset.
+ */
+BaseColumn.prototype.getRowsSubset = function (index, count) {
+	assert.isNumber(index, "Expected 'index' parameter to getRowsSubset to be an integer.");
+	assert.isNumber(index, "Expected 'count' parameter to getRowsSubset to be an integer.");
+
+	var self = this;
+
+	var LazyColumn = require('./lazycolumn'); // Require here to prevent circular ref.
+
+	return new LazyColumn(
+		self.getName(),
+		function () {
+			return E.from(self.getValues())
+				.skip(index)
+				.take(count)
+				.toArray();
+		}
+	);
+};
+
 //
 // Interface functions.
 //
@@ -23461,18 +23486,18 @@ BaseDataFrame.prototype.getColumnsSubset = function (columnNames) {
 //
 // Save the data frame via plugable output.
 //
-BaseDataFrame.prototype.as = function (formatPlugin, formatOptions) {
+BaseDataFrame.prototype.as = function (formatPlugin) {
 	assert.isObject(formatPlugin, "Expected 'formatPlugin' parameter to 'DataFrame.as' to be an object.");
 	assert.isFunction(formatPlugin.to, "Expected 'formatPlugin' parameter to 'DataFrame.as' to be an object with a 'to' function.");
 
 	var self = this;	
 	return {
-		to: function (dataSourcePlugin, dataSourceOptions) {
+		to: function (dataSourcePlugin) {
 			assert.isObject(dataSourcePlugin, "Expected 'dataSourcePlugin' parameter to 'DataFrame.as.to' to be an object.");
 			assert.isFunction(dataSourcePlugin.write, "Expected 'dataSourcePlugin' parameter to 'DataFrame.as.to' to be an object with a 'write' function.");
 			
-			var textData = formatPlugin.to(self, formatOptions);
-			return dataSourcePlugin.write(textData, dataSourceOptions);		
+			var textData = formatPlugin.to(self);
+			return dataSourcePlugin.write(textData);
 		},		
 	};
 };
@@ -23759,6 +23784,33 @@ BaseDataFrame.prototype.setColumn = function (columnName, data) {
 };
 
 /**
+ * Get a subset of rows from the data frame.
+ *
+ * @param {int} index - Index where the subset starts.
+ * @param {int} count - Number of rows to include in the subset.
+ */
+BaseDataFrame.prototype.getRowsSubset = function (index, count) {
+	assert.isNumber(index, "Expected 'index' parameter to getRowsSubset to be an integer.");
+	assert.isNumber(index, "Expected 'count' parameter to getRowsSubset to be an integer.");
+
+	var self = this;
+
+	var LazyDataFrame = require('./lazydataframe'); // Require here to prevent circular ref.
+
+	return new LazyDataFrame(
+		function () {
+			return self.columnNames();
+		},
+		function () {
+			return E.from(self.getValues())
+				.skip(index)
+				.take(count)
+				.toArray();
+		}
+	);
+};
+
+/** todo:
  * Execute code over a moving window to produce a new data frame.
  *
  * @param {integer} period - The number of entries to include in the window.

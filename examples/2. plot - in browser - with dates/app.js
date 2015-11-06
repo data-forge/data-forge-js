@@ -25,7 +25,9 @@ $(function() {
 			})
 			.toArray();
 
-		$.plot(id, flotSeries);
+		$.plot(id, flotSeries, {
+				xaxis: { mode: "time" }
+			});
 	};
 	
 	// 
