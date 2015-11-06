@@ -46,7 +46,7 @@ describe('BaseDataFrame', function () {
 		);
 
 		var merged = panjas.merge(left, right, 'key');
-		expect(merged.columnNames()).to.eql([
+		expect(merged.getColumnNames()).to.eql([
 			'key',
 			'lval',
 			'rval',
@@ -83,7 +83,7 @@ describe('BaseDataFrame', function () {
 		);
 
 		var merged = panjas.merge(left, right, 'key');
-		expect(merged.columnNames()).to.eql([
+		expect(merged.getColumnNames()).to.eql([
 			'key',
 			'lval',
 			'rval',

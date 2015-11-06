@@ -22,7 +22,7 @@ var LazyDataFrame = function (columnNamesFn, valuesFn) {
 
 var parent = inherit(LazyDataFrame, BaseDataFrame);
 
-LazyDataFrame.prototype.columnNames = function () {
+LazyDataFrame.prototype.getColumnNames = function () {
 	var self = this;
 	return self._columnNamesFn();
 };

@@ -28,7 +28,7 @@ describe('LazyDataFrame', function () {
 	it('can get columns', function () {
 		
 		var lazyDataFrame = initExampleLazyDataFrame();	
-		expect(lazyDataFrame.columnNames()).to.eql([
+		expect(lazyDataFrame.getColumnNames()).to.eql([
 			"Value1",
 			"Value2",
 			"Value3",

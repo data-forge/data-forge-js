@@ -45,7 +45,7 @@ module.exports = {
 	//
 	to: function (dataFrame, csvOptions) {
 		
-		var header = dataFrame.columnNames().join(',');
+		var header = dataFrame.getColumnNames().join(',');
 		var rows = E.from(dataFrame.getValues())
 				.select(function (row) {
 					return row.join(',');

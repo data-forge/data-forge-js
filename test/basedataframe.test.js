@@ -11,7 +11,7 @@ describe('BaseDataFrame', function () {
 	
 	var initExampleDataFrame = function () {
 		var dataFrame = new BaseDataFrame();
-		dataFrame.columnNames = function () {
+		dataFrame.getColumnNames = function () {
 			return [
 				"Date",
 				"Value1",
@@ -30,7 +30,7 @@ describe('BaseDataFrame', function () {
 
 	var initExampleDataFrame2 = function () {
 		var dataFrame = new BaseDataFrame();
-		dataFrame.columnNames = function () {
+		dataFrame.getColumnNames = function () {
 			return [
 				"Date",
 				"Value1",
@@ -255,7 +255,7 @@ describe('BaseDataFrame', function () {
 		
 		var dataFrame = initExampleDataFrame2();
 		var modified = dataFrame.setColumn('Value4', [1, 2, 3, 4]);
-		expect(modified.columnNames()).to.eql([
+		expect(modified.getColumnNames()).to.eql([
 			"Date",
 			"Value1",
 			"Value2",
@@ -287,7 +287,7 @@ describe('BaseDataFrame', function () {
 		var dataFrame1 = initExampleDataFrame();
 		var dataFrame2 = initExampleDataFrame2();
 		var modified = dataFrame2.setColumn('Value4', dataFrame1.getColumn('Value2'));
-		expect(modified.columnNames()).to.eql([
+		expect(modified.getColumnNames()).to.eql([
 			"Date",
 			"Value1",
 			"Value2",

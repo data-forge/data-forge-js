@@ -22,7 +22,7 @@ BaseDataFrame.prototype._columnNameToIndex = function (columnName) {
 	assert.isString(columnName, "Expected 'columnName' parameter to _columnNameToIndex to be a non-empty string.");
 	
 	var self = this;	
-	var columnNames = self.columnNames();
+	var columnNames = self.getColumnNames();
 	
 	for (var i = 0; i < columnNames.length; ++i) {
 		if (columnName == columnNames[i]) {
@@ -55,7 +55,7 @@ BaseDataFrame.prototype.getColumn = function (columnNameOrIndex) {
 	}
 	
 	return new LazyColumn(
-		self.columnNames()[columnIndex],
+		self.getColumnNames()[columnIndex],
 		function () {
 			return E.from(self.getValues())
 				.select(function (entry) {
@@ -73,7 +73,7 @@ BaseDataFrame.prototype.getColumns = function () {
 
 	var self = this;
 
-	return E.from(self.columnNames())
+	return E.from(self.getColumnNames())
 		.select(function (columnName) {
 			return self.getColumn(columnName);
 		})
@@ -188,7 +188,7 @@ var executeOrderBy = function (self, batch) {
 
 	return new LazyDataFrame(
 		function () {
-			return self.columnNames();
+			return self.getColumnNames();
 		},
 		function () {
 			return executeLazySort();	
@@ -315,7 +315,7 @@ BaseDataFrame.prototype.dropColumn = function (columnOrColumns) {
 		})
 		.toArray();
 
-	var columns = E.from(self.columnNames())
+	var columns = E.from(self.getColumnNames())
 		.where(function (columnName, columnIndex) {
 			return columnIndices.indexOf(columnIndex) < 0;
 		})
@@ -367,7 +367,7 @@ BaseDataFrame.prototype.setColumn = function (columnName, data) {
 		// Add new column.
 		return new LazyDataFrame(
 			function () {
-				return self.columnNames().concat([columnName]);
+				return self.getColumnNames().concat([columnName]);
 			},
 			function () {
 				return E.from(self.getValues())
@@ -383,7 +383,7 @@ BaseDataFrame.prototype.setColumn = function (columnName, data) {
 		// Replace existing column.
 		return new LazyDataFrame(
 			function () {
-				return E.from(self.columnNames())
+				return E.from(self.getColumnNames())
 					.select(function (thisColumnName, thisColumnIndex) {
 						if (thisColumnIndex === columnIndex) {
 							return columnName;
