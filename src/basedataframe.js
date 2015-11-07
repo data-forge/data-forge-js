@@ -441,21 +441,11 @@ BaseDataFrame.prototype.getRowsSubset = function (index, count) {
 	);
 };
 
-/** todo:
- * Execute code over a moving window to produce a new data frame.
- *
- * @param {integer} period - The number of entries to include in the window.
- * @param {function} fn - The function to invoke on each window.
- */
-BaseDataFrame.prototype.rollingWindow = function (period, fn) {
-
-}
-
 //
 // Interface functions.
 //
-// columnNames - Get the columns for the data frame.
-// values - Get the values for the data frame.
+// getColumnNames - Get the columns for the data frame.
+// getValues - Get the values for the data frame.
 //
 
 module.exports = BaseDataFrame;

@@ -111,6 +111,37 @@ BaseColumn.prototype.getRowsSubset = function (index, count) {
 	);
 };
 
+/** todo:
+ * Execute code over a moving window to produce a new data frame.
+ *
+ * @param {integer} period - The number of entries to include in the window.
+ * @param {function} fn - The function to invoke on each window.
+ */
+BaseColumn.prototype.rollingWindow = function (period, fn) {
+
+	assert.isNumber(period, "Expected 'period' parameter to 'rollingWindow' to be a number.");
+	assert.isFunction(fn, "Expected 'fn' parameter to 'rollingWindow' to be a function.");
+
+	var self = this;
+
+	var values = self.getValues();
+
+	var Column = require('./column');
+
+	if (values.length == 0) {
+		return new Column(self.getName(), []);
+	}
+
+	var newValues = E.range(0, values.length-period+1)
+		.select(function (i) {
+			var window = E.from(values).skip(i).take(period).toArray();
+			return fn(window);
+		})
+		.toArray();
+
+	return new Column(self.getName(), newValues);
+};
+
 //
 // Interface functions.
 //
