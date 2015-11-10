@@ -5,7 +5,7 @@
 //
 
 var LazyColumn = require('./lazycolumn');
-var Index = require('./index');
+var LazyIndex = require('./lazyindex');
 
 var assert = require('chai').assert; 
 var E = require('linq');
@@ -468,7 +468,11 @@ BaseDataFrame.prototype.setIndex = function (columnNameOrIndex) {
 			return self.getValues();
 		},
 		function () {
-			return new Index(self.getColumn(columnNameOrIndex).getValues()); //todo: should be lazy index.
+			return new LazyIndex(
+				function () {
+					return self.getColumn(columnNameOrIndex).getValues();
+				}
+			);
 		}		
 	);
 }
@@ -489,7 +493,11 @@ BaseDataFrame.prototype.resetIndex = function () {
 			return self.getValues();
 		},
 		function () {
-			return new Index(E.range(0, self.getValues().length).toArray()); //todo: lazy index.
+			return new LazyIndex(
+				function () {
+					return E.range(0, self.getValues().length).toArray();
+				}
+			);
 		}		
 	);
 };

@@ -6,7 +6,7 @@
 
 var LazyColumn = require('./lazycolumn');
 var BaseDataFrame = require('./basedataframe');
-var Index = require('./index');
+var LazyIndex = require('./lazyindex');
 
 var assert = require('chai').assert;
 var E = require('linq');
@@ -26,7 +26,11 @@ var LazyDataFrame = function (columnNamesFn, valuesFn, indexFn) {
 	self._indexFn = indexFn || 
 		// Default to generated index range.
 		function () {
-			return new Index(E.range(0, self.getValues().length).toArray());
+			return new LazyIndex(
+				function () {
+					return E.range(0, self.getValues().length).toArray();
+				}
+			);
 		};
 };
 

@@ -1,6 +1,10 @@
 'use strict';
 
+var BaseIndex = require('./baseindex');
+
 var assert = require('chai').assert;
+var E = require('linq');
+var inherit = require('./inherit');
 
 /**
  * Implements an index for a data frame or series.
@@ -12,8 +16,10 @@ var Index = function (values) {
 	self._values = values;
 };
 
+var parent = inherit(Index, BaseIndex);
+
 /*
- * Get the values from the index.
+ * Get the array of values from the index.
  */
 Index.prototype.getValues = function () {
 	var self = this;
