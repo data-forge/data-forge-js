@@ -5,13 +5,21 @@
 //
 
 var LazyColumn = require('./lazycolumn');
+var Index = require('./index');
 
 var assert = require('chai').assert; 
 var E = require('linq');
 
+/**
+ * Base class for data frames.
+ *
+ * Derived classes must implement:
+ *
+ * getIndex - Get the index for the data frame.
+ * getColumnNames - Get the columns for the data frame.
+ * getValues - Get the values for the data frame.
+ */
 var BaseDataFrame = function () {
-	
-	
 };
 
 //
@@ -441,11 +449,49 @@ BaseDataFrame.prototype.getRowsSubset = function (index, count) {
 	);
 };
 
-//
-// Interface functions.
-//
-// getColumnNames - Get the columns for the data frame.
-// getValues - Get the values for the data frame.
-//
+/**
+ * Set a column as the index of the data frame.
+ *
+ * @param {string|int} columnNameOrIndex - Name or index of the column to set as the index.
+ */
+BaseDataFrame.prototype.setIndex = function (columnNameOrIndex) {
+
+	var self = this;
+
+	var LazyDataFrame = require('./lazydataframe'); // Require here to prevent circular ref.
+
+	return new LazyDataFrame(
+		function () {
+			return self.getColumnNames();
+		},
+		function () {
+			return self.getValues();
+		},
+		function () {
+			return new Index(self.getColumn(columnNameOrIndex).getValues()); //todo: should be lazy index.
+		}		
+	);
+}
+
+/**
+ * Reset the index of the data frame back to the default sequential integer index.
+ */
+BaseDataFrame.prototype.resetIndex = function () {
+
+	var self = this;
+	var LazyDataFrame = require('./lazydataframe'); // Require here to prevent circular ref.
+
+	return new LazyDataFrame(
+		function () {
+			return self.getColumnNames();
+		},
+		function () {
+			return self.getValues();
+		},
+		function () {
+			return new Index(E.range(0, self.getValues().length).toArray()); //todo: lazy index.
+		}		
+	);
+};
 
 module.exports = BaseDataFrame;

@@ -43,4 +43,14 @@ describe('LazyDataFrame', function () {
 			[new Date(2015, 24, 2), 200, 'bar', 22],
 		]);		
 	});
+
+	it('default index is generated', function () {
+
+		var dataFrame = initExampleLazyDataFrame();
+
+		expect(dataFrame.getIndex().getValues()).to.eql([
+			0,
+			1
+		]);
+	});
 });

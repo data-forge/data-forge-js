@@ -25,6 +25,9 @@ describe('BaseDataFrame', function () {
 				[new Date(2015, 24, 2), 200, 'bar', 22],
 			];
 		};
+		dataFrame.getIndex = function () {
+			return new panjas.Index(E.range(0, 2).toArray());
+		};
 		return dataFrame;
 	}; 
 
@@ -315,6 +318,54 @@ describe('BaseDataFrame', function () {
 		expect(subset.getValues()).to.eql([
 			[new Date(1975, 24, 2), 200, 'b', 1],
 			[new Date(2013, 24, 2), 20, 'c', 22],
+		]);
+	});
+
+	it('can set index by column name', function () {
+
+		var dataFrame = initExampleDataFrame();
+		var indexedDataFrame = dataFrame.setIndex("Date");
+
+		expect(indexedDataFrame.getIndex().getValues()).to.eql([
+			new Date(1975, 24, 2),
+			new Date(2015, 24, 2)
+		]);
+
+		expect(indexedDataFrame.getValues()).to.eql([
+			[new Date(1975, 24, 2), 100, 'foo', 11],
+			[new Date(2015, 24, 2), 200, 'bar', 22],
+		]);
+	});
+
+	it('can set index by column index', function () {
+
+		var dataFrame = initExampleDataFrame();
+		var indexedDataFrame = dataFrame.setIndex(0);
+
+		expect(indexedDataFrame.getIndex().getValues()).to.eql([
+			new Date(1975, 24, 2),
+			new Date(2015, 24, 2)
+		]);
+
+		expect(indexedDataFrame.getValues()).to.eql([
+			[new Date(1975, 24, 2), 100, 'foo', 11],
+			[new Date(2015, 24, 2), 200, 'bar', 22],
+		]);
+	});
+
+	it('can reset index', function () {
+
+		var dataFrame = initExampleDataFrame();
+		var dataFrameWithIndexReset = dataFrame.setIndex("Date").resetIndex();
+
+		expect(dataFrameWithIndexReset.getIndex().getValues()).to.eql([
+			0,
+			1
+		]);
+
+		expect(dataFrameWithIndexReset.getValues()).to.eql([
+			[new Date(1975, 24, 2), 100, 'foo', 11],
+			[new Date(2015, 24, 2), 200, 'bar', 22],
 		]);
 	});
 });
