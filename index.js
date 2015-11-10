@@ -26,6 +26,7 @@ var panjas = {
 	Column: require('./src/column'),
 	LazyColumn: require('./src/lazycolumn'),
 	builder: require('./src/builder'),	
+	Index: require('./src/index'),
 
 	/**
 	 * Read a DataFrame from a plugable data source.
