@@ -62,14 +62,4 @@ LazyColumn.prototype.getIndex = function () {
 	return self._indexFn();
 };
 
-//
-// Bake the lazy column to a normal column. 
-//
-LazyColumn.prototype.bake = function () {
-	var Column = require('./column'); // Local require, to prevent circular reference.
-	
-	var self = this;
-	return new Column(self.getName(), self.getValues());
-};
-
 module.exports = LazyColumn;
