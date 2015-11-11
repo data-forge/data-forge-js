@@ -379,10 +379,10 @@ BaseDataFrame.prototype.setColumn = function (columnName, data) {
 	var self = this;
 
 	if (!Object.isArray(data)) {
-		assert.isObject(data, "Expected 'data' parameter to 'setColumn' to be either an array or a column.");
-		assert.isFunction(data.getValues, "Expected 'data' parameter to 'setColumn' to have a 'getValues' function that returns the values of the column.");
+		assert.isObject(data, "Expected 'data' parameter to 'setColumn' to be either an array or a column object.");
+		assert.isFunction(data.reindex, "Expected 'data' parameter to 'setColumn' to have a 'reindex' function that allows the column to be reindexed.");
 
-		data = data.getValues();
+		data = data.reindex(self.getIndex()).getValues();
 	}
 
 	var LazyDataFrame = require('./lazydataframe');

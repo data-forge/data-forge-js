@@ -124,7 +124,7 @@ BaseColumn.prototype.getRowsSubset = function (index, count) {
 	);
 };
 
-/** todo:
+/** 
  * Execute code over a moving window to produce a new data frame.
  *
  * @param {integer} period - The number of entries to include in the window.
@@ -139,7 +139,7 @@ BaseColumn.prototype.rollingWindow = function (period, fn) {
 
 	var values = self.getValues();
 
-	var Column = require('./column');
+	var Column = require('./column'); //todo: this should be lazy.
 
 	if (values.length == 0) {
 		return new Column(self.getName(), []);
@@ -153,6 +153,45 @@ BaseColumn.prototype.rollingWindow = function (period, fn) {
 		.toArray();
 
 	return new Column(self.getName(), newValues);
+};
+
+/**
+ * Create a new column, reindexed from this column.
+ *
+ * @param {index} newIndex - The index used to generate the new column.
+ */
+BaseColumn.prototype.reindex = function (newIndex) {
+	assert.isObject(newIndex, "Expected 'newIndex' parameter to 'reindex' function to be an index.");
+
+	var self = this;
+
+	var indexMap = {};
+	E.from(self.getIndex().getValues())
+		.zip(self.getValues(), function (indexValue, columnValue) {
+			return [indexValue, columnValue];
+		})
+		.toArray()
+		.forEach(function (pair) {
+			indexMap[pair[0]] = pair[1];
+		});
+
+	var newValues = E.from(newIndex.getValues())
+		.select(function (newIndexValue) {
+			return indexMap[newIndexValue];
+		})
+		.toArray();
+
+	var LazyColumn = require('./lazycolumn');
+
+	return new LazyColumn(
+		self.getName(),
+		function () {
+			return newValues;
+		},
+		function () {
+			return newIndex;
+		}
+	);
 };
 
 module.exports = BaseColumn;

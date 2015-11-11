@@ -129,4 +129,14 @@ describe('BaseColumn', function () {
 		expect(values[2]).to.eql([2, 3, 4]);
 		expect(values[3]).to.eql([3, 4, 5]);
 	});
+
+	it('can reindex column', function () {
+
+		var column = initExampleColumn();
+		var newIndex = new panjas.Index([3, 10, 1, 32])
+
+		var reindexed = column.reindex(newIndex);
+		expect(reindexed.getIndex().getValues()).to.eql([3, 10, 1, 32]);
+		expect(reindexed.getValues()).to.eql([5, undefined, 300, undefined]);
+	});
 });

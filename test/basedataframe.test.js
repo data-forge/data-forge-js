@@ -26,7 +26,7 @@ describe('BaseDataFrame', function () {
 			];
 		};
 		dataFrame.getIndex = function () {
-			return new panjas.Index([3, 4]);
+			return new panjas.Index([5, 6]);
 		};
 		return dataFrame;
 	}; 
@@ -67,15 +67,15 @@ describe('BaseDataFrame', function () {
 		
 		var dataFrame = initExampleDataFrame();
 		var column1 = dataFrame.getColumn('Value1');
-		expect(column1.getIndex().getValues()).to.eql([3, 4]);
+		expect(column1.getIndex().getValues()).to.eql([5, 6]);
 		expect(column1.getValues()).to.eql([100, 200]);
 		
 		var column2 = dataFrame.getColumn('Value2');
-		expect(column2.getIndex().getValues()).to.eql([3, 4]);
+		expect(column2.getIndex().getValues()).to.eql([5, 6]);
 		expect(column2.getValues()).to.eql(['foo', 'bar']);
 		
 		var column3 = dataFrame.getColumn('Value3');
-		expect(column3.getIndex().getValues()).to.eql([3, 4]);
+		expect(column3.getIndex().getValues()).to.eql([5, 6]);
 		expect(column3.getValues()).to.eql([11, 22]);
 	});
 
@@ -83,15 +83,15 @@ describe('BaseDataFrame', function () {
 		
 		var dataFrame = initExampleDataFrame();
 		var column1 = dataFrame.getColumn(1);
-		expect(column1.getIndex().getValues()).to.eql([3, 4]);
+		expect(column1.getIndex().getValues()).to.eql([5, 6]);
 		expect(column1.getValues()).to.eql([100, 200]);
 		
 		var column2 = dataFrame.getColumn(2);
-		expect(column2.getIndex().getValues()).to.eql([3, 4]);
+		expect(column2.getIndex().getValues()).to.eql([5, 6]);
 		expect(column2.getValues()).to.eql(['foo', 'bar']);
 		
 		var column3 = dataFrame.getColumn(3);
-		expect(column3.getIndex().getValues()).to.eql([3, 4]);
+		expect(column3.getIndex().getValues()).to.eql([5, 6]);
 		expect(column3.getValues()).to.eql([11, 22]);
 	});
 
@@ -113,7 +113,7 @@ describe('BaseDataFrame', function () {
 		var dataFrame = initExampleDataFrame();
 		var subset = dataFrame.getColumnsSubset(['Value3', 'Value1']);
 		expect(dataFrame).not.to.equal(subset); 
-		expect(subset.getIndex().getValues()).to.eql([3, 4]);
+		expect(subset.getIndex().getValues()).to.eql([5, 6]);
 		expect(subset.getValues()).to.eql([
 			[11, 100],
 			[22, 200],
@@ -305,6 +305,33 @@ describe('BaseDataFrame', function () {
 			[new Date(2013, 24, 2), 20, 'c', 22, undefined],
 			[new Date(2015, 24, 2), 100, 'd', 4, undefined],
 		]);
+	});
+
+	it('column being merged is reindexed', function () {
+
+		var dataFrame = initExampleDataFrame2();
+		var newColumnName = "new column";
+		var newColumn = new panjas.Column(newColumnName, [4, 3, 2, 1], new panjas.Index([0, 5, 2, 7]))
+		var modified = dataFrame.setColumn(newColumnName, newColumn);
+		var mergedColumn = modified.getColumn(newColumnName);
+
+		expect(modified.getIndex().getValues()).to.eql([5, 6, 7, 8]);
+		expect(modified.getColumnNames()).to.eql([
+			"Date",
+			"Value1",
+			"Value2",
+			"Value3",
+			newColumnName,
+		]);
+		expect(modified.getValues()).to.eql([
+			[new Date(2011, 24, 2), 300, 'c', 3, 3],
+			[new Date(1975, 24, 2), 200, 'b', 1, undefined],
+			[new Date(2013, 24, 2), 20, 'c', 22, 1],
+			[new Date(2015, 24, 2), 100, 'd', 4, undefined],
+		]);
+
+		expect(mergedColumn.getIndex().getValues()).to.eql([5, 6, 7, 8]);
+		expect(mergedColumn.getValues()).to.eql([3, undefined, 1, undefined]);
 	});
 
 	it('can get subset of rows', function () {
