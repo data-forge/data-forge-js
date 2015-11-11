@@ -316,41 +316,50 @@ BaseDataFrame.prototype.dropColumn = function (columnOrColumns) {
 
 	var self = this;
 
+	var cachedColumnIndices = null;
+
+	var lazyGenerateColumnIndices = function () {
+
+		if (cachedColumnIndices) {
+			return cachedColumnIndices;
+		}
+
+		cachedColumnIndices = E.from(columnOrColumns)
+			.select(function (columnName)  {
+				assert.isString(columnName);
+				var columnIndex = self._columnNameToIndex(columnName);
+				if (columnIndex < 0) {
+					throw new Error("In call to 'dropColumn' failed to find column '" + columnName + "'.");
+				}
+				return columnIndex;
+			})
+			.toArray();
+		return cachedColumnIndices;
+	};
+
+
 	var LazyDataFrame = require('./lazydataframe');
-
-	var columnIndices = E.from(columnOrColumns)
-		.select(function (columnName)  {
-			assert.isString(columnName);
-			var columnIndex = self._columnNameToIndex(columnName);
-			if (columnIndex < 0) {
-				throw new Error("In call to 'dropColumn' failed to find column '" + columnName + "'.");
-			}
-			return columnIndex;
-		})
-		.toArray();
-
-	var columns = E.from(self.getColumnNames())
-		.where(function (columnName, columnIndex) {
-			return columnIndices.indexOf(columnIndex) < 0;
-		})
-		.toArray();
-
-	var rows = E.from(self.getValues())
-		.select(function (row) {
-			return E.from(row)
-				.where(function (column, columnIndex) {
-					return columnIndices.indexOf(columnIndex) < 0;
-				})
-				.toArray();
-		})
-		.toArray();
 
 	return new LazyDataFrame(
 		function () {
-			return columns;			
+			var columnIndices = lazyGenerateColumnIndices();
+			return E.from(self.getColumnNames())
+				.where(function (columnName, columnIndex) {
+					return columnIndices.indexOf(columnIndex) < 0;
+				})
+				.toArray();
 		},
 		function () {
-			return rows;			
+			var columnIndices = lazyGenerateColumnIndices();
+			return E.from(self.getValues())
+				.select(function (row) {
+					return E.from(row)
+						.where(function (column, columnIndex) {
+							return columnIndices.indexOf(columnIndex) < 0;
+						})
+						.toArray();
+				})
+				.toArray();
 		},
 		function () {
 			return self.getIndex();
