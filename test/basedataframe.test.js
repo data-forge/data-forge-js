@@ -26,7 +26,7 @@ describe('BaseDataFrame', function () {
 			];
 		};
 		dataFrame.getIndex = function () {
-			return new panjas.Index(E.range(0, 2).toArray());
+			return new panjas.Index([3, 4]);
 		};
 		return dataFrame;
 	}; 
@@ -49,6 +49,9 @@ describe('BaseDataFrame', function () {
 				[new Date(2015, 24, 2), 100, 'd', 4],
 			];
 		};
+		dataFrame.getIndex = function () {
+			return new panjas.Index([5, 6, 7, 8]);
+		};
 		return dataFrame;
 	}; 
 	
@@ -64,44 +67,32 @@ describe('BaseDataFrame', function () {
 		
 		var dataFrame = initExampleDataFrame();
 		var column1 = dataFrame.getColumn('Value1');
-		expect(column1.getValues()).to.eql([
-			100,
-			200,
-		]);		
+		expect(column1.getIndex().getValues()).to.eql([3, 4]);
+		expect(column1.getValues()).to.eql([100, 200]);
 		
 		var column2 = dataFrame.getColumn('Value2');
-		expect(column2.getValues()).to.eql([
-			'foo',
-			'bar',
-		]);			
+		expect(column2.getIndex().getValues()).to.eql([3, 4]);
+		expect(column2.getValues()).to.eql(['foo', 'bar']);
 		
 		var column3 = dataFrame.getColumn('Value3');
-		expect(column3.getValues()).to.eql([
-			11,
-			22,
-		]);		
+		expect(column3.getIndex().getValues()).to.eql([3, 4]);
+		expect(column3.getValues()).to.eql([11, 22]);
 	});
 
 	it('can retreive column by index', function () {
 		
 		var dataFrame = initExampleDataFrame();
 		var column1 = dataFrame.getColumn(1);
-		expect(column1.getValues()).to.eql([
-			100,
-			200,
-		]);		
+		expect(column1.getIndex().getValues()).to.eql([3, 4]);
+		expect(column1.getValues()).to.eql([100, 200]);
 		
 		var column2 = dataFrame.getColumn(2);
-		expect(column2.getValues()).to.eql([
-			'foo',
-			'bar',
-		]);			
+		expect(column2.getIndex().getValues()).to.eql([3, 4]);
+		expect(column2.getValues()).to.eql(['foo', 'bar']);
 		
 		var column3 = dataFrame.getColumn(3);
-		expect(column3.getValues()).to.eql([
-			11,
-			22,
-		]);		
+		expect(column3.getIndex().getValues()).to.eql([3, 4]);
+		expect(column3.getValues()).to.eql([11, 22]);
 	});
 
 	it('can retreive columns', function () {
@@ -120,9 +111,10 @@ describe('BaseDataFrame', function () {
 	it('can retreive column subset as new dataframe', function () 
 	{
 		var dataFrame = initExampleDataFrame();
-		var subsetDataFrame = dataFrame.getColumnsSubset(['Value3', 'Value1']);
-		expect(dataFrame).not.to.equal(subsetDataFrame); 
-		expect(subsetDataFrame.getValues()).to.eql(			[
+		var subset = dataFrame.getColumnsSubset(['Value3', 'Value1']);
+		expect(dataFrame).not.to.equal(subset); 
+		expect(subset.getIndex().getValues()).to.eql([3, 4]);
+		expect(subset.getValues()).to.eql([
 			[11, 100],
 			[22, 200],
 		]);
@@ -240,6 +232,7 @@ describe('BaseDataFrame', function () {
 		
 		var dataFrame = initExampleDataFrame2();
 		var modified = dataFrame.dropColumn('Date');
+		expect(modified.getIndex().getValues()).to.eql([5, 6, 7, 8]);
 		expect(modified.getValues()).to.eql([
 			[300, 'c', 3],
 			[200, 'b', 1],
@@ -252,6 +245,7 @@ describe('BaseDataFrame', function () {
 		
 		var dataFrame = initExampleDataFrame2();
 		var modified = dataFrame.dropColumn(['Date', 'Value2'])
+		expect(modified.getIndex().getValues()).to.eql([5, 6, 7, 8]);
 		expect(modified.getValues()).to.eql([
 			[300, 3],
 			[200, 1],
@@ -264,6 +258,7 @@ describe('BaseDataFrame', function () {
 		
 		var dataFrame = initExampleDataFrame2();
 		var modified = dataFrame.setColumn('Value4', [1, 2, 3, 4]);
+		expect(modified.getIndex().getValues()).to.eql([5, 6, 7, 8]);
 		expect(modified.getColumnNames()).to.eql([
 			"Date",
 			"Value1",
@@ -283,6 +278,7 @@ describe('BaseDataFrame', function () {
 		
 		var dataFrame = initExampleDataFrame2();
 		var modified = dataFrame.setColumn('Value1', [1, 2, 3, 4]);
+		expect(modified.getIndex().getValues()).to.eql([5, 6, 7, 8]);
 		expect(modified.getValues()).to.eql([
 			[new Date(2011, 24, 2), 1, 'c', 3],
 			[new Date(1975, 24, 2), 2, 'b', 1],
@@ -311,10 +307,11 @@ describe('BaseDataFrame', function () {
 		]);
 	});
 
-	it('can get slice of rows', function () {
+	it('can get subset of rows', function () {
 
 		var dataFrame = initExampleDataFrame2();
 		var subset = dataFrame.getRowsSubset(1, 2);
+		expect(subset.getIndex().getValues()).to.eql([6, 7]);
 		expect(subset.getValues()).to.eql([
 			[new Date(1975, 24, 2), 200, 'b', 1],
 			[new Date(2013, 24, 2), 20, 'c', 22],

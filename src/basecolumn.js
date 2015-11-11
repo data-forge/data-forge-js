@@ -10,16 +10,23 @@ var E = require('linq');
 
 /**
  * Base class for columns.
+ *
+ * getName - Get the name of the column.
+ * getValues - Get the values for each entry in the series.
+ * getIndex - Get the index for the column.
  */
-var BaseColumn = function () {
-	
+var BaseColumn = function () {	
 	
 };
 
-//
-// Skip a number of rows in the series.
-//
+/**
+ * Skip a number of rows in the column.
+ *
+ * @param {int} numRows - Number of rows to skip.
+ */
 BaseColumn.prototype.skip = function (numRows) {
+	assert.isNumber(numRows, "Expected 'numRows' parameter to 'skip' function to be a number.");
+
 	var LazyColumn = require('./lazycolumn'); // Require here to prevent circular ref.
 	
 	var self = this;
@@ -29,7 +36,10 @@ BaseColumn.prototype.skip = function (numRows) {
 			return E
 				.from(self.getValues())
 				.skip(numRows)
-				.toArray();			
+				.toArray();	numRows		
+		},
+		function () {
+			return self.getIndex().skip(numRows);
 		}
 	); 	
 };
@@ -107,6 +117,9 @@ BaseColumn.prototype.getRowsSubset = function (index, count) {
 				.skip(index)
 				.take(count)
 				.toArray();
+		},
+		function () {
+			return self.getIndex().getRowsSubset(index, count);
 		}
 	);
 };
@@ -141,12 +154,5 @@ BaseColumn.prototype.rollingWindow = function (period, fn) {
 
 	return new Column(self.getName(), newValues);
 };
-
-//
-// Interface functions.
-//
-// getName - Get the name of the column.
-// getValues - Get the values for each entry in the series.
-//
 
 module.exports = BaseColumn;

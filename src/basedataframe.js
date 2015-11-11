@@ -70,6 +70,9 @@ BaseDataFrame.prototype.getColumn = function (columnNameOrIndex) {
 					return entry[columnIndex];
 				})
 				.toArray();
+		},
+		function () {
+			return self.getIndex();
 		}
 	);
 };
@@ -118,6 +121,9 @@ BaseDataFrame.prototype.getColumnsSubset = function (columnNames) {
 						.toArray();
 				})
 				.toArray();
+		},
+		function () {
+			return self.getIndex();
 		}
 	);	 
 };
@@ -345,7 +351,10 @@ BaseDataFrame.prototype.dropColumn = function (columnOrColumns) {
 		},
 		function () {
 			return rows;			
-		}		
+		},
+		function () {
+			return self.getIndex();
+		}
 	);
 };
 
@@ -383,7 +392,10 @@ BaseDataFrame.prototype.setColumn = function (columnName, data) {
 						return row.concat([data[rowIndex]]);
 					})
 					.toArray();
-			}		
+			},
+			function () {
+				return self.getIndex();
+			}
 		);
 	}
 	else {
@@ -417,7 +429,10 @@ BaseDataFrame.prototype.setColumn = function (columnName, data) {
 							.toArray();
 					})
 					.toArray();
-			}		
+			},
+			function () {
+				return self.getIndex();
+			}
 		);
 	}
 };
@@ -445,6 +460,9 @@ BaseDataFrame.prototype.getRowsSubset = function (index, count) {
 				.skip(index)
 				.take(count)
 				.toArray();
+		},
+		function () {
+			return self.getIndex().getRowsSubset(index, count);
 		}
 	);
 };
