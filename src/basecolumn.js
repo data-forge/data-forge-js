@@ -165,27 +165,35 @@ BaseColumn.prototype.reindex = function (newIndex) {
 
 	var self = this;
 
-	var indexMap = {};
-	E.from(self.getIndex().getValues())
-		.zip(self.getValues(), function (indexValue, columnValue) {
-			return [indexValue, columnValue];
-		})
-		.toArray()
-		.forEach(function (pair) {
-			indexMap[pair[0]] = pair[1];
-		});
-
-	var newValues = E.from(newIndex.getValues())
-		.select(function (newIndexValue) {
-			return indexMap[newIndexValue];
-		})
-		.toArray();
-
 	var LazyColumn = require('./lazycolumn');
 
 	return new LazyColumn(
 		self.getName(),
 		function () {
+			//
+			// Generate a map to relate an index value to a column value.
+			//
+			var indexMap = {};
+			E.from(self.getIndex().getValues())
+				.zip(self.getValues(), 
+					function (indexValue, columnValue) {
+						return [indexValue, columnValue];
+					}
+				)
+				.toArray()
+				.forEach(function (pair) {
+					indexMap[pair[0]] = pair[1];
+				});
+
+			//
+			// Return the columns values in the order specified by the new index.
+			//
+			var newValues = E.from(newIndex.getValues())
+				.select(function (newIndexValue) {
+					return indexMap[newIndexValue];
+				})
+				.toArray();
+
 			return newValues;
 		},
 		function () {
