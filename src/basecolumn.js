@@ -137,8 +137,10 @@ BaseColumn.prototype.rollingWindow = function (period, fn) {
 
 	var self = this;
 
-	var values = self.getValues();
+	//todo: make this properly lazy
 
+	var index = self.getIndex().getValues();
+	var values = self.getValues();
 
 	if (values.length == 0) {
 		var Column = require('./column');
@@ -146,9 +148,10 @@ BaseColumn.prototype.rollingWindow = function (period, fn) {
 	}
 
 	var newIndexAndValues = E.range(0, values.length-period+1)
-		.select(function (i) {
-			var window = E.from(values).skip(i).take(period).toArray();
-			return fn(window, i);
+		.select(function (rowIndex) {
+			var _index = E.from(index).skip(rowIndex).take(period).toArray();
+			var _values = E.from(values).skip(rowIndex).take(period).toArray();
+			return fn(_index, _values, rowIndex);
 		})
 		.toArray();
 
