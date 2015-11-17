@@ -17,19 +17,22 @@ describe('rolling window integration', function () {
 				.select(function (i) {
 					return [i];
 				})
-				.toArray()
+				.toArray(),
+			new panjas.Index(E.range(10, 12).toArray())
 		);
 
-		var newValues = dataFrame
+		var newColumn = dataFrame
 			.getColumn('Value')
-			.rollingWindow(5, function (window) {
-				return window[window.length-1];
-			})
-			.getValues();
+			.rollingWindow(5, function (index, values, rowIndex) {
+				return [index[index.length-1], values[values.length-1]];
+			});
 
-		expect(newValues).to.eql([5, 6, 7, 8, 9, 10, 11, 12]);
+		expect(newColumn.getIndex().getValues()).to.eql([14, 15, 16, 17, 18, 19, 20, 21]);
+		expect(newColumn.getValues()).to.eql([5, 6, 7, 8, 9, 10, 11, 12]);
 
-		var newDataFrame = dataFrame.setColumn('Value2', newValues);
+		var newDataFrame = dataFrame.setColumn('Value2', newColumn);
+
+		expect(newDataFrame.getIndex().getValues()).to.eql([10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]);
 
 		expect(newDataFrame.getValues()).to.eql([
 			[1, undefined],
