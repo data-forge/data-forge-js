@@ -139,20 +139,44 @@ BaseColumn.prototype.rollingWindow = function (period, fn) {
 
 	var values = self.getValues();
 
-	var Column = require('./column'); //todo: this should be lazy.
 
 	if (values.length == 0) {
+		var Column = require('./column');
 		return new Column(self.getName(), []);
 	}
 
-	var newValues = E.range(0, values.length-period+1)
+	var newIndexAndValues = E.range(0, values.length-period+1)
 		.select(function (i) {
 			var window = E.from(values).skip(i).take(period).toArray();
-			return fn(window);
+			return fn(window, i);
 		})
 		.toArray();
 
-	return new Column(self.getName(), newValues);
+	var LazyColumn = require('./lazycolumn');
+
+	return new LazyColumn(
+		self.getName(), 
+		function () {
+			return E.from(newIndexAndValues)
+				.select(function (indexAndValue) {
+					return indexAndValue[1];
+				})
+				.toArray();
+		},
+		function () {
+			var LazyIndex = require('./lazyindex');
+
+			return new LazyIndex(
+				function () {
+					return E.from(newIndexAndValues)
+						.select(function (indexAndValue) {
+							return indexAndValue[0];
+						})
+						.toArray();					
+				}
+			);
+		}
+	);
 };
 
 /**

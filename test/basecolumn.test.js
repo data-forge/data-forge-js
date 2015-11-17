@@ -73,8 +73,8 @@ describe('BaseColumn', function () {
 	it('can compute rolling window - odd data set with even period', function () {
 
 		var column = initExampleColumn(E.range(0, 5).toArray());
-		var newColumn = column.rollingWindow(2, function (window) {
-			return window;
+		var newColumn = column.rollingWindow(2, function (window, index) {
+			return [index, window];
 		});
 
 		var values = newColumn.getValues();
@@ -88,8 +88,8 @@ describe('BaseColumn', function () {
 	it('can compute rolling window - odd data set with odd period', function () {
 
 		var column = initExampleColumn(E.range(0, 5).toArray());
-		var newColumn = column.rollingWindow(3, function (window) {
-			return window;
+		var newColumn = column.rollingWindow(3, function (window, index) {
+			return [index, window];
 		});
 
 		var values = newColumn.getValues();
@@ -102,9 +102,12 @@ describe('BaseColumn', function () {
 	it('can compute rolling window - even data set with even period', function () {
 
 		var column = initExampleColumn(E.range(0, 6).toArray());
-		var newColumn = column.rollingWindow(2, function (window) {
-			return window;
+		var newColumn = column.rollingWindow(2, function (window, index) {
+			return [index+10, window];
 		});
+
+		var index = newColumn.getIndex().getValues();
+		expect(index).to.eql([10, 11, 12, 13, 14]);
 
 		var values = newColumn.getValues();
 		expect(values.length).to.eql(5);
@@ -118,8 +121,8 @@ describe('BaseColumn', function () {
 	it('can compute rolling window - even data set with odd period', function () {
 
 		var column = initExampleColumn(E.range(0, 6).toArray());
-		var newColumn = column.rollingWindow(3, function (window) {
-			return window;
+		var newColumn = column.rollingWindow(3, function (window, index) {
+			return [index, window];
 		});
 
 		var values = newColumn.getValues();
