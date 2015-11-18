@@ -617,7 +617,9 @@ BaseDataFrame.prototype.resetIndex = function () {
  * Format the data frame for display as a string.
  */
 BaseDataFrame.prototype.toString = function () {
+
 	var self = this;
+	var Table = require('easy-table');
 
 	var index = self.getIndex().getValues();
 	var header = ['index'].concat(self.getColumnNames());
@@ -626,13 +628,16 @@ BaseDataFrame.prototype.toString = function () {
 				return [index[rowIndex]].concat(row);
 			})
 			.toArray()
-	var rowsAndHeader = [header].concat(rows);
-	return E.from(rowsAndHeader)
-		.select(function (row) {
-			return row.join(', ');
-		})
-		.toArray()
-		.join('\r\n');
+
+	var t = new Table();
+	rows.forEach(function (row, rowIndex) {
+		row.forEach(function (cell, cellIndex) {
+			t.cell(header[cellIndex], cell);
+		});
+		t.newRow();
+	});
+
+	return t.toString();
 };
 
 module.exports = BaseDataFrame;
