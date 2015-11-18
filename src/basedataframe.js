@@ -162,6 +162,26 @@ var validateSortMethod = function (sortMethod) {
 };
 
 //
+// Map a row of data to a JS object with column names as fields.
+//
+var mapRowByColumns = function (self, row) {
+	return E.from(self.getColumnNames())
+		.select(function (columnName, columnIndex) {
+			return [columnName, columnIndex];
+		})
+		.toObject(
+			function (column) {
+				var columnName = column[0];
+				return columnName;
+			},
+			function (column) {
+				var columnIndex = column[1];
+				return row[columnIndex];
+			}
+		);
+};
+
+//
 // Execute a batched sorting command.
 //
 var executeOrderBy = function (self, batch) {
@@ -182,8 +202,7 @@ var executeOrderBy = function (self, batch) {
 
 		batch.forEach(function (orderCmd) {
 			assert.isObject(orderCmd);
-			assert.isNumber(orderCmd.columnIndex);
-			assert(orderCmd.columnIndex >= 0);
+			assert.isFunction(orderCmd.sortSelector);
 			validateSortMethod(orderCmd.sortMethod);
 		});
 
@@ -191,12 +210,13 @@ var executeOrderBy = function (self, batch) {
 			.zip(self.getValues(), function (index, values) {
 				return [index].concat(values);
 			})
-			.toArray();		
+			.toArray();	
 
 		cachedSorted = E.from(batch)
 			.aggregate(E.from(valuesWithIndex), function (unsorted, orderCmd) {
 				return unsorted[orderCmd.sortMethod](function (row) {
-					return row[orderCmd.columnIndex+1]; // Add 1 because the index is include in the rows being sorted.
+					var columnMappedRow = mapRowByColumns(self, E.from(row).skip(1).toArray()); // Skip the generated index column.
+					return orderCmd.sortSelector(columnMappedRow);
 				}); 
 			})
 			.toArray();
@@ -235,25 +255,62 @@ var executeOrderBy = function (self, batch) {
 //
 // Order by values in a partcular column, either ascending or descending
 //
-var orderBy = function (self, sortMethod, columnIndex) {
+var orderBy = function (self, sortMethod, sortSelector) {
 	assert.isObject(self);
 	validateSortMethod(sortMethod);
-	assert.isNumber(columnIndex);
+	assert.isFunction(sortSelector);
 
 	var batchOrder = [
 		{ 
-			columnIndex: columnIndex, 
+			sortSelector: sortSelector, 
 			sortMethod: sortMethod 
 		}
 	];
 
 	var sortedDataFrame = executeOrderBy(self, batchOrder);
-
 	sortedDataFrame.thenBy = orderThenBy(self, batchOrder, 'thenBy');
-	sortedDataFrame.thenByDescending = orderThenBy(self, batchOrder, 'thenByDescending');
-	
+	sortedDataFrame.thenByDescending = orderThenBy(self, batchOrder, 'thenByDescending');	
 	return sortedDataFrame;
 };
+
+//
+// Process a column selector that might be a column name, column index or selector function.
+// Returns a selector fucntion.
+//
+var processColumnSelector = function (self, columnNameOrIndexOrSelector, fnName) {
+	assert.isObject(self);
+	assert.isString(fnName);
+
+	if (!Object.isFunction(columnNameOrIndexOrSelector)) {
+
+		var columnName;
+
+		if (Object.isNumber(columnNameOrIndexOrSelector)) {
+			var columnNames = self.getColumnNames();
+			assert(
+				columnNameOrIndexOrSelector >= 0 && columnNameOrIndexOrSelector < columnNames.length, 
+				"Bad column index specified for 'columnNameOrIndexOrSelector' parameter to 'orderBy', expected a column index >= 0 and < " + columnNames.length
+			);
+			
+			columnName = columnNames[columnNameOrIndexOrSelector];
+		}
+		else {
+			assert.isString(
+				columnNameOrIndexOrSelector, 
+				"Expected 'columnNameOrIndexOrSelector' parameter to '" + fnName + "' to be a column name, a column index or a selector function."
+			);
+
+			columnName = columnNameOrIndexOrSelector;
+		}
+
+		columnNameOrIndexOrSelector = function (row) {
+				return row[columnName];
+			};
+	}
+
+	return columnNameOrIndexOrSelector;
+};
+
 
 //
 // Generates a thenBy function that is attached to already ordered data frames.
@@ -264,26 +321,18 @@ var orderThenBy = function (self, batch, nextSortMethod) {
 	assert(batch.length > 0);
 	validateSortMethod(nextSortMethod);
 	
-	return function (nextColumnName) {
-		assert.isString(nextColumnName);
-
-		var nextColumnIndex = self._columnNameToIndex(nextColumnName);
-		if (nextColumnIndex < 0) {
-			throw new Error("In call to 'thenBy' failed to find column with name '" + nextColumnName + "'.");
-		}
+	return function (columnNameOrIndexOrSelector) {
 
 		var extendedBatch = batch.concat([
 			{
-				columnIndex: nextColumnIndex,
+				sortSelector: processColumnSelector(self, columnNameOrIndexOrSelector, 'thenBy'),
 				sortMethod: nextSortMethod,
 			},
 		]);
 
 		var sortedDataFrame = executeOrderBy(self, extendedBatch);
-
 		sortedDataFrame.thenBy = orderThenBy(self, extendedBatch, 'thenBy');
-		sortedDataFrame.thenByDescending = orderThenBy(self, extendedBatch, 'thenByDescending');
-		
+		sortedDataFrame.thenByDescending = orderThenBy(self, extendedBatch, 'thenByDescending');		
 		return sortedDataFrame;
 	};	
 };
@@ -291,19 +340,12 @@ var orderThenBy = function (self, batch, nextSortMethod) {
 /**
  * Sorts a data frame based on a single column (ascending). 
  * 
- * @param {string|array} columnName - Column to sort by.
+ * @param {string|index|function} columnNameOrIndexOrSelector - A name, index or selector that specifies the column to sort by.
  */
-BaseDataFrame.prototype.orderBy = function (columnName) {
-	assert.isString(columnName);
-	
+BaseDataFrame.prototype.orderBy = function (columnNameOrIndexOrSelector) {
+
 	var self = this;
-
-	var columnIndex = self._columnNameToIndex(columnName);
-	if (columnIndex < 0) {
-		throw new Error("In call to 'orderBy' failed to find column with name '" + columnName + "'.");
-	}
-
-	return orderBy(self, 'orderBy', columnIndex);
+	return orderBy(self, 'orderBy', processColumnSelector(self, columnNameOrIndexOrSelector, 'orderBy'));
 };
 
 /**
@@ -311,17 +353,10 @@ BaseDataFrame.prototype.orderBy = function (columnName) {
  * 
  * @param {string|array} columnName - Column to sort by.
  */
-BaseDataFrame.prototype.orderByDescending = function (columnName) {
-	assert.isString(columnName);
-	
+BaseDataFrame.prototype.orderByDescending = function (columnNameOrIndexOrSelector) {
+
 	var self = this;
-
-	var columnIndex = self._columnNameToIndex(columnName);
-	if (columnIndex < 0) {
-		throw new Error("In call to 'orderByDescending' failed to find column with name '" + columnName + "'.");
-	}
-
-	return orderBy(self, 'orderByDescending', columnIndex);
+	return orderBy(self, 'orderByDescending', processColumnSelector(self, columnNameOrIndexOrSelector, 'orderByDescending'));
 };
 
 /**

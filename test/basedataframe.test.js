@@ -302,6 +302,110 @@ describe('BaseDataFrame', function () {
 		]);
 	});
 
+	it('can sort by selector ascending', function () {
+		
+		var dataFrame = initDataFrame(
+			[ "Date", "Value1", "Value2", "Value3" ],
+			[
+				[new Date(2011, 24, 2), 300, 'c', 3],
+				[new Date(1975, 24, 2), 200, 'b', 1],
+				[new Date(2013, 24, 2), 20, 'c', 22],
+				[new Date(2015, 24, 2), 100, 'd', 4],
+			],
+			[5, 6, 7, 8]
+		);
+		var sorted = dataFrame
+			.orderBy(function (row) {
+				return row.Value2;
+			})
+			.thenBy(function (row) {
+				return row.Value1;
+			});
+		expect(sorted.getIndex().getValues()).to.eql([6, 7, 5, 8]);
+		expect(sorted.getValues()).to.eql([
+			[new Date(1975, 24, 2), 200, 'b', 1],
+			[new Date(2013, 24, 2), 20, 'c', 22],
+			[new Date(2011, 24, 2), 300, 'c', 3],
+			[new Date(2015, 24, 2), 100, 'd', 4],
+		]);
+	});
+
+	it('can sort by selector descending', function () {
+		
+		var dataFrame = initDataFrame(
+			[ "Date", "Value1", "Value2", "Value3" ],
+			[
+				[new Date(2011, 24, 2), 300, 'c', 3],
+				[new Date(1975, 24, 2), 200, 'b', 1],
+				[new Date(2013, 24, 2), 20, 'c', 22],
+				[new Date(2015, 24, 2), 100, 'd', 4],
+			],
+			[5, 6, 7, 8]
+		);
+		var sorted = dataFrame
+			.orderByDescending(function (row) {
+				return row.Value2;
+			})
+			.thenByDescending(function (row) {
+				return row.Value1;
+			});
+		expect(sorted.getIndex().getValues()).to.eql([8, 5, 7, 6]);
+		expect(sorted.getValues()).to.eql([
+			[new Date(2015, 24, 2), 100, 'd', 4],
+			[new Date(2011, 24, 2), 300, 'c', 3],
+			[new Date(2013, 24, 2), 20, 'c', 22],
+			[new Date(1975, 24, 2), 200, 'b', 1],
+		]);
+	});
+
+	it('can sort by column index - ascending', function () {
+		
+		var dataFrame = initDataFrame(
+			[ "Date", "Value1", "Value2", "Value3" ],
+			[
+				[new Date(2011, 24, 2), 300, 'c', 3],
+				[new Date(1975, 24, 2), 200, 'b', 1],
+				[new Date(2013, 24, 2), 20, 'c', 22],
+				[new Date(2015, 24, 2), 100, 'd', 4],
+			],
+			[5, 6, 7, 8]
+		);
+		var sorted = dataFrame
+			.orderBy(2)
+			.thenBy(1);
+		expect(sorted.getIndex().getValues()).to.eql([6, 7, 5, 8]);
+		expect(sorted.getValues()).to.eql([
+			[new Date(1975, 24, 2), 200, 'b', 1],
+			[new Date(2013, 24, 2), 20, 'c', 22],
+			[new Date(2011, 24, 2), 300, 'c', 3],
+			[new Date(2015, 24, 2), 100, 'd', 4],
+		]);
+	});
+
+	it('can sort by column index - descending', function () {
+		
+		var dataFrame = initDataFrame(
+			[ "Date", "Value1", "Value2", "Value3" ],
+			[
+				[new Date(2011, 24, 2), 300, 'c', 3],
+				[new Date(1975, 24, 2), 200, 'b', 1],
+				[new Date(2013, 24, 2), 20, 'c', 22],
+				[new Date(2015, 24, 2), 100, 'd', 4],
+			],
+			[5, 6, 7, 8]
+		);
+		var sorted = dataFrame
+			.orderByDescending(2)
+			.thenByDescending(1);
+		expect(sorted.getIndex().getValues()).to.eql([8, 5, 7, 6]);
+		expect(sorted.getValues()).to.eql([
+			[new Date(2015, 24, 2), 100, 'd', 4],
+			[new Date(2011, 24, 2), 300, 'c', 3],
+			[new Date(2013, 24, 2), 20, 'c', 22],
+			[new Date(1975, 24, 2), 200, 'b', 1],
+		]);
+	});
+
 	it('can drop column', function () {
 		
 		var dataFrame = initDataFrame(
