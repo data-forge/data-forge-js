@@ -8,64 +8,50 @@ describe('BaseDataFrame', function () {
 	
 	var expect = require('chai').expect;
 	var assert = require('chai').assert;
-	
-	var initExampleDataFrame = function () {
-		var dataFrame = new BaseDataFrame();
-		dataFrame.getColumnNames = function () {
-			return [
-				"Date",
-				"Value1",
-				"Value2",
-				"Value3",
-			]; 
-		};
-		dataFrame.getValues = function () {
-			return [
-				[new Date(1975, 24, 2), 100, 'foo', 11],
-				[new Date(2015, 24, 2), 200, 'bar', 22],
-			];
-		};
-		dataFrame.getIndex = function () {
-			return new panjas.Index([5, 6]);
-		};
-		return dataFrame;
-	}; 
 
-	var initExampleDataFrame2 = function () {
+	var initDataFrame = function (columns, values, index) {
+		assert.isArray(columns);
+		assert.isArray(values);
+		assert.isArray(index);
+
 		var dataFrame = new BaseDataFrame();
 		dataFrame.getColumnNames = function () {
-			return [
-				"Date",
-				"Value1",
-				"Value2",
-				"Value3",
-			]; 
+			return columns; 
 		};
 		dataFrame.getValues = function () {
-			return [
-				[new Date(2011, 24, 2), 300, 'c', 3],
-				[new Date(1975, 24, 2), 200, 'b', 1],
-				[new Date(2013, 24, 2), 20, 'c', 22],
-				[new Date(2015, 24, 2), 100, 'd', 4],
-			];
+			return values;
 		};
 		dataFrame.getIndex = function () {
-			return new panjas.Index([5, 6, 7, 8]);
+			return new panjas.Index(index);
 		};
 		return dataFrame;
-	}; 
+	};
 	
 	it('throws expection when pulling a non-existing column name', function () {
 		
 		expect(function () {
-			var dataFrame = initExampleDataFrame();
+			var dataFrame = initDataFrame(
+				[ "Date", "Value1", "Value2", "Value3" ],
+				[
+					[new Date(1975, 24, 2), 100, 'foo', 11],
+					[new Date(2015, 24, 2), 200, 'bar', 22],
+				],
+				[5, 6]
+			);
 			dataFrame.getColumn('non-existing column name');			
 		}).to.throw(Error).with.property('message').that.equals("In call to 'getColumn' failed to find column 'non-existing column name'.");
 	});
 
 	it('can retreive column by name', function () {
 		
-		var dataFrame = initExampleDataFrame();
+		var dataFrame = initDataFrame(
+			[ "Date", "Value1", "Value2", "Value3" ],
+			[
+				[new Date(1975, 24, 2), 100, 'foo', 11],
+				[new Date(2015, 24, 2), 200, 'bar', 22],
+			],
+			[5, 6]
+		);
 		var column1 = dataFrame.getColumn('Value1');
 		expect(column1.getIndex().getValues()).to.eql([5, 6]);
 		expect(column1.getValues()).to.eql([100, 200]);
@@ -81,7 +67,14 @@ describe('BaseDataFrame', function () {
 
 	it('can retreive column by index', function () {
 		
-		var dataFrame = initExampleDataFrame();
+		var dataFrame = initDataFrame(
+			[ "Date", "Value1", "Value2", "Value3" ],
+			[
+				[new Date(1975, 24, 2), 100, 'foo', 11],
+				[new Date(2015, 24, 2), 200, 'bar', 22],
+			],
+			[5, 6]
+		);
 		var column1 = dataFrame.getColumn(1);
 		expect(column1.getIndex().getValues()).to.eql([5, 6]);
 		expect(column1.getValues()).to.eql([100, 200]);
@@ -97,7 +90,14 @@ describe('BaseDataFrame', function () {
 
 	it('can retreive columns', function () {
 		
-		var dataFrame = initExampleDataFrame();
+		var dataFrame = initDataFrame(
+			[ "Date", "Value1", "Value2", "Value3" ],
+			[
+				[new Date(1975, 24, 2), 100, 'foo', 11],
+				[new Date(2015, 24, 2), 200, 'bar', 22],
+			],
+			[5, 6]
+		);
 		var columns = dataFrame.getColumns();
 		expect(columns.length).to.eql(4);
 
@@ -110,7 +110,14 @@ describe('BaseDataFrame', function () {
 	
 	it('can retreive column subset as new dataframe', function () 
 	{
-		var dataFrame = initExampleDataFrame();
+		var dataFrame = initDataFrame(
+			[ "Date", "Value1", "Value2", "Value3" ],
+			[
+				[new Date(1975, 24, 2), 100, 'foo', 11],
+				[new Date(2015, 24, 2), 200, 'bar', 22],
+			],
+			[5, 6]
+		);
 		var subset = dataFrame.getColumnsSubset(['Value3', 'Value1']);
 		expect(dataFrame).not.to.equal(subset); 
 		expect(subset.getIndex().getValues()).to.eql([5, 6]);
@@ -122,7 +129,14 @@ describe('BaseDataFrame', function () {
 	
 	it('can output data frame', function () {
 		
-		var dataFrame = initExampleDataFrame();
+		var dataFrame = initDataFrame(
+			[ "Date", "Value1", "Value2", "Value3" ],
+			[
+				[new Date(1975, 24, 2), 100, 'foo', 11],
+				[new Date(2015, 24, 2), 200, 'bar', 22],
+			],
+			[5, 6]
+		);
 		var dataSourceOptions = {};
 		var formatOptions = {};
 		var formattedText = "some-text";
@@ -158,7 +172,16 @@ describe('BaseDataFrame', function () {
 	
 	it('can sort by single column ascending', function () {
 		
-		var dataFrame = initExampleDataFrame2();
+		var dataFrame = initDataFrame(
+			[ "Date", "Value1", "Value2", "Value3" ],
+			[
+				[new Date(2011, 24, 2), 300, 'c', 3],
+				[new Date(1975, 24, 2), 200, 'b', 1],
+				[new Date(2013, 24, 2), 20, 'c', 22],
+				[new Date(2015, 24, 2), 100, 'd', 4],
+			],
+			[5, 6, 7, 8]
+		);
 		var sorted = dataFrame.orderBy('Value1');
 		expect(sorted.getValues()).to.eql([
 			[new Date(2013, 24, 2), 20, 'c', 22],
@@ -170,7 +193,16 @@ describe('BaseDataFrame', function () {
 	
 	it('can sort by multiple columns ascending', function () {
 		
-		var dataFrame = initExampleDataFrame2();
+		var dataFrame = initDataFrame(
+			[ "Date", "Value1", "Value2", "Value3" ],
+			[
+				[new Date(2011, 24, 2), 300, 'c', 3],
+				[new Date(1975, 24, 2), 200, 'b', 1],
+				[new Date(2013, 24, 2), 20, 'c', 22],
+				[new Date(2015, 24, 2), 100, 'd', 4],
+			],
+			[5, 6, 7, 8]
+		);
 		var sorted = dataFrame.orderBy('Value2').thenBy('Value1');
 		expect(sorted.getValues()).to.eql([
 			[new Date(1975, 24, 2), 200, 'b', 1],
@@ -182,7 +214,16 @@ describe('BaseDataFrame', function () {
 
 	it('can sort by 3 columns ascending', function () {
 		
-		var dataFrame = initExampleDataFrame2();
+		var dataFrame = initDataFrame(
+			[ "Date", "Value1", "Value2", "Value3" ],
+			[
+				[new Date(2011, 24, 2), 300, 'c', 3],
+				[new Date(1975, 24, 2), 200, 'b', 1],
+				[new Date(2013, 24, 2), 20, 'c', 22],
+				[new Date(2015, 24, 2), 100, 'd', 4],
+			],
+			[5, 6, 7, 8]
+		);
 		var sorted = dataFrame.orderBy('Value2').thenBy('Value1').thenBy('Value3');
 		expect(sorted.getValues()).to.eql([
 			[new Date(1975, 24, 2), 200, 'b', 1],
@@ -194,7 +235,16 @@ describe('BaseDataFrame', function () {
 
 	it('can sort by single column descending', function () {
 		
-		var dataFrame = initExampleDataFrame2();
+		var dataFrame = initDataFrame(
+			[ "Date", "Value1", "Value2", "Value3" ],
+			[
+				[new Date(2011, 24, 2), 300, 'c', 3],
+				[new Date(1975, 24, 2), 200, 'b', 1],
+				[new Date(2013, 24, 2), 20, 'c', 22],
+				[new Date(2015, 24, 2), 100, 'd', 4],
+			],
+			[5, 6, 7, 8]
+		);
 		var sorted = dataFrame.orderByDescending('Value3');
 		expect(sorted.getValues()).to.eql([
 			[new Date(2013, 24, 2), 20, 'c', 22],
@@ -206,7 +256,16 @@ describe('BaseDataFrame', function () {
 
 	it('can sort by multiple column descending', function () {
 		
-		var dataFrame = initExampleDataFrame2();
+		var dataFrame = initDataFrame(
+			[ "Date", "Value1", "Value2", "Value3" ],
+			[
+				[new Date(2011, 24, 2), 300, 'c', 3],
+				[new Date(1975, 24, 2), 200, 'b', 1],
+				[new Date(2013, 24, 2), 20, 'c', 22],
+				[new Date(2015, 24, 2), 100, 'd', 4],
+			],
+			[5, 6, 7, 8]
+		);
 		var sorted = dataFrame.orderByDescending('Value2').thenByDescending('Value3');
 		expect(sorted.getValues()).to.eql([
 			[new Date(2015, 24, 2), 100, 'd', 4],
@@ -218,7 +277,16 @@ describe('BaseDataFrame', function () {
 
 	it('can sort by 3 columns descending', function () {
 		
-		var dataFrame = initExampleDataFrame2();
+		var dataFrame = initDataFrame(
+			[ "Date", "Value1", "Value2", "Value3" ],
+			[
+				[new Date(2011, 24, 2), 300, 'c', 3],
+				[new Date(1975, 24, 2), 200, 'b', 1],
+				[new Date(2013, 24, 2), 20, 'c', 22],
+				[new Date(2015, 24, 2), 100, 'd', 4],
+			],
+			[5, 6, 7, 8]
+		);
 		var sorted = dataFrame.orderByDescending('Value2').thenByDescending('Value3').thenByDescending('Value1');
 		expect(sorted.getValues()).to.eql([
 			[new Date(2015, 24, 2), 100, 'd', 4],
@@ -230,7 +298,16 @@ describe('BaseDataFrame', function () {
 
 	it('can drop column', function () {
 		
-		var dataFrame = initExampleDataFrame2();
+		var dataFrame = initDataFrame(
+			[ "Date", "Value1", "Value2", "Value3" ],
+			[
+				[new Date(2011, 24, 2), 300, 'c', 3],
+				[new Date(1975, 24, 2), 200, 'b', 1],
+				[new Date(2013, 24, 2), 20, 'c', 22],
+				[new Date(2015, 24, 2), 100, 'd', 4],
+			],
+			[5, 6, 7, 8]
+		);
 		var modified = dataFrame.dropColumn('Date');
 		expect(modified.getIndex().getValues()).to.eql([5, 6, 7, 8]);
 		expect(modified.getValues()).to.eql([
@@ -243,7 +320,16 @@ describe('BaseDataFrame', function () {
 
 	it('can drop multiple columns', function () {
 		
-		var dataFrame = initExampleDataFrame2();
+		var dataFrame = initDataFrame(
+			[ "Date", "Value1", "Value2", "Value3" ],
+			[
+				[new Date(2011, 24, 2), 300, 'c', 3],
+				[new Date(1975, 24, 2), 200, 'b', 1],
+				[new Date(2013, 24, 2), 20, 'c', 22],
+				[new Date(2015, 24, 2), 100, 'd', 4],
+			],
+			[5, 6, 7, 8]
+		);
 		var modified = dataFrame.dropColumn(['Date', 'Value2'])
 		expect(modified.getIndex().getValues()).to.eql([5, 6, 7, 8]);
 		expect(modified.getValues()).to.eql([
@@ -256,7 +342,16 @@ describe('BaseDataFrame', function () {
 
 	it('can add column', function () {
 		
-		var dataFrame = initExampleDataFrame2();
+		var dataFrame = initDataFrame(
+			[ "Date", "Value1", "Value2", "Value3" ],
+			[
+				[new Date(2011, 24, 2), 300, 'c', 3],
+				[new Date(1975, 24, 2), 200, 'b', 1],
+				[new Date(2013, 24, 2), 20, 'c', 22],
+				[new Date(2015, 24, 2), 100, 'd', 4],
+			],
+			[5, 6, 7, 8]
+		);
 		var modified = dataFrame.setColumn('Value4', [1, 2, 3, 4]);
 		expect(modified.getIndex().getValues()).to.eql([5, 6, 7, 8]);
 		expect(modified.getColumnNames()).to.eql([
@@ -276,7 +371,16 @@ describe('BaseDataFrame', function () {
 
 	it('can overwrite column', function () {
 		
-		var dataFrame = initExampleDataFrame2();
+		var dataFrame = initDataFrame(
+			[ "Date", "Value1", "Value2", "Value3" ],
+			[
+				[new Date(2011, 24, 2), 300, 'c', 3],
+				[new Date(1975, 24, 2), 200, 'b', 1],
+				[new Date(2013, 24, 2), 20, 'c', 22],
+				[new Date(2015, 24, 2), 100, 'd', 4],
+			],
+			[5, 6, 7, 8]
+		);
 		var modified = dataFrame.setColumn('Value1', [1, 2, 3, 4]);
 		expect(modified.getIndex().getValues()).to.eql([5, 6, 7, 8]);
 		expect(modified.getValues()).to.eql([
@@ -289,8 +393,24 @@ describe('BaseDataFrame', function () {
 
 	it('can add column from other data frame', function () {
 		
-		var dataFrame1 = initExampleDataFrame();
-		var dataFrame2 = initExampleDataFrame2();
+		var dataFrame1 = initDataFrame(
+			[ "Date", "Value1", "Value2", "Value3" ],
+			[
+				[new Date(1975, 24, 2), 100, 'foo', 11],
+				[new Date(2015, 24, 2), 200, 'bar', 22],
+			],
+			[5, 6]
+		);
+		var dataFrame2 = initDataFrame(
+			[ "Date", "Value1", "Value2", "Value3" ],
+			[
+				[new Date(2011, 24, 2), 300, 'c', 3],
+				[new Date(1975, 24, 2), 200, 'b', 1],
+				[new Date(2013, 24, 2), 20, 'c', 22],
+				[new Date(2015, 24, 2), 100, 'd', 4],
+			],
+			[5, 6, 7, 8]
+		);
 		var modified = dataFrame2.setColumn('Value4', dataFrame1.getColumn('Value2'));
 		expect(modified.getColumnNames()).to.eql([
 			"Date",
@@ -309,7 +429,16 @@ describe('BaseDataFrame', function () {
 
 	it('column being merged is reindexed', function () {
 
-		var dataFrame = initExampleDataFrame2();
+		var dataFrame = initDataFrame(
+			[ "Date", "Value1", "Value2", "Value3" ],
+			[
+				[new Date(2011, 24, 2), 300, 'c', 3],
+				[new Date(1975, 24, 2), 200, 'b', 1],
+				[new Date(2013, 24, 2), 20, 'c', 22],
+				[new Date(2015, 24, 2), 100, 'd', 4],
+			],
+			[5, 6, 7, 8]
+		);
 		var newColumnName = "new column";
 		var newColumn = new panjas.Column(newColumnName, [4, 3, 2, 1], new panjas.Index([0, 5, 2, 7]))
 		var modified = dataFrame.setColumn(newColumnName, newColumn);
@@ -336,7 +465,16 @@ describe('BaseDataFrame', function () {
 
 	it('can get subset of rows', function () {
 
-		var dataFrame = initExampleDataFrame2();
+		var dataFrame = initDataFrame(
+			[ "Date", "Value1", "Value2", "Value3" ],
+			[
+				[new Date(2011, 24, 2), 300, 'c', 3],
+				[new Date(1975, 24, 2), 200, 'b', 1],
+				[new Date(2013, 24, 2), 20, 'c', 22],
+				[new Date(2015, 24, 2), 100, 'd', 4],
+			],
+			[5, 6, 7, 8]
+		);
 		var subset = dataFrame.getRowsSubset(1, 2);
 		expect(subset.getIndex().getValues()).to.eql([6, 7]);
 		expect(subset.getValues()).to.eql([
@@ -347,7 +485,14 @@ describe('BaseDataFrame', function () {
 
 	it('can set index by column name', function () {
 
-		var dataFrame = initExampleDataFrame();
+		var dataFrame = initDataFrame(
+			[ "Date", "Value1", "Value2", "Value3" ],
+			[
+				[new Date(1975, 24, 2), 100, 'foo', 11],
+				[new Date(2015, 24, 2), 200, 'bar', 22],
+			],
+			[5, 6]
+		);
 		var indexedDataFrame = dataFrame.setIndex("Date");
 
 		expect(indexedDataFrame.getIndex().getValues()).to.eql([
@@ -363,7 +508,14 @@ describe('BaseDataFrame', function () {
 
 	it('can set index by column index', function () {
 
-		var dataFrame = initExampleDataFrame();
+		var dataFrame = initDataFrame(
+			[ "Date", "Value1", "Value2", "Value3" ],
+			[
+				[new Date(1975, 24, 2), 100, 'foo', 11],
+				[new Date(2015, 24, 2), 200, 'bar', 22],
+			],
+			[5, 6]
+		);
 		var indexedDataFrame = dataFrame.setIndex(0);
 
 		expect(indexedDataFrame.getIndex().getValues()).to.eql([
@@ -379,7 +531,14 @@ describe('BaseDataFrame', function () {
 
 	it('can reset index', function () {
 
-		var dataFrame = initExampleDataFrame();
+		var dataFrame = initDataFrame(
+			[ "Date", "Value1", "Value2", "Value3" ],
+			[
+				[new Date(1975, 24, 2), 100, 'foo', 11],
+				[new Date(2015, 24, 2), 200, 'bar', 22],
+			],
+			[5, 6]
+		);
 		var dataFrameWithIndexReset = dataFrame.setIndex("Date").resetIndex();
 
 		expect(dataFrameWithIndexReset.getIndex().getValues()).to.eql([
