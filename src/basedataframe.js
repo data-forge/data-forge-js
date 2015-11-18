@@ -338,9 +338,9 @@ var orderThenBy = function (self, batch, nextSortMethod) {
 };
 
 /**
- * Sorts a data frame based on a single column (ascending). 
+ * Sorts a data frame based on a single column (specified by name or index) or by selector (ascending). 
  * 
- * @param {string|index|function} columnNameOrIndexOrSelector - A name, index or selector that specifies the column to sort by.
+ * @param {string|index|function} columnNameOrIndexOrSelector - A column name, column index or selector function that indicates the value to sort by.
  */
 BaseDataFrame.prototype.orderBy = function (columnNameOrIndexOrSelector) {
 
@@ -349,9 +349,9 @@ BaseDataFrame.prototype.orderBy = function (columnNameOrIndexOrSelector) {
 };
 
 /**
- * Sorts a data frame based on a single column (descending). 
+ * Sorts a data frame based on a single column (specified by name or index) or by selector (descending). 
  * 
- * @param {string|array} columnName - Column to sort by.
+ * @param {string|index|function} columnNameOrIndexOrSelector - A column name, column index or selector function that indicates the value to sort by.
  */
 BaseDataFrame.prototype.orderByDescending = function (columnNameOrIndexOrSelector) {
 

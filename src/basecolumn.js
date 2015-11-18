@@ -36,7 +36,7 @@ BaseColumn.prototype.skip = function (numRows) {
 			return E
 				.from(self.getValues())
 				.skip(numRows)
-				.toArray();	numRows		
+				.toArray();
 		},
 		function () {
 			return self.getIndex().skip(numRows);
@@ -44,6 +44,179 @@ BaseColumn.prototype.skip = function (numRows) {
 	); 	
 };
 
+//
+// Throw an exception if the sort method doesn't make sense.
+//
+var validateSortMethod = function (sortMethod) {
+	assert.isString(sortMethod);
+	assert(
+		sortMethod === 'orderBy' || 
+	   sortMethod === 'orderByDescending' ||
+	   sortMethod === 'thenBy' ||
+	   sortMethod === 'thenByDescending', 
+	   "Expected 'sortMethod' to be one of 'orderBy', 'orderByDescending', 'thenBy' or 'thenByDescending', instead it is '" + sortMethod + "'."
+   );
+};
+
+//
+// Execute a batched sorting command.
+//
+var executeOrderBy = function (self, batch) {
+
+	assert.isObject(self);
+	assert.isArray(batch);
+	assert(batch.length > 0);
+
+	var cachedSorted = null;
+
+	//
+	// Don't invoke the sort until we really know what we need.
+	//
+	var executeLazySort = function () {
+		if (cachedSorted) {
+			return cachedSorted;
+		}
+
+		batch.forEach(function (orderCmd) {
+			assert.isObject(orderCmd);
+			assert.isFunction(orderCmd.sortSelector);
+			validateSortMethod(orderCmd.sortMethod);
+		});
+
+		var valuesWithIndex = E.from(self.getIndex().getValues())
+			.zip(self.getValues(), function (index, value) {
+				return [index, value];
+			})
+			.toArray();	
+
+		cachedSorted = E.from(batch)
+			.aggregate(E.from(valuesWithIndex), function (unsorted, orderCmd) {
+				return unsorted[orderCmd.sortMethod](function (row) {
+					var value = row[1];
+					return orderCmd.sortSelector(value);
+				}); 
+			})
+			.toArray();
+
+		return cachedSorted;
+	};
+
+	var LazyDataFrame = require('./lazydataframe');
+
+	return new LazyDataFrame(
+		function () {
+			return self.getColumnNames();
+		},
+		function () {
+			return E.from(executeLazySort())
+				.select(function (row) {
+					return row[1]; // Extract the value (minus the index) from the sorted data.					
+				})
+				.toArray();
+		},
+		function () {
+			var LazyIndex = require('./lazyindex');
+			return new LazyIndex(
+				function () {
+					return E.from(executeLazySort())
+						.select(function (row) {
+							return row[0]; // Extract the index from the sorted data.
+						})
+						.toArray();
+				}
+			);
+		}
+	);
+};
+
+//
+// Order by values in a partcular column, either ascending or descending
+//
+var orderBy = function (self, sortMethod, sortSelector) {
+	assert.isObject(self);
+	validateSortMethod(sortMethod);
+	assert.isFunction(sortSelector);
+
+	var batchOrder = [
+		{ 
+			sortSelector: sortSelector, 
+			sortMethod: sortMethod 
+		}
+	];
+
+	var sortedDataFrame = executeOrderBy(self, batchOrder);
+	sortedDataFrame.thenBy = orderThenBy(self, batchOrder, 'thenBy');
+	sortedDataFrame.thenByDescending = orderThenBy(self, batchOrder, 'thenByDescending');	
+	return sortedDataFrame;
+};
+
+//
+// Process an optional selector.
+// Returns a selector fuctcion.
+//
+var processOptionalSelector = function (self, optionalSortSelector, fnName) {
+	assert.isObject(self);
+	assert.isString(fnName);
+
+	if (!Object.isFunction(optionalSortSelector)) {
+
+		optionalSortSelector = function (value) {
+				return value; // If no sort selector is provided, generate on that just passes the value through.
+			};
+	}
+
+	return optionalSortSelector;
+};
+
+//
+// Generates a thenBy function that is attached to already ordered data frames.
+//
+var orderThenBy = function (self, batch, nextSortMethod) {
+	assert.isObject(self);
+	assert.isArray(batch);
+	assert(batch.length > 0);
+	validateSortMethod(nextSortMethod);
+	
+	return function (optionalSortSelector) {
+
+		var extendedBatch = batch.concat([
+			{
+				sortSelector: processOptionalSelector(self, optionalSortSelector, 'thenBy'),
+				sortMethod: nextSortMethod,
+			},
+		]);
+
+		var sortedDataFrame = executeOrderBy(self, extendedBatch);
+		sortedDataFrame.thenBy = orderThenBy(self, extendedBatch, 'thenBy');
+		sortedDataFrame.thenByDescending = orderThenBy(self, extendedBatch, 'thenByDescending');		
+		return sortedDataFrame;
+	};	
+};
+
+/**
+ * Sorts the column by value or optional sort selector (ascending). 
+ * 
+ * @param {function} [optionalSortSelector] - An optional function to select a value to sort by.
+ */
+BaseColumn.prototype.orderBy = function (optionalSortSelector) {
+
+	var self = this;
+	return orderBy(self, 'orderBy', processOptionalSelector(self, optionalSortSelector, 'orderBy'));
+};
+
+/**
+ * Sorts the column by value or optional sort selector (descending). 
+ * 
+ * @param {function} [optionalSortSelector] - An optional function to select a value to sort by.
+ */
+BaseColumn.prototype.orderByDescending = function (optionalSortSelector) {
+
+	var self = this;
+	return orderBy(self, 'orderByDescending', processOptionalSelector(self, optionalSortSelector, 'orderByDescending'));
+};
+
+
+/*fio:
 //
 // Orders a series based on values in asscending order.
 //
@@ -80,21 +253,22 @@ var order = function (self, sortMethod) {
 	);
 };
 
-/**
+
  * Orders a series based on values in asscending order.
- */
+
 BaseColumn.prototype.order = function () {
 	var self = this;
 	return order(self, 'orderBy');
 };
 
-/**
+
  * Orders a series based on values in descending order.
- */
+
 BaseColumn.prototype.orderDescending = function () {
 	var self = this;
 	return order(self, 'orderByDescending');
 };
+*/
 
 /**
  * Get a subset of rows from the column.
