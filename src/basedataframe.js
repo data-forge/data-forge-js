@@ -187,10 +187,16 @@ var executeOrderBy = function (self, batch) {
 			validateSortMethod(orderCmd.sortMethod);
 		});
 
+		var valuesWithIndex = E.from(self.getIndex().getValues())
+			.zip(self.getValues(), function (index, values) {
+				return [index].concat(values);
+			})
+			.toArray();		
+
 		cachedSorted = E.from(batch)
-			.aggregate(E.from(self.getValues()), function (unsorted, orderCmd) {
+			.aggregate(E.from(valuesWithIndex), function (unsorted, orderCmd) {
 				return unsorted[orderCmd.sortMethod](function (row) {
-					return row[orderCmd.columnIndex];
+					return row[orderCmd.columnIndex+1]; // Add 1 because the index is include in the rows being sorted.
 				}); 
 			})
 			.toArray();
@@ -205,8 +211,24 @@ var executeOrderBy = function (self, batch) {
 			return self.getColumnNames();
 		},
 		function () {
-			return executeLazySort();	
-		}		
+			return E.from(executeLazySort())
+				.select(function (row) {
+					return E.from(row).skip(1).toArray(); // Extract the values (minus the index) from the sorted data.					
+				})
+				.toArray();
+		},
+		function () {
+			var LazyIndex = require('./lazyindex');
+			return new LazyIndex(
+				function () {
+					return E.from(executeLazySort())
+						.select(function (row) {
+							return row[0]; // Extract the index from the sorted data.
+						})
+						.toArray();
+				}
+			);
+		}
 	);
 };
 

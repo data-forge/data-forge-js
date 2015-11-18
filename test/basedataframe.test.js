@@ -183,6 +183,7 @@ describe('BaseDataFrame', function () {
 			[5, 6, 7, 8]
 		);
 		var sorted = dataFrame.orderBy('Value1');
+		expect(sorted.getIndex().getValues()).to.eql([7, 8, 6, 5]);
 		expect(sorted.getValues()).to.eql([
 			[new Date(2013, 24, 2), 20, 'c', 22],
 			[new Date(2015, 24, 2), 100, 'd', 4],
@@ -204,6 +205,7 @@ describe('BaseDataFrame', function () {
 			[5, 6, 7, 8]
 		);
 		var sorted = dataFrame.orderBy('Value2').thenBy('Value1');
+		expect(sorted.getIndex().getValues()).to.eql([6, 7, 5, 8]);
 		expect(sorted.getValues()).to.eql([
 			[new Date(1975, 24, 2), 200, 'b', 1],
 			[new Date(2013, 24, 2), 20, 'c', 22],
@@ -225,6 +227,7 @@ describe('BaseDataFrame', function () {
 			[5, 6, 7, 8]
 		);
 		var sorted = dataFrame.orderBy('Value2').thenBy('Value1').thenBy('Value3');
+		expect(sorted.getIndex().getValues()).to.eql([6, 7, 5, 8]);
 		expect(sorted.getValues()).to.eql([
 			[new Date(1975, 24, 2), 200, 'b', 1],
 			[new Date(2013, 24, 2), 20, 'c', 22],
@@ -246,6 +249,7 @@ describe('BaseDataFrame', function () {
 			[5, 6, 7, 8]
 		);
 		var sorted = dataFrame.orderByDescending('Value3');
+		expect(sorted.getIndex().getValues()).to.eql([7, 8, 5, 6]);
 		expect(sorted.getValues()).to.eql([
 			[new Date(2013, 24, 2), 20, 'c', 22],
 			[new Date(2015, 24, 2), 100, 'd', 4],
@@ -267,6 +271,7 @@ describe('BaseDataFrame', function () {
 			[5, 6, 7, 8]
 		);
 		var sorted = dataFrame.orderByDescending('Value2').thenByDescending('Value3');
+		expect(sorted.getIndex().getValues()).to.eql([8, 7, 5, 6]);
 		expect(sorted.getValues()).to.eql([
 			[new Date(2015, 24, 2), 100, 'd', 4],
 			[new Date(2013, 24, 2), 20, 'c', 22],
@@ -288,6 +293,7 @@ describe('BaseDataFrame', function () {
 			[5, 6, 7, 8]
 		);
 		var sorted = dataFrame.orderByDescending('Value2').thenByDescending('Value3').thenByDescending('Value1');
+		expect(sorted.getIndex().getValues()).to.eql([8, 7, 5, 6]);
 		expect(sorted.getValues()).to.eql([
 			[new Date(2015, 24, 2), 100, 'd', 4],
 			[new Date(2013, 24, 2), 20, 'c', 22],
