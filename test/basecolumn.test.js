@@ -36,13 +36,13 @@ describe('BaseColumn', function () {
 
 	it('can sort values ascending', function () {		
 		var column = initColumn([0, 1, 2, 3], [100, 300, 200, 5]);
-		var sorted = column.orderBy();
+		var sorted = column.order();
 		expect(sorted.getValues()).to.eql([5, 100, 200, 300]);
 	});
 	
 	it('can sort values descending', function () {		
 		var column = initColumn([0, 1, 2, 3], [100, 300, 200, 5]);
-		var sorted = column.orderByDescending();
+		var sorted = column.orderDescending();
 		expect(sorted.getValues()).to.eql([300, 200, 100, 5]);
 	});
 

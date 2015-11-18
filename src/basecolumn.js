@@ -151,24 +151,6 @@ var orderBy = function (self, sortMethod, sortSelector) {
 };
 
 //
-// Process an optional selector.
-// Returns a selector fuctcion.
-//
-var processOptionalSelector = function (self, optionalSortSelector, fnName) {
-	assert.isObject(self);
-	assert.isString(fnName);
-
-	if (!Object.isFunction(optionalSortSelector)) {
-
-		optionalSortSelector = function (value) {
-				return value; // If no sort selector is provided, generate on that just passes the value through.
-			};
-	}
-
-	return optionalSortSelector;
-};
-
-//
 // Generates a thenBy function that is attached to already ordered data frames.
 //
 var orderThenBy = function (self, batch, nextSortMethod) {
@@ -177,11 +159,12 @@ var orderThenBy = function (self, batch, nextSortMethod) {
 	assert(batch.length > 0);
 	validateSortMethod(nextSortMethod);
 	
-	return function (optionalSortSelector) {
+	return function (sortSelector) {
+		assert.isFunction(sortSelector, "Expected parameter 'sortSelector' to be a function")
 
 		var extendedBatch = batch.concat([
 			{
-				sortSelector: processOptionalSelector(self, optionalSortSelector, 'thenBy'),
+				sortSelector: sortSelector,
 				sortMethod: nextSortMethod,
 			},
 		]);
@@ -194,25 +177,49 @@ var orderThenBy = function (self, batch, nextSortMethod) {
 };
 
 /**
- * Sorts the column by value or optional sort selector (ascending). 
- * 
- * @param {function} [optionalSortSelector] - An optional function to select a value to sort by.
+ * Sorts the column by value (ascending). 
  */
-BaseColumn.prototype.orderBy = function (optionalSortSelector) {
+BaseColumn.prototype.order = function () {
 
 	var self = this;
-	return orderBy(self, 'orderBy', processOptionalSelector(self, optionalSortSelector, 'orderBy'));
+	return orderBy(self, 'orderBy', function (value) { 
+		return value; 
+	});
 };
 
 /**
- * Sorts the column by value or optional sort selector (descending). 
- * 
- * @param {function} [optionalSortSelector] - An optional function to select a value to sort by.
+ * Sorts the column by value (descending). 
  */
-BaseColumn.prototype.orderByDescending = function (optionalSortSelector) {
+BaseColumn.prototype.orderDescending = function (optionalSortSelector) {
 
 	var self = this;
-	return orderBy(self, 'orderByDescending', processOptionalSelector(self, optionalSortSelector, 'orderByDescending'));
+	return orderBy(self, 'orderByDescending', function (value) {
+		return value;
+	});
+};
+
+/**
+ * Sorts the column by sort selector (ascending). 
+ * 
+ * @param {function} sortSelector - An function to select a value to sort by.
+ */
+BaseColumn.prototype.orderBy = function (sortSelector) {
+
+	assert.isFunction
+
+	var self = this;
+	return orderBy(self, 'orderBy', sortSelector);
+};
+
+/**
+ * Sorts the column by sort selector (descending). 
+ * 
+ * @param {function} sortSelector - An function to select a value to sort by.
+ */
+BaseColumn.prototype.orderByDescending = function (sortSelector) {
+
+	var self = this;
+	return orderBy(self, 'orderByDescending', sortSelector);
 };
 
 
