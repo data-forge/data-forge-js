@@ -15,4 +15,4 @@ var values = E
 
 var dataFrame = new panjas.DataFrame(["index", "Sin", "Cos"], values);
 
-console.log(dataFrame.toString());
+console.log(dataFrame.skip(10).toString());
