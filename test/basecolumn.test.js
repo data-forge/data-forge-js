@@ -37,14 +37,117 @@ describe('BaseColumn', function () {
 	it('can sort values ascending', function () {		
 		var column = initColumn([0, 1, 2, 3], [100, 300, 200, 5]);
 		var sorted = column.order();
+		expect(sorted.getIndex().getValues()).to.eql([3, 0, 2, 1]);
 		expect(sorted.getValues()).to.eql([5, 100, 200, 300]);
 	});
 	
 	it('can sort values descending', function () {		
 		var column = initColumn([0, 1, 2, 3], [100, 300, 200, 5]);
 		var sorted = column.orderDescending();
+		expect(sorted.getIndex().getValues()).to.eql([1, 2, 0, 3]);
 		expect(sorted.getValues()).to.eql([300, 200, 100, 5]);
 	});
+
+	it('can sort nested objects using selector - ascending', function () {
+		var column = initColumn(
+			[0, 1, 2, 3], 
+			[
+				{
+					i: 1,
+					v: 300,
+				},
+				{
+					i: 2,
+					v: 100,
+				},
+				{
+					i: 0,
+					v: 100,
+				},
+				{
+					i: 3,
+					v: 5
+				}
+			]
+		);
+		var sorted = column
+			.orderBy(function (row) {
+				return row.v;
+			})
+			.thenBy(function (row) {
+				return row.i;
+			});
+		expect(sorted.getIndex().getValues()).to.eql([3, 2, 1, 0]);
+		expect(sorted.getValues()).to.eql([
+			{
+				i: 3,
+				v: 5
+			},
+			{
+				i: 0,
+				v: 100,
+			},
+			{
+				i: 2,
+				v: 100,
+			},
+			{
+				i: 1,
+				v: 300,
+			},
+		]);
+	});
+
+		it('can sort nested objects using selector - descending', function () {
+		var column = initColumn(
+			[0, 1, 2, 3], 
+			[
+				{
+					i: 1,
+					v: 300,
+				},
+				{
+					i: 2,
+					v: 100,
+				},
+				{
+					i: 0,
+					v: 100,
+				},
+				{
+					i: 3,
+					v: 5
+				}
+			]
+		);
+		var sorted = column
+			.orderByDescending(function (row) {
+				return row.v;
+			})
+			.thenByDescending(function (row) {
+				return row.i;
+			});
+		expect(sorted.getIndex().getValues()).to.eql([0, 1, 2, 3]);
+		expect(sorted.getValues()).to.eql([
+			{
+				i: 1,
+				v: 300,
+			},
+			{
+				i: 2,
+				v: 100,
+			},
+			{
+				i: 0,
+				v: 100,
+			},
+			{
+				i: 3,
+				v: 5
+			},
+		]);
+	});
+
 
 	it('can get subset of rows', function () {
 
