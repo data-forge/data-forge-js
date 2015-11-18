@@ -622,7 +622,7 @@ BaseDataFrame.prototype.toString = function () {
 	var Table = require('easy-table');
 
 	var index = self.getIndex().getValues();
-	var header = ['index'].concat(self.getColumnNames());
+	var header = ['__index__'].concat(self.getColumnNames());
 	var rows = E.from(self.getValues())
 			.select(function (row, rowIndex) { 
 				return [index[rowIndex]].concat(row);
