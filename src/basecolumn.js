@@ -201,6 +201,8 @@ BaseColumn.prototype.reindex = function (newIndex) {
 			// Generate a map to relate an index value to a column value.
 			//
 			var indexMap = {};
+			var indexExists = {};
+
 			E.from(self.getIndex().getValues())
 				.zip(self.getValues(), 
 					function (indexValue, columnValue) {
@@ -209,7 +211,15 @@ BaseColumn.prototype.reindex = function (newIndex) {
 				)
 				.toArray()
 				.forEach(function (pair) {
-					indexMap[pair[0]] = pair[1];
+					var index = pair[0];
+					var value = pair[1];
+
+					if (indexExists[index]) {
+						throw new Error("Duplicate index detected, failed to 'reindex'");
+					}
+
+					indexMap[index] = value;
+					indexExists[index] = true;
 				});
 
 			//

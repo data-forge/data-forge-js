@@ -169,4 +169,17 @@ describe('BaseColumn', function () {
 		expect(reindexed.getIndex().getValues()).to.eql([3, 10, 1, 32]);
 		expect(reindexed.getValues()).to.eql([5, undefined, 300, undefined]);
 	});
+
+	it('reindexing a column with duplicate indicies throws', function () {
+
+		var column = initColumn([0, 1, 1, 3], [100, 300, 200, 5]);
+		var newIndex = new panjas.Index([3, 10, 1, 32])
+
+		var reindexed = column.reindex(newIndex);
+
+		expect(function () {
+			reindexed.getValues(); // Force lazy evaluation to complete.
+			
+		}).to.throw(Error);
+	});
 });
