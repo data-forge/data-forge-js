@@ -613,4 +613,26 @@ BaseDataFrame.prototype.resetIndex = function () {
 	);
 };
 
+/** 
+ * Format the data frame for display as a string.
+ */
+BaseDataFrame.prototype.toString = function () {
+	var self = this;
+
+	var index = self.getIndex().getValues();
+	var header = ['index'].concat(self.getColumnNames());
+	var rows = E.from(self.getValues())
+			.select(function (row, rowIndex) { 
+				return [index[rowIndex]].concat(row);
+			})
+			.toArray()
+	var rowsAndHeader = [header].concat(rows);
+	return E.from(rowsAndHeader)
+		.select(function (row) {
+			return row.join(', ');
+		})
+		.toArray()
+		.join('\r\n');
+};
+
 module.exports = BaseDataFrame;
