@@ -27,22 +27,6 @@ describe('BaseColumn', function () {
 		return column;		
 	};
 	
-	/*fio:
-	var initExampleColumn = function (values) {
-		var column = new BaseColumn();
-		column.getName = function () {
-			return 'some-column';
-		};
-		column.getValues = function () {
-			return values || [100, 300, 200, 5];
-		};
-		column.getIndex = function () {
-			return new panjas.Index([0, 1, 2, 3]);
-		};
-		return column;		
-	};
-	*/
-
 	it('can skip', function () {
 		var column = initColumn([0, 1, 2, 3], [100, 300, 200, 5]);
 		var skipped = column.skip(2);		
