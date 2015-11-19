@@ -13,6 +13,9 @@ var values = E
 	})
 	.toArray();
 
-var dataFrame = new panjas.DataFrame(["index", "Sin", "Cos"], values);
+var dataFrame = new panjas.DataFrame(["index", "Sin", "Cos"], values).setIndex("index").dropColumn("index");
 
 console.log(dataFrame.skip(10).toString());
+
+var column = dataFrame.getColumn("Sin");
+console.log(column.skip(10).toString());

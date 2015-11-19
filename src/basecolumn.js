@@ -365,4 +365,31 @@ BaseColumn.prototype.reindex = function (newIndex) {
 	);
 };
 
+/** 
+ * Format the data frame for display as a string.
+ */
+BaseColumn.prototype.toString = function () {
+
+	var self = this;
+	var Table = require('easy-table');
+
+	var index = self.getIndex().getValues();
+	var header = ['__index__', self.getName()];
+	var rows = E.from(self.getValues())
+			.select(function (value, rowIndex) { 
+				return [index[rowIndex], value];
+			})
+			.toArray()
+
+	var t = new Table();
+	rows.forEach(function (row, rowIndex) {
+		row.forEach(function (cell, cellIndex) {
+			t.cell(header[cellIndex], cell);
+		});
+		t.newRow();
+	});
+
+	return t.toString();
+};
+
 module.exports = BaseColumn;
