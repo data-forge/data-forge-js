@@ -192,20 +192,22 @@ var validateSortMethod = function (sortMethod) {
 // Map a row of data to a JS object with column names as fields.
 //
 var mapRowByColumns = function (self, row) {
-	return E.from(self.getColumnNames())
+	var copy = E.from(row).toArray();
+
+	E.from(self.getColumnNames())
 		.select(function (columnName, columnIndex) {
 			return [columnName, columnIndex];
 		})
-		.toObject(
+		.toArray()
+		.forEach(
 			function (column) {
 				var columnName = column[0];
-				return columnName;
-			},
-			function (column) {
 				var columnIndex = column[1];
-				return row[columnIndex];
+				copy[columnName] = copy[columnIndex];
 			}
 		);
+
+	return copy;
 };
 
 //
