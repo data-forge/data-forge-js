@@ -68,12 +68,12 @@ var panjas = {
 			assert.isString(columnName, "Expected optional 'columnName' parameter to 'merge' to be a string.");
 		}
 
-		var leftColumnIndex = leftDataFrame._columnNameToIndex(columnName);
+		var leftColumnIndex = leftDataFrame.getColumnIndex(columnName);
 		if (leftColumnIndex < 0) {
 			throw new Error("Column with name '" + columnName + "' doesn't exist in 'leftDataFrame'.");
 		}
 
-		var rightColumnIndex = rightDataFrame._columnNameToIndex(columnName);
+		var rightColumnIndex = rightDataFrame.getColumnIndex(columnName);
 		if (rightColumnIndex < 0) {
 			throw new Error("Column with name '" + columnName + "' doesn't exist in 'rightColumnIndex'.");
 		}

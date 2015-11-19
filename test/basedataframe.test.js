@@ -26,6 +26,20 @@ describe('BaseDataFrame', function () {
 		};
 		return dataFrame;
 	};
+
+	it('can get column index from name', function () {
+		var dataFrame = initDataFrame(
+			[ "Date", "Value1", "Value2", "Value3" ],
+			[],
+			[]
+		);
+
+		expect(dataFrame.getColumnIndex("Date")).to.eql(0);
+		expect(dataFrame.getColumnIndex("Value1")).to.eql(1);
+		expect(dataFrame.getColumnIndex("Value2")).to.eql(2);
+		expect(dataFrame.getColumnIndex("Value3")).to.eql(3);
+
+	});
 	
 	it('can skip', function () {
 		var dataFrame = initDataFrame(

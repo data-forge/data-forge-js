@@ -22,12 +22,15 @@ var E = require('linq');
 var BaseDataFrame = function () {
 };
 
-//
-// Maps a column name to an array index.
-// Returns -1 if the requested column was not found.
-//
-BaseDataFrame.prototype._columnNameToIndex = function (columnName) {
-	assert.isString(columnName, "Expected 'columnName' parameter to _columnNameToIndex to be a non-empty string.");
+/**
+ * Gets a column index from a column name.
+ *
+ * @param {string} columnName - The name of the column to retrieve the column index for.
+ *
+ * @returns {Number} Returns the index of the named column or -1 if the requested column was not found.
+ */
+BaseDataFrame.prototype.getColumnIndex = function (columnName) {
+	assert.isString(columnName, "Expected 'columnName' parameter to getColumnIndex to be a non-empty string.");
 	
 	var self = this;	
 	var columnNames = self.getColumnNames();
@@ -78,12 +81,12 @@ BaseDataFrame.prototype.getColumn = function (columnNameOrIndex) {
 
 	var columnIndex;
 	if (Object.isString(columnNameOrIndex)) {
-		columnIndex = self._columnNameToIndex(columnNameOrIndex);
+		columnIndex = self.getColumnIndex(columnNameOrIndex);
 		if (columnIndex < 0) {
 			throw new Error("In call to 'getColumn' failed to find column '" + columnNameOrIndex + "'.");
 		}
 	}
-	else {
+	else {	
 		assert.isNumber(columnNameOrIndex, "Expected 'columnNameOrIndex' parameter to 'getColumn' to be either a string or index that specifies the column to retreive.");
 
 		columnIndex = columnNameOrIndex;
@@ -135,7 +138,7 @@ BaseDataFrame.prototype.getColumnsSubset = function (columnNames) {
 		function () {
 			var columnIndices = E.from(columnNames)
 				.select(function (columnName) {
-					return self._columnNameToIndex(columnName);
+					return self.getColumnIndex(columnName);
 				})
 				.toArray();
 			
@@ -413,7 +416,7 @@ BaseDataFrame.prototype.dropColumn = function (columnOrColumns) {
 		cachedColumnIndices = E.from(columnOrColumns)
 			.select(function (columnName)  {
 				assert.isString(columnName);
-				var columnIndex = self._columnNameToIndex(columnName);
+				var columnIndex = self.getColumnIndex(columnName);
 				if (columnIndex < 0) {
 					throw new Error("In call to 'dropColumn' failed to find column '" + columnName + "'.");
 				}
@@ -473,7 +476,7 @@ BaseDataFrame.prototype.setColumn = function (columnName, data) {
 
 	var LazyDataFrame = require('./lazydataframe');
 
-	var columnIndex = self._columnNameToIndex(columnName);
+	var columnIndex = self.getColumnIndex(columnName);
 	if (columnIndex < 0) {
 		
 		// Add new column.
