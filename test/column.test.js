@@ -22,7 +22,7 @@ describe('Column', function () {
 
 	it('can get index', function () {
 		
-		var column = initExampleColumn(new panjas.Index([5, 6]));
+		var column = initExampleColumn(new panjas.Index("__test__", [5, 6]));
 		expect(column.getIndex().getValues()).to.eql([			
 			5,
 			6

@@ -299,6 +299,7 @@ var executeOrderBy = function (self, batch) {
 		function () {
 			var LazyIndex = require('./lazyindex');
 			return new LazyIndex(
+				self.getIndex().getName(),
 				function () {
 					return E.from(executeLazySort())
 						.select(function (row) {
@@ -612,6 +613,7 @@ BaseDataFrame.prototype.setIndex = function (columnNameOrIndex) {
 		},
 		function () {
 			return new LazyIndex(
+				self.getColumn(columnNameOrIndex).getName(),
 				function () {
 					return self.getColumn(columnNameOrIndex).getValues();
 				}
@@ -637,6 +639,7 @@ BaseDataFrame.prototype.resetIndex = function () {
 		},
 		function () {
 			return new LazyIndex(
+				"__index___",
 				function () {
 					return E.range(0, self.getValues().length).toArray();
 				}
@@ -654,7 +657,7 @@ BaseDataFrame.prototype.toString = function () {
 	var Table = require('easy-table');
 
 	var index = self.getIndex().getValues();
-	var header = ['__index__'].concat(self.getColumnNames());
+	var header = [self.getIndex().getName()].concat(self.getColumnNames());
 	var rows = E.from(self.getValues())
 			.select(function (row, rowIndex) { 
 				return [index[rowIndex]].concat(row);

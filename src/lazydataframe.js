@@ -27,6 +27,7 @@ var LazyDataFrame = function (columnNamesFn, valuesFn, indexFn) {
 		// Default to generated index range.
 		function () {
 			return new LazyIndex(
+				"__index__",
 				function () {
 					return E.range(0, self.getValues().length).toArray();
 				}

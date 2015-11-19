@@ -27,7 +27,7 @@ describe('LazyColumn', function () {
 		
 		var column = initExampleColumn(
 			function () {
-				return new panjas.Index([5, 6])
+				return new panjas.Index("__test__", [5, 6])
 			}
 		);
 		expect(column.getIndex().getValues()).to.eql([			

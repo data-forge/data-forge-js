@@ -22,7 +22,7 @@ describe('BaseDataFrame', function () {
 			return values;
 		};
 		dataFrame.getIndex = function () {
-			return new panjas.Index(index);
+			return new panjas.Index("__test__", index);
 		};
 		return dataFrame;
 	};
@@ -602,7 +602,7 @@ describe('BaseDataFrame', function () {
 			[5, 6, 7, 8]
 		);
 		var newColumnName = "new column";
-		var newColumn = new panjas.Column(newColumnName, [4, 3, 2, 1], new panjas.Index([0, 5, 2, 7]))
+		var newColumn = new panjas.Column(newColumnName, [4, 3, 2, 1], new panjas.Index("__test__", [0, 5, 2, 7]))
 		var modified = dataFrame.setColumn(newColumnName, newColumn);
 		var mergedColumn = modified.getColumn(newColumnName);
 

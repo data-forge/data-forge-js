@@ -9,6 +9,7 @@ describe('Index', function () {
 	it('can get values from index', function () {
 
 		var index = new LazyIndex(
+			"__test__",
 			function () { 
 				return [0, 1, 2, 3] 
 			}

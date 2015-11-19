@@ -10,6 +10,7 @@ var E = require('linq');
  *
  * Derives classes must implement:
  *
+ *		getName - Get the name of theindex.
  *		getValues - Get the array of values from the index.
  */
 var BaseIndex = function () {
@@ -28,6 +29,7 @@ BaseIndex.prototype.skip = function (numRows) {
 
 	var self = this;
 	return new LazyIndex(
+		self.getName(),
 		function () {
 			return E.from(self.getValues()).skip(numRows).toArray();
 		}
@@ -46,6 +48,7 @@ BaseIndex.prototype.take = function (numRows) {
 
 	var self = this;
 	return new LazyIndex(
+		self.getName(),
 		function () {
 			return E.from(self.getValues()).take(numRows).toArray();
 		}
@@ -67,6 +70,7 @@ BaseIndex.prototype.getRowsSubset = function (index, count) {
 	var LazyIndex = require('./lazyindex');
 
 	return new LazyIndex(
+		self.getName(),
 		function () {
 			return E.from(self.getValues())
 				.skip(index)

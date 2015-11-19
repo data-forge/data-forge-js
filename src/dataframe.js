@@ -23,11 +23,13 @@ var DataFrame = function (columnNames, values, index) {
 	var self = this;
 	self._columnNames = columnNames;
 	self._values = values;
-	self._index = index || new LazyIndex(
-		function () {
-			return E.range(0, values.length).toArray();
-		}
-	);
+	self._index = index || 
+		new LazyIndex(
+			"__index___",
+			function () {
+				return E.range(0, values.length).toArray();
+			}
+		);
 };
 
 var parent = inherit(DataFrame, BaseDataFrame);

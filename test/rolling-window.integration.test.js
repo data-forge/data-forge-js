@@ -18,7 +18,7 @@ describe('rolling window integration', function () {
 					return [i];
 				})
 				.toArray(),
-			new panjas.Index(E.range(10, 12).toArray())
+			new panjas.Index("__test__", E.range(10, 12).toArray())
 		);
 
 		var newColumn = dataFrame
