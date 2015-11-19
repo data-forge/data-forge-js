@@ -71,6 +71,33 @@ BaseDataFrame.prototype.skip = function (numRows) {
 	); 	
 };
 
+/**
+ * Take a number of rows in the data frame.
+ *
+ * @param {int} numRows - Number of rows to take.
+ */
+BaseDataFrame.prototype.take = function (numRows) {
+	assert.isNumber(numRows, "Expected 'numRows' parameter to 'take' function to be a number.");
+
+	var LazyDataFrame = require('./lazydataframe'); // Require here to prevent circular ref.
+	
+	var self = this;
+	return new LazyDataFrame(
+		function () {
+			return self.getColumnNames();
+		},
+		function () {
+			return E
+				.from(self.getValues())
+				.take(numRows)
+				.toArray();
+		},
+		function () {
+			return self.getIndex().take(numRows);
+		}
+	); 	
+};
+
 /*
  * Retreive a named column from the DataFrame.
  *

@@ -44,6 +44,31 @@ BaseColumn.prototype.skip = function (numRows) {
 	); 	
 };
 
+/**
+ * Take a number of rows in the column.
+ *
+ * @param {int} numRows - Number of rows to take.
+ */
+BaseColumn.prototype.take = function (numRows) {
+	assert.isNumber(numRows, "Expected 'numRows' parameter to 'take' function to be a number.");
+
+	var LazyColumn = require('./lazycolumn'); // Require here to prevent circular ref.
+	
+	var self = this;
+	return new LazyColumn(
+		self.getName(),
+		function () {
+			return E
+				.from(self.getValues())
+				.take(numRows)
+				.toArray();
+		},
+		function () {
+			return self.getIndex().take(numRows);
+		}
+	); 	
+};
+
 //
 // Throw an exception if the sort method doesn't make sense.
 //

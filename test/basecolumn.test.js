@@ -34,6 +34,13 @@ describe('BaseColumn', function () {
 		expect(skipped.getValues()).to.eql([200, 5]);		
 	});
 
+	it('can take', function () {
+		var column = initColumn([0, 1, 2, 3], [100, 300, 200, 5]);
+		var skipped = column.take(2);		
+		expect(skipped.getIndex().getValues()).to.eql([0, 1]);
+		expect(skipped.getValues()).to.eql([100, 300]);		
+	});
+
 	it('can sort values ascending', function () {		
 		var column = initColumn([0, 1, 2, 3], [100, 300, 200, 5]);
 		var sorted = column.order();

@@ -18,6 +18,12 @@ describe('Index', function () {
 		expect(index.skip(2).getValues()).to.eql([2, 3]);
 	});
 
+	it('can take', function () {
+
+		var index = new Index([0, 1, 2, 3]);
+		expect(index.take(2).getValues()).to.eql([0, 1]);
+	});
+
 	it('can get subset of rows', function () {
 
 		var index = new Index([0, 1, 2, 3]);
