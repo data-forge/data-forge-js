@@ -22,6 +22,28 @@ var E = require('linq');
 var BaseDataFrame = function () {
 };
 
+//
+// Map a row of data to a JS object with column names as fields.
+//
+var mapRowByColumns = function (self, row) {
+	var copy = E.from(row).toArray();
+
+	E.from(self.getColumnNames())
+		.select(function (columnName, columnIndex) {
+			return [columnName, columnIndex];
+		})
+		.toArray()
+		.forEach(
+			function (column) {
+				var columnName = column[0];
+				var columnIndex = column[1];
+				copy[columnName] = copy[columnIndex];
+			}
+		);
+
+	return copy;
+};
+
 /**
  * Gets a column index from a column name.
  *
@@ -94,6 +116,68 @@ BaseDataFrame.prototype.take = function (numRows) {
 		},
 		function () {
 			return self.getIndex().take(numRows);
+		}
+	); 	
+};
+
+/**
+ * Filter a data frame by a predicate selector.
+ *
+ * @param {function} filterSelectorPredicate - Predicte function to filter rows of the data frame.
+ */
+BaseDataFrame.prototype.where = function (filterSelectorPredicate) {
+	assert.isFunction(filterSelectorPredicate, "Expected 'filterSelectorPredicate' parameter to 'where' function to be a function.");
+
+	var self = this;
+
+	var cachedFilteredIndexAndValues = null;
+
+	//
+	// Lazy  execute the filtering.
+	//
+	var executeLazyWhere = function () {
+
+		if (cachedFilteredIndexAndValues) {
+			return cachedFilteredIndexAndValues;
+		}
+
+		cachedFilteredIndexAndValues = E
+			.from(self.getIndex().getValues())
+			.zip(self.getValues(), function (index, values) {
+				return [index, values];
+			})
+			.where(function (data) {
+				var row = data[1];
+				return filterSelectorPredicate(mapRowByColumns(self, row));
+			})
+			.toArray();
+		return cachedFilteredIndexAndValues;
+	}
+
+
+	var LazyDataFrame = require('./lazydataframe');
+	return new LazyDataFrame(
+		function () {
+			return self.getColumnNames();
+		},
+		function () {
+			return E.from(executeLazyWhere())
+				.select(function (data) {
+					return data[1]; // Row
+				})
+				.toArray();
+		},
+		function () {
+			return new LazyIndex(
+				self.getIndex().getName(),
+				function () {
+					return E.from(executeLazyWhere())
+						.select(function (data) {
+							return data[0]; // Index
+						})
+						.toArray();
+				}
+			);
 		}
 	); 	
 };
@@ -216,28 +300,6 @@ var validateSortMethod = function (sortMethod) {
 	   sortMethod === 'thenByDescending', 
 	   "Expected 'sortMethod' to be one of 'orderBy', 'orderByDescending', 'thenBy' or 'thenByDescending', instead it is '" + sortMethod + "'."
    );
-};
-
-//
-// Map a row of data to a JS object with column names as fields.
-//
-var mapRowByColumns = function (self, row) {
-	var copy = E.from(row).toArray();
-
-	E.from(self.getColumnNames())
-		.select(function (columnName, columnIndex) {
-			return [columnName, columnIndex];
-		})
-		.toArray()
-		.forEach(
-			function (column) {
-				var columnName = column[0];
-				var columnIndex = column[1];
-				copy[columnName] = copy[columnIndex];
-			}
-		);
-
-	return copy;
 };
 
 //

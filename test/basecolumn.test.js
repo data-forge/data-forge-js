@@ -41,6 +41,15 @@ describe('BaseColumn', function () {
 		expect(skipped.getValues()).to.eql([100, 300]);		
 	});
 
+	it('can filter', function () {
+		var column = initColumn([0, 1, 2, 3], [100, 300, 200, 5]);
+		var filtered = column.where(function (value) {
+				return value >= 100 && value < 300;
+			});
+		expect(filtered.getIndex().getValues()).to.eql([0, 2]);
+		expect(filtered.getValues()).to.eql([100, 200]);		
+	});
+
 	it('can sort values ascending', function () {		
 		var column = initColumn([0, 1, 2, 3], [100, 300, 200, 5]);
 		var sorted = column.order();

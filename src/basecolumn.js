@@ -69,6 +69,67 @@ BaseColumn.prototype.take = function (numRows) {
 	); 	
 };
 
+/**
+ * Filter a column by a predicate selector.
+ *
+ * @param {function} filterSelectorPredicate - Predicte function to filter rows of the column.
+ */
+BaseColumn.prototype.where = function (filterSelectorPredicate) {
+	assert.isFunction(filterSelectorPredicate, "Expected 'filterSelectorPredicate' parameter to 'where' function to be a function.");
+
+	var self = this;
+
+	var cachedFilteredIndexAndValues = null;
+
+	//
+	// Lazy  execute the filtering.
+	//
+	var executeLazyWhere = function () {
+
+		if (cachedFilteredIndexAndValues) {
+			return cachedFilteredIndexAndValues;
+		}
+
+		cachedFilteredIndexAndValues = E
+			.from(self.getIndex().getValues())
+			.zip(self.getValues(), function (index, value) {
+				return [index, value];
+			})
+			.where(function (data) {
+				var value = data[1];
+				return filterSelectorPredicate(value);
+			})
+			.toArray();
+		return cachedFilteredIndexAndValues;
+	}
+
+
+	var LazyColumn = require('./lazycolumn');
+	return new LazyColumn(
+		self.getName(),
+		function () {
+			return E.from(executeLazyWhere())
+				.select(function (data) {
+					return data[1]; // Value
+				})
+				.toArray();
+		},
+		function () {
+			var LazyIndex = require('./lazyindex');
+			return new LazyIndex(
+				self.getIndex().getName(),
+				function () {
+					return E.from(executeLazyWhere())
+						.select(function (data) {
+							return data[0]; // Index
+						})
+						.toArray();
+				}
+			);
+		}
+	); 	
+};
+
 //
 // Throw an exception if the sort method doesn't make sense.
 //

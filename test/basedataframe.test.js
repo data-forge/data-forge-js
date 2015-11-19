@@ -79,6 +79,27 @@ describe('BaseDataFrame', function () {
 		]);		
 	});
 
+	it('can filter', function () {
+		var dataFrame = initDataFrame(
+			[ "Date", "Value1", "Value2", "Value3" ],
+			[
+				[new Date(2011, 24, 2), 300, 'c', 3],
+				[new Date(1975, 24, 2), 200, 'b', 1],
+				[new Date(2013, 24, 2), 20, 'c', 22],
+				[new Date(2015, 24, 2), 100, 'd', 4],
+			],
+			[5, 6, 7, 8]
+		);
+		var filtered = dataFrame.where(function (row) {
+				return row.Value1 >= 100 && row.Value1 < 300;
+			});		
+		expect(filtered.getIndex().getValues()).to.eql([6, 8]);
+		expect(filtered.getValues()).to.eql([
+				[new Date(1975, 24, 2), 200, 'b', 1],
+				[new Date(2015, 24, 2), 100, 'd', 4],
+		]);		
+	});
+
 	it('throws expection when pulling a non-existing column name', function () {
 		
 		expect(function () {
