@@ -277,9 +277,6 @@ BaseDataFrame.prototype.selectMany = function (selector) {
 		},
 		function () {
 			return newValues;
-		},
-		function () {
-			return self.getIndex();
 		}
 	); 	
 };
