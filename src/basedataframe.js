@@ -192,42 +192,47 @@ BaseDataFrame.prototype.select = function (selector) {
 
 	var self = this;
 
-	//todo: make this lazy
-
-	var newColumnNames = null;
 	var newValues = null;
+	var newColumnNames = null;
 
-	newValues = E
-		.from(self.getValues())
-		.select(function (row) {
-			return selector(mapRowByColumns(self, row));
-		})
-		.toArray();
+	var lazyEvaluate = function () {
+		if (newValues) {
+			return;
+		}
+		
+		newValues = E
+			.from(self.getValues())
+			.select(function (row) {
+				return selector(mapRowByColumns(self, row));
+			})
+			.toArray();
 
-	newColumnNames = E.from(newValues)
-		.selectMany(function (value) {
-			return Object.keys(value);
-		})
-		.distinct()
-		.toArray();
-
-	newValues = E.from(newValues)
-		.select(function (value) {
-			return E.from(newColumnNames)
-				.select(function (columnName) {
-					return value[columnName];
-				})
-				.toArray();
-		})
-		.toArray();
+		newColumnNames = E.from(newValues)
+			.selectMany(function (value) {
+				return Object.keys(value);
+			})
+			.distinct()
+			.toArray();
+	};
 
 	var LazyDataFrame = require('./lazydataframe');
 	return new LazyDataFrame(
 		function () {
+			lazyEvaluate();
 			return newColumnNames;
 		},
 		function () {
-			return newValues;
+			lazyEvaluate();
+			var newRows = E.from(newValues)
+				.select(function (value) {
+					return E.from(newColumnNames)
+						.select(function (columnName) {
+							return value[columnName];
+						})
+						.toArray();
+				})
+				.toArray();			
+			return newRows;
 		},
 		function () {
 			return self.getIndex();
