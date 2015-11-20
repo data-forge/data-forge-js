@@ -133,7 +133,7 @@ BaseColumn.prototype.where = function (filterSelectorPredicate) {
 /**
  * Generate a new column based on the results of the selector function.
  *
- * @param {function} selector - Selector function that transforms each row to a different data structure.
+ * @param {function} selector - Selector function that transforms each value to a different data structure.
  */
 BaseColumn.prototype.select = function (selector) {
 	assert.isFunction(selector, "Expected 'selector' parameter to 'select' function to be a function.");
@@ -153,6 +153,70 @@ BaseColumn.prototype.select = function (selector) {
 		},
 		function () {
 			return self.getIndex();
+		}
+	); 	
+};
+
+/**
+ * Generate a new column based on the results of the selector function.
+ *
+ * @param {function} selector - Selector function that transforms each value to a different data structure.
+ */
+BaseColumn.prototype.selectMany = function (selector) {
+	assert.isFunction(selector, "Expected 'selector' parameter to 'selectMany' function to be a function.");
+
+	var self = this;
+
+	var newIndexAndNewValues = null;
+	var newValues = null;
+
+	var lazyEvaluate = function () {
+
+		if (newIndexAndNewValues) {
+			return;
+		}
+
+		newIndexAndNewValues = E.from(self.getIndex().getValues())
+			.zip(self.getValues(), function (index, value) {
+				return [index, selector(value)];
+			})
+			.toArray();
+
+		newValues = E.from(newIndexAndNewValues)
+			.selectMany(function (data) {
+				return data[1]; // Extract expanded values.
+			})
+			.toArray();
+	};
+
+	var LazyColumn = require('./lazycolumn');
+	return new LazyColumn(
+		self.getName(),
+		function () {
+			lazyEvaluate();
+			return newValues;
+		},
+		function () {
+			var LazyIndex = require('./lazyindex');
+
+			return new LazyIndex(
+				self.getIndex().getName(),
+				function () {
+					lazyEvaluate();
+					var indexValues = E.from(newIndexAndNewValues)
+						.selectMany(function (data) {
+							var index = data[0];
+							var values = data[1];
+							return E.range(0, values.length)
+								.select(function (_) {
+									return index;
+								})
+								.toArray();
+						})
+						.toArray();
+					return indexValues;
+				}
+			);
 		}
 	); 	
 };

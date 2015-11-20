@@ -59,6 +59,19 @@ describe('BaseColumn', function () {
 		expect(modified.getValues()).to.eql([110, 310, 210, 15]);		
 	});
 
+	it('can select many', function () {
+		var column = initColumn([0, 1, 2, 3], [100, 300, 200, 5]);
+		var modified = column.selectMany(function (value) {
+				return E.range(0, 2)
+					.select(function (i) {
+						return value + i + 1;
+					})
+					.toArray();
+			});
+		expect(modified.getIndex().getValues()).to.eql([0, 0, 1, 1, 2, 2, 3, 3]);
+		expect(modified.getValues()).to.eql([101, 102, 301, 302, 201, 202, 6, 7]);		
+	});
+
 	it('can sort values ascending', function () {		
 		var column = initColumn([0, 1, 2, 3], [100, 300, 200, 5]);
 		var sorted = column.order();
