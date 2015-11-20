@@ -136,7 +136,7 @@ describe('BaseColumn', function () {
 		]);
 	});
 
-		it('can sort nested objects using selector - descending', function () {
+	it('can sort nested objects using selector - descending', function () {
 		var column = initColumn(
 			[0, 1, 2, 3], 
 			[
