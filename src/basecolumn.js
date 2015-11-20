@@ -130,6 +130,33 @@ BaseColumn.prototype.where = function (filterSelectorPredicate) {
 	); 	
 };
 
+/**
+ * Generate a new column based on the results of the selector function.
+ *
+ * @param {function} selector - Selector function that transforms each row to a different data structure.
+ */
+BaseColumn.prototype.select = function (selector) {
+	assert.isFunction(selector, "Expected 'selector' parameter to 'select' function to be a function.");
+
+	var self = this;
+
+	var LazyColumn = require('./lazycolumn');
+	return new LazyColumn(
+		self.getName(),
+		function () {
+			return E
+				.from(self.getValues())
+				.select(function (value) {
+					return selector(value);
+				})
+				.toArray();
+		},
+		function () {
+			return self.getIndex();
+		}
+	); 	
+};
+
 //
 // Throw an exception if the sort method doesn't make sense.
 //

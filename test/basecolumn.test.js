@@ -50,6 +50,15 @@ describe('BaseColumn', function () {
 		expect(filtered.getValues()).to.eql([100, 200]);		
 	});
 
+	it('can select', function () {
+		var column = initColumn([0, 1, 2, 3], [100, 300, 200, 5]);
+		var modified = column.select(function (value) {
+				return value + 10;
+			});
+		expect(modified.getIndex().getValues()).to.eql([0, 1, 2, 3]);
+		expect(modified.getValues()).to.eql([110, 310, 210, 15]);		
+	});
+
 	it('can sort values ascending', function () {		
 		var column = initColumn([0, 1, 2, 3], [100, 300, 200, 5]);
 		var sorted = column.order();
