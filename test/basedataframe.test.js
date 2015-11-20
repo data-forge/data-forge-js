@@ -8,6 +8,7 @@ describe('BaseDataFrame', function () {
 	
 	var expect = require('chai').expect;
 	var assert = require('chai').assert;
+	var E = require('linq');
 
 	var initDataFrame = function (columns, values, index) {
 		assert.isArray(columns);
@@ -124,6 +125,41 @@ describe('BaseDataFrame', function () {
 				[210, 'b'],
 				[30, 'c'],
 				[110, 'd'],
+		]);		
+	});
+
+	it('can select many', function () {
+		var dataFrame = initDataFrame(
+			[ "Date", "Value1", "Value2", "Value3" ],
+			[
+				[new Date(2011, 24, 2), 300, 'c', 3],
+				[new Date(1975, 24, 2), 200, 'b', 1],
+				[new Date(2013, 24, 2), 20, 'c', 22],
+				[new Date(2015, 24, 2), 100, 'd', 4],
+			],
+			[5, 6, 7, 8]
+		);
+		var modified = dataFrame.selectMany(function (row) {
+				return E.range(0, 2).
+					select(function (i) {
+						return {
+							TestA: row.Value1 + i + 1,
+							TestB: row.Value2,
+						};					
+					})
+					.toArray();
+			});		
+		expect(modified.getIndex().getValues()).to.eql([5, 6, 7, 8]);
+		expect(modified.getColumnNames()).to.eql(["TestA", "TestB"]);
+		expect(modified.getValues()).to.eql([
+				[301, 'c'],
+				[302, 'c'],
+				[201, 'b'],
+				[202, 'b'],
+				[21, 'c'],
+				[22, 'c'],
+				[101, 'd'],
+				[102, 'd'],
 		]);		
 	});
 
