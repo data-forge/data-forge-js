@@ -149,7 +149,7 @@ describe('BaseDataFrame', function () {
 					})
 					.toArray();
 			});		
-		expect(modified.getIndex().getValues()).to.eql([0, 1, 2, 3, 4, 5, 6, 7]); // Select many has to reindex.
+		expect(modified.getIndex().getValues()).to.eql([5, 5, 6, 6, 7, 7, 8, 8]);
 		expect(modified.getColumnNames()).to.eql(["TestA", "TestB"]);
 		expect(modified.getValues()).to.eql([
 				[301, 'c'],

@@ -192,6 +192,8 @@ BaseDataFrame.prototype.select = function (selector) {
 
 	var self = this;
 
+	//todo: make this lazy
+
 	var newColumnNames = null;
 	var newValues = null;
 
@@ -243,28 +245,51 @@ BaseDataFrame.prototype.selectMany = function (selector) {
 
 	var self = this;
 
+	//todo: make this lazy
+
 	var newColumnNames = null;
 	var newValues = null;
 
-	newValues = E
-		.from(self.getValues())
-		.selectMany(function (row) {
-			return selector(mapRowByColumns(self, row));
+	newValues = E.from(self.getIndex().getValues())
+		.zip(self.getValues(), function (index, row) {
+			return [index, selector(mapRowByColumns(self, row))];
 		})
 		.toArray();
 
 	newColumnNames = E.from(newValues)
-		.selectMany(function (value) {
-			return Object.keys(value);
+		.selectMany(function (data) {
+			var values = data[1];
+			return E.from(values)
+				.selectMany(function (value) {
+					return Object.keys(value);
+				})
+				.toArray();
 		})
 		.distinct()
 		.toArray();
 
+	var indexValues = E.from(newValues)
+		.selectMany(function (data) {
+			var index = data[0];
+			var values = data[1];
+			return E.range(0, values.length)
+				.select(function (_) {
+					return index;
+				})
+				.toArray();
+		})
+		.toArray();
+
 	newValues = E.from(newValues)
-		.select(function (value) {
-			return E.from(newColumnNames)
-				.select(function (columnName) {
-					return value[columnName];
+		.selectMany(function (data) {
+			var values = data[1];
+			return E.from(values)
+				.select(function (value) {
+					return E.from(newColumnNames)
+						.select(function (columnName) {
+							return value[columnName];
+						})
+						.toArray();
 				})
 				.toArray();
 		})
@@ -277,6 +302,14 @@ BaseDataFrame.prototype.selectMany = function (selector) {
 		},
 		function () {
 			return newValues;
+		},
+		function () {
+			return new LazyIndex(
+				self.getIndex().getName(),
+				function () {
+					return indexValues;
+				}
+			);
 		}
 	); 	
 };
