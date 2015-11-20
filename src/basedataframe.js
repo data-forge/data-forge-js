@@ -183,7 +183,7 @@ BaseDataFrame.prototype.where = function (filterSelectorPredicate) {
 };
 
 /**
- * Generate a new data frame based on the results the selector function.
+ * Generate a new data frame based on the results of the selector function.
  *
  * @param {function} selector - Selector function that transforms each row to a different data structure.
  */

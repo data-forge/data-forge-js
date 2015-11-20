@@ -112,7 +112,6 @@ describe('BaseDataFrame', function () {
 			[5, 6, 7, 8]
 		);
 		var modified = dataFrame.select(function (row) {
-			console.log(row); //fio:
 				return {
 					Test1: row.Value1 + 10,
 					Test2: row.Value2,
