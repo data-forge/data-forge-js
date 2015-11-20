@@ -100,6 +100,34 @@ describe('BaseDataFrame', function () {
 		]);		
 	});
 
+	it('can select', function () {
+		var dataFrame = initDataFrame(
+			[ "Date", "Value1", "Value2", "Value3" ],
+			[
+				[new Date(2011, 24, 2), 300, 'c', 3],
+				[new Date(1975, 24, 2), 200, 'b', 1],
+				[new Date(2013, 24, 2), 20, 'c', 22],
+				[new Date(2015, 24, 2), 100, 'd', 4],
+			],
+			[5, 6, 7, 8]
+		);
+		var modified = dataFrame.select(function (row) {
+			console.log(row); //fio:
+				return {
+					Test1: row.Value1 + 10,
+					Test2: row.Value2,
+				};
+			});		
+		expect(modified.getIndex().getValues()).to.eql([5, 6, 7, 8]);
+		expect(modified.getColumnNames()).to.eql(["Test1", "Test2"]);
+		expect(modified.getValues()).to.eql([
+				[310, 'c'],
+				[210, 'b'],
+				[30, 'c'],
+				[110, 'd'],
+		]);		
+	});
+
 	it('throws expection when pulling a non-existing column name', function () {
 		
 		expect(function () {

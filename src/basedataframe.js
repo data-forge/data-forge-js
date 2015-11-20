@@ -182,6 +182,57 @@ BaseDataFrame.prototype.where = function (filterSelectorPredicate) {
 	); 	
 };
 
+/**
+ * Generate a new data frame based on the results the selector function.
+ *
+ * @param {function} selector - Selector function that transforms each row to a different data structure.
+ */
+BaseDataFrame.prototype.select = function (selector) {
+	assert.isFunction(selector, "Expected 'selector' parameter to 'select' function to be a function.");
+
+	var self = this;
+
+	var newColumnNames = null;
+	var newValues = null;
+
+	newValues = E
+		.from(self.getValues())
+		.select(function (row) {
+			return selector(mapRowByColumns(self, row));
+		})
+		.toArray();
+
+	newColumnNames = E.from(newValues)
+		.selectMany(function (value) {
+			return Object.keys(value);
+		})
+		.distinct()
+		.toArray();
+
+	newValues = E.from(newValues)
+		.select(function (value) {
+			return E.from(newColumnNames)
+				.select(function (columnName) {
+					return value[columnName];
+				})
+				.toArray();
+		})
+		.toArray();
+
+	var LazyDataFrame = require('./lazydataframe');
+	return new LazyDataFrame(
+		function () {
+			return newColumnNames;
+		},
+		function () {
+			return newValues;
+		},
+		function () {
+			return self.getIndex();
+		}
+	); 	
+};
+
 /*
  * Retreive a named column from the DataFrame.
  *
