@@ -48,11 +48,13 @@ module.exports = function (options) {
 		},
 		
 		//
-		// Write DataFrame to csv text data.
+		// Write DataFrame to json objects.
 		//
 		to: function (dataFrame) {
 
-			throw new Error("Not implemented");
+			assert.isObject(dataFrame, "Expected 'dataFrame' parameter to 'json.to' to be a data frame object.");
+
+			return [dataFrame.getColumnNames()].concat(dataFrame.getValues());
 		},	
 	};
 };

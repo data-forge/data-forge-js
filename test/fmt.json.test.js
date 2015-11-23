@@ -79,4 +79,33 @@ describe('fmt/json', function () {
 			[undefined, 2],
 		]);
 	});	
+
+	it('can save empty data frame to json', function () {
+
+		var dataFrame = new panjas.DataFrame([], []);
+
+		var options = {};
+		var jsonFormatter = json(options);
+		var jsonData = jsonFormatter.to(dataFrame);
+
+		expect(jsonData).to.eql([[]]);
+	});
+
+	it('can save data frame to json', function () {
+
+		var dataFrame = new panjas.DataFrame(["Column1", "Column2"], [
+			['A', 1],
+			['B', 2],
+		]);
+
+		var options = {};
+		var jsonFormatter = json(options);
+		var jsonData = jsonFormatter.to(dataFrame);
+
+		expect(jsonData).to.eql([
+			['Column1', 'Column2'],
+			['A', 1],
+			['B', 2],
+		]);
+	});
 });
