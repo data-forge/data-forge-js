@@ -88,7 +88,7 @@ describe('fmt/json', function () {
 		var jsonFormatter = json(options);
 		var jsonData = jsonFormatter.to(dataFrame);
 
-		expect(jsonData).to.eql([[]]);
+		expect(jsonData).to.eql([]);
 	});
 
 	it('can save data frame to json', function () {
@@ -103,9 +103,14 @@ describe('fmt/json', function () {
 		var jsonData = jsonFormatter.to(dataFrame);
 
 		expect(jsonData).to.eql([
-			['Column1', 'Column2'],
-			['A', 1],
-			['B', 2],
+			{
+				'Column1': 'A',
+				'Column2': 1,
+			},
+			{
+				'Column1': 'B',
+				'Column2': 2,
+			},
 		]);
 	});
 });

@@ -54,7 +54,26 @@ module.exports = function (options) {
 
 			assert.isObject(dataFrame, "Expected 'dataFrame' parameter to 'json.to' to be a data frame object.");
 
-			return [dataFrame.getColumnNames()].concat(dataFrame.getValues());
+			var columnNames = dataFrame.getColumnNames();
+
+			return E.from(dataFrame.getValues())
+				.select(function (row) {
+					return E.from(columnNames)
+						.select(function (columnName, columnIndex) {
+							return [columnName, columnIndex];
+						})
+						.toObject(
+							function (column) {
+								var columnName = column[0];
+								return columnName;
+							},
+							function (column) {
+								var columnIndex = column[1];
+								return row[columnIndex];
+							}
+						);
+				})
+				.toArray();
 		},	
 	};
 };
