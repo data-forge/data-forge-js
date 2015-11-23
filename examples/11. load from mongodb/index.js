@@ -23,7 +23,15 @@ panjas
 		var subset = dataFrame.getColumnsSubset(['SomeColumn', 'SomeOtherColumn']);
 		console.log(subset.toString());
 
-		return subset.as(csv()).to(file('test.csv'));
+		//return subset.as(csv()).to(file('test.csv'));
+
+		return subset
+			.as(json())
+			.to(mongo({
+				host: 'localhost',
+				db: 'test',
+				collection: "test",
+			}));
 	})
 	.catch(function (err) {
 		console.error((err && err.stack) || err);

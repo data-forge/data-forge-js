@@ -4,13 +4,14 @@
 // Implements input/output for the CSV format.
 //
 
-var panjas = require('../../index');
-
-var fs = require('fs');
-var assert = require('chai').assert;
-var Q = require('q');
-
 module.exports = function (config) {
+	var panjas = require('../../index');
+
+	var fs = require('fs');
+	var assert = require('chai').assert;
+	var Q = require('q');
+	var E = require('linq');
+
 	assert.isObject(config, "Expected 'config' parameter to 'mongo data source' to be an object.");
 	assert.isString(config.db, "Expected 'config.db' parameter to 'mongo data source' to be a string.");
 	assert.isString(config.collection, "Expected 'config.collection' parameter to 'mongo data source' to be a string.");
@@ -48,7 +49,8 @@ module.exports = function (config) {
 			return E.from(documents)
 				.aggregate(Q(), function (prevSavePromise, document) {
 					return prevSavePromise.then(function () {
-						return db[collection].save(document);
+						console.log(document); //fio:
+						return db[config.collection].save(document);
 					});
 				})
 				.then(function () {
