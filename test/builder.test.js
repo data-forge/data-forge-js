@@ -56,7 +56,7 @@ describe('builder', function () {
 		]);
 	});
 	
-	it('integer columns are automatically parsed to integer type', function () {
+	it('number columns are automatically parsed to number type', function () {
 		
 		var data = [
 			['Col1'],
@@ -69,6 +69,22 @@ describe('builder', function () {
 		expect(dataFrame.getValues()).to.eql([
 			[1],
 			[15],			
+		]);
+	});
+
+	it('undefined values are parsed to undefined', function () {
+		
+		var data = [
+			['Col1'],
+			[undefined],
+			[undefined],			
+		];
+		
+		var dataFrame = panjas.builder(data);
+		
+		expect(dataFrame.getValues()).to.eql([
+			[undefined],
+			[undefined],			
 		]);
 	});
 	

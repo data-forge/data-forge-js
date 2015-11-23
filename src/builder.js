@@ -16,7 +16,7 @@ require('sugar');
 //
 function tryParseFloat(str, defaultValue) {
      var retValue = defaultValue;
-     if(str !== null) {
+     if (str) {
          if(str.length > 0) {
              if (!isNaN(str)) {
                  retValue = parseFloat(str);
