@@ -28,12 +28,23 @@ module.exports = function (options) {
 			
 			var lines = csvData.split('\n');
 			var rows = E
-				.from(lines)
+				.from(lines) // Ignore blank lines.
+				.where(function (line) {
+					return line.trim().length > 0;
+				})
 				.select(function (line) {
 					return E
 						.from(line.split(','))
 						.select(function (col) {
 							return col.trim();
+						})
+						.select(function (col) {
+							if (col.length === 0) {
+								return undefined;
+							}
+							else {
+								return col;
+							}
 						})
 						.toArray();					
 				})
@@ -53,7 +64,7 @@ module.exports = function (options) {
 						return row.join(',');
 					})
 					.toArray();
-			return [header].concat(rows).join('\n');	
+			return [header].concat(rows).join('\r\n');	
 		},	
 	};
 };
