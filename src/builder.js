@@ -34,6 +34,11 @@ module.exports = function (rows, options) {
 	if (!options.parse_dates) {
 		options.parse_dates = [];		
 	}
+
+	if (rows.length == 0) {
+		// Handle empty set of rows.
+		return new DataFrame([], []);
+	}
 	
 	var columnNames = rows[0];
 	var values = E 
@@ -78,5 +83,5 @@ module.exports = function (rows, options) {
 		})
 		.toArray();	
 		
-		return new DataFrame(columnNames, values); 
+	return new DataFrame(columnNames, values); 
 };

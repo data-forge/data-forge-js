@@ -6,6 +6,31 @@ describe('builder', function () {
 	
 	var expect = require('chai').expect;
 	var moment = require('moment');
+
+	it('can build data frame from empty set of rows', function () {
+		var data = [];
+		
+		var dataFrame = panjas.builder(data);
+		
+		expect(dataFrame).to.be.an.instanceof(panjas.DataFrame);
+		expect(dataFrame.getColumnNames().length).to.eql(0)
+		expect(dataFrame.getValues().length).to.eql(0);
+	});
+
+	it('can build data when rows only contains the column headers', function () {
+		var data = [
+			['Col1', 'Col2'],
+		];
+		
+		var dataFrame = panjas.builder(data);
+		
+		expect(dataFrame).to.be.an.instanceof(panjas.DataFrame);
+		expect(dataFrame.getColumnNames()).to.eql([
+			'Col1',
+			'Col2',
+		]);
+		expect(dataFrame.getValues().length).to.eql(0);
+	});
 	
 	it('raw data is passed through when no transformation is needed', function () {
 		
@@ -21,7 +46,7 @@ describe('builder', function () {
 		expect(dataFrame.getColumnNames()).to.eql([
 			'Col1',
 			'Col2',
-		])
+		]);
 		expect(dataFrame.getValues()).to.eql([
 			['foo', 'bar'],
 			['hello', 'computer'],			
