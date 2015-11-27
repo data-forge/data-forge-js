@@ -323,4 +323,12 @@ describe('BaseColumn', function () {
 			
 		}).to.throw(Error);
 	});
+
+	it('can compute pct changed', function () {
+
+		var column = initColumn([0, 1, 2, 3], [1, 2, 4, 8]);
+		var pctChanged = column.percentChange();
+		expect(pctChanged.getIndex().getValues()).to.eql([1, 2, 3]);
+		expect(pctChanged.getValues()).to.eql([1, 1, 1]);
+	});
 });

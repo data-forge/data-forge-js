@@ -571,4 +571,17 @@ BaseColumn.prototype.toString = function () {
 	return t.toString();
 };
 
+/**
+ * Compute the percent change for each row after the first.
+ * Percentages are expressed as 0-1 values.
+ */
+BaseColumn.prototype.percentChange = function () {
+
+	var self = this;
+	return self.rollingWindow(2, function (index, window) {
+		var amountChange = window[1] - window[0];
+		return [index[1], amountChange / window[0]];
+	});
+};
+
 module.exports = BaseColumn;
