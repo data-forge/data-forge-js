@@ -10,6 +10,65 @@ Works in both NodeJS and the browser.
 
 This project is a work in progress, please don't use unless you want to be an early adopter. Please expect API changes. Please contribute and help guide the direction of *data-forge*.
 
+# Contents
+
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Project Aims](#project-aims)
+- [Driving Principles](#driving-principles)
+- [Implementation](#implementation)
+- [Installation](#installation)
+  - [NodeJS Installation and setup](#nodejs-installation-and-setup)
+  - [Browser Installation and setup](#browser-installation-and-setup)
+  - [Getting the code](#getting-the-code)
+- [Key Concepts](#key-concepts)
+  - [Data Source](#data-source)
+  - [Data Format](#data-format)
+  - [Data Frame](#data-frame)
+  - [Row](#row)
+  - [Column](#column)
+  - [Index](#index)
+- [Basic Usage](#basic-usage)
+  - [Creating a Data Frame](#creating-a-data-frame)
+  - [Immutability and Chained Functions](#immutability-and-chained-functions)
+- [Working with data](#working-with-data)
+  - [Loading data](#loading-data)
+  - [Saving data](#saving-data)
+  - [Data Sources and Formats](#data-sources-and-formats)
+    - [NodeJS data sources](#nodejs-data-sources)
+    - [Browser data sources](#browser-data-sources)
+    - [Data formats](#data-formats)
+    - [Custom data source](#custom-data-source)
+    - [Custom data format](#custom-data-format)
+- [Data exploration and visualization](#data-exploration-and-visualization)
+  - [Console output](#console-output)
+  - [Visual output](#visual-output)
+- [Accessing the data](#accessing-the-data)
+  - [Accessing all values](#accessing-all-values)
+  - [Column access](#column-access)
+  - [Accessing column values](#accessing-column-values)
+- [Data transformation](#data-transformation)
+  - [Data frame transformation](#data-frame-transformation)
+  - [Column transformation](#column-transformation)
+  - [Data frame and column filtering](#data-frame-and-column-filtering)
+  - [LINQ functions](#linq-functions)
+  - [Adding a column](#adding-a-column)
+  - [Replacing a column](#replacing-a-column)
+  - [Removing a column](#removing-a-column)
+  - [Data frame aggregation](#data-frame-aggregation)
+  - [Data frame window](#data-frame-window)
+- [Examples](#examples)
+  - [Working with CSV files](#working-with-csv-files)
+  - [Working with JSON files](#working-with-json-files)
+  - [Working with MongoDB](#working-with-mongodb)
+  - [Working with HTTP](#working-with-http)
+    - [NodeJS](#nodejs)
+    - [Browser](#browser)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Project Aims
 
 The aims of this project:
@@ -39,7 +98,9 @@ General implementation goals:
 
 The rest of the README defines the setup and usage of data-forge. Certain features described here are not implemented yet. 
 
-# NodeJS Installation and setup
+# Installation
+
+## NodeJS Installation and setup
 
 Install via [NPM](https://en.wikipedia.org/wiki/Npm_(software)): 
 
@@ -49,7 +110,7 @@ Require the module into your script:
 
 	var dataForge = require('data-forge');
 
-# Browser Installation and setup
+## Browser Installation and setup
 
 Install via [Bower](https://en.wikipedia.org/wiki/Bower_(software)):
 
@@ -61,7 +122,7 @@ Include the main script in your HTML file:
 
 You can now access the global `dataForge` variable.
  
-# Getting the code
+## Getting the code
 
 Clone, fork or download the code from Github:
 
@@ -94,9 +155,11 @@ A single *named* column of data in a *data frame*. Contains a slice of data acro
 
 ## Index 
 
-Used to index a data frame for operations such as *merge*. If not specified an integer index (starting at 0) is generated based on row position. An index can be explicitly set by promoting a column to an index. 
+Used to index a data frame for operations such as *merge*. If not specified an integer index (starting at 0) is generated based on row position. An index can be explicitly set by promoting a column to an index.
 
-# Creating a Data Frame
+# Basic Usage 
+
+## Creating a Data Frame
 
 A data frame can be simply created from values in memory. The following example creates a data frame with 3 rows:
 
@@ -123,7 +186,7 @@ Be aware that promoting a column to an index in *data-forge* doesn't remove the 
 
 	var df = new dataForge.DataFrame(columnNames, values).setIndex("Col3").dropColumn("Col3");
 
-# Immutability and Chained Functions
+## Immutability and Chained Functions
 
 You may have noticed in the previous examples that multiple functions have been chained.
 
@@ -141,7 +204,9 @@ Consider an alternate structure:
 
 Here *df1*, *df2* and *df3* are separate data frames with the results of the previous operations applied. These data frames are all immutable and cannot be changed. Any function that transforms a data frame returns a new and independent data frame. This is great, but may require some getting used to!
   
-# Loading data
+# Working with data 
+
+## Loading data
 
 The `from` function acquires data from a particular data source (eg file, HTTP, database).
 
@@ -171,7 +236,7 @@ With certain plugins, we can also use the simpler API for synchronous loading:
 
 Warning: Asynchronous loading is not supported by all plugins and, if not possible, will cause an exception to be thrown.
 
-# Saving data
+## Saving data
 
 The `as` function [serializes](https://en.wikipedia.org/wiki/Serialization) a data-frame to a particular format.
 
@@ -195,13 +260,13 @@ With certain plugins there is a simpler API for synchronous loading:
 
 	// Data has been synchronously saved. 
 
-# Data Sources and Formats
+## Data Sources and Formats
 
 *data-forge* supports a number of data sources and formats out of the box. Creating custom plugins is very easy.
 
 Please see subsequent sections in the README for examples of the most common plugins.  
 
-## NodeJS data sources
+### NodeJS data sources
 
 The NodeJS package includes several data sources.
 
@@ -213,11 +278,11 @@ There are more to come, including:
 - SQL
 - HTTP (rest APIs)
 
-## Browser data sources
+### Browser data sources
 
 - HTTP: For HTTP GET/POST to a REST API.
 
-## Data formats
+### Data formats
 
 - CSV: For serializing/deserializing CSV files. 
 - Json: For serializing/deserializing JSON files. 
@@ -228,7 +293,7 @@ There are more to come, including:
 - BSON
 - YAML
 
-## Custom data source
+### Custom data source
 
 Skip this section if you aren't yet interested in creating plugins.
 
@@ -280,7 +345,7 @@ Here is the *simplest* stub for a data source plugin (designed to be used with N
 		};
 	};
 	
-## Custom data format
+### Custom data format
 
 Skip this section if you aren't yet interested in creating plugins.
 
@@ -314,7 +379,159 @@ Following is the *simplest* stub data format plugin (implemented as NodeJS modul
 		};
 	};
 
-# Working with CSV files
+# Data exploration and visualization
+
+In order to understand the data we are working 
+
+## Console output
+
+The data frame, index and column classes all provide a `toString` function that can be used to visualize data on the console.
+
+You can also query for data frame values, column names and column values (described further below) so you can dump whatever you want to the console.
+
+If you want to preview a subset of the data you can use the LINQ functions `skip` and `take` (more on LINQ functions soon):
+
+	console.log(df.skip(10).take(20).toString()); // <-- Skip 10 rows, then dump 20 rows.
+
+There is also a convenient function for getting a subset of rows:
+
+	console.log(df.getRowsSubset(10, 20).toString()); // <-- Get a range of 20 rows starting at index 10.
+
+As you explore a data set you may want to understand what data types you are working with. You can use the `getTypes` function to produce a new data frame with information on the data types in the data frame you are exploring:
+
+	var typesDf = df.getTypes(); // <-- Create a data frame with the types from the source data frame.
+	console.log(typesDf.toString());
+
+
+## Visual output
+
+More on this soon. If you need to get started now the [Github repo](https://github.com/Real-Serious-Games/data-forge-js) has [examples](https://github.com/Real-Serious-Games/data-forge-js/tree/master/examples) showing how to use *data-forge* with [Flot](http://www.flotcharts.org/).
+
+# Accessing the data 
+
+## Accessing all values
+
+`getValues` pulls all values (across all columns and rows) for a data frame.
+
+It returns an array of arrays. Each nested array represents a row.
+
+	console.log(df.getValues());
+
+## Column access
+
+There are several ways to access columns.
+
+An entire column can be extracted using `getColumn`. The column is specified by name:
+
+	var column = df.getColumn("Some-Column");
+	console.log(column.toString());
+
+Or by (zero-based) index: 
+
+	var column = df.getColumn(2); // <-- Get column at array-index 2. 
+	console.log(column.toString());
+
+Get the names of all columns via `getColumnNames`:
+
+	console.log(df.getColumnNames());
+
+Get all column objects via `getColumn`:
+
+	var columns = df.getColumns();
+	columns.forEach(function (column) {
+		console.log(column.toString());
+	});
+
+Create a new data frame from a sub-set of columns:
+
+	var subset = df.getColumnsSubset(["Some-Column", "Some-Other-Column"]);
+
+## Accessing column values
+
+Call `getValues` on a column to pull an array of all values in that column.
+
+	var columnValues = df.getColumn("Some-Column").getValues();
+
+# Data transformation
+
+## Data frame transformation
+
+An entire data frame can be transformed using the [LINQ](https://en.wikipedia.org/wiki/Language_Integrated_Query)-style [`select`](http://www.dotnetperls.com/select) function:
+
+	var transformedDataFrame = df
+		.select(function (row) {
+			return {
+				NewColumn: row.OldColumn * 2,	// <-- Transform existing column to create a new column.
+				AnotherNewColumn: rand(0, 100)	// <-- Create a new column (in this cause just use random data).
+			};
+		});
+
+The assigned index is maintained for the transformed data frame.
+
+The more advanced [`selectMany`](http://www.dotnetperls.com/selectmany) function is also available.
+
+Note: Data frames are immutable, the original column is unmodified.
+
+## Column transformation
+
+Columns can also be transformed using `select`:
+
+	var oldColumn = df.getColumn("Some-Column");
+	var newColumn = oldColumn
+		.select(function (value) {
+			return transform(value); 	// <-- Apply a transformation to each value in the column.
+		});
+
+The column index is maintained for the transformed column.
+
+Note: Columns are immutable, the original column is unmodified.
+
+## Data frame and column filtering
+
+Data frames and columns can be filtered using the [LINQ](https://en.wikipedia.org/wiki/Language_Integrated_Query)-style [`where`](http://www.dotnetperls.com/where) function:
+
+	var newDf = df
+		.where(function (row) {
+			// .. return true to include the row in the new data frame, return false to exclude it ...
+		});
+
+## LINQ functions
+
+Most of the other [LINQ functions](https://code.msdn.microsoft.com/101-LINQ-Samples-3fb9811b) are or will be available. 
+
+More documentation will be here soon on supported LINQ functions.
+
+## Adding a column
+
+New columns can be added to a data frame. Again note that this doesn't change the original data frame, but generates a new data frame that contains the additional column.
+
+	var newDf = df.setColumn("Some-New-Column", newColumnObject); 
+
+## Replacing a column
+
+We can replace an existing column using the same function:
+
+	var newDf = df.setColumn("Some-Existing-Column", newColumnObject);
+
+Again note that it is only the new data frame that includes the modified column.
+
+## Removing a column
+
+A column can easily be removed:
+
+	var newDf = df.dropColumn('Column-to-be-dropped');
+
+## Data frame aggregation
+
+Under construction this is a work in progress.
+
+## Data frame window
+
+Under construction this is a work in progress.
+
+# Examples
+
+## Working with CSV files
 
 To work with CSV files on disk you need the *file* and *csv* plugins that are included with *data-forge*.
 
@@ -340,7 +557,7 @@ To work with CSV files on disk you need the *file* and *csv* plugins that are in
 			console.error(err && err.stack || err); // <-- Handle errors.
 		});
 
-# Working with JSON files
+## Working with JSON files
 
 To work with JSON files on disk you need the *file* and *json* plugins that are included with *data forge*.
 
@@ -366,7 +583,7 @@ To work with JSON files on disk you need the *file* and *json* plugins that are 
 			console.error(err && err.stack || err); // <-- Handle errors.
 		});
 
-# Working with Mongodb
+## Working with MongoDB
 
 When working with MongoDB we use the *mongo* plugin combine with the *json* plugin. 
 
@@ -398,13 +615,13 @@ When working with MongoDB we use the *mongo* plugin combine with the *json* plug
 			console.error(err && err.stack || err); // <-- Handle errors.
 		});
 
-# Working with HTTP
+## Working with HTTP
 
 When working with HTTP we can use *json*, *csv* and other text formats. This example uses *json* as it is the most common used in combination with HTTP. 
 
 Note that HTTP is the only *data source* that works in the browser. So this example can work in both NodeJS and the browser. A NodeJS example is presented first, followed by the browser.
 
-## NodeJS 
+### NodeJS 
  
 	var dataForge = require('data-forge');
 	var http = require('data-forge/source/http');
@@ -427,7 +644,7 @@ Note that HTTP is the only *data source* that works in the browser. So this exam
 			console.error(err && err.stack || err); // <-- Handle errors.
 		});
 
-## Browser
+### Browser
 
 Note the differences in the way plugins are referenced than in the NodeJS version.
 
@@ -454,149 +671,5 @@ Javascript:
 			console.error(err && err.stack || err); // <-- Handle errors.
 		});
 
-# Data exploration and visualization
 
-In order to understand the data we are working 
-
-## Console output
-
-The data frame, index and column classes all provide a `toString` function that can be used to visualize data on the console.
-
-You can also query for data frame values, column names and column values (described further below) so you can dump whatever you want to the console.
-
-If you want to preview a subset of the data you can use the LINQ functions `skip` and `take` (more on LINQ functions soon):
-
-	console.log(df.skip(10).take(20).toString()); // <-- Skip 10 rows, then dump 20 rows.
-
-There is also a convenient function for getting a subset of rows:
-
-	console.log(df.getRowsSubset(10, 20).toString()); // <-- Get a range of 20 rows starting at index 10.
-
-As you explore a data set you may want to understand what data types you are working with. You can use the `getTypes` function to produce a new data frame with information on the data types in the data frame you are exploring:
-
-	var typesDf = df.getTypes(); // <-- Create a data frame with the types from the source data frame.
-	console.log(typesDf.toString());
-
-
-## Visual output
-
-More on this soon. If you need to get started now the [Github repo](https://github.com/Real-Serious-Games/data-forge-js) has [examples](https://github.com/Real-Serious-Games/data-forge-js/tree/master/examples) showing how to use *data-forge* with [Flot](http://www.flotcharts.org/). 
-
-# Accessing all values
-
-`getValues` pulls all values (across all columns and rows) for a data frame.
-
-It returns an array of arrays. Each nested array represents a row.
-
-	console.log(df.getValues());
-
-# Column access
-
-There are several ways to access columns.
-
-An entire column can be extracted using `getColumn`. The column is specified by name:
-
-	var column = df.getColumn("Some-Column");
-	console.log(column.toString());
-
-Or by (zero-based) index: 
-
-	var column = df.getColumn(2); // <-- Get column at array-index 2. 
-	console.log(column.toString());
-
-Get the names of all columns via `getColumnNames`:
-
-	console.log(df.getColumnNames());
-
-Get all column objects via `getColumn`:
-
-	var columns = df.getColumns();
-	columns.forEach(function (column) {
-		console.log(column.toString());
-	});
-
-Create a new data frame from a sub-set of columns:
-
-	var subset = df.getColumnsSubset(["Some-Column", "Some-Other-Column"]);
-
-# Accessing column values
-
-Call `getValues` on a column to pull an array of all values in that column.
-
-	var columnValues = df.getColumn("Some-Column").getValues();
-
-# Data frame transformation
-
-An entire data frame can be transformed using the [LINQ](https://en.wikipedia.org/wiki/Language_Integrated_Query)-style [`select`](http://www.dotnetperls.com/select) function:
-
-	var transformedDataFrame = df
-		.select(function (row) {
-			return {
-				NewColumn: row.OldColumn * 2,	// <-- Transform existing column to create a new column.
-				AnotherNewColumn: rand(0, 100)	// <-- Create a new column (in this cause just use random data).
-			};
-		});
-
-The assigned index is maintained for the transformed data frame.
-
-The more advanced [`selectMany`](http://www.dotnetperls.com/selectmany) function is also available.
-
-Note: Data frames are immutable, the original column is unmodified.
-
-# Column transformation
-
-Columns can also be transformed using `select`:
-
-	var oldColumn = df.getColumn("Some-Column");
-	var newColumn = oldColumn
-		.select(function (value) {
-			return transform(value); 	// <-- Apply a transformation to each value in the column.
-		});
-
-The column index is maintained for the transformed column.
-
-Note: Columns are immutable, the original column is unmodified.
-
-# Data frame and column filtering
-
-Data frames and columns can be filtered using the [LINQ](https://en.wikipedia.org/wiki/Language_Integrated_Query)-style [`where`](http://www.dotnetperls.com/where) function:
-
-	var newDf = df
-		.where(function (row) {
-			// .. return true to include the row in the new data frame, return false to exclude it ...
-		});
-
-# LINQ functions
-
-Most of the other [LINQ functions](https://code.msdn.microsoft.com/101-LINQ-Samples-3fb9811b) are or will be available. 
-
-More documentation will be here soon on supported LINQ functions.
-
-# Adding a column
-
-New columns can be added to a data frame. Again note that this doesn't change the original data frame, but generates a new data frame that contains the additional column.
-
-	var newDf = df.setColumn("Some-New-Column", newColumnObject); 
-
-# Replacing a column
-
-We can replace an existing column using the same function:
-
-	var newDf = df.setColumn("Some-Existing-Column", newColumnObject);
-
-Again note that it is only the new data frame that includes the modified column.
-
-# Removing a column
-
-A column can easily be removed:
-
-	var newDf = df.dropColumn('Column-to-be-dropped');
-
-# Data frame aggregation
-
-Under construction this is a work in progress.
-
-# Data frame window
-
-Under construction this is a work in progress.
 
