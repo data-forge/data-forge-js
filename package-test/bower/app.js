@@ -31,12 +31,10 @@ $(function() {
 	// 
 	// Create a simple data frame.
 	//
-	var values = E
-		.range(0, 14)
-		.select(function (i) {
-			return [i, Math.sin(i), Math.cos(i)];
-		})
-		.toArray();
+	var values = [];
+	for (var i = 0; i < 14; ++i) {
+		values.push([i, Math.sin(i), Math.cos(i)]);
+	}
 
 	var dataFrame = new dataForge.DataFrame(["index", "Sin", "Cos"], values);
 	
