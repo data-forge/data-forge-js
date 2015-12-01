@@ -16,7 +16,7 @@ module.exports = function (filePath) {
 	return {
 
 		//
-		// Write to a text file.
+		// Async read from a text file.
 		//	
 		read: function () {
 			
@@ -33,7 +33,7 @@ module.exports = function (filePath) {
 		},
 		
 		//
-		// Read from a text file.
+		// Async write to a text file.
 		//
 		write: function (fileData) {
 			assert.isString(fileData, "Expected 'fileData' parameter to 'file.write' to be a string.");
