@@ -1,9 +1,9 @@
 'use strict';
 
-describe('fmt/json', function () {
+describe('format/json', function () {
 
 	var panjas = require('../index');
-	var json = require('../fmt/json');
+	var json = require('../format/json');
 
 	var expect = require('chai').expect;
 

@@ -1,9 +1,9 @@
 'use strict';
 
-describe('fmt/csv', function () {
+describe('format/csv', function () {
 
 	var panjas = require('../index');
-	var csv = require('../fmt/csv');
+	var csv = require('../format/csv');
 
 	var expect = require('chai').expect;
 	var assert = require('chai').assert;

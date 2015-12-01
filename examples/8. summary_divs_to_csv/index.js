@@ -1,8 +1,8 @@
 'use strict';
 
 var panjas = require("../../index.js");
-var csv = require('../../fmt/csv');
-var file = require('../../datasource/file');
+var csv = require('../../format/csv');
+var file = require('../../source/file');
 
 var glob = require('glob');
 var E = require('linq');

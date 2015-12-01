@@ -1,10 +1,10 @@
 'use strict';
 
 var panjas = require("../../index.js");
-var json = require('../../fmt/json');
-var mongo = require('../../datasource/mongo/mongo');
-var csv = require('../../fmt/csv');
-var file = require('../../datasource/file');
+var json = require('../../format/json');
+var mongo = require('../../source/mongo/mongo');
+var csv = require('../../format/csv');
+var file = require('../../source/file');
 
 panjas
 	.from(mongo({

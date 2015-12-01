@@ -3,8 +3,8 @@
 describe('csv.integration', function () {
 	
 	var panjas = require('../index.js');
-	var csv = require('../fmt/csv');
-	var file = require('../datasource/file');
+	var csv = require('../format/csv');
+	var file = require('../source/file');
 
 	var expect = require('chai').expect;
 	var fs = require('fs');
