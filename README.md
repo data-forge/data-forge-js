@@ -10,7 +10,7 @@ Works in both NodeJS and the browser.
 
 This project is a work in progress, please don't use unless you want to be an early adopter. Please expect API changes. Please contribute and help guide the direction of *data-forge*.
 
-## Project Aims
+# Project Aims
 
 The aims of this project:
 
@@ -18,7 +18,7 @@ The aims of this project:
 - To be able to load data, transform and save data.
 - To be able to prepare data for visualization. 
 
-## Driving Principles 
+# Driving Principles 
 
 The principles that drive decision making and tradeoffs:
 
@@ -26,7 +26,7 @@ The principles that drive decision making and tradeoffs:
 - High performance.
 - Be able to use the same (or very similar API in both Javascript and C#).
 
-## Implementation
+# Implementation
 
 General implementation goals:
 
@@ -39,7 +39,7 @@ General implementation goals:
 
 The rest of the README defines the setup and usage of data-forge. Certain features described here are not implemented yet. 
 
-## NodeJS Installation and setup
+# NodeJS Installation and setup
 
 Install via [NPM](https://en.wikipedia.org/wiki/Npm_(software)): 
 
@@ -49,7 +49,7 @@ Require the module into your script:
 
 	var dataForge = require('data-forge');
 
-## Browser Installation and setup
+# Browser Installation and setup
 
 Install via [Bower](https://en.wikipedia.org/wiki/Bower_(software)):
 
@@ -61,42 +61,42 @@ Include the main script in your HTML file:
 
 You can now access the global `dataForge` variable.
  
-## Getting the code
+# Getting the code
 
 Clone, fork or download the code from Github:
 
 [https://github.com/Real-Serious-Games/data-forge-js](https://github.com/Real-Serious-Games/data-forge-js)
 
 
-## Key Concepts
+# Key Concepts
 
 This section explains the key concepts related to *data-forge*.
 
-### Data Source
+## Data Source
 
 A plugin to load data from or save data to a particular data source. Examples include *file*, [*mongodb*](https://en.wikipedia.org/wiki/MongoDB) and [*HTTP*](https://en.wikipedia.org/wiki/Hypertext_Transfer_Protocol) ([REST API](https://en.wikipedia.org/wiki/Representational_state_transfer)) for NodeJS and just *HTTP* for the browser.
 
-### Data Format
+## Data Format
 
 A plugin to load or save data in a particular format. Examples include [*CSV*](https://en.wikipedia.org/wiki/Comma-separated_values) and [*JSON*](https://en.wikipedia.org/wiki/JSON). 
 
-### Data Frame
+## Data Frame
 
 This is the *main* concept. A matrix of data structured as rows and columns. Has an implicit or explicit index. Think of it as a spreadsheet in memory.
 
-### Row
+## Row
 
 A single *indexed* row of data in a *data frame*. Contains a slice of data across columns. Has an implicit or explicit index. A sequence of values is associated with a row.
 
-### Column
+## Column
 
 A single *named* column of data in a *data frame*. Contains a slice of data across rows. A sequence of values is associated with a column. All values in a column are generally expected to have the same type, although this is not a requirement of *data-forge-js*.  
 
-### Index 
+## Index 
 
 Used to index a data frame for operations such as *merge*. If not specified an integer index (starting at 0) is generated based on row position. An index can be explicitly set by promoting a column to an index. 
 
-## Creating a Data Frame
+# Creating a Data Frame
 
 A data frame can be simply created from values in memory. The following example creates a data frame with 3 rows:
 
@@ -123,7 +123,7 @@ Be aware that promoting a column to an index in *data-forge* doesn't remove the 
 
 	var df = new dataForge.DataFrame(columnNames, values).setIndex("Col3").dropColumn("Col3");
 
-## Immutability and Chained Functions
+# Immutability and Chained Functions
 
 You may have noticed in the previous examples that multiple functions have been chained.
 
@@ -141,7 +141,7 @@ Consider an alternate structure:
 
 Here *df1*, *df2* and *df3* are separate data frames with the results of the previous operations applied. These data frames are all immutable and cannot be changed. Any function that transforms a data frame returns a new and independent data frame. This is great, but may require some getting used to!
   
-## Loading data
+# Loading data
 
 The `from` function acquires data from a particular data source (eg file, HTTP, database).
 
@@ -171,7 +171,7 @@ With certain plugins, we can also use the simpler API for synchronous loading:
 
 Warning: Asynchronous loading is not supported by all plugins and, if not possible, will cause an exception to be thrown.
 
-## Saving data
+# Saving data
 
 The `as` function [serializes](https://en.wikipedia.org/wiki/Serialization) a data-frame to a particular format.
 
@@ -201,7 +201,7 @@ With certain plugins there is a simpler API for synchronous loading:
 
 Please see subsequent sections in the README for examples of the most common plugins.  
 
-### NodeJS data sources
+## NodeJS data sources
 
 The NodeJS package includes several data sources.
 
@@ -213,11 +213,11 @@ There are more to come, including:
 - SQL
 - HTTP (rest APIs)
 
-### Browser data sources
+## Browser data sources
 
 - HTTP: For HTTP GET/POST to a REST API.
 
-### Data formats
+## Data formats
 
 - CSV: For serializing/deserializing CSV files. 
 - Json: For serializing/deserializing JSON files. 
@@ -228,7 +228,7 @@ There are more to come, including:
 - BSON
 - YAML
 
-### Custom data source
+## Custom data source
 
 Skip this section if you aren't yet interested in creating plugins.
 
@@ -280,7 +280,7 @@ Here is the *simplest* stub for a data source plugin (designed to be used with N
 		};
 	};
 	
-### Custom data format
+## Custom data format
 
 Skip this section if you aren't yet interested in creating plugins.
 
@@ -314,10 +314,7 @@ Following is the *simplest* stub data format plugin (implemented as NodeJS modul
 		};
 	};
 
-
-
-
-## Working with CSV files
+# Working with CSV files
 
 To work with CSV files on disk you need the *file* and *csv* plugins that are included with *data-forge*.
 
@@ -343,7 +340,7 @@ To work with CSV files on disk you need the *file* and *csv* plugins that are in
 			console.error(err && err.stack || err); // <-- Handle errors.
 		});
 
-## Working with JSON files
+# Working with JSON files
 
 To work with JSON files on disk you need the *file* and *json* plugins that are included with *data forge*.
 
@@ -369,7 +366,7 @@ To work with JSON files on disk you need the *file* and *json* plugins that are 
 			console.error(err && err.stack || err); // <-- Handle errors.
 		});
 
-## Working with Mongodb
+# Working with Mongodb
 
 When working with MongoDB we use the *mongo* plugin combine with the *json* plugin. 
 
@@ -401,13 +398,13 @@ When working with MongoDB we use the *mongo* plugin combine with the *json* plug
 			console.error(err && err.stack || err); // <-- Handle errors.
 		});
 
-## Working with HTTP
+# Working with HTTP
 
 When working with HTTP we can use *json*, *csv* and other text formats. This example uses *json* as it is the most common used in combination with HTTP. 
 
 Note that HTTP is the only *data source* that works in the browser. So this example can work in both NodeJS and the browser. A NodeJS example is presented first, followed by the browser.
 
-### NodeJS 
+## NodeJS 
  
 	var dataForge = require('data-forge');
 	var http = require('data-forge/source/http');
@@ -430,7 +427,7 @@ Note that HTTP is the only *data source* that works in the browser. So this exam
 			console.error(err && err.stack || err); // <-- Handle errors.
 		});
 
-### Browser
+## Browser
 
 Note the differences in the way plugins are referenced than in the NodeJS version.
 
@@ -457,11 +454,11 @@ Javascript:
 			console.error(err && err.stack || err); // <-- Handle errors.
 		});
 
-## Data exploration and visualization
+# Data exploration and visualization
 
 In order to understand the data we are working 
 
-### Console output
+## Console output
 
 The data frame, index and column classes all provide a `toString` function that can be used to visualize data on the console.
 
@@ -481,11 +478,11 @@ As you explore a data set you may want to understand what data types you are wor
 	console.log(typesDf.toString());
 
 
-### Visual output
+## Visual output
 
 More on this soon. If you need to get started now the [Github repo](https://github.com/Real-Serious-Games/data-forge-js) has [examples](https://github.com/Real-Serious-Games/data-forge-js/tree/master/examples) showing how to use *data-forge* with [Flot](http://www.flotcharts.org/). 
 
-### Accessing all values
+# Accessing all values
 
 `getValues` pulls all values (across all columns and rows) for a data frame.
 
@@ -493,7 +490,7 @@ It returns an array of arrays. Each nested array represents a row.
 
 	console.log(df.getValues());
 
-### Column access
+# Column access
 
 There are several ways to access columns.
 
@@ -522,13 +519,13 @@ Create a new data frame from a sub-set of columns:
 
 	var subset = df.getColumnsSubset(["Some-Column", "Some-Other-Column"]);
 
-### Accessing column values
+# Accessing column values
 
 Call `getValues` on a column to pull an array of all values in that column.
 
 	var columnValues = df.getColumn("Some-Column").getValues();
 
-## Data frame transformation
+# Data frame transformation
 
 An entire data frame can be transformed using the [LINQ](https://en.wikipedia.org/wiki/Language_Integrated_Query)-style [`select`](http://www.dotnetperls.com/select) function:
 
@@ -546,7 +543,7 @@ The more advanced [`selectMany`](http://www.dotnetperls.com/selectmany) function
 
 Note: Data frames are immutable, the original column is unmodified.
 
-### Column transformation
+# Column transformation
 
 Columns can also be transformed using `select`:
 
@@ -560,7 +557,7 @@ The column index is maintained for the transformed column.
 
 Note: Columns are immutable, the original column is unmodified.
 
-### Data frame and column filtering
+# Data frame and column filtering
 
 Data frames and columns can be filtered using the [LINQ](https://en.wikipedia.org/wiki/Language_Integrated_Query)-style [`where`](http://www.dotnetperls.com/where) function:
 
@@ -569,19 +566,19 @@ Data frames and columns can be filtered using the [LINQ](https://en.wikipedia.or
 			// .. return true to include the row in the new data frame, return false to exclude it ...
 		});
 
-### LINQ functions
+# LINQ functions
 
 Most of the other [LINQ functions](https://code.msdn.microsoft.com/101-LINQ-Samples-3fb9811b) are or will be available. 
 
 More documentation will be here soon on supported LINQ functions.
 
-### Adding a column
+# Adding a column
 
 New columns can be added to a data frame. Again note that this doesn't change the original data frame, but generates a new data frame that contains the additional column.
 
 	var newDf = df.setColumn("Some-New-Column", newColumnObject); 
 
-### Replacing a column
+# Replacing a column
 
 We can replace an existing column using the same function:
 
@@ -589,17 +586,17 @@ We can replace an existing column using the same function:
 
 Again note that it is only the new data frame that includes the modified column.
 
-### Removing a column
+# Removing a column
 
 A column can easily be removed:
 
 	var newDf = df.dropColumn('Column-to-be-dropped');
 
-### Data frame aggregation
+# Data frame aggregation
 
 Under construction this is a work in progress.
 
-### Data frame window
+# Data frame window
 
 Under construction this is a work in progress.
 
