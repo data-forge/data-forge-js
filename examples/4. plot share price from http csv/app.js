@@ -7,9 +7,9 @@ $(function() {
 	//
 	var loadFile = function (url) {
 	
-		return panjas
-			.from(panjas.http(url))
-			.as(panjas.csv());
+		return dataForge
+			.from(dataForge.http(url))
+			.as(dataForge.csv());
 	};
 
 	//

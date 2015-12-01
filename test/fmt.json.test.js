@@ -2,7 +2,7 @@
 
 describe('format/json', function () {
 
-	var panjas = require('../index');
+	var dataForge = require('../index');
 	var json = require('../format/json');
 
 	var expect = require('chai').expect;
@@ -82,7 +82,7 @@ describe('format/json', function () {
 
 	it('can save empty data frame to json', function () {
 
-		var dataFrame = new panjas.DataFrame([], []);
+		var dataFrame = new dataForge.DataFrame([], []);
 
 		var options = {};
 		var jsonFormatter = json(options);
@@ -93,7 +93,7 @@ describe('format/json', function () {
 
 	it('can save data frame to json', function () {
 
-		var dataFrame = new panjas.DataFrame(["Column1", "Column2"], [
+		var dataFrame = new dataForge.DataFrame(["Column1", "Column2"], [
 			['A', 1],
 			['B', 2],
 		]);

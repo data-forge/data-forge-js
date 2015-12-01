@@ -3,7 +3,7 @@
 
 describe('BaseColumn', function () {
 	
-	var panjas = require('../index');
+	var dataForge = require('../index');
 	var BaseColumn = require('../src/basecolumn');
 	
 	var expect = require('chai').expect; 
@@ -22,7 +22,7 @@ describe('BaseColumn', function () {
 			return values;
 		};
 		column.getIndex = function () {
-			return new panjas.Index("__test__", index);
+			return new dataForge.Index("__test__", index);
 		};
 		return column;		
 	};
@@ -304,7 +304,7 @@ describe('BaseColumn', function () {
 	it('can reindex column', function () {
 
 		var column = initColumn([0, 1, 2, 3], [100, 300, 200, 5]);
-		var newIndex = new panjas.Index("__test__", [3, 10, 1, 32])
+		var newIndex = new dataForge.Index("__test__", [3, 10, 1, 32])
 
 		var reindexed = column.reindex(newIndex);
 		expect(reindexed.getIndex().getValues()).to.eql([3, 10, 1, 32]);
@@ -314,7 +314,7 @@ describe('BaseColumn', function () {
 	it('reindexing a column with duplicate indicies throws', function () {
 
 		var column = initColumn([0, 1, 1, 3], [100, 300, 200, 5]);
-		var newIndex = new panjas.Index("__test__", [3, 10, 1, 32])
+		var newIndex = new dataForge.Index("__test__", [3, 10, 1, 32])
 
 		var reindexed = column.reindex(newIndex);
 

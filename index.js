@@ -9,17 +9,17 @@ var dropElement = require('./src/utils').dropElement;
  * 
  * Nodejs:
  * 
- * 		npm install --save panjas
+ * 		npm install --save data-forge
  * 		
- * 		var panjas = require('panjas');
+ * 		var dataForge = require('data-forge');
  * 
  * Browser:
  * 
- * 		bower install --save panjas
+ * 		bower install --save data-forge
  * 
- * 		<script language="javascript" type="text/javascript" src="bower_components/panjas.js"></script>
+ * 		<script language="javascript" type="text/javascript" src="bower_components/data-forge/data-forge.js"></script>
  */
-var panjas = {
+var dataForge = {
 	
 	DataFrame: require('./src/dataframe'),
 	LazyDataFrame: require('./src/lazydataframe'),
@@ -32,16 +32,16 @@ var panjas = {
 	 * Read a DataFrame from a plugable data source.
 	 */
 	from: function (dataSourcePlugin) {
-		assert.isObject(dataSourcePlugin, "Expected 'dataSourcePlugin' parameter to 'panjas.from' to be an object.");
-		assert.isFunction(dataSourcePlugin.read, "Expected 'dataSourcePlugin' parameter to 'panjas.from' to be an object with a 'read' function.");
+		assert.isObject(dataSourcePlugin, "Expected 'dataSourcePlugin' parameter to 'dataForge.from' to be an object.");
+		assert.isFunction(dataSourcePlugin.read, "Expected 'dataSourcePlugin' parameter to 'dataForge.from' to be an object with a 'read' function.");
 		
 		return {
 			/**
 			 * Convert DataFrame from a particular data format using a plugable format.
 			 */
 			as: function (formatPlugin) {
-				assert.isObject(formatPlugin, "Expected 'formatPlugin' parameter to 'panjas.from' to be an object.");
-				assert.isFunction(formatPlugin.from, "Expected 'formatPlugin' parameter to 'panjas.from' to be an object with a 'from' function.");
+				assert.isObject(formatPlugin, "Expected 'formatPlugin' parameter to 'dataForge.from' to be an object.");
+				assert.isFunction(formatPlugin.from, "Expected 'formatPlugin' parameter to 'dataForge.from' to be an object with a 'from' function.");
 				
 				return dataSourcePlugin.read()
 					.then(function (textData) {
@@ -107,4 +107,4 @@ var panjas = {
 	},
 };
 
-module.exports = panjas;
+module.exports = dataForge;

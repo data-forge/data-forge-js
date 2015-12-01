@@ -2,7 +2,7 @@
 
 describe('csv.integration', function () {
 	
-	var panjas = require('../index.js');
+	var dataForge = require('../index.js');
 	var csv = require('../format/csv');
 	var file = require('../source/file');
 
@@ -13,7 +13,7 @@ describe('csv.integration', function () {
 	var testFile = 'test.csv';
 	
 	var initExampleDataFrame = function () {
-		return new panjas.DataFrame(
+		return new dataForge.DataFrame(
 			[
 				"Date",
 				"Value1",
@@ -46,7 +46,7 @@ describe('csv.integration', function () {
 			parse_dates: ['Date',],			
 		};
 		
-		return panjas
+		return dataForge
 			.from(file(testFile))
 			.as(csv(csvOptions))
 			.then(function (dataFrame) {
@@ -98,7 +98,7 @@ describe('csv.integration', function () {
 			.to(file(testFile))
 			.then(function () {
 				var data = fs.readFileSync(testFile, 'utf8');
-				return panjas
+				return dataForge
 					.from(file(testFile))
 					.as(csv({
 						parse_dates: ['Date',],			

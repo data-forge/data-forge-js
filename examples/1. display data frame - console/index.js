@@ -1,6 +1,6 @@
 'use strict';
 
-var panjas = require('../../index.js');
+var dataForge = require('../../index.js');
 var E = require('linq');
 
 // 
@@ -13,7 +13,7 @@ var values = E
 	})
 	.toArray();
 
-var dataFrame = new panjas.DataFrame(["index", "Sin", "Cos"], values).setIndex("index").dropColumn("index");
+var dataFrame = new dataForge.DataFrame(["index", "Sin", "Cos"], values).setIndex("index").dropColumn("index");
 
 console.log(dataFrame.skip(4).take(5).toString());
 

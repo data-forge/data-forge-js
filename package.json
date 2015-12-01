@@ -1,21 +1,21 @@
 {
-  "name": "panjas",
+  "name": "data-forge",
   "version": "0.0.1",
-  "description": "JavaScript data analysis toolkit inspired by Pandas.",
+  "description": "JavaScript data transformation and analysis toolkit inspired by Pandas and LINQ.",
   "main": "index.js",
   "scripts": {
     "test": "mocha"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ashleydavis/Panjas.git"
+    "url": "git+https://github.com/real-serious-games/data-forge-js.git"
   },
-  "author": "ashley@codecapers.com.au",
+  "author": "ashley.davis@realseriousgames.com",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/ashleydavis/Panjas/issues"
+    "url": "https://github.com/real-serious-games/data-forge-js/issues"
   },
-  "homepage": "https://github.com/ashleydavis/Panjas#readme",
+  "homepage": "https://github.com/real-serious-games/data-forge-js#readme",
   "dependencies": {
     "chai": "^3.4.0",
     "csv": "^0.4.6",

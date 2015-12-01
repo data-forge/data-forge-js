@@ -3,12 +3,12 @@
 
 describe('LazyDataFrame', function () {
 	
-	var panjas = require('../index');
+	var dataForge = require('../index');
 	
 	var expect = require('chai').expect;
 	
 	var initExampleLazyDataFrame = function () {
-		return new panjas.LazyDataFrame(
+		return new dataForge.LazyDataFrame(
 			function () {
 				return [
 					"Value1",

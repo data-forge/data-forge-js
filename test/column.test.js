@@ -3,12 +3,12 @@
 
 describe('Column', function () {
 	
-	var panjas = require('../index');
+	var dataForge = require('../index');
 	
 	var expect = require('chai').expect; 
 	
 	var initExampleColumn = function (index) {
-		return new panjas.Column('some-column', [100, 200], index);
+		return new dataForge.Column('some-column', [100, 200], index);
 	};
 
 	it('default index is generated', function () {
@@ -22,7 +22,7 @@ describe('Column', function () {
 
 	it('can get index', function () {
 		
-		var column = initExampleColumn(new panjas.Index("__test__", [5, 6]));
+		var column = initExampleColumn(new dataForge.Index("__test__", [5, 6]));
 		expect(column.getIndex().getValues()).to.eql([			
 			5,
 			6

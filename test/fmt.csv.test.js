@@ -2,7 +2,7 @@
 
 describe('format/csv', function () {
 
-	var panjas = require('../index');
+	var dataForge = require('../index');
 	var csv = require('../format/csv');
 
 	var expect = require('chai').expect;
@@ -105,7 +105,7 @@ describe('format/csv', function () {
 
 	it('can save empty data frame to csv', function () {
 
-		var dataFrame = new panjas.DataFrame([], []);
+		var dataFrame = new dataForge.DataFrame([], []);
 
 		var options = {};
 		var csvFormatter = csv(options);
@@ -117,7 +117,7 @@ describe('format/csv', function () {
 
 	it('can save data frame to csv', function () {
 
-		var dataFrame = new panjas.DataFrame(["Column1", "Column2"], [
+		var dataFrame = new dataForge.DataFrame(["Column1", "Column2"], [
 			['A', 1],
 			['B', 2],
 		]);

@@ -3,12 +3,12 @@
 
 describe('DataFrame', function () {
 	
-	var panjas = require('../index');	
+	var dataForge = require('../index');	
 	
 	var expect = require('chai').expect;
 	
 	var initExampleDataFrame = function () {
-		return new panjas.DataFrame(
+		return new dataForge.DataFrame(
 			[
 				"Date",
 				"Value1",

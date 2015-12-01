@@ -3,7 +3,7 @@
 
 describe('BaseDataFrame', function () {
 	
-	var panjas = require('../index');	
+	var dataForge = require('../index');	
 	
 	var expect = require('chai').expect;
 	var assert = require('chai').assert;
@@ -12,7 +12,7 @@ describe('BaseDataFrame', function () {
 		assert.isArray(columns);
 		assert.isArray(values);
 
-		return new panjas.LazyDataFrame(
+		return new dataForge.LazyDataFrame(
 			function () {
 				return columns;
 			},
@@ -45,7 +45,7 @@ describe('BaseDataFrame', function () {
 			]
 		);
 
-		var merged = panjas.merge(left, right, 'key');
+		var merged = dataForge.merge(left, right, 'key');
 		expect(merged.getColumnNames()).to.eql([
 			'key',
 			'lval',
@@ -82,7 +82,7 @@ describe('BaseDataFrame', function () {
 			]
 		);
 
-		var merged = panjas.merge(left, right, 'key');
+		var merged = dataForge.merge(left, right, 'key');
 		expect(merged.getColumnNames()).to.eql([
 			'key',
 			'lval',
@@ -120,7 +120,7 @@ describe('BaseDataFrame', function () {
 		);
 
 		expect(function () {
-			panjas.merge(left, right, 'right-key');
+			dataForge.merge(left, right, 'right-key');
 		}).to.throw(Error);
 	});
 
@@ -148,7 +148,7 @@ describe('BaseDataFrame', function () {
 		);
 
 		expect(function () {
-			panjas.merge(left, right, 'left-key');
+			dataForge.merge(left, right, 'left-key');
 		}).to.throw(Error);
 	});
 });

@@ -4,7 +4,7 @@
 // Implements input/output for the CSV format.
 //
 
-var panjas = require('../index');
+var dataForge = require('../index');
 
 var E = require('linq');
 var assert = require('chai').assert;
@@ -50,7 +50,7 @@ module.exports = function (options) {
 				})
 				.toArray();
 					
-			return panjas.builder(rows, options);
+			return dataForge.builder(rows, options);
 		},
 		
 		//

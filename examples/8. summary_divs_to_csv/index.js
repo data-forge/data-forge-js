@@ -1,6 +1,6 @@
 'use strict';
 
-var panjas = require("../../index.js");
+var dataForge = require("../../index.js");
 var csv = require('../../format/csv');
 var file = require('../../source/file');
 
@@ -14,7 +14,7 @@ var assert = require('chai').assert;
 var loadFile = function (filePath) {
 	assert.isString(filePath);
 	
-	return panjas.from(file(filePath)).as(csv());
+	return dataForge.from(file(filePath)).as(csv());
 };
 
 //

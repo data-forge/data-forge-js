@@ -1,1 +1,1 @@
-browserify panjas.js -o panjas-compiled.js 
+browserify data-forge.js -o data-forge-compiled.js 

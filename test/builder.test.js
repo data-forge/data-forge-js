@@ -2,7 +2,7 @@
 
 describe('builder', function () {
 	
-	var panjas = require('../index');
+	var dataForge = require('../index');
 	
 	var expect = require('chai').expect;
 	var moment = require('moment');
@@ -10,9 +10,9 @@ describe('builder', function () {
 	it('can build data frame from empty set of rows', function () {
 		var data = [];
 		
-		var dataFrame = panjas.builder(data);
+		var dataFrame = dataForge.builder(data);
 		
-		expect(dataFrame).to.be.an.instanceof(panjas.DataFrame);
+		expect(dataFrame).to.be.an.instanceof(dataForge.DataFrame);
 		expect(dataFrame.getColumnNames().length).to.eql(0)
 		expect(dataFrame.getValues().length).to.eql(0);
 	});
@@ -22,9 +22,9 @@ describe('builder', function () {
 			['Col1', 'Col2'],
 		];
 		
-		var dataFrame = panjas.builder(data);
+		var dataFrame = dataForge.builder(data);
 		
-		expect(dataFrame).to.be.an.instanceof(panjas.DataFrame);
+		expect(dataFrame).to.be.an.instanceof(dataForge.DataFrame);
 		expect(dataFrame.getColumnNames()).to.eql([
 			'Col1',
 			'Col2',
@@ -40,9 +40,9 @@ describe('builder', function () {
 			['hello', 'computer'],			
 		];
 		
-		var dataFrame = panjas.builder(data);
+		var dataFrame = dataForge.builder(data);
 		
-		expect(dataFrame).to.be.an.instanceof(panjas.DataFrame);
+		expect(dataFrame).to.be.an.instanceof(dataForge.DataFrame);
 		expect(dataFrame.getColumnNames()).to.eql([
 			'Col1',
 			'Col2',
@@ -66,7 +66,7 @@ describe('builder', function () {
 			[date2, 'hello', date1],			
 		];
 		
-		var dataFrame = panjas.builder(data, {
+		var dataFrame = dataForge.builder(data, {
 			parse_dates: ['Col1', 'Col3'],
 		});
 		
@@ -89,7 +89,7 @@ describe('builder', function () {
 			['15'],			
 		];
 		
-		var dataFrame = panjas.builder(data);
+		var dataFrame = dataForge.builder(data);
 		
 		expect(dataFrame.getValues()).to.eql([
 			[1],
@@ -105,7 +105,7 @@ describe('builder', function () {
 			[undefined],			
 		];
 		
-		var dataFrame = panjas.builder(data);
+		var dataFrame = dataForge.builder(data);
 		
 		expect(dataFrame.getValues()).to.eql([
 			[undefined],
@@ -121,7 +121,7 @@ describe('builder', function () {
 			[15],			
 		];
 		
-		var dataFrame = panjas.builder(data);
+		var dataFrame = dataForge.builder(data);
 		
 		expect(dataFrame.getValues()).to.eql([
 			[1],
@@ -140,7 +140,7 @@ describe('builder', function () {
 			[date2],			
 		];
 		
-		var dataFrame = panjas.builder(data);
+		var dataFrame = dataForge.builder(data);
 		
 		expect(dataFrame.getValues()).to.eql([
 			[date1],

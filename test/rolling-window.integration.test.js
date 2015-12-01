@@ -2,14 +2,14 @@
 
 describe('rolling window integration', function () {
 
-	var panjas = require('../index');
+	var dataForge = require('../index');
 
 	var E = require('linq');
 	var expect = require('chai').expect;
 
 	it('blah', function () {
 
-		var dataFrame = new panjas.DataFrame(
+		var dataFrame = new dataForge.DataFrame(
 			[
 				"Value",
 			],
@@ -18,7 +18,7 @@ describe('rolling window integration', function () {
 					return [i];
 				})
 				.toArray(),
-			new panjas.Index("__test__", E.range(10, 12).toArray())
+			new dataForge.Index("__test__", E.range(10, 12).toArray())
 		);
 
 		var newColumn = dataFrame

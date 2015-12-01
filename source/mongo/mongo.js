@@ -1,11 +1,10 @@
 'use strict';
 
 //
-// Implements input/output for the CSV format.
+// Implements mongodb data source.
 //
 
 module.exports = function (config) {
-	var panjas = require('../../index');
 
 	var fs = require('fs');
 	var assert = require('chai').assert;
@@ -49,7 +48,6 @@ module.exports = function (config) {
 			return E.from(documents)
 				.aggregate(Q(), function (prevSavePromise, document) {
 					return prevSavePromise.then(function () {
-						console.log(document); //fio:
 						return db[config.collection].save(document);
 					});
 				})

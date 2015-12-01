@@ -1,13 +1,12 @@
 'use strict';
 
-var panjas = require("../../index.js");
+var dataForge = require("../../index.js");
 var json = require('../../format/json');
 var mongo = require('../../source/mongo/mongo');
 var csv = require('../../format/csv');
 var file = require('../../source/file');
 
-panjas
-	.from(mongo({
+dataForge.from(mongo({
 		host: 'localhost:27017',
 		db: 'somed-b',
 		collection: 'some-collection',

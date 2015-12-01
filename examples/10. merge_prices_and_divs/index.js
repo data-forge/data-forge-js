@@ -1,6 +1,6 @@
 'use strict';
 
-var panjas = require("../../index.js");
+var dataForge = require("../../index.js");
 var csv = require('../../format/csv');
 var file = require('../../source/file');
 
@@ -14,7 +14,7 @@ var assert = require('chai').assert;
 var loadSharePricesFile = function (filePath) {
 	assert.isString(filePath);
 	
-	return panjas.from(file(filePath)).as(csv());
+	return dataForge.from(file(filePath)).as(csv());
 };
 
 //
@@ -39,7 +39,7 @@ var loadSharePrices = function () {
 var loadDividends = function (filePath) {
 	assert.isString(filePath);
 	
-	return panjas.from(file, filePath).as(csv);
+	return dataForge.from(file, filePath).as(csv);
 };
 
 //
@@ -57,7 +57,7 @@ loadSharePrices()
 
 		return loadDividends('dividends.csv')
 			.then(function (dividendsDataFrame) {
-				return panjas.merge(sharePricesDataFrame, dividendsDataFrame, {
+				return dataForge.merge(sharePricesDataFrame, dividendsDataFrame, {
 						left: "date",
 						right: "ex date",
 						how: 'inner',

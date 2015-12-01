@@ -40,7 +40,7 @@ $(function() {
 		})
 		.toArray();
 
-	var dataFrame = new panjas.DataFrame(["Date", "Sin", "Cos"], values);
+	var dataFrame = new dataForge.DataFrame(["Date", "Sin", "Cos"], values);
 	
 	//
 	// Plot the data frame.

@@ -4,8 +4,6 @@
 // Implements input/output for the CSV format.
 //
 
-var panjas = require('../index');
-
 var fs = require('fs');
 var assert = require('chai').assert;
 var Q = require('q');

@@ -38,7 +38,7 @@ $(function() {
 		})
 		.toArray();
 
-	var dataFrame = new panjas.DataFrame(["index", "Sin", "Cos"], values);
+	var dataFrame = new dataForge.DataFrame(["index", "Sin", "Cos"], values);
 	
 	//
 	// Plot the data frame.
