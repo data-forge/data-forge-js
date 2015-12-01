@@ -1,0 +1,28 @@
+{
+  "name": "data-forge",
+  "version": "0.0.3",
+  "homepage": "https://github.com/Real-Serious-Games/data-forge-js-bower",
+  "authors": [
+    "Ashley Davis <ashley.davis@realseriousgames.com>"
+  ],
+  "description": "JavaScript data transformation and analysis toolkit inspired by Pandas and LINQ.",
+  "main": "data-forge.js",
+  "moduleType": [],
+  "keywords": [
+    "Data",
+    "Analysis",
+    "Manipulation",
+    "Pandas",
+    "LINQ",
+    "Visualization",
+    "Transformation"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
