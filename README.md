@@ -20,8 +20,8 @@ This project is a work in progress, please don't use unless you want to be an ea
 - [Driving Principles](#driving-principles)
 - [Implementation](#implementation)
 - [Installation](#installation)
-  - [NodeJS Installation and setup](#nodejs-installation-and-setup)
-  - [Browser Installation and setup](#browser-installation-and-setup)
+  - [NodeJS installation and setup](#nodejs-installation-and-setup)
+  - [Browser installation and setup](#browser-installation-and-setup)
   - [Getting the code](#getting-the-code)
 - [Key Concepts](#key-concepts)
   - [Data Source](#data-source)
@@ -83,7 +83,7 @@ The principles that drive decision making and tradeoffs:
 
 - Simple, easy to learn, easy to use.
 - High performance.
-- Be able to use the same (or very similar API in both Javascript and C#).
+- Be able to use the same (or very similar) API in both Javascript and C#.
 
 # Implementation
 
@@ -100,7 +100,7 @@ The rest of the README defines the setup and usage of data-forge. Certain featur
 
 # Installation
 
-## NodeJS Installation and setup
+## NodeJS installation and setup
 
 Install via [NPM](https://en.wikipedia.org/wiki/Npm_(software)): 
 
@@ -110,7 +110,7 @@ Require the module into your script:
 
 	var dataForge = require('data-forge');
 
-## Browser Installation and setup
+## Browser installation and setup
 
 Install via [Bower](https://en.wikipedia.org/wiki/Bower_(software)):
 
