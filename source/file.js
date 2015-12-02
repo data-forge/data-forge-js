@@ -47,6 +47,20 @@ module.exports = function (filePath) {
 				});					
 			});		
 		},
+
+		//
+		// Sync read from a text file.
+		//	
+		readSync: function () {			
+			return fs.readFileSync(filePath, 'utf-8');
+		},
+		
+		//
+		// Sync write to a text file.
+		//
+		writeSync: function (fileData) {
+			fs.writeFileSync(filePath, fileData);
+		},
 	};
 };
 	
