@@ -1,7 +1,7 @@
 'use strict';
 
 
-describe('BaseDataFrame', function () {
+describe('data-forge', function () {
 	
 	var dataForge = require('../index');	
 	
