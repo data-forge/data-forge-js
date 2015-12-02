@@ -7,6 +7,7 @@ describe('data-forge', function () {
 	
 	var expect = require('chai').expect;
 	var assert = require('chai').assert;
+	var Q = require('q');
 
 	var initDataFrame = function (columns, values) {
 		assert.isArray(columns);
@@ -21,6 +22,33 @@ describe('data-forge', function () {
 			}
 		);
 	};
+
+	it('can load data', function () {
+
+		var someTestData = 'some-test-data';
+		var promise = Q(someTestData);
+		var mockDataFrame = {};
+
+		var mockDataSource = {
+			read: function () {
+				return promise;
+			}
+		};
+		
+		var mockDataFormat = {
+			from: function (data) {
+				expect(data).to.eql(someTestData);
+				return mockDataFrame;
+			}
+		};
+
+		return dataForge
+			.from(mockDataSource)
+			.as(mockDataFormat)
+			.then(function (dataFrame) {
+				expect(dataFrame).to.eql(mockDataFrame);
+			});
+	});
 	
 	it('can merge on column', function () {
 
