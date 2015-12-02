@@ -6,7 +6,6 @@
 
 var fs = require('fs');
 var assert = require('chai').assert;
-var Q = require('q');
 
 module.exports = function (filePath) {
 	assert.isString(filePath, "Expected 'filePath' parameter to 'file data source' to be a string.");
@@ -18,7 +17,7 @@ module.exports = function (filePath) {
 		//	
 		read: function () {
 			
-			return Q.Promise(function (resolve, reject) {
+			return new Promise(function (resolve, reject) {
 				fs.readFile(filePath, 'utf-8', function (err, fileData) {
 					if (err) {
 						reject(err);
@@ -36,7 +35,7 @@ module.exports = function (filePath) {
 		write: function (fileData) {
 			assert.isString(fileData, "Expected 'fileData' parameter to 'file.write' to be a string.");
 			
-			return Q.Promise(function (resolve, reject) {
+			return new Promise(function (resolve, reject) {
 				fs.writeFile(filePath, fileData, function (err) {
 					if (err) {
 						reject(err);

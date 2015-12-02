@@ -7,7 +7,6 @@ describe('data-forge', function () {
 	
 	var expect = require('chai').expect;
 	var assert = require('chai').assert;
-	var Q = require('q');
 
 	var initDataFrame = function (columns, values) {
 		assert.isArray(columns);
@@ -26,7 +25,7 @@ describe('data-forge', function () {
 	it('can load data async', function () {
 
 		var someTestData = 'some-test-data';
-		var promise = Q(someTestData);
+		var promise = Promise.resolve(someTestData);
 		var mockDataFrame = {};
 
 		var mockDataSource = {

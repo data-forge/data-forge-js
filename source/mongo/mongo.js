@@ -8,7 +8,6 @@ module.exports = function (config) {
 
 	var fs = require('fs');
 	var assert = require('chai').assert;
-	var Q = require('q');
 	var E = require('linq');
 
 	assert.isObject(config, "Expected 'config' parameter to 'mongo data source' to be an object.");
@@ -46,7 +45,7 @@ module.exports = function (config) {
 
 			var db = pmongo(connectionString, [config.collection]);
 			return E.from(documents)
-				.aggregate(Q(), function (prevSavePromise, document) {
+				.aggregate(Promise.resolve(), function (prevSavePromise, document) {
 					return prevSavePromise.then(function () {
 						return db[config.collection].save(document);
 					});
