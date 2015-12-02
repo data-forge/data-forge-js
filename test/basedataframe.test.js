@@ -263,7 +263,7 @@ describe('BaseDataFrame', function () {
 		]);
 	});
 	
-	it('can output data frame', function () {
+	it('can save data frame', function () {
 		
 		var dataFrame = initDataFrame(
 			[ "Date", "Value1", "Value2", "Value3" ],
