@@ -427,8 +427,14 @@ BaseDataFrame.prototype.as = function (formatPlugin) {
 			assert.isObject(dataSourcePlugin, "Expected 'dataSourcePlugin' parameter to 'DataFrame.as.to' to be an object.");
 			assert.isFunction(dataSourcePlugin.write, "Expected 'dataSourcePlugin' parameter to 'DataFrame.as.to' to be an object with a 'write' function.");
 			
-			var textData = formatPlugin.to(self);
-			return dataSourcePlugin.write(textData);
+			return dataSourcePlugin.write(formatPlugin.to(self));
+		},		
+
+		toSync: function (dataSourcePlugin) {
+			assert.isObject(dataSourcePlugin, "Expected 'dataSourcePlugin' parameter to 'DataFrame.as.to' to be an object.");
+			assert.isFunction(dataSourcePlugin.writeSync, "Expected 'dataSourcePlugin' parameter to 'DataFrame.as.to' to be an object with a 'writeSync' function.");
+			
+			return dataSourcePlugin.writeSync(formatPlugin.to(self));
 		},		
 	};
 };

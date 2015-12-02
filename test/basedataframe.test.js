@@ -263,7 +263,7 @@ describe('BaseDataFrame', function () {
 		]);
 	});
 	
-	it('can save data frame', function () {
+	it('can save data frame async', function () {
 		
 		var dataFrame = initDataFrame(
 			[ "Date", "Value1", "Value2", "Value3" ],
@@ -273,39 +273,65 @@ describe('BaseDataFrame', function () {
 			],
 			[5, 6]
 		);
-		var dataSourceOptions = {};
-		var formatOptions = {};
+
 		var formattedText = "some-text";
 		var promise = {};
 
-		var dataFormatPlugin = function (options) {			
-			expect(options).to.equal(formatOptions);
-
-			return {
-				to: function (outputDataFrame) {
-					expect(outputDataFrame).to.equal(dataFrame);
-					return formattedText;				
-				},
-			};
+		var mockDataFormat = {
+			to: function (outputDataFrame) {
+				expect(outputDataFrame).to.equal(dataFrame);
+				return formattedText;				
+			},
 		};
 		
-		var dataSourcePlugin = function (options) {
-			expect(options).to.equal(options);
-
-			return {
-				write: function (textData, options) {
-					expect(textData).to.equal(formattedText);					
-					return promise;				
-				},
-			};
+		var mockDataSource = {
+			write: function (textData, options) {
+				expect(textData).to.equal(formattedText);					
+				return promise;				
+			},
 		};
 		
 		var result = dataFrame
-			.as(dataFormatPlugin(formatOptions))
-			.to(dataSourcePlugin(dataSourceOptions));
+			.as(mockDataFormat)
+			.to(mockDataSource);
+			
 		expect(result).to.equal(promise);
 	});
 	
+	it('can save data frameasync', function () {
+		
+		var dataFrame = initDataFrame(
+			[ "Date", "Value1", "Value2", "Value3" ],
+			[
+				[new Date(1975, 24, 2), 100, 'foo', 11],
+				[new Date(2015, 24, 2), 200, 'bar', 22],
+			],
+			[5, 6]
+		);
+
+		var formattedText = "some-text";
+		var hasWrittenData = false;
+
+		var mockDataFormat = {
+			to: function (outputDataFrame) {
+				expect(outputDataFrame).to.equal(dataFrame);
+				return formattedText;				
+			},
+		};
+		
+		var mockDataSource = {
+			writeSync: function (textData) {
+				expect(textData).to.equal(formattedText);					
+				hasWrittenData = true;
+			},
+		};
+		
+		dataFrame
+			.as(mockDataFormat)
+			.toSync(mockDataSource);
+
+		expect(hasWrittenData).to.eql(true);
+	});	
 	it('can sort by single column ascending', function () {
 		
 		var dataFrame = initDataFrame(
