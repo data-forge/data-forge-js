@@ -29,7 +29,7 @@ var dataForge = {
 	Index: require('./src/index'),
 
 	/**
-	 * Read a DataFrame from a plugable data source.
+	 * Read a DataFrame asynchronously from a plugable data source.
 	 */
 	from: function (dataSourcePlugin) {
 		assert.isObject(dataSourcePlugin, "Expected 'dataSourcePlugin' parameter to 'dataForge.from' to be an object.");
@@ -47,6 +47,26 @@ var dataForge = {
 					.then(function (textData) {
 						return formatPlugin.from(textData);
 					});		
+			},		
+		};
+	},
+
+	/**
+	 * Read a DataFrame synchronously from a plugable data source.
+	 */
+	fromSync: function (dataSourcePlugin) {
+		assert.isObject(dataSourcePlugin, "Expected 'dataSourcePlugin' parameter to 'dataForge.from' to be an object.");
+		assert.isFunction(dataSourcePlugin.readSync, "Expected 'dataSourcePlugin' parameter to 'dataForge.from' to be an object with a 'readSync' function.");
+		
+		return {
+			/**
+			 * Convert DataFrame from a particular data format using a plugable format.
+			 */
+			as: function (formatPlugin) {
+				assert.isObject(formatPlugin, "Expected 'formatPlugin' parameter to 'dataForge.from' to be an object.");
+				assert.isFunction(formatPlugin.from, "Expected 'formatPlugin' parameter to 'dataForge.from' to be an object with a 'from' function.");
+				
+				return formatPlugin.from(dataSourcePlugin.readSync());
 			},		
 		};
 	},
