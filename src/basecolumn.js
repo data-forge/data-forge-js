@@ -670,4 +670,40 @@ BaseColumn.prototype.toStrings = function () {
 	});
 };
 
+
+/** 
+  * Detect the actual types of the values that comprised the column and their frequency.
+  */
+BaseColumn.prototype.detectActualTypes = function () {
+
+	var self = this;
+	var values = self.getValues();
+	var typeFrequencies = E.from(values)
+		.select(function (value) {
+			return typeof(value);
+		})
+		.aggregate({}, function (accumulated, valueType) {
+			var typeInfo = accumulated[valueType];
+			if (!typeInfo) {
+				typeInfo = {
+					count: 0
+				};
+				accumulated[valueType] = typeInfo;
+			}
+			++typeInfo.count;
+			return accumulated;
+		});
+
+	var distinctTypes = Object.keys(typeFrequencies);
+	var total = values.length;
+	return E.from(distinctTypes)
+		.select(function (valueType) {
+			return {
+				type: valueType,
+				frequency: (typeFrequencies[valueType].count / total) * 100
+			};
+		})
+		.toArray();
+};
+
 module.exports = BaseColumn;

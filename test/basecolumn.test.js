@@ -466,5 +466,34 @@ describe('BaseColumn', function () {
 
 	});
 
+	it('can detect actual column type', function () {
+
+		var column = initColumn([1], [1]);
+		var types = column.detectActualTypes();
+		expect(types).to.eql([
+			{
+				type: 'number',
+				frequency: 100
+			}
+		]);
+
+	});
+
+	it('can detect multiple column types', function () {
+
+		var column = initColumn([1, 2], [1, 'foo']);
+		var types = column.detectActualTypes();
+		expect(types).to.eql([
+			{
+				type: 'number',
+				frequency: 50
+			},
+			{
+				type: 'string',
+				frequency: 50
+			}
+		]);
+
+	});
 
 });
