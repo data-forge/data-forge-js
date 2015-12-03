@@ -823,4 +823,28 @@ describe('BaseDataFrame', function () {
 			[new Date(2015, 24, 2), 200, 'bar', 22],
 		]);
 	});
+
+	it('can detect actual types', function () {
+
+		var dataFrame = initDataFrame(
+			[ "Date", "Value1" ],
+			[
+				[new Date(1975, 24, 2), 'foo'],
+				[new Date(2015, 24, 2), 200],
+			],
+			[5, 6]
+		);
+
+		var detectedTypes = dataFrame.detectTypes();
+		expect(detectedTypes.getColumnNames()).to.eql(["type", "frequency", "column"]); //todo: upper case these.
+		expect(detectedTypes.getIndex().getValues()).to.eql([0, 1, 2]);
+		console.log(detectedTypes.getValues()); //fio:
+		expect(detectedTypes.getValues()).to.eql([
+			['date', 100, "Date"],
+			['string', 50, "Value1"],
+			['number', 50, "Value1"],
+		]);
+
+
+	});
 });

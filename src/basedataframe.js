@@ -924,5 +924,33 @@ BaseDataFrame.prototype.toStrings = function (columnNameOrIndex) {
 	return self.setColumn(columnNameOrIndex, self.getColumn(columnNameOrIndex).toString());
 };
 
+/**
+ * Detect actual types and their frequencies contained within columns in the data frame.
+ */
+BaseDataFrame.prototype.detectTypes = function () { //todo: make lazy.
+
+	var self = this;
+
+	var DataFrame = require('./dataframe');
+
+	var accumulatedValues = E.from(self.getColumns())
+		.select(function (column) {
+			//todo: need tobe able to create a column from a single value.
+			var numValues = column.getValues().length;
+			var Column = require('./column');
+			var columnNameColumn = new Column('column', E.range(0, numValues).select(function () { return column.getName(); }).toArray());
+			return column.detectTypes().setColumn('column', columnNameColumn);
+		})
+		.aggregate([], function (accumulated, dataFrame) {
+			//todo: return accumulated.concat(dataFrame); //todo: need to implement concat.
+			return accumulated.concat(dataFrame.getValues());
+		});
+
+	return new DataFrame(
+		["type", "frequency", "column"],
+		accumulatedValues
+	);
+};
+
 
 module.exports = BaseDataFrame;
