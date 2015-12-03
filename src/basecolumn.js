@@ -687,4 +687,33 @@ BaseColumn.prototype.parseDates = function () {
 	);
 };
 
+/**
+ * Convert a column of values of different types to a column of string values.
+ */
+BaseColumn.prototype.toStrings = function () {
+
+	var self = this;
+
+	var LazyColumn = require('./lazycolumn');
+	return new LazyColumn(
+		self.getName(),
+		function () {
+			return E.from(self.getValues())
+				.select(function (value) {
+					if (value === undefined) {
+						return undefined;
+					}
+					else if (value === null) {
+						return null;
+					}
+					return value.toString();
+				})
+				.toArray();
+		},
+		function () {
+			return self.getIndex();
+		}
+	);	
+};
+
 module.exports = BaseColumn;

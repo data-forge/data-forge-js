@@ -449,5 +449,22 @@ describe('BaseColumn', function () {
 		}).to.throw();
 	});
 
+	it('can parse values to strings', function () {
+
+		var column = initColumn([1, 2, 3, 4, 5, 6], [1, null, undefined, "foo", 5.5, new Date(2015, 1, 1)]);
+		var converted = column.toStrings();
+
+		expect(converted.getIndex().getValues()).to.eql([1, 2, 3, 4, 5, 6]);
+		expect(converted.getValues()).to.eql([
+			'1', 
+			null, 
+			undefined, 
+			"foo", 
+			'5.5', 
+			'Sun Feb 01 2015 00:00:00 GMT+1000 (E. Australia Standard Time)'
+		]);
+
+	});
+
 
 });
