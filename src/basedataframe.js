@@ -888,4 +888,41 @@ BaseDataFrame.prototype.toString = function () {
 	return t.toString();
 };
 
+/**
+ * Parse a column with string values to a column with int values.
+ */
+BaseDataFrame.prototype.parseInts = function (columnNameOrIndex) {
+
+	var self = this;
+	return self.setColumn(columnNameOrIndex, self.getColumn(columnNameOrIndex).parseInts());
+};
+
+/**
+ * Parse a column with string values to a column with float values.
+ */
+BaseDataFrame.prototype.parseFloats = function (columnNameOrIndex) {
+
+	var self = this;
+	return self.setColumn(columnNameOrIndex, self.getColumn(columnNameOrIndex).parseFloats());
+};
+
+/**
+ * Parse a column with string values to a column with date values.
+ */
+BaseDataFrame.prototype.parseDates = function (columnNameOrIndex) {
+
+	var self = this;
+	return self.setColumn(columnNameOrIndex, self.getColumn(columnNameOrIndex).parseDates());
+};
+
+/**
+ * Convert a column of values of different types to a column of string values.
+ */
+BaseDataFrame.prototype.toStrings = function (columnNameOrIndex) {
+
+	var self = this;
+	return self.setColumn(columnNameOrIndex, self.getColumn(columnNameOrIndex).toString());
+};
+
+
 module.exports = BaseDataFrame;
