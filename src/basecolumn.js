@@ -678,39 +678,6 @@ BaseColumn.prototype.toStrings = function () {
 BaseColumn.prototype.detectTypes = function () {
 
 	var self = this;
-	var values = self.getValues();
-	var typeFrequencies = E.from(values)
-		.select(function (value) {
-			var valueType = typeof(value);
-			if (valueType === 'object') {
-				if (Object.isDate(value)) {
-					valueType = 'date';
-				}
-			}
-			return valueType;
-		})
-		.aggregate({}, function (accumulated, valueType) {
-			var typeInfo = accumulated[valueType];
-			if (!typeInfo) {
-				typeInfo = {
-					count: 0
-				};
-				accumulated[valueType] = typeInfo;
-			}
-			++typeInfo.count;
-			return accumulated;
-		});
-
-	var distinctTypes = Object.keys(typeFrequencies);
-	var total = values.length;
-	var rows = E.from(distinctTypes)
-		.select(function (valueType) {
-			return [
-				valueType,
-				(typeFrequencies[valueType].count / total) * 100
-			];
-		})
-		.toArray();
 
 	var LazyDataFrame = require('./lazydataframe');
 	return new LazyDataFrame(
@@ -718,7 +685,39 @@ BaseColumn.prototype.detectTypes = function () {
 			return ["type", "frequency"];
 		},
 		function () {
-			return rows;
+			var values = self.getValues();
+			var totalValues = values.length;
+
+			var typeFrequencies = E.from(values)
+				.select(function (value) {
+					var valueType = typeof(value);
+					if (valueType === 'object') {
+						if (Object.isDate(value)) {
+							valueType = 'date';
+						}
+					}
+					return valueType;
+				})
+				.aggregate({}, function (accumulated, valueType) {
+					var typeInfo = accumulated[valueType];
+					if (!typeInfo) {
+						typeInfo = {
+							count: 0
+						};
+						accumulated[valueType] = typeInfo;
+					}
+					++typeInfo.count;
+					return accumulated;
+				});
+
+			return E.from(Object.keys(typeFrequencies))
+				.select(function (valueType) {
+					return [
+						valueType,
+						(typeFrequencies[valueType].count / totalValues) * 100
+					];
+				})
+				.toArray();
 		}
 	);
 };
