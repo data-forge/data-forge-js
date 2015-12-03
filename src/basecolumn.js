@@ -591,32 +591,20 @@ BaseColumn.prototype.percentChange = function () {
 BaseColumn.prototype.parseInts = function () {
 
 	var self = this;
-	
-	var LazyColumn = require('./lazycolumn');
-	return new LazyColumn(
-		self.getName(),
-		function () {
-			return E.from(self.getValues())
-				.select(function (value, valueIndex) {
-					if (value === undefined) {
-						return undefined;
-					}
-					else {
-						assert.isString(value, "Called parseInt on column '" + self.getName() + "', expected all values in the column to be strings, instead found a '" + typeof(value) + "' at index " + valueIndex);
-
-						if (value.length === 0) {
-							return undefined;
-						}
-
-						return parseInt(value);
-					}
-				})
-				.toArray();
-		},
-		function () {
-			return self.getIndex();
+	return self.select(function (value, valueIndex) {
+		if (value === undefined) {
+			return undefined;
 		}
-	);
+		else {
+			assert.isString(value, "Called parseInt on column '" + self.getName() + "', expected all values in the column to be strings, instead found a '" + typeof(value) + "' at index " + valueIndex);
+
+			if (value.length === 0) {
+				return undefined;
+			}
+
+			return parseInt(value);
+		}
+	});
 };
 
 /**
@@ -625,32 +613,20 @@ BaseColumn.prototype.parseInts = function () {
 BaseColumn.prototype.parseFloats = function () {
 
 	var self = this;
-	
-	var LazyColumn = require('./lazycolumn');
-	return new LazyColumn(
-		self.getName(),
-		function () {
-			return E.from(self.getValues())
-				.select(function (value, valueIndex) {
-					if (value === undefined) {
-						return undefined;
-					}
-					else {
-						assert.isString(value, "Called parseInt on column '" + self.getName() + "', expected all values in the column to be strings, instead found a '" + typeof(value) + "' at index " + valueIndex);
-
-						if (value.length === 0) {
-							return undefined;
-						}
-
-						return parseFloat(value);
-					}				
-				})
-				.toArray();
-		},
-		function () {
-			return self.getIndex();
+	return self.select(function (value, valueIndex) {
+		if (value === undefined) {
+			return undefined;
 		}
-	);
+		else {
+			assert.isString(value, "Called parseInt on column '" + self.getName() + "', expected all values in the column to be strings, instead found a '" + typeof(value) + "' at index " + valueIndex);
+
+			if (value.length === 0) {
+				return undefined;
+			}
+
+			return parseFloat(value);
+		}
+	});
 };
 
 /**
@@ -659,32 +635,20 @@ BaseColumn.prototype.parseFloats = function () {
 BaseColumn.prototype.parseDates = function () {
 
 	var self = this;
-	
-	var LazyColumn = require('./lazycolumn');
-	return new LazyColumn(
-		self.getName(),
-		function () {
-			return E.from(self.getValues())
-				.select(function (value, valueIndex) {
-					if (value === undefined) {
-						return undefined;
-					}
-					else {
-						assert.isString(value, "Called parseInt on column '" + self.getName() + "', expected all values in the column to be strings, instead found a '" + typeof(value) + "' at index " + valueIndex);
-
-						if (value.length === 0) {
-							return undefined;
-						}
-
-						return moment(value).toDate();
-					}
-				})
-				.toArray();
-		},
-		function () {
-			return self.getIndex();
+	return self.select(function (value, valueIndex) {
+		if (value === undefined) {
+			return undefined;
 		}
-	);
+		else {
+			assert.isString(value, "Called parseInt on column '" + self.getName() + "', expected all values in the column to be strings, instead found a '" + typeof(value) + "' at index " + valueIndex);
+
+			if (value.length === 0) {
+				return undefined;
+			}
+
+			return moment(value).toDate();
+		}
+	});
 };
 
 /**
@@ -693,27 +657,17 @@ BaseColumn.prototype.parseDates = function () {
 BaseColumn.prototype.toStrings = function () {
 
 	var self = this;
-
-	var LazyColumn = require('./lazycolumn');
-	return new LazyColumn(
-		self.getName(),
-		function () {
-			return E.from(self.getValues())
-				.select(function (value) {
-					if (value === undefined) {
-						return undefined;
-					}
-					else if (value === null) {
-						return null;
-					}
-					return value.toString();
-				})
-				.toArray();
-		},
-		function () {
-			return self.getIndex();
+	return self.select(function (value) {
+		if (value === undefined) {
+			return undefined;
 		}
-	);	
+		else if (value === null) {
+			return null;
+		}
+		else {
+			return value.toString();	
+		}		
+	});
 };
 
 module.exports = BaseColumn;
