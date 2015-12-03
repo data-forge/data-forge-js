@@ -203,4 +203,61 @@ describe('data-forge', function () {
 			dataForge.merge(left, right, 'left-key');
 		}).to.throw(Error);
 	});
+
+	it('can concat data frames', function () { //todo: also when columns are unevan or at different indices
+
+	 	var df1 = initDataFrame(["1", "2"], [[1, 2], [3, 4]]);
+	 	var df2 = initDataFrame(["1", "2"], [[5, 6], [7, 8]]);
+	 	var df3 = initDataFrame(["1", "2"], [[9, 10], [11, 12]]);
+
+	 	var result = dataForge.concat([df1, df2, df3]);
+
+	 	expect(result.getColumnNames()).to.eql(["1", "2"]);
+	 	expect(result.getIndex().getValues()).to.eql([0, 1, 0, 1, 0, 1]);
+	 	expect(result.getValues()).to.eql([
+ 			[1, 2],
+ 			[3, 4],
+ 			[5, 6],
+ 			[7, 8],
+ 			[9, 10],
+ 			[11, 12]
+ 		]);
+	});
+
+	it('concat can handle out of order columns', function () {
+
+	 	var df1 = initDataFrame(["1", "2"], [[1, 2], [3, 4]]);
+	 	var df2 = initDataFrame(["2", "1"], [[6, 5], [8, 7]]);
+
+	 	var result = dataForge.concat([df1, df2]);
+
+	 	expect(result.getColumnNames()).to.eql(["1", "2"]);
+	 	expect(result.getIndex().getValues()).to.eql([0, 1, 0, 1]);
+	 	expect(result.getValues()).to.eql([
+ 			[1, 2],
+ 			[3, 4],
+ 			[5, 6],
+ 			[7, 8],
+ 		]);
+	});
+
+	/*todo:
+	it('concat can handle uneven columns', function () {
+
+	 	var df1 = initDataFrame(["1", "2"], [[1, 2], [3, 4]]);
+	 	var df2 = initDataFrame(["2", "3"], [[6, 5], [8, 7]]);
+
+	 	var result = dataForge.concat([df1, df2]);
+
+	 	expect(result.getColumnNames()).to.eql(["1", "2", "3"]);
+	 	expect(result.getIndex().getValues()).to.eql([0, 1, 0, 1]);
+	 	expect(result.getValues()).to.eql([
+ 			[1, 2, undefined],
+ 			[3, 4, undefined],
+ 			[undefined, 5, 6],
+ 			[undefined, 7, 8],
+ 		]);
+	});
+	*/
+
 });

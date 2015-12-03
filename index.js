@@ -27,6 +27,7 @@ var dataForge = {
 	Column: require('./src/column'),
 	LazyColumn: require('./src/lazycolumn'),
 	Index: require('./src/index'),
+	LazyIndex: require('./src/lazyindex'),
 
 	/**
 	 * Read a DataFrame asynchronously from a plugable data source.
@@ -122,6 +123,84 @@ var dataForge = {
 			},
 			function () {
 				return mergedValues;
+			}
+		);
+	},
+
+	/**
+	 * Concatenate multiple data frames into a single.
+	 *
+	 * @param {array} dataFrames - Array of data frames to concatenate.
+	 */
+	concat: function (dataFrames) {
+		assert.isArray(dataFrames, "Expected 'dataFrames' parameter to 'dataForge.concat' to be an array of data frames.");
+
+		var concatenatedColumns = E.from(dataFrames)
+			.selectMany(function (dataFrame) {
+				return dataFrame.getColumnNames();
+			})
+			.distinct()
+			.toArray();
+
+		var newValues = E.from(dataFrames)
+			.selectMany(function (dataFrame) {
+
+				var columnNames = dataFrame.getColumnNames();
+
+				return E.from(dataFrame.getValues())
+					.select(function (row) {
+						var columnValueMap = E.from(columnNames)
+							.select(function (columnName, columnIndex) {
+								return [columnName, row[columnIndex]];
+							})
+							.toObject(
+								function (pair) {
+									return pair[0];
+
+								},
+								function (pair) {
+									return pair[1];									
+								}
+							);
+
+						return E.from(concatenatedColumns)
+							.select(function (columnName) {
+								return columnValueMap[columnName];
+							})
+							.toArray();
+					})
+					.toArray();
+
+				/*todo:
+				return dataFrame
+					.remapColumns(concatenatedColumns)
+					.getValues();
+				*/
+			})
+			.toArray();
+
+		var newIndices = E.from(dataFrames)
+			.selectMany(function (dataFrame) {
+				return dataFrame.getIndex().getValues();
+			})
+			.toArray();
+
+		var LazyDataFrame = require('./src/lazydataframe');
+		return new LazyDataFrame(
+			function () {
+				return concatenatedColumns;
+			},
+			function () {
+				return newValues;
+			},
+			function () {
+				var LazyIndex = require('./src/lazyindex');
+				return new LazyIndex(
+					"__concatenated__",
+					function () {
+						return newIndices;
+					}
+				)
 			}
 		);
 	},
