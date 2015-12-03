@@ -53,22 +53,6 @@ describe('builder', function () {
 		]);
 	});
 
-	it('number columns are automatically parsed to number type', function () {
-		
-		var data = [
-			['Col1'],
-			['1'],
-			['15'],			
-		];
-		
-		var dataFrame = dataForge.builder(data);
-		
-		expect(dataFrame.getValues()).to.eql([
-			[1],
-			[15],			
-		]);
-	});
-
 	it('undefined values are parsed to undefined', function () {
 		
 		var data = [

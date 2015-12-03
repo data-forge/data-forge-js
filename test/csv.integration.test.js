@@ -21,8 +21,8 @@ describe('csv.integration', function () {
 				"Value3",
 			],
 			[
-				['1975-2-24', 100, 'foo', 11],
-				['2015-2-24', 200, 'bar', 22],
+				['1975-2-24', '100', 'foo', '11'],
+				['2015-2-24', '200', 'bar', '22'],
 			]
 		);		
 	}; 
@@ -47,8 +47,8 @@ describe('csv.integration', function () {
 			.then(function (dataFrame) {
 				var series1 = dataFrame.getColumn('Value1');
 				expect(series1.getValues()).to.eql([
-					100,
-					300,			
+					'100',
+					'300',
 				]);
 				
 				var series2 = dataFrame.getColumn('Value2');
@@ -65,8 +65,8 @@ describe('csv.integration', function () {
 				]);
 				
 				expect(dataFrame.getValues()).to.eql([
-					['1975-2-24', 100, "foo", 22],
-					['2015-10-23', 300, "bar", 23],			
+					['1975-2-24', '100', "foo", '22'],
+					['2015-10-23', '300', "bar", '23'],
 				]);
 				
 				var dataFrame2 = dataFrame.getColumnsSubset(['Value1', 'Value3']); 
@@ -77,8 +77,8 @@ describe('csv.integration', function () {
 				]);
 				
 				expect(dataFrame2.getValues()).to.eql([
-					[100, 22],
-					[300, 23],			
+					['100', '22'],
+					['300', '23'],			
 				]);
 				
 				fs.unlink(testFile);				

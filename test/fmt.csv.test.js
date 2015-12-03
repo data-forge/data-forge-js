@@ -56,8 +56,8 @@ describe('format/csv', function () {
 
 		expect(dataFrame.getColumnNames()).to.eql(['Column1', 'Column2']);
 		expect(dataFrame.getValues()).to.eql([
-			['A', 1],
-			['B', 2],
+			['A', '1'],
+			['B', '2'],
 		]);
 	});
 
@@ -77,8 +77,8 @@ describe('format/csv', function () {
 
 		expect(dataFrame.getColumnNames()).to.eql(['Column1', 'Column2']);
 		expect(dataFrame.getValues()).to.eql([
-			['A',1],
-			['B',2],
+			['A', '1'],
+			['B', '2'],
 		]);
 	});
 
@@ -98,8 +98,8 @@ describe('format/csv', function () {
 
 		expect(dataFrame.getColumnNames()).to.eql(['Column1', 'Column2']);
 		expect(dataFrame.getValues()).to.eql([
-			[undefined,1],
-			['B',undefined],
+			[undefined, '1'],
+			['B', undefined],
 		]);
 	});
 
