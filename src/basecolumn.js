@@ -588,7 +588,7 @@ BaseColumn.prototype.percentChange = function () {
 /**
  * Parse a column with string values to a column with int values.
  */
-BaseColumn.prototype.parseInt = function () {
+BaseColumn.prototype.parseInts = function () {
 
 	var self = this;
 	
@@ -622,7 +622,7 @@ BaseColumn.prototype.parseInt = function () {
 /**
  * Parse a column with string values to a column with float values.
  */
-BaseColumn.prototype.parseFloat = function () {
+BaseColumn.prototype.parseFloats = function () {
 
 	var self = this;
 	
@@ -656,7 +656,7 @@ BaseColumn.prototype.parseFloat = function () {
 /**
  * Parse a column with string values to a column with date values.
  */
-BaseColumn.prototype.parseDate = function () {
+BaseColumn.prototype.parseDates = function () {
 
 	var self = this;
 	

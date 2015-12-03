@@ -338,7 +338,7 @@ describe('BaseColumn', function () {
 	it('can parse string column to int', function () {
 
 		var column = initColumn([10, 5, 2], ['1', '100', '5']);
-		var parsed = column.parseInt();
+		var parsed = column.parseInts();
 
 		expect(parsed.getIndex().getValues()).to.eql([10, 5, 2]);
 		expect(parsed.getValues()).to.eql([1, 100, 5]);
@@ -347,7 +347,7 @@ describe('BaseColumn', function () {
 	it('can parse string column to int - with empty string', function () {
 
 		var column = initColumn([10], ['']);
-		var parsed = column.parseInt();
+		var parsed = column.parseInts();
 
 		expect(parsed.getIndex().getValues()).to.eql([10]);
 		expect(parsed.getValues()).to.eql([undefined]);
@@ -356,7 +356,7 @@ describe('BaseColumn', function () {
 	it('can parse string column to int - with undefined', function () {
 
 		var column = initColumn([10], [undefined]);
-		var parsed = column.parseInt();
+		var parsed = column.parseInts();
 
 		expect(parsed.getIndex().getValues()).to.eql([10]);
 		expect(parsed.getValues()).to.eql([undefined]);
@@ -365,7 +365,7 @@ describe('BaseColumn', function () {
 	it('can parse string column to int - throws when source value is not a string', function () {
 
 		var column = initColumn([10], [5]);
-		var parsed = column.parseInt();
+		var parsed = column.parseInts();
 
 		expect(parsed.getIndex().getValues()).to.eql([10]);
 		expect(function () { 
@@ -376,7 +376,7 @@ describe('BaseColumn', function () {
 	it('can parse string column to float', function () {
 
 		var column = initColumn([10, 5, 2], ['1', '100.2020', '5.5']);
-		var parsed = column.parseFloat();
+		var parsed = column.parseFloats();
 
 		expect(parsed.getIndex().getValues()).to.eql([10, 5, 2]);
 		expect(parsed.getValues()).to.eql([1, 100.2020, 5.5]);
@@ -385,7 +385,7 @@ describe('BaseColumn', function () {
 	it('can parse string column to float - with empty string', function () {
 
 		var column = initColumn([10], ['']);
-		var parsed = column.parseFloat();
+		var parsed = column.parseFloats();
 
 		expect(parsed.getIndex().getValues()).to.eql([10]);
 		expect(parsed.getValues()).to.eql([undefined]);
@@ -394,7 +394,7 @@ describe('BaseColumn', function () {
 	it('can parse string column to float - with undefined', function () {
 
 		var column = initColumn([10], [undefined]);
-		var parsed = column.parseFloat();
+		var parsed = column.parseFloats();
 
 		expect(parsed.getIndex().getValues()).to.eql([10]);
 		expect(parsed.getValues()).to.eql([undefined]);
@@ -403,7 +403,7 @@ describe('BaseColumn', function () {
 	it('can parse string column to float - throws when source value is not a string', function () {
 
 		var column = initColumn([10], [5]);
-		var parsed = column.parseFloat();
+		var parsed = column.parseFloats();
 
 		expect(parsed.getIndex().getValues()).to.eql([10]);
 		expect(function () { 
@@ -414,7 +414,7 @@ describe('BaseColumn', function () {
 	it('can parse string column to date', function () {
 
 		var column = initColumn([10, 5], ['1975-2-24', '2015-2-24']);
-		var parsed = column.parseDate();
+		var parsed = column.parseDates();
 
 		expect(parsed.getIndex().getValues()).to.eql([10, 5]);
 		expect(parsed.getValues()).to.eql([new Date(1975, 1, 24), new Date(2015, 1, 24)]); // Note months are 0-based here.
@@ -423,7 +423,7 @@ describe('BaseColumn', function () {
 	it('can parse string column to date - with empty string', function () {
 
 		var column = initColumn([10], ['']);
-		var parsed = column.parseDate();
+		var parsed = column.parseDates();
 
 		expect(parsed.getIndex().getValues()).to.eql([10]);
 		expect(parsed.getValues()).to.eql([undefined]);
@@ -432,7 +432,7 @@ describe('BaseColumn', function () {
 	it('can parse string column to date - with undefined', function () {
 
 		var column = initColumn([10], [undefined]);
-		var parsed = column.parseDate();
+		var parsed = column.parseDates();
 
 		expect(parsed.getIndex().getValues()).to.eql([10]);
 		expect(parsed.getValues()).to.eql([undefined]);
@@ -441,11 +441,13 @@ describe('BaseColumn', function () {
 	it('can parse string column to date - throws when source value is not a string', function () {
 
 		var column = initColumn([10], [5]);
-		var parsed = column.parseDate();
+		var parsed = column.parseDates();
 
 		expect(parsed.getIndex().getValues()).to.eql([10]);
 		expect(function () { 
 			parsed.getValues();
 		}).to.throw();
 	});
+
+
 });
