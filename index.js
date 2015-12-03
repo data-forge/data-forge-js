@@ -3,6 +3,7 @@
 var assert = require('chai').assert;
 var E = require('linq');
 var dropElement = require('./src/utils').dropElement;
+require('sugar');
 
 /**
  * Main namespace for Panjas.
@@ -25,7 +26,6 @@ var dataForge = {
 	LazyDataFrame: require('./src/lazydataframe'),
 	Column: require('./src/column'),
 	LazyColumn: require('./src/lazycolumn'),
-	builder: require('./src/builder'),	
 	Index: require('./src/index'),
 
 	/**

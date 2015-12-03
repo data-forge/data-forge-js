@@ -46,8 +46,14 @@ module.exports = function (options) {
 						.toArray();					
 				})
 				.toArray();
+
+			if (rows.length === 0) {
+				return new dataForge.DataFrame([], []);
+			}
 					
-			return dataForge.builder(rows, options);
+			var header = E.from(rows).first();
+			var remaining = E.from(rows).skip(1).toArray();
+			return new dataForge.DataFrame(header, remaining);
 		},
 		
 		//

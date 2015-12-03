@@ -40,8 +40,7 @@ module.exports = function (options) {
 				})
 				.toArray();
 
-			var all = [headers].concat(rows);
-			return dataForge.builder(all, options);			
+			return new dataForge.DataFrame(headers, rows);
 		},
 		
 		//
