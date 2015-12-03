@@ -52,35 +52,7 @@ describe('builder', function () {
 			['hello', 'computer'],			
 		]);
 	});
-	
-	it('can parse dates in requested columns', function () {
-		
-		var date1 = "1975-2-24";
-		var date2 = "2015-10-28";
-		var date1AsDate = moment(date1).toDate();
-		var date2AsDate = moment(date2).toDate();
-		
-		var data = [
-			['Col1', 'Col2', 'Col3'],
-			[date1, 'foo', date2],
-			[date2, 'hello', date1],			
-		];
-		
-		var dataFrame = dataForge.builder(data, {
-			parse_dates: ['Col1', 'Col3'],
-		});
-		
-		expect(dataFrame.getColumnNames()).to.eql([
-			'Col1',
-			'Col2',
-			'Col3',
-		])
-		expect(dataFrame.getValues()).to.eql([
-			[date1AsDate, 'foo', date2AsDate],
-			[date2AsDate, 'hello', date1AsDate],			
-		]);
-	});
-	
+
 	it('number columns are automatically parsed to number type', function () {
 		
 		var data = [

@@ -76,14 +76,17 @@ The aims of this project:
 - To combine the best aspects of [Pandas](https://en.wikipedia.org/wiki/Pandas_(software)) and [LINQ](https://en.wikipedia.org/wiki/Language_Integrated_Query) and make them available in JavaScript and C#.
 - To be able to load data, transform and save data.
 - To be able to prepare data for visualization. 
+- Be able to load massive data files.
 
 # Driving Principles 
 
 The principles that drive decision making and tradeoffs:
 
 - Simple, easy to learn, easy to use.
+- Minimize the magic, everything should be understandable, the API should be orthogonal.
 - High performance.
 - Be able to use the same (or very similar) API in both Javascript and C#.
+- The code you build during interactive data exploration should be transplantable to an app or microservice.
 
 # Implementation
 
@@ -91,7 +94,7 @@ General implementation goals:
 
 - Immutable, every operation generates a new immutable data set.
 - Lazy evaluation, to make the performance of immutability acceptable.
-- To support different data sources and formats via plugins.
+- Extensible via plugins for data sources and formats.
 
 
 ----------

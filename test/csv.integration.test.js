@@ -21,8 +21,8 @@ describe('csv.integration', function () {
 				"Value3",
 			],
 			[
-				[new Date(1975, 24, 2), 100, 'foo', 11],
-				[new Date(2015, 24, 2), 200, 'bar', 22],
+				['1975-2-24', 100, 'foo', 11],
+				['2015-2-24', 200, 'bar', 22],
 			]
 		);		
 	}; 
@@ -41,14 +41,9 @@ describe('csv.integration', function () {
 			"2015-10-23, 300, bar, 23"
 		);
 		
-		var csvOptions = {
-			index_col: 'Date',
-			parse_dates: ['Date',],			
-		};
-		
 		return dataForge
 			.from(file(testFile))
-			.as(csv(csvOptions))
+			.as(csv())
 			.then(function (dataFrame) {
 				var series1 = dataFrame.getColumn('Value1');
 				expect(series1.getValues()).to.eql([
@@ -70,8 +65,8 @@ describe('csv.integration', function () {
 				]);
 				
 				expect(dataFrame.getValues()).to.eql([
-					[moment('1975-2-24').toDate(), 100, "foo", 22],
-					[moment('2015-10-23').toDate(), 300, "bar", 23],			
+					['1975-2-24', 100, "foo", 22],
+					['2015-10-23', 300, "bar", 23],			
 				]);
 				
 				var dataFrame2 = dataFrame.getColumnsSubset(['Value1', 'Value3']); 
@@ -100,14 +95,11 @@ describe('csv.integration', function () {
 				var data = fs.readFileSync(testFile, 'utf8');
 				return dataForge
 					.from(file(testFile))
-					.as(csv({
-						parse_dates: ['Date',],			
-					}));
+					.as(csv());
 			})
 			.then(function (loadedDataFrame) {
 				expect(loadedDataFrame.getColumnNames()).to.eql(dataFrame.getColumnNames());
-				expect(loadedDataFrame.getValues()).to.eql(dataFrame.getValues());
-				
+				expect(loadedDataFrame.getValues()).to.eql(dataFrame.getValues());				
 			});
 	});
 });

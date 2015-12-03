@@ -14,9 +14,6 @@ module.exports = function (options) {
 	if (!options) {
 		options = {};
 	}
-	if (!options.parse_dates) {
-		options.parse_dates = [];			
-	}
 
 	return {
 

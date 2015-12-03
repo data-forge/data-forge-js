@@ -31,9 +31,6 @@ module.exports = function (rows, options) {
 	if (!options) {
 		options = {};
 	}
-	if (!options.parse_dates) {
-		options.parse_dates = [];		
-	}
 
 	if (rows.length == 0) {
 		// Handle empty set of rows.
@@ -46,12 +43,6 @@ module.exports = function (rows, options) {
 		.skip(1) // Skip header.
 		.toArray();	
 		
-	var parseDates = E
-		.from(columnNames)
-		.select(function (columnName) {
-			return options.parse_dates.indexOf(columnName) >= 0;
-		})	
-		.toArray();				
 	var values = E 
 		.from(rows)
 		.skip(1) // Skip header.
@@ -68,18 +59,6 @@ module.exports = function (rows, options) {
 					}					
 				})
 				.toArray();					
-		})
-		.select(function (row) { // Parse requested dates.
-			var out = [];
-			for (var i = 0; i < row.length; ++i) {
-				if (parseDates[i]) {
-					out.push(moment(row[i]).toDate());	
-				}
-				else {
-					out.push(row[i]);
-				}						
-			} 			
-			return out;			
 		})
 		.toArray();	
 		
