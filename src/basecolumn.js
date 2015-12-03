@@ -712,18 +712,15 @@ BaseColumn.prototype.detectTypes = function () {
 		})
 		.toArray();
 
-	var LazyColumn = require('./lazycolumn');
-	var newColumnName = self.getName() + " types";
-	return new LazyColumn(
-		newColumnName,
+	var LazyDataFrame = require('./lazydataframe');
+	return new LazyDataFrame(
+		function () {
+			return ["type", "frequency"];
+		},
 		function () {
 			return rows;
-		}, 
-		function () {
-			var Index = require('./index');
-			return new Index(newColumnName, ["type", "frequency"]);
 		}
-	)
+	);
 };
 
 module.exports = BaseColumn;

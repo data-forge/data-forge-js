@@ -470,7 +470,8 @@ describe('BaseColumn', function () {
 
 		var column = initColumn([1], [1]);
 		var types = column.detectTypes();
-		expect(types.getIndex().getValues()).to.eql(['type', 'frequency']);
+		expect(types.getColumnNames()).to.eql(['type', 'frequency']);
+		expect(types.getIndex().getValues()).to.eql([0]);
 		expect(types.getValues()).to.eql([
 			['number', 100]
 		]);
@@ -480,7 +481,8 @@ describe('BaseColumn', function () {
 
 		var column = initColumn([1], [new Date(2015, 1, 1)]);
 		var types = column.detectTypes();
-		expect(types.getIndex().getValues()).to.eql(['type', 'frequency']);
+		expect(types.getColumnNames()).to.eql(['type', 'frequency']);
+		expect(types.getIndex().getValues()).to.eql([0]);
 		expect(types.getValues()).to.eql([
 			['date', 100]
 		]);
@@ -490,7 +492,8 @@ describe('BaseColumn', function () {
 
 		var column = initColumn([1, 2], [1, 'foo']);
 		var types = column.detectTypes();
-		expect(types.getIndex().getValues()).to.eql(['type', 'frequency']);
+		expect(types.getColumnNames()).to.eql(['type', 'frequency']);
+		expect(types.getIndex().getValues()).to.eql([0, 1]);
 		expect(types.getValues()).to.eql([
 			['number', 50],
 			['string', 50],
