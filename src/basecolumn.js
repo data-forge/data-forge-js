@@ -673,8 +673,9 @@ BaseColumn.prototype.toStrings = function () {
 
 /** 
   * Detect the actual types of the values that comprised the column and their frequency.
+  * Returns a new column containing the type information.
   */
-BaseColumn.prototype.detectActualTypes = function () {
+BaseColumn.prototype.detectTypes = function () {
 
 	var self = this;
 	var values = self.getValues();
@@ -702,14 +703,27 @@ BaseColumn.prototype.detectActualTypes = function () {
 
 	var distinctTypes = Object.keys(typeFrequencies);
 	var total = values.length;
-	return E.from(distinctTypes)
+	var rows = E.from(distinctTypes)
 		.select(function (valueType) {
-			return {
-				type: valueType,
-				frequency: (typeFrequencies[valueType].count / total) * 100
-			};
+			return [
+				valueType,
+				(typeFrequencies[valueType].count / total) * 100
+			];
 		})
 		.toArray();
+
+	var LazyColumn = require('./lazycolumn');
+	var newColumnName = self.getName() + " types";
+	return new LazyColumn(
+		newColumnName,
+		function () {
+			return rows;
+		}, 
+		function () {
+			var Index = require('./index');
+			return new Index(newColumnName, ["type", "frequency"]);
+		}
+	)
 };
 
 module.exports = BaseColumn;
