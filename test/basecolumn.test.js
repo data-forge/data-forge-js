@@ -331,4 +331,121 @@ describe('BaseColumn', function () {
 		expect(pctChanged.getIndex().getValues()).to.eql([1, 2, 3]);
 		expect(pctChanged.getValues()).to.eql([1, 1, 1]);
 	});
+
+	//todo: what happens when parsing floats as int?
+	//todo: what should happen when running parseInt on a non string column?
+
+	it('can parse string column to int', function () {
+
+		var column = initColumn([10, 5, 2], ['1', '100', '5']);
+		var parsed = column.parseInt();
+
+		expect(parsed.getIndex().getValues()).to.eql([10, 5, 2]);
+		expect(parsed.getValues()).to.eql([1, 100, 5]);
+	});
+
+	it('can parse string column to int - with empty string', function () {
+
+		var column = initColumn([10], ['']);
+		var parsed = column.parseInt();
+
+		expect(parsed.getIndex().getValues()).to.eql([10]);
+		expect(parsed.getValues()).to.eql([undefined]);
+	});
+
+	it('can parse string column to int - with undefined', function () {
+
+		var column = initColumn([10], [undefined]);
+		var parsed = column.parseInt();
+
+		expect(parsed.getIndex().getValues()).to.eql([10]);
+		expect(parsed.getValues()).to.eql([undefined]);
+	});
+
+	it('can parse string column to int - throws when source value is not a string', function () {
+
+		var column = initColumn([10], [5]);
+		var parsed = column.parseInt();
+
+		expect(parsed.getIndex().getValues()).to.eql([10]);
+		expect(function () { 
+			parsed.getValues();
+		}).to.throw();
+	});
+
+	it('can parse string column to float', function () {
+
+		var column = initColumn([10, 5, 2], ['1', '100.2020', '5.5']);
+		var parsed = column.parseFloat();
+
+		expect(parsed.getIndex().getValues()).to.eql([10, 5, 2]);
+		expect(parsed.getValues()).to.eql([1, 100.2020, 5.5]);
+	});
+
+	it('can parse string column to float - with empty string', function () {
+
+		var column = initColumn([10], ['']);
+		var parsed = column.parseFloat();
+
+		expect(parsed.getIndex().getValues()).to.eql([10]);
+		expect(parsed.getValues()).to.eql([undefined]);
+	});
+
+	it('can parse string column to float - with undefined', function () {
+
+		var column = initColumn([10], [undefined]);
+		var parsed = column.parseFloat();
+
+		expect(parsed.getIndex().getValues()).to.eql([10]);
+		expect(parsed.getValues()).to.eql([undefined]);
+	});
+
+	it('can parse string column to float - throws when source value is not a string', function () {
+
+		var column = initColumn([10], [5]);
+		var parsed = column.parseFloat();
+
+		expect(parsed.getIndex().getValues()).to.eql([10]);
+		expect(function () { 
+			parsed.getValues();
+		}).to.throw();
+	});
+
+	it('can parse string column to date', function () {
+
+		var column = initColumn([10, 5], ['1975-2-24', '2015-2-24']);
+		var parsed = column.parseDate();
+
+		expect(parsed.getIndex().getValues()).to.eql([10, 5]);
+		expect(parsed.getValues()).to.eql([new Date(1975, 1, 24), new Date(2015, 1, 24)]); // Note months are 0-based here.
+	});
+
+	it('can parse string column to date - with empty string', function () {
+
+		var column = initColumn([10], ['']);
+		var parsed = column.parseDate();
+
+		expect(parsed.getIndex().getValues()).to.eql([10]);
+		expect(parsed.getValues()).to.eql([undefined]);
+	});
+
+	it('can parse string column to date - with undefined', function () {
+
+		var column = initColumn([10], [undefined]);
+		var parsed = column.parseDate();
+
+		expect(parsed.getIndex().getValues()).to.eql([10]);
+		expect(parsed.getValues()).to.eql([undefined]);
+	});
+
+	it('can parse string column to date - throws when source value is not a string', function () {
+
+		var column = initColumn([10], [5]);
+		var parsed = column.parseDate();
+
+		expect(parsed.getIndex().getValues()).to.eql([10]);
+		expect(function () { 
+			parsed.getValues();
+		}).to.throw();
+	});
 });

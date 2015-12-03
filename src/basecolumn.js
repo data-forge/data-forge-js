@@ -6,6 +6,7 @@
 
 var assert = require('chai').assert; 
 var E = require('linq');
+var moment = require('moment');
 
 
 /**
@@ -338,7 +339,7 @@ var orderThenBy = function (self, batch, nextSortMethod) {
 	validateSortMethod(nextSortMethod);
 	
 	return function (sortSelector) {
-		assert.isFunction(sortSelector, "Expected parameter 'sortSelector' to be a function")
+		assert.isFunction(sortSelector, "Expected parameter 'sortSelector' to be a function");
 
 		var extendedBatch = batch.concat([
 			{
@@ -582,6 +583,108 @@ BaseColumn.prototype.percentChange = function () {
 		var amountChange = window[1] - window[0];
 		return [index[1], amountChange / window[0]];
 	});
+};
+
+/**
+ * Parse a column with string values to a column with int values.
+ */
+BaseColumn.prototype.parseInt = function () {
+
+	var self = this;
+	
+	var LazyColumn = require('./lazycolumn');
+	return new LazyColumn(
+		self.getName(),
+		function () {
+			return E.from(self.getValues())
+				.select(function (value, valueIndex) {
+					if (value === undefined) {
+						return undefined;
+					}
+					else {
+						assert.isString(value, "Called parseInt on column '" + self.getName() + "', expected all values in the column to be strings, instead found a '" + typeof(value) + "' at index " + valueIndex);
+
+						if (value.length === 0) {
+							return undefined;
+						}
+
+						return parseInt(value);
+					}
+				})
+				.toArray();
+		},
+		function () {
+			return self.getIndex();
+		}
+	);
+};
+
+/**
+ * Parse a column with string values to a column with float values.
+ */
+BaseColumn.prototype.parseFloat = function () {
+
+	var self = this;
+	
+	var LazyColumn = require('./lazycolumn');
+	return new LazyColumn(
+		self.getName(),
+		function () {
+			return E.from(self.getValues())
+				.select(function (value, valueIndex) {
+					if (value === undefined) {
+						return undefined;
+					}
+					else {
+						assert.isString(value, "Called parseInt on column '" + self.getName() + "', expected all values in the column to be strings, instead found a '" + typeof(value) + "' at index " + valueIndex);
+
+						if (value.length === 0) {
+							return undefined;
+						}
+
+						return parseFloat(value);
+					}				
+				})
+				.toArray();
+		},
+		function () {
+			return self.getIndex();
+		}
+	);
+};
+
+/**
+ * Parse a column with string values to a column with date values.
+ */
+BaseColumn.prototype.parseDate = function () {
+
+	var self = this;
+	
+	var LazyColumn = require('./lazycolumn');
+	return new LazyColumn(
+		self.getName(),
+		function () {
+			return E.from(self.getValues())
+				.select(function (value, valueIndex) {
+					if (value === undefined) {
+						return undefined;
+					}
+					else {
+						assert.isString(value, "Called parseInt on column '" + self.getName() + "', expected all values in the column to be strings, instead found a '" + typeof(value) + "' at index " + valueIndex);
+
+						if (value.length === 0) {
+							return undefined;
+						}
+
+						return moment(value).toDate();
+					}
+				})
+				.toArray();
+		},
+		function () {
+			return self.getIndex();
+		}
+	);
 };
 
 module.exports = BaseColumn;
