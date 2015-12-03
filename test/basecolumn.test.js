@@ -476,7 +476,18 @@ describe('BaseColumn', function () {
 				frequency: 100
 			}
 		]);
+	});
 
+	it('can detect date column type', function () {
+
+		var column = initColumn([1], [new Date(2015, 1, 1)]);
+		var types = column.detectActualTypes();
+		expect(types).to.eql([
+			{
+				type: 'date',
+				frequency: 100
+			}
+		]);
 	});
 
 	it('can detect multiple column types', function () {
@@ -491,7 +502,7 @@ describe('BaseColumn', function () {
 			{
 				type: 'string',
 				frequency: 50
-			}
+			},
 		]);
 
 	});

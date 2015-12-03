@@ -680,7 +680,13 @@ BaseColumn.prototype.detectActualTypes = function () {
 	var values = self.getValues();
 	var typeFrequencies = E.from(values)
 		.select(function (value) {
-			return typeof(value);
+			var valueType = typeof(value);
+			if (valueType === 'object') {
+				if (Object.isDate(value)) {
+					valueType = 'date';
+				}
+			}
+			return valueType;
 		})
 		.aggregate({}, function (accumulated, valueType) {
 			var typeInfo = accumulated[valueType];
