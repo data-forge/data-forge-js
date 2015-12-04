@@ -68,7 +68,7 @@ module.exports = function (options) {
 					})
 					.select(function (col) { // Strip newlines... these don't work in CSV files.
 						if (Object.isString(col)) { //todo: not necessar if all columns are converted to strings.
-							return col.replace('\r\n', ' ').replace('\n', ' ');
+							return col.replace(/\r\n/g, ' ').replace(/\n/g, ' ');
 						}
 						else {
 							return col;

@@ -137,7 +137,7 @@ describe('format/csv', function () {
 	it('newlines are automatically stripped from strings when saving a csv', function () {
 
 		var dataFrame = new dataForge.DataFrame(["Column1"], [
-			['First line\nsecond line'],
+			['First line\nsecond line\nthird line'],
 			['1st line\r\n2nd line'],
 		]);
 
@@ -148,7 +148,7 @@ describe('format/csv', function () {
 		assert.isString(csvData);
 		expect(csvData).to.eql(
 			"Column1\r\n" +
-			"First line second line\r\n" +
+			"First line second line third line\r\n" +
 			"1st line 2nd line"
 		);
 	});	
