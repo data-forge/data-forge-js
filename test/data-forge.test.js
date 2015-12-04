@@ -241,7 +241,6 @@ describe('data-forge', function () {
  		]);
 	});
 
-	/*todo:
 	it('concat can handle uneven columns', function () {
 
 	 	var df1 = initDataFrame(["1", "2"], [[1, 2], [3, 4]]);
@@ -254,10 +253,9 @@ describe('data-forge', function () {
 	 	expect(result.getValues()).to.eql([
  			[1, 2, undefined],
  			[3, 4, undefined],
- 			[undefined, 5, 6],
- 			[undefined, 7, 8],
+ 			[undefined, 6, 5],
+ 			[undefined, 8, 7],
  		]);
 	});
-	*/
 
 });
