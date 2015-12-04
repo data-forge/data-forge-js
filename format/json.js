@@ -20,8 +20,17 @@ module.exports = function (options) {
 		//
 		// Load a DataFrame from CSV text data.
 		//
-		from: function (jsonData) {
-			assert.isArray(jsonData, "Expected 'jsonData' parameter to 'json.from' to be an array of objects.");
+		from: function (inputJsonData) {
+
+			var jsonData;
+			if (Object.isArray(inputJsonData)) {
+				jsonData = inputJsonData;
+			}
+			else {
+				assert.isString(inputJsonData, "Expected 'jsonData' parameter to 'json.from' to be an array or a string containing JSON data.");	
+
+				jsonData = JSON.parse(inputJsonData);
+			}		
 
 			var headers = E.from(jsonData)
 				.selectMany(function (obj) {

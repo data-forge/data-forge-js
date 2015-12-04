@@ -34,6 +34,29 @@ describe('format/json', function () {
 		]);
 	});
 
+	it('error loading from empty string', function () {
+
+		var options = {};
+		var jsonFormatter = json(options);
+
+		var jsonData = "";
+		expect(function () {
+			jsonFormatter.from(jsonData);
+		}).to.throw();
+	});
+
+	it('can load from string with empty json array', function () {
+
+		var options = {};
+		var jsonFormatter = json(options);
+
+		var jsonData = "[]";
+		var dataFrame = jsonFormatter.from(jsonData);
+
+		expect(dataFrame.getColumnNames().length).to.eql(0);
+		expect(dataFrame.getValues().length).to.eql(0);
+	});
+
 	it('can load from json array', function () {
 
 		var options = {};
@@ -49,6 +72,30 @@ describe('format/json', function () {
 				'Column2': 2
 			}
 		];
+		var dataFrame = jsonFormatter.from(jsonData);
+
+		expect(dataFrame.getColumnNames()).to.eql(['Column1', 'Column2']);
+		expect(dataFrame.getValues()).to.eql([
+			['A', 1],
+			['B', 2],
+		]);
+	});
+
+	it('can load from string with json array', function () {
+
+		var options = {};
+		var jsonFormatter = json(options);
+
+		var jsonData = '[' +
+			'{' +
+			'	"Column1": "A",' +
+			'	"Column2": 1' +
+			'},' +
+			'{' +
+			'   "Column1": "B",' +
+			'	"Column2": 2' +
+			'}' +
+		']';
 		var dataFrame = jsonFormatter.from(jsonData);
 
 		expect(dataFrame.getColumnNames()).to.eql(['Column1', 'Column2']);
