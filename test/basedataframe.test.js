@@ -837,8 +837,7 @@ describe('BaseDataFrame', function () {
 
 		var detectedTypes = dataFrame.detectTypes();
 		expect(detectedTypes.getColumnNames()).to.eql(["type", "frequency", "column"]); //todo: upper case these.
-		expect(detectedTypes.getIndex().getValues()).to.eql([0, 1, 2]);
-		console.log(detectedTypes.getValues()); //fio:
+		expect(detectedTypes.getIndex().getValues()).to.eql([0, 0, 1]);
 		expect(detectedTypes.getValues()).to.eql([
 			['date', 100, "Date"],
 			['string', 50, "Value1"],

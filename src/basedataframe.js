@@ -933,7 +933,7 @@ BaseDataFrame.prototype.detectTypes = function () { //todo: make lazy.
 
 	var DataFrame = require('./dataframe');
 
-	var accumulatedValues = E.from(self.getColumns())
+	var dataFrames = E.from(self.getColumns())
 		.select(function (column) {
 			//todo: need tobe able to create a column from a single value.
 			var numValues = column.getValues().length;
@@ -941,15 +941,9 @@ BaseDataFrame.prototype.detectTypes = function () { //todo: make lazy.
 			var columnNameColumn = new Column('column', E.range(0, numValues).select(function () { return column.getName(); }).toArray());
 			return column.detectTypes().setColumn('column', columnNameColumn);
 		})
-		.aggregate([], function (accumulated, dataFrame) {
-			//todo: return accumulated.concat(dataFrame); //todo: need to implement concat.
-			return accumulated.concat(dataFrame.getValues());
-		});
-
-	return new DataFrame(
-		["type", "frequency", "column"],
-		accumulatedValues
-	);
+		.toArray();
+	var dataForge = require('../index');
+	return dataForge.concat(dataFrames);
 };
 
 /**
