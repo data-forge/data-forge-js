@@ -927,7 +927,7 @@ BaseDataFrame.prototype.toStrings = function (columnNameOrIndex) {
 /**
  * Detect actual types and their frequencies contained within columns in the data frame.
  */
-BaseDataFrame.prototype.detectTypes = function () { //todo: make lazy.
+BaseDataFrame.prototype.detectTypes = function () {
 
 	var self = this;
 
