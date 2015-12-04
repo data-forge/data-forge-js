@@ -501,4 +501,28 @@ describe('BaseColumn', function () {
 
 	});
 
+	it('can truncate string values', function () {
+
+		var column = initColumn([1, 2], ['foo', 'bar']);
+		var truncated = column.truncateStrings(2);
+
+		expect(truncated.getIndex().getValues()).to.eql([1, 2]);
+		expect(truncated.getValues()).to.eql(['fo', 'ba']);
+	});
+
+	it('truncation ignores strings that are already short enough', function () {
+
+		var column = initColumn([1, 2], ['foo', 'bar']);
+		var truncated = column.truncateStrings(20);
+
+		expect(truncated.getValues()).to.eql(['foo', 'bar']);
+	});
+
+	it('truncation passes through other values', function () {
+
+		var column = initColumn([1, 2, 3, 4], [null, undefined, 1, new Date(2015, 1, 1)]);
+		var truncated = column.truncateStrings(20);
+
+		expect(truncated.getValues()).to.eql([null, undefined, 1, new Date(2015, 1, 1)]);
+	});
 });

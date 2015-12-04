@@ -722,4 +722,26 @@ BaseColumn.prototype.detectTypes = function () {
 	);
 };
 
+/**
+ * Produces a new column with all string values truncated to the requested maximum length.
+ *
+ * @param {int} maxLength - The maximum length of the string values after truncation.
+ */
+BaseColumn.prototype.truncateStrings = function (maxLength) {
+	assert.isNumber(maxLength, "Expected 'maxLength' parameter to 'truncateStrings' to be an integer.");
+
+	var self = this;
+	return self
+		.select(function (value) {
+			if (Object.isString(value)) {
+				if (value.length > maxLength) {
+					return value.substring(0, maxLength);
+				}
+			}
+
+			return value;
+		});
+};
+
+
 module.exports = BaseColumn;
