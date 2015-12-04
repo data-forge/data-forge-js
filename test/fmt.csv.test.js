@@ -133,4 +133,23 @@ describe('format/csv', function () {
 			"B,2"
 		);
 	});
+
+	it('newlines are automatically stripped from strings when saving a csv', function () {
+
+		var dataFrame = new dataForge.DataFrame(["Column1"], [
+			['First line\nsecond line'],
+			['1st line\r\n2nd line'],
+		]);
+
+		var options = {};
+		var csvFormatter = csv(options);
+		var csvData = csvFormatter.to(dataFrame);
+
+		assert.isString(csvData);
+		expect(csvData).to.eql(
+			"Column1\r\n" +
+			"First line second line\r\n" +
+			"1st line 2nd line"
+		);
+	});	
 });
