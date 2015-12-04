@@ -332,9 +332,6 @@ describe('BaseColumn', function () {
 		expect(pctChanged.getValues()).to.eql([1, 1, 1]);
 	});
 
-	//todo: what happens when parsing floats as int?
-	//todo: what should happen when running parseInt on a non string column?
-
 	it('can parse string column to int', function () {
 
 		var column = initColumn([10, 5, 2], ['1', '100', '5']);

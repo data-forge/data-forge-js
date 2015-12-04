@@ -952,5 +952,38 @@ BaseDataFrame.prototype.detectTypes = function () { //todo: make lazy.
 	);
 };
 
+/**
+ * Produces a new data frame with all string values truncated to the requested maximum length.
+ *
+ * @param {int} maxLength - The maximum length of the string values after truncation.
+ */
+BaseDataFrame.prototype.truncateStrings = function (maxLength) {
+	assert.isNumber(maxLength, "Expected 'maxLength' parameter to 'truncateStrings' to be an integer.");
+
+	var self = this;
+	var truncatedValues = E.from(self.getValues())
+		.select(function (row) {
+			return E.from(row)
+				.select(function (value) {
+					if (Object.isString(value)) {
+						if (value.length > maxLength) {
+							return value.substring(0, maxLength);
+						}
+					}
+
+					return value;
+				})
+				.toArray();
+		})
+		.toArray();
+
+	var DataFrame = require('./dataframe');
+	return new DataFrame(
+		self.getColumnNames(),
+		truncatedValues,
+		self.getIndex()
+	);
+};
+
 
 module.exports = BaseDataFrame;

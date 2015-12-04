@@ -844,7 +844,23 @@ describe('BaseDataFrame', function () {
 			['string', 50, "Value1"],
 			['number', 50, "Value1"],
 		]);
+	});
 
+	it('can truncate string values', function () {
 
+		var dataFrame = initDataFrame(
+			["Col1", "Col2"],
+			[
+				["Long string", "Short"],
+				["Small", "Even longer string"],
+			],
+			[1, 2]
+		);
+
+		var truncated = dataFrame.truncateStrings(10);
+		expect(truncated.getValues()).to.eql([
+			["Long strin", "Short"],
+			["Small", "Even longe"],
+		]);
 	});
 });
