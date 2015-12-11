@@ -12,7 +12,7 @@ This project is a work in progress, please don't use unless you want to be an ea
 
 # Generated API docs
 
-See here for [generated API docs](./blob/master/docs/api.md) that are taking shape.
+See here for [generated API docs](./docs/api.md) that are taking shape.
 
 # Contents
 
