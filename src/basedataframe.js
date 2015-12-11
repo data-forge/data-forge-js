@@ -994,28 +994,34 @@ BaseDataFrame.prototype.remapColumns = function (columnNames) {
 	});
 
 	var self = this;
-	var newValues = E.from(self.getValues())
-		.select(function (row) {
-			return E.from(columnNames)
-				.select(function (columnName) {
-					var columnIndex = self.getColumnIndex(columnName);
-					if (columnIndex >= 0) {
-						return row[columnIndex];
-					}
-					else { 
-						// Column doesn't exist.
-						return undefined;
-					}
+
+ 	var LazyDataFrame = require('./lazydataframe');
+	return new LazyDataFrame(
+		function () {
+			return columnNames;
+		},
+		function () {
+			var newValues = E.from(self.getValues())
+				.select(function (row) {
+					return E.from(columnNames)
+						.select(function (columnName) {
+							var columnIndex = self.getColumnIndex(columnName);
+							if (columnIndex >= 0) {
+								return row[columnIndex];
+							}
+							else { 
+								// Column doesn't exist.
+								return undefined;
+							}
+						})
+						.toArray();
 				})
 				.toArray();
-		})
-		.toArray();
-
- 	var DataFrame = require('./dataframe');
-	return new DataFrame(
-		columnNames,
-		newValues,
-		self.getIndex()
+			return newValues;
+		},
+		function () {
+			return self.getIndex();
+		}		
 	);
 };
 
