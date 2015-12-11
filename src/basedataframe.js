@@ -851,7 +851,7 @@ BaseDataFrame.prototype.resetIndex = function () {
 			return self.getValues();
 		},
 		function () {
-			return new LazyIndex(
+			return new LazyIndex( //todo: broad-cast index
 				"__index___",
 				function () {
 					return E.range(0, self.getValues().length).toArray();
@@ -935,9 +935,9 @@ BaseDataFrame.prototype.detectTypes = function () {
 
 	var dataFrames = E.from(self.getColumns())
 		.select(function (column) {
-			//todo: need tobe able to create a column from a single value.
 			var numValues = column.getValues().length;
 			var Column = require('./column');
+			//todo: broad-cast column
 			var columnNameColumn = new Column('column', E.range(0, numValues).select(function () { return column.getName(); }).toArray());
 			return column.detectTypes().setColumn('column', columnNameColumn);
 		})
@@ -975,6 +975,46 @@ BaseDataFrame.prototype.truncateStrings = function (maxLength) {
 	return new DataFrame(
 		self.getColumnNames(),
 		truncatedValues,
+		self.getIndex()
+	);
+};
+
+/**
+ * Create a new data frame with columns reordered.
+ * New column names create new columns (with undefined values), omitting existing column names causes those columns to be dropped.
+ * 
+ * @param {array} columnNames - The new order for columns. 
+ */
+BaseDataFrame.prototype.remapColumns = function (columnNames) {
+
+	assert.isArray(columnNames, "Expected parameter 'columnNames' to remapColumns to be an array with column names.");
+
+	columnNames.forEach(function (columnName) {
+		assert.isString(columnName, "Expected parameter 'columnNames' to remapColumns to be an array with column names.");
+	});
+
+	var self = this;
+	var newValues = E.from(self.getValues())
+		.select(function (row) {
+			return E.from(columnNames)
+				.select(function (columnName) {
+					var columnIndex = self.getColumnIndex(columnName);
+					if (columnIndex >= 0) {
+						return row[columnIndex];
+					}
+					else { 
+						// Column doesn't exist.
+						return undefined;
+					}
+				})
+				.toArray();
+		})
+		.toArray();
+
+ 	var DataFrame = require('./dataframe');
+	return new DataFrame(
+		columnNames,
+		newValues,
 		self.getIndex()
 	);
 };
