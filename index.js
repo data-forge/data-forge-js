@@ -6,7 +6,7 @@ var dropElement = require('./src/utils').dropElement;
 require('sugar');
 
 /**
- * Main namespace for Panjas.
+ * Main namespace for Data-Forge.
  * 
  * Nodejs:
  * 

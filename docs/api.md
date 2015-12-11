@@ -1,7 +1,7 @@
 ## Members
 <dl>
 <dt><a href="#dataForge">dataForge</a></dt>
-<dd><p>Main namespace for Panjas.</p>
+<dd><p>Main namespace for Data-Forge.</p>
 <p>Nodejs:</p>
 <pre><code>    npm install --save data-forge
 
@@ -14,6 +14,9 @@
 </dl>
 ## Functions
 <dl>
+<dt><a href="#as">as()</a></dt>
+<dd><p>Convert DataFrame from a particular data format using a plugable format.</p>
+</dd>
 <dt><a href="#as">as()</a></dt>
 <dd><p>Convert DataFrame from a particular data format using a plugable format.</p>
 </dd>
@@ -51,17 +54,24 @@ getValues - Get the values for the data frame.</p>
 </dl>
 <a name="dataForge"></a>
 ## dataForge
-Main namespace for Panjas.Nodejs:		npm install --save data-forge				var dataForge = require('data-forge');Browser:		bower install --save data-forge		<script language="javascript" type="text/javascript" src="bower_components/data-forge/data-forge.js"></script>
+Main namespace for Data-Forge.Nodejs:		npm install --save data-forge				var dataForge = require('data-forge');Browser:		bower install --save data-forge		<script language="javascript" type="text/javascript" src="bower_components/data-forge/data-forge.js"></script>
 
 **Kind**: global variable  
 
 * [dataForge](#dataForge)
   * [.from()](#dataForge.from)
+  * [.fromSync()](#dataForge.fromSync)
   * [.merge(leftDataFrame, rightDataFrame, [columnName])](#dataForge.merge)
+  * [.concat(dataFrames)](#dataForge.concat)
 
 <a name="dataForge.from"></a>
 ### dataForge.from()
-Read a DataFrame from a plugable data source.
+Read a DataFrame asynchronously from a plugable data source.
+
+**Kind**: static method of <code>[dataForge](#dataForge)</code>  
+<a name="dataForge.fromSync"></a>
+### dataForge.fromSync()
+Read a DataFrame synchronously from a plugable data source.
 
 **Kind**: static method of <code>[dataForge](#dataForge)</code>  
 <a name="dataForge.merge"></a>
@@ -76,6 +86,21 @@ Merge data frames by index or a particular column.
 | rightDataFrame | <code>DataFrame</code> | The other data frame to merge. |
 | [columnName] | <code>string</code> | The name of the column to merge on. Optional, when not specified merge is based on the index. |
 
+<a name="dataForge.concat"></a>
+### dataForge.concat(dataFrames)
+Concatenate multiple data frames into a single.
+
+**Kind**: static method of <code>[dataForge](#dataForge)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| dataFrames | <code>array</code> | Array of data frames to concatenate. |
+
+<a name="as"></a>
+## as()
+Convert DataFrame from a particular data format using a plugable format.
+
+**Kind**: global function  
 <a name="as"></a>
 ## as()
 Convert DataFrame from a particular data format using a plugable format.
@@ -102,6 +127,12 @@ Base class for columns.getName - Get the name of the column.getValues - Get t
   * [.reindex(newIndex)](#BaseColumn+reindex)
   * [.toString()](#BaseColumn+toString)
   * [.percentChange()](#BaseColumn+percentChange)
+  * [.parseInts()](#BaseColumn+parseInts)
+  * [.parseFloats()](#BaseColumn+parseFloats)
+  * [.parseDates()](#BaseColumn+parseDates)
+  * [.toStrings()](#BaseColumn+toStrings)
+  * [.detectTypes()](#BaseColumn+detectTypes)
+  * [.truncateStrings(maxLength)](#BaseColumn+truncateStrings)
 
 <a name="BaseColumn+skip"></a>
 ### baseColumn.skip(numRows)
@@ -225,6 +256,41 @@ Format the data frame for display as a string.
 Compute the percent change for each row after the first.Percentages are expressed as 0-1 values.
 
 **Kind**: instance method of <code>[BaseColumn](#BaseColumn)</code>  
+<a name="BaseColumn+parseInts"></a>
+### baseColumn.parseInts()
+Parse a column with string values to a column with int values.
+
+**Kind**: instance method of <code>[BaseColumn](#BaseColumn)</code>  
+<a name="BaseColumn+parseFloats"></a>
+### baseColumn.parseFloats()
+Parse a column with string values to a column with float values.
+
+**Kind**: instance method of <code>[BaseColumn](#BaseColumn)</code>  
+<a name="BaseColumn+parseDates"></a>
+### baseColumn.parseDates()
+Parse a column with string values to a column with date values.
+
+**Kind**: instance method of <code>[BaseColumn](#BaseColumn)</code>  
+<a name="BaseColumn+toStrings"></a>
+### baseColumn.toStrings()
+Convert a column of values of different types to a column of string values.
+
+**Kind**: instance method of <code>[BaseColumn](#BaseColumn)</code>  
+<a name="BaseColumn+detectTypes"></a>
+### baseColumn.detectTypes()
+Detect the actual types of the values that comprised the column and their frequency.Returns a new column containing the type information.
+
+**Kind**: instance method of <code>[BaseColumn](#BaseColumn)</code>  
+<a name="BaseColumn+truncateStrings"></a>
+### baseColumn.truncateStrings(maxLength)
+Produces a new column with all string values truncated to the requested maximum length.
+
+**Kind**: instance method of <code>[BaseColumn](#BaseColumn)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| maxLength | <code>int</code> | The maximum length of the string values after truncation. |
+
 <a name="BaseDataFrame"></a>
 ## BaseDataFrame()
 Base class for data frames.Derived classes must implement:getIndex - Get the index for the data frame.getColumnNames - Get the columns for the data frame.getValues - Get the values for the data frame.
@@ -247,6 +313,12 @@ Base class for data frames.Derived classes must implement:getIndex - Get the
   * [.setIndex(columnNameOrIndex)](#BaseDataFrame+setIndex)
   * [.resetIndex()](#BaseDataFrame+resetIndex)
   * [.toString()](#BaseDataFrame+toString)
+  * [.parseInts()](#BaseDataFrame+parseInts)
+  * [.parseFloats()](#BaseDataFrame+parseFloats)
+  * [.parseDates()](#BaseDataFrame+parseDates)
+  * [.toStrings()](#BaseDataFrame+toStrings)
+  * [.detectTypes()](#BaseDataFrame+detectTypes)
+  * [.truncateStrings(maxLength)](#BaseDataFrame+truncateStrings)
 
 <a name="BaseDataFrame+getColumnIndex"></a>
 ### baseDataFrame.getColumnIndex(columnName) ⇒ <code>Number</code>
@@ -386,6 +458,41 @@ Reset the index of the data frame back to the default sequential integer index.
 Format the data frame for display as a string.
 
 **Kind**: instance method of <code>[BaseDataFrame](#BaseDataFrame)</code>  
+<a name="BaseDataFrame+parseInts"></a>
+### baseDataFrame.parseInts()
+Parse a column with string values to a column with int values.
+
+**Kind**: instance method of <code>[BaseDataFrame](#BaseDataFrame)</code>  
+<a name="BaseDataFrame+parseFloats"></a>
+### baseDataFrame.parseFloats()
+Parse a column with string values to a column with float values.
+
+**Kind**: instance method of <code>[BaseDataFrame](#BaseDataFrame)</code>  
+<a name="BaseDataFrame+parseDates"></a>
+### baseDataFrame.parseDates()
+Parse a column with string values to a column with date values.
+
+**Kind**: instance method of <code>[BaseDataFrame](#BaseDataFrame)</code>  
+<a name="BaseDataFrame+toStrings"></a>
+### baseDataFrame.toStrings()
+Convert a column of values of different types to a column of string values.
+
+**Kind**: instance method of <code>[BaseDataFrame](#BaseDataFrame)</code>  
+<a name="BaseDataFrame+detectTypes"></a>
+### baseDataFrame.detectTypes()
+Detect actual types and their frequencies contained within columns in the data frame.
+
+**Kind**: instance method of <code>[BaseDataFrame](#BaseDataFrame)</code>  
+<a name="BaseDataFrame+truncateStrings"></a>
+### baseDataFrame.truncateStrings(maxLength)
+Produces a new data frame with all string values truncated to the requested maximum length.
+
+**Kind**: instance method of <code>[BaseDataFrame](#BaseDataFrame)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| maxLength | <code>int</code> | The maximum length of the string values after truncation. |
+
 <a name="BaseIndex"></a>
 ## BaseIndex()
 Base class for indexes.Derives classes must implement:		getName - Get the name of theindex.		getValues - Get the array of values from the index.
