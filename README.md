@@ -10,6 +10,10 @@ Works in both NodeJS and the browser.
 
 This project is a work in progress, please don't use unless you want to be an early adopter. Please expect API changes. Please contribute and help guide the direction of *data-forge*.
 
+# Generated API docs
+
+See here for [generated API docs](./blob/master/docs/api.md) that are taking shape.
+
 # Contents
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
