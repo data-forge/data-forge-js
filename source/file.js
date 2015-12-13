@@ -1,7 +1,7 @@
 'use strict';
 
 //
-// Implements input/output for the CSV format.
+// Implements input/output for text files.
 //
 
 var fs = require('fs');
