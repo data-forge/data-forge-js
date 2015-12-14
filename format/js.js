@@ -1,7 +1,7 @@
 'use strict';
 
 //
-// Implements input/output for the JSON format.
+// Implements input/output for Javascript objects.
 //
 
 var dataForge = require('../index');
@@ -18,22 +18,20 @@ module.exports = function (options) {
 	return {
 
 		//
-		// Load a DataFrame from JSON text data.
+		// Load a DataFrame from Javascript objects.
 		//
-		from: function (inputJsonData) {
+		from: function (jsData) {
 
-			assert.isString(inputJsonData, "Expected 'inputJsonData' parameter to 'json.from' to be a string containing JSON data.");	
+			assert.isArray(jsData, "Expected 'jsData' parameter to 'js.from' to be an array of Javascript objects.");	
 
-			var jsonData = JSON.parse(inputJsonData);
-
-			var headers = E.from(jsonData)
+			var headers = E.from(jsData)
 				.selectMany(function (obj) {
 					return Object.keys(obj);
 				})
 				.distinct()
 				.toArray();
 
-			var rows = E.from(jsonData)
+			var rows = E.from(jsData)
 				.select(function (obj) {
 					return E.from(headers)
 						.select(function (header) {
@@ -47,7 +45,7 @@ module.exports = function (options) {
 		},
 		
 		//
-		// Write DataFrame to JSON text data.
+		// Write DataFrame to json objects.
 		//
 		to: function (dataFrame) {
 
@@ -55,7 +53,7 @@ module.exports = function (options) {
 
 			var columnNames = dataFrame.getColumnNames();
 
-			return JSON.stringify(E.from(dataFrame.getValues())
+			return E.from(dataFrame.getValues())
 				.select(function (row) {
 					return E.from(columnNames)
 						.select(function (columnName, columnIndex) {
@@ -72,7 +70,7 @@ module.exports = function (options) {
 							}
 						);
 				})
-				.toArray(), null, 4);
+				.toArray();
 		},	
 	};
 };
