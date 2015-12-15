@@ -39,7 +39,6 @@ describe('BaseDataFrame', function () {
 		expect(dataFrame.getColumnIndex("Value1")).to.eql(1);
 		expect(dataFrame.getColumnIndex("Value2")).to.eql(2);
 		expect(dataFrame.getColumnIndex("Value3")).to.eql(3);
-
 	});
 	
 	it('can skip', function () {
@@ -921,5 +920,25 @@ describe('BaseDataFrame', function () {
 			[undefined, 11],
 			[undefined, 22],
 		]);
+	});
+
+	it('can rename columns', function () {
+
+		var dataFrame = initDataFrame(
+			[ "Col1", "Col2", "Col3" ],
+			[
+				[300, 'c', 3],
+				[200, 'b', 1],
+			],
+			[5, 6]
+		);
+		var newColumnNames = ["Val1", "Val2", "Val3"];
+		var renamed = dataFrame.renameColumns(newColumnNames);
+		expect(renamed.getColumnNames()).to.eql(newColumnNames);
+		var columns = renamed.getColumns();
+		expect(columns.length).to.eql(3);
+		expect(columns[0].getValues()).to.eql([300, 200]);
+		expect(columns[1].getValues()).to.eql(['c', 'b']);
+		expect(columns[2].getValues()).to.eql([3, 1]);
 	});
 });

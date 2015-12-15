@@ -1025,5 +1025,37 @@ BaseDataFrame.prototype.remapColumns = function (columnNames) {
 	);
 };
 
+/**
+ * Create a new data frame with different column names.
+ *
+ * @param {string array} newColumnNames - Array of strings, with an element for each existing column that specifies the new name of that column.
+ */
+BaseDataFrame.prototype.renameColumns = function (newColumnNames) {
+
+	var self = this;
+
+	var numExistingColumns = self.getColumnNames().length;
+
+	assert.isArray(newColumnNames, "Expected parameter 'newColumnNames' to renameColumns to be an array with column names.");
+	assert(newColumnNames.length === numExistingColumns, "Expected 'newColumnNames' array to have an element for each existing column. There are " + numExistingColumns + "existing columns.");
+
+	newColumnNames.forEach(function (newColumnName) {
+		assert.isString(newColumnName, "Expected new column name to be a string, intead got " + typeof(newColumnName));
+	});
+
+ 	var LazyDataFrame = require('./lazydataframe');
+	return new LazyDataFrame(
+		function () {
+			return newColumnNames;
+		},
+		function () {
+			return self.getValues();
+		},
+		function () {
+			return self.getIndex();
+		}
+	);
+};
+
 
 module.exports = BaseDataFrame;
