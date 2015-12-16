@@ -13,36 +13,81 @@ var fs = require('fs');
 var inherit = require('./inherit');
 
 var DataFrame = function (config) {
-	assert.isObject(config, "Expected 'config' parameter to DataFrame constructor to be an object with options for initialisation.");
-	assert.isArray(config.rows, "Expected 'rows' member of 'config' parameter to DataFrame constructor to be an array of rows.");
-
-	if (config.index) {
-		assert.isObject(config.index, "Expected 'index' member of 'config' parameter to DataFrame constructor to be an object.");
-	}
 
 	var columnNames;
+	var rows;
 
-	if (config.columnNames) {
-		assert.isArray(config.columnNames, "Expected 'columnNames' member of 'config' parameter to DataFrame constructor to be an array of strings.");
+	if (config) {
+		assert.isObject(config, "Expected 'config' parameter to DataFrame constructor to be an object with options for initialisation.");
 
-		config.columnNames.forEach(function (columnName) {
-			assert.isString(columnName, "Expected 'columnNames' member of 'config' parameter to DataFrame constructor to be an array of strings.");
-		});
-
-		if (config.rows.length > 0) {
-			assert.isArray(config.rows[0], "Expect 'rows' member of 'config' parameter to DataFrame constructor to be an array of arrays.");
+		if (config.index) {
+			assert.isObject(config.index, "Expected 'index' member of 'config' parameter to DataFrame constructor to be an object.");
 		}
 
-		columnNames = config.columnNames;
-	}
-	else {
-		throw new Error("Expected 'columnNames' member of 'config' parameter to DataFrame constructor.");
+		if (config.columnNames) {
+			assert.isArray(config.columnNames, "Expected 'columnNames' member of 'config' parameter to DataFrame constructor to be an array of strings.");
+			assert.isArray(config.rows, "Expected 'rows' member of 'config' parameter to DataFrame constructor to be an array of rows.");
+
+			config.columnNames.forEach(function (columnName) {
+				assert.isString(columnName, "Expected 'columnNames' member of 'config' parameter to DataFrame constructor to be an array of strings.");
+			});
+
+			config.rows.forEach(function (row) {
+				assert.isArray(row, "Expect 'rows' member of 'config' parameter to DataFrame constructor to be an array of arrays or an array of objects.");
+			});				
+
+			columnNames = config.columnNames;
+			rows = config.rows;
+		}
+		else if (config.rows) {
+			assert.isArray(config.rows, "Expected 'rows' member of 'config' parameter to DataFrame constructor to be an array of rows.");
+			
+			if (config.rows.length > 0) {
+				if (Object.isObject(config.rows[0])) {
+					config.rows.forEach(function (row) {
+						assert.isObject(row, "Expect 'rows' member of 'config' parameter to DataFrame constructor to be array of objects or arrays, do not mix and match arrays and objects in 'rows'.");
+					});	
+
+					// Derive column names from object fields.
+					columnNames = E.from(config.rows)
+						.selectMany(function (row) {
+							return Object.keys(row);
+						})
+						.distinct()
+						.toArray();
+
+					rows = E.from(config.rows)
+						.select(function (row) {
+							return E.from(columnNames)
+								.select(function (columnName) {
+									return row[columnName];
+								})
+								.toArray();
+						})
+						.toArray();
+				}
+				else {
+					config.rows.forEach(function (row) {
+						assert.isArray(row, "Expect 'rows' member of 'config' parameter to DataFrame constructor to be array of objects or arrays, do not mix and match arrays and objects in 'rows'.");
+					});				
+
+					// Default column names.
+					columnNames = E.range(0, config.rows[0].length)
+						.select(function (columnIndex) {
+							return columnIndex.toString();
+						})
+						.toArray();
+
+					rows = config.rows;
+				}
+			}
+		}
 	}
 
 	var self = this;
-	self._columnNames = columnNames;
-	self._values = config.rows;
-	self._index = config.index || 
+	self._columnNames = columnNames || [];
+	self._values = rows || [];
+	self._index = (config && config.index) || 
 		new LazyIndex(
 			"__index___",
 			function () {

@@ -36,4 +36,112 @@ describe('DataFrame', function () {
 		expect(dataFrame.getIndex().getValues()).to.eql([0, 1 ]);
 	});
 
+	it('there are no rows or columns when no columns or rows are specified', function () {
+		
+		var dataFrame = new dataForge.DataFrame();
+		expect(dataFrame.getColumnNames()).to.eql([]);
+		expect(dataFrame.getColumns()).to.eql([]);
+		expect(dataFrame.getValues()).to.eql([]);
+	})
+
+	it('there are no rows or columns when no columns or rows are specified', function () {
+		
+		var dataFrame = new dataForge.DataFrame({});
+		expect(dataFrame.getColumnNames()).to.eql([]);
+		expect(dataFrame.getColumns()).to.eql([]);
+		expect(dataFrame.getValues()).to.eql([]);
+	})
+
+	it('column names default to integer index when not specified', function () {
+
+		var rows = [
+			['foo', 11],
+			['bar', 22],
+		];
+		var dataFrame = new dataForge.DataFrame({ rows: rows });
+		expect(dataFrame.getColumnNames()).to.eql(["0", "1" ]);
+	});
+
+	it('can initialize from array of objects', function () {
+
+		var dataFrame = new dataForge.DataFrame({
+				rows: [
+					{
+						Col1: 1,
+						Col2: 'hello',
+					},
+					{
+						Col2: 'computer',
+						Col1: 10,
+					}
+				]
+			});
+		
+		expect(dataFrame.getColumnNames()).to.eql(["Col1", "Col2"]);
+		expect(dataFrame.getValues()).to.eql([
+			[1, 'hello'],
+			[10, 'computer'],
+		])
+		
+		var columns = dataFrame.getColumns();
+		expect(columns.length).to.eql(2);
+
+		expect(columns[0].getName()).to.eql("Col1");
+		expect(columns[0].getValues()).to.eql([1, 10]);
+
+		expect(columns[1].getName()).to.eql("Col2");
+		expect(columns[1].getValues()).to.eql(["hello", "computer"]);
+	});
+
+	it('can initialize from array of objects with different fields', function () {
+
+		var dataFrame = new dataForge.DataFrame({
+				rows: [
+					{
+						Col1: 1,
+						Col2: 'hello',
+					},
+					{
+						Col3: 10,
+						Col4: 'computer',
+					}
+				]
+			});
+
+		expect(dataFrame.getColumnNames()).to.eql(["Col1", "Col2", "Col3", "Col4"]);
+
+		expect(dataFrame.getValues()).to.eql([
+			[1, 'hello', undefined, undefined],
+			[undefined, undefined, 10, 'computer'],
+		]);
+		
+		var columns = dataFrame.getColumns();
+		expect(columns.length).to.eql(4);
+
+		expect(columns[0].getName()).to.eql("Col1");
+		expect(columns[0].getValues()).to.eql([1, undefined]);
+
+		expect(columns[1].getName()).to.eql("Col2");
+		expect(columns[1].getValues()).to.eql(["hello", undefined]);
+
+		expect(columns[2].getName()).to.eql("Col3");
+		expect(columns[2].getValues()).to.eql([undefined, 10]);
+
+		expect(columns[3].getName()).to.eql("Col4");
+		expect(columns[3].getValues()).to.eql([undefined, "computer"]);
+	});
+
+	it('can initialize from array of objects with zero fields', function () {
+
+		var dataFrame = new dataForge.DataFrame({
+				rows: [
+					{},
+					{}
+				]
+			});
+
+		expect(dataFrame.getColumnNames()).to.eql([]);
+		expect(dataFrame.getColumns()).to.eql([]);
+		expect(dataFrame.getValues()).to.eql([[], []]);
+	});	
 });
