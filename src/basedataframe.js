@@ -1097,9 +1097,7 @@ BaseDataFrame.prototype.renameColumns = function (newColumnNames) {
 			return newColumnNames;
 		},
 		function () {
-			return new ArrayEnumerator(
-				self.getValues()
-			);
+			return self.getEnumerator();
 		},
 		function () {
 			return self.getIndex();
