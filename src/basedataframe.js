@@ -1115,7 +1115,7 @@ BaseDataFrame.prototype.getValues = function () { //todo: toRows
 	var enumerator = self.getEnumerator();
 	validateEnumerator(enumerator);
 
-	var values = [];
+	var values = []; //todo: move this to the enumerator interface: eg a bake function.
 
 	while (enumerator.moveNext()) {
 		values.push(enumerator.getCurrent());
