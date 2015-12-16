@@ -105,7 +105,7 @@ describe('format/csv', function () {
 
 	it('can save empty data frame to csv', function () {
 
-		var dataFrame = new dataForge.DataFrame([], []);
+		var dataFrame = new dataForge.DataFrame({ columnNames: [], rows: [] });
 
 		var options = {};
 		var csvFormatter = csv(options);
@@ -117,10 +117,13 @@ describe('format/csv', function () {
 
 	it('can save data frame to csv', function () {
 
-		var dataFrame = new dataForge.DataFrame(["Column1", "Column2"], [
-			['A', 1],
-			['B', 2],
-		]);
+		var dataFrame = new dataForge.DataFrame({
+				columnNames: ["Column1", "Column2"], 
+				rows: [
+					['A', 1],
+					['B', 2],
+				]
+			});
 
 		var options = {};
 		var csvFormatter = csv(options);
@@ -136,10 +139,13 @@ describe('format/csv', function () {
 
 	it('newlines are automatically stripped from strings when saving a csv', function () {
 
-		var dataFrame = new dataForge.DataFrame(["Column1"], [
-			['First line\nsecond line\nthird line'],
-			['1st line\r\n2nd line'],
-		]);
+		var dataFrame = new dataForge.DataFrame({
+				columnNames: ["Column1"], 
+				rows: [
+					['First line\nsecond line\nthird line'],
+					['1st line\r\n2nd line'],
+				]
+			});
 
 		var options = {};
 		var csvFormatter = csv(options);

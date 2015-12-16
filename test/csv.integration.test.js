@@ -13,18 +13,18 @@ describe('csv.integration', function () {
 	var testFile = 'test.csv';
 	
 	var initExampleDataFrame = function () {
-		return new dataForge.DataFrame(
-			[
-				"Date",
-				"Value1",
-				"Value2",
-				"Value3",
-			],
-			[
-				['1975-2-24', '100', 'foo', '11'],
-				['2015-2-24', '200', 'bar', '22'],
-			]
-		);		
+		return new dataForge.DataFrame({
+				columnNames: [
+					"Date",
+					"Value1",
+					"Value2",
+					"Value3",
+				],
+				rows: [
+					['1975-2-24', '100', 'foo', '11'],
+					['2015-2-24', '200', 'bar', '22'],
+				]
+			});		
 	}; 
 
 	afterEach(function () {

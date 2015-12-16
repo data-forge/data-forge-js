@@ -9,17 +9,15 @@ describe('rolling window integration', function () {
 
 	it('blah', function () {
 
-		var dataFrame = new dataForge.DataFrame(
-			[
-				"Value",
-			],
-			E.range(1, 12)
+		var dataFrame = new dataForge.DataFrame({
+			columnNames: [ "Value" ],
+			rows: E.range(1, 12)
 				.select(function (i) {
 					return [i];
 				})
 				.toArray(),
-			new dataForge.Index("__test__", E.range(10, 12).toArray())
-		);
+			index: new dataForge.Index("__test__", E.range(10, 12).toArray())
+		});
 
 		var newColumn = dataFrame
 			.getColumn('Value')

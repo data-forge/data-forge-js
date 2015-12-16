@@ -972,11 +972,11 @@ BaseDataFrame.prototype.truncateStrings = function (maxLength) {
 		.toArray();
 
 	var DataFrame = require('./dataframe');
-	return new DataFrame(
-		self.getColumnNames(),
-		truncatedValues,
-		self.getIndex()
-	);
+	return new DataFrame({
+			columnNames: self.getColumnNames(),
+			rows: truncatedValues,
+			index: self.getIndex(),
+		});
 };
 
 /**

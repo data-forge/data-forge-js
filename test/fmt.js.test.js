@@ -93,7 +93,7 @@ describe('format/js', function () {
 
 	it('can save empty data frame to js', function () {
 
-		var dataFrame = new dataForge.DataFrame([], []);
+		var dataFrame = new dataForge.DataFrame({ columnNames: [], rows: [] });
 
 		var options = {};
 		var jsonFormatter = js(options);
@@ -104,10 +104,13 @@ describe('format/js', function () {
 
 	it('can save data frame to js', function () {
 
-		var dataFrame = new dataForge.DataFrame(["Column1", "Column2"], [
-			['A', 1],
-			['B', 2],
-		]);
+		var dataFrame = new dataForge.DataFrame({
+				columnNames: ["Column1", "Column2"], 
+				rows: [
+					['A', 1],
+					['B', 2],
+				]
+			});
 
 		var options = {};
 		var jsonFormatter = js(options);

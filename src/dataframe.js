@@ -12,22 +12,41 @@ var E = require('linq');
 var fs = require('fs');
 var inherit = require('./inherit');
 
-var DataFrame = function (columnNames, values, index) {
-	assert.isArray(columnNames, "Expected 'columnNames' parameter to DataFrame constructor to be an array.");
-	assert.isArray(values, "Expected 'values' parameter to DataFrame constructor to be an array.");
+var DataFrame = function (config) {
+	assert.isObject(config, "Expected 'config' parameter to DataFrame constructor to be an object with options for initialisation.");
+	assert.isArray(config.rows, "Expected 'rows' member of 'config' parameter to DataFrame constructor to be an array of rows.");
 
-	if (index) {
-		assert.isObject(index, "Expected 'index' parameter to DataFrame constructor to be an object.");
+	if (config.index) {
+		assert.isObject(config.index, "Expected 'index' member of 'config' parameter to DataFrame constructor to be an object.");
 	}
-	
+
+	var columnNames;
+
+	if (config.columnNames) {
+		assert.isArray(config.columnNames, "Expected 'columnNames' member of 'config' parameter to DataFrame constructor to be an array of strings.");
+
+		config.columnNames.forEach(function (columnName) {
+			assert.isString(columnName, "Expected 'columnNames' member of 'config' parameter to DataFrame constructor to be an array of strings.");
+		});
+
+		if (config.rows.length > 0) {
+			assert.isArray(config.rows[0], "Expect 'rows' member of 'config' parameter to DataFrame constructor to be an array of arrays.");
+		}
+
+		columnNames = config.columnNames;
+	}
+	else {
+		throw new Error("Expected 'columnNames' member of 'config' parameter to DataFrame constructor.");
+	}
+
 	var self = this;
 	self._columnNames = columnNames;
-	self._values = values;
-	self._index = index || 
+	self._values = config.rows;
+	self._index = config.index || 
 		new LazyIndex(
 			"__index___",
 			function () {
-				return E.range(0, values.length).toArray();
+				return E.range(0, self._values.length).toArray();
 			}
 		);
 };

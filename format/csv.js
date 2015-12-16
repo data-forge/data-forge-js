@@ -48,12 +48,15 @@ module.exports = function (options) {
 				.toArray();
 
 			if (rows.length === 0) {
-				return new dataForge.DataFrame([], []);
+				return new dataForge.DataFrame({ columnNames: [], rows: [] });
 			}
 					
 			var header = E.from(rows).first();
 			var remaining = E.from(rows).skip(1).toArray();
-			return new dataForge.DataFrame(header, remaining);
+			return new dataForge.DataFrame({
+					columnNames: header, 
+					rows: remaining
+				});
 		},
 		
 		//

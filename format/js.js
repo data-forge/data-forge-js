@@ -41,7 +41,10 @@ module.exports = function (options) {
 				})
 				.toArray();
 
-			return new dataForge.DataFrame(headers, rows);
+			return new dataForge.DataFrame({
+					columnNames: headers, 
+					rows: rows
+				});
 		},
 		
 		//
