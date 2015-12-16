@@ -5,6 +5,15 @@ var assert = require('chai').assert;
 var assert = require('chai').assert;
 var E = require('linq');
 
+//
+// Helper function to validate an enumerator.
+//
+var validateEnumerator = function (enumerator) {
+	assert.isObject(enumerator, "Expected an 'enumerator' object.");
+	assert.isFunction(enumerator.moveNext, "Expected enumerator to have function 'moveNext'.");
+	assert.isFunction(enumerator.getCurrent, "Expected enumerator to have function 'getCurrent'.");
+};
+
 /**
  * Base class for indexes.
  *
@@ -78,6 +87,24 @@ BaseIndex.prototype.getRowsSubset = function (index, count) {
 				.toArray();
 		}
 	);
+};
+
+/*
+ * Extract values from the index. This forces lazy evaluation to complete.
+ */
+BaseIndex.prototype.getValues = function () {
+
+	var self = this;
+	var enumerator = self.getEnumerator();
+	validateEnumerator(enumerator);
+
+	var values = [];
+
+	while (enumerator.moveNext()) {
+		values.push(enumerator.getCurrent());
+	}
+
+	return values;
 };
 
 

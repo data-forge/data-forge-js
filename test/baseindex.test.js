@@ -3,6 +3,7 @@
 describe('Index', function () {
 
 	var BaseIndex = require('../src/baseindex');
+	var ArrayEnumerator = require('../src/enumerators/array');
 
 	var expect = require('chai').expect;
 	var assert = require('chai').assert;
@@ -16,8 +17,8 @@ describe('Index', function () {
 			return '==test-index==';
 		};
 
-		baseIndex.getValues = function () {
-			return values;
+		baseIndex.getEnumerator = function () {
+			return new ArrayEnumerator(values);
 		};
 		
 		return baseIndex;
