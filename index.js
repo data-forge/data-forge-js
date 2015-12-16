@@ -167,11 +167,12 @@ var dataForge = {
 				return new LazyIndex(
 					"__concatenated__",
 					function () {
-						return E.from(dataFrames)
+						return new ArrayEnumerator(E.from(dataFrames)
 							.selectMany(function (dataFrame) {
 								return dataFrame.getIndex().getValues();
 							})
-							.toArray();
+							.toArray()
+						);
 					}
 				)
 			}

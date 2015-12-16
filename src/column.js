@@ -30,7 +30,7 @@ var Column = function (name, values, index) {
 		new LazyIndex(
 			"__index___",
 			function () {
-				return E.range(0, values.length).toArray();
+				return new ArrayEnumerator(E.range(0, values.length).toArray());
 			}
 		);
 };

@@ -7,6 +7,7 @@
 var LazyColumn = require('./lazycolumn');
 var BaseDataFrame = require('./basedataframe');
 var LazyIndex = require('./lazyindex');
+var ArrayEnumerator = require('./enumerators/array');
 
 var assert = require('chai').assert;
 var E = require('linq');
@@ -30,7 +31,7 @@ var LazyDataFrame = function (columnNamesFn, enumeratorFn, indexFn) {
 			return new LazyIndex(
 				"__index__",
 				function () {
-					return E.range(0, self.getValues().length).toArray();
+					return new ArrayEnumerator(E.range(0, self.getValues().length).toArray());
 				}
 			);
 		};

@@ -3,6 +3,7 @@
 describe('Index', function () {
 
 	var LazyIndex = require('../src/lazyindex');
+	var ArrayEnumerator = require('../src/enumerators/array');
 
 	var expect = require('chai').expect;
 
@@ -11,7 +12,7 @@ describe('Index', function () {
 		var index = new LazyIndex(
 			"__test__",
 			function () { 
-				return [0, 1, 2, 3] 
+				return new ArrayEnumerator([0, 1, 2, 3]); 
 			}
 		);
 		expect(index.getValues()).to.eql([0, 1, 2, 3]);

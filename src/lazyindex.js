@@ -10,13 +10,13 @@ var inherit = require('./inherit');
 /**
  * Implements an lazy-evaluated index for a data frame or column.
  */
-var LazyIndex = function (name, valuesFn) {
-	assert.isString(name, "Expected 'name' parameter to Index constructor to be a string.");
-	assert.isFunction(valuesFn, "Expected 'valuesFn' parameter to Index constructor to be a function.");
+var LazyIndex = function (name, enumeratorFn) {
+	assert.isString(name, "Expected 'name' parameter to LazyIndex constructor to be a string.");
+	assert.isFunction(enumeratorFn, "Expected 'enumeratorFn' parameter to LazyIndex constructor to be a function.");
 
 	var self = this;
 	self._name = name;
-	self._valuesFn = valuesFn;
+	self._enumeratorFn = enumeratorFn;
 };
 
 var parent = inherit(LazyIndex, BaseIndex);
@@ -34,7 +34,7 @@ LazyIndex.prototype.getName = function () {
  */
 LazyIndex.prototype.getEnumerator = function () {
 	var self = this;
-	return new ArrayEnumerator(self._valuesFn());
+	return self._enumeratorFn();
 };
 
 module.exports = LazyIndex;

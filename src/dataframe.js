@@ -92,7 +92,7 @@ var DataFrame = function (config) {
 		new LazyIndex(
 			"__index___",
 			function () {
-				return E.range(0, self._values.length).toArray();
+				return new ArrayEnumerator(E.range(0, self._values.length).toArray());
 			}
 		);
 };

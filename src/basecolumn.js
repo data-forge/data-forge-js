@@ -132,11 +132,12 @@ BaseColumn.prototype.where = function (filterSelectorPredicate) {
 			return new LazyIndex(
 				self.getIndex().getName(),
 				function () {
-					return E.from(executeLazyWhere())
+					return new ArrayEnumerator(E.from(executeLazyWhere())
 						.select(function (data) {
 							return data[0]; // Index
 						})
-						.toArray();
+						.toArray()
+					);
 				}
 			);
 		}
@@ -228,7 +229,7 @@ BaseColumn.prototype.selectMany = function (selector) {
 								.toArray();
 						})
 						.toArray();
-					return indexValues;
+					return new ArrayEnumerator(indexValues);
 				}
 			);
 		}
@@ -312,11 +313,12 @@ var executeOrderBy = function (self, batch) {
 			return new LazyIndex(
 				self.getIndex().getName(),
 				function () {
-					return E.from(executeLazySort())
+					return new ArrayEnumerator(E.from(executeLazySort())
 						.select(function (row) {
 							return row[0]; // Extract the index from the sorted data.
 						})
-						.toArray();
+						.toArray()
+					);
 				}
 			);
 		}
@@ -495,11 +497,12 @@ BaseColumn.prototype.rollingWindow = function (period, fn) {
 			return new LazyIndex(
 				self.getIndex().getName(),
 				function () {
-					return E.from(newIndexAndValues)
+					return new ArrayEnumerator(E.from(newIndexAndValues)
 						.select(function (indexAndValue) {
 							return indexAndValue[0];
 						})
-						.toArray();					
+						.toArray()
+					);
 				}
 			);
 		}

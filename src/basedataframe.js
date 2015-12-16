@@ -184,11 +184,12 @@ BaseDataFrame.prototype.where = function (filterSelectorPredicate) {
 			return new LazyIndex(
 				self.getIndex().getName(),
 				function () {
-					return E.from(executeLazyWhere())
+					return new ArrayEnumerator(E.from(executeLazyWhere())
 						.select(function (data) {
 							return data[0]; // Index
 						})
-						.toArray();
+						.toArray()
+					);
 				}
 			);
 		}
@@ -334,7 +335,7 @@ BaseDataFrame.prototype.selectMany = function (selector) {
 								.toArray();
 						})
 						.toArray();
-					return indexValues;
+					return new ArrayEnumerator(indexValues);
 				}
 			);
 		}
@@ -533,11 +534,12 @@ var executeOrderBy = function (self, batch) {
 			return new LazyIndex(
 				self.getIndex().getName(),
 				function () {
-					return E.from(executeLazySort())
+					return new ArrayEnumerator(E.from(executeLazySort())
 						.select(function (row) {
 							return row[0]; // Extract the index from the sorted data.
 						})
-						.toArray();
+						.toArray()
+					);
 				}
 			);
 		}
@@ -855,7 +857,7 @@ BaseDataFrame.prototype.setIndex = function (columnNameOrIndex) {
 			return new LazyIndex(
 				self.getColumn(columnNameOrIndex).getName(),
 				function () {
-					return self.getColumn(columnNameOrIndex).getValues();
+					return new ArrayEnumerator(self.getColumn(columnNameOrIndex).getValues());
 				}
 			);
 		}		
@@ -881,7 +883,7 @@ BaseDataFrame.prototype.resetIndex = function () {
 			return new LazyIndex( //todo: broad-cast index
 				"__index___",
 				function () {
-					return E.range(0, self.getValues().length).toArray();
+					return new ArrayEnumerator(E.range(0, self.getValues().length).toArray());
 				}
 			);
 		}		
