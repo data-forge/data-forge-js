@@ -168,30 +168,58 @@ Used to index a data frame for operations such as *merge*. If not specified an i
 
 ## Creating a Data Frame
 
-A data frame can be simply created from values in memory. The following example creates a data frame with 3 rows:
+The DataFrame constructor is passed a *config* object that specifies the initial contents of the data frame. 
 
-	var columnNames = ["Col1", "Col2", "Col3"];
-	var values = [
-		[1, 'hello', new Date(...)],
-		[5, 'computer', new Date(...)],
-		[10, 'good day', new Date(...)]
-	]; 
-	var df = new dataForge.DataFrame(columnNames, values);
+A data frame can be simply created from column names and rows:
+
+	var df = new dataForge.DataFrame({
+			columnNames: ["Col1", "Col2", "Col3"],
+			rows: [
+				[1, 'hello', new Date(...)],
+				[5, 'computer', new Date(...)],
+				[10, 'good day', new Date(...)]
+			]
+		});
 
 That example generates an index with the values *0, 1, 2*.
 
-An index can be explicitly be provided as a constructor parameter:
+A data frame can also be created from an array of JavaScript objects:
 
-	var index = new dataForge.Index([5, 10, 100]); 
-	var df = new dataForge.DataFrame(columnNames, values, index);
+	var df = new dataForge.DataFrame({
+			rows: [
+				{
+					Col1: 1,
+					Col2: 'hello',
+					Col3: new Date(....)
+				},
+				{
+					Col1: 5,
+					Col2: 'computer',
+					Col3: new Date(....)
+				},
+				{
+					Col1: 10,
+					Col2: 'good day',
+					Col3: new Date(....)
+				}
+			]
+		});
+
+An index can be explicitly be provided:
+
+	var df = new dataForge.DataFrame({
+			columnNames: <column-names>,
+			rows: <rows>,
+			index: new dataForge.Index([5, 10, 100])
+		})
 
 Or an existing column can be promoted to an index:
  
-	var df = new dataForge.DataFrame(columnNames, values).setIndex("Col3");
+	var df = new dataForge.DataFrame(someConfig).setIndex("Col3");
 
 Be aware that promoting a column to an index in *data-forge* doesn't remove the column (as it does in *Pandas*). You can easily achieve this by calling *dropColumn*:
 
-	var df = new dataForge.DataFrame(columnNames, values).setIndex("Col3").dropColumn("Col3");
+	var df = new dataForge.DataFrame(someConfig).setIndex("Col3").dropColumn("Col3");
 
 ## Immutability and Chained Functions
 
@@ -201,11 +229,11 @@ You may have noticed in the previous examples that multiple functions have been 
 
 This is why, in the following example, the final data frame is captured after all operations are applied:
 
-	var df = new dataForge.DataFrame(columnNames, values).setIndex("Col3").dropColumn("Col3");
+	var df = new dataForge.DataFrame(config).setIndex("Col3").dropColumn("Col3");
 
 Consider an alternate structure:
 
-	var df1 = new dataForge.DataFrame(columnNames, values);
+	var df1 = new dataForge.DataFrame(config);
 	var df2 = df1.setIndex("Col3");
 	var df3 = df2.dropColumn("Col3");
 
