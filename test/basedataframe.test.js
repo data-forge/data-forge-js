@@ -16,15 +16,29 @@ describe('BaseDataFrame', function () {
 		assert.isArray(index);
 
 		var dataFrame = new BaseDataFrame();
+
 		dataFrame.getColumnNames = function () {
 			return columns; 
 		};
-		dataFrame.getValues = function () {
-			return values;
+
+		dataFrame.getEnumerator = function () {
+			var valueIndex = -1;
+
+			return {
+				moveNext: function () {
+					return ++valueIndex < values.length;
+				},
+
+				getCurrent: function () {
+					return values[valueIndex];
+				},
+			}
 		};
+		
 		dataFrame.getIndex = function () {
 			return new dataForge.Index("__test__", index);
 		};
+		
 		return dataFrame;
 	};
 
@@ -39,6 +53,26 @@ describe('BaseDataFrame', function () {
 		expect(dataFrame.getColumnIndex("Value1")).to.eql(1);
 		expect(dataFrame.getColumnIndex("Value2")).to.eql(2);
 		expect(dataFrame.getColumnIndex("Value3")).to.eql(3);
+	});
+
+	it('can bake values from enumerator', function () {
+
+		var dataFrame = initDataFrame(
+				[ "Date", "Value1", "Value2", "Value3" ],
+				[
+					[new Date(2011, 24, 2), 300, 'c', 3],
+					[new Date(1975, 24, 2), 200, 'b', 1],
+					[new Date(2013, 24, 2), 20, 'c', 22],
+					[new Date(2015, 24, 2), 100, 'd', 4],
+				],
+				[5, 6, 7, 8]
+			);
+		expect(dataFrame.getValues()).to.eql([
+			[new Date(2011, 24, 2), 300, 'c', 3],
+			[new Date(1975, 24, 2), 200, 'b', 1],
+			[new Date(2013, 24, 2), 20, 'c', 22],
+			[new Date(2015, 24, 2), 100, 'd', 4],
+		]);
 	});
 	
 	it('can skip', function () {

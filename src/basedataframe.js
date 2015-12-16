@@ -17,7 +17,7 @@ var E = require('linq');
  *
  * getIndex - Get the index for the data frame.
  * getColumnNames - Get the columns for the data frame.
- * getValues - Get the values for the data frame.
+ * getEnumerator - Get a row enumerator for the data frame.
  */
 var BaseDataFrame = function () {
 };
@@ -153,7 +153,6 @@ BaseDataFrame.prototype.where = function (filterSelectorPredicate) {
 			.toArray();
 		return cachedFilteredIndexAndValues;
 	}
-
 
 	var LazyDataFrame = require('./lazydataframe');
 	return new LazyDataFrame(
@@ -1057,15 +1056,44 @@ BaseDataFrame.prototype.renameColumns = function (newColumnNames) {
 	);
 };
 
+//
+// Helper function to validate an enumerator.
+//
+var validateEnumerator = function (enumerator) {
+	assert.isObject(enumerator, "Expected an 'enumerator' object.");
+	assert.isFunction(enumerator.moveNext, "Expected enumerator to have function 'moveNext'.");
+	assert.isFunction(enumerator.getCurrent, "Expected enumerator to have function 'getCurrent'.");
+};
+
+/**
+ * Bake the data frame an array of rows.
+ */
+BaseDataFrame.prototype.getValues = function () { //todo: toRows
+
+	var self = this;
+
+	var enumerator = self.getEnumerator();
+	validateEnumerator(enumerator);
+
+	var values = [];
+
+	while (enumerator.moveNext()) {
+		values.push(enumerator.getCurrent());
+	}
+
+	return values;
+};
+
 /**
  * Bake the data frame to an array of JavaScript objects.
  */
 BaseDataFrame.prototype.toObjects = function () {
 
 	var self = this;
-	return E.from(self.getValues())
+	var columnNames = self.getColumnNames();
+	return E.from(self.getValues()) //todo: should this rely on get enumerator?
 		.select(function (row) {
-			return E.from(self.getColumnNames())
+			return E.from(columnNames)
 				.zip(row, function (columnName, columnValue) {
 					return [columnName, columnValue];
 				})
