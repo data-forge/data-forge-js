@@ -24,28 +24,8 @@ module.exports = function (options) {
 
 			assert.isString(inputJsonData, "Expected 'inputJsonData' parameter to 'json.from' to be a string containing JSON data.");	
 
-			var jsonData = JSON.parse(inputJsonData);
-
-			var headers = E.from(jsonData)
-				.selectMany(function (obj) {
-					return Object.keys(obj);
-				})
-				.distinct()
-				.toArray();
-
-			var rows = E.from(jsonData)
-				.select(function (obj) {
-					return E.from(headers)
-						.select(function (header) {
-							return obj[header];
-						})
-						.toArray();
-				})
-				.toArray();
-
 			return new dataForge.DataFrame({
-					columnNames: headers, 
-					rows: rows
+					rows: JSON.parse(inputJsonData)
 				});
 		},
 		
