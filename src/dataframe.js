@@ -115,11 +115,20 @@ DataFrame.prototype.getColumnNames = function () {
 };
 
 /**
- * Get the values of all rows in the data frame.
+ * Get an enumerator to enumerate the rows of the DataFrame.
  */
-DataFrame.prototype.getValues = function () {
+DataFrame.prototype.getEnumerator = function () {
 	var self = this;
-	return self._values;
+	var rowIndex = -1;
+	return {
+		moveNext: function () {
+			return ++rowIndex < self._values.length;
+		},
+
+		getCurrent: function () {
+			return self._values[rowIndex];
+		}
+	};
 };
 
 module.exports = DataFrame;

@@ -54,13 +54,22 @@ LazyDataFrame.prototype.getColumnNames = function () {
 };
 
 /**
- * Get the values of all rows in the data frame.
+ * Get an enumerator to enumerate the rows of the DataFrame.
  */
-LazyDataFrame.prototype.getValues = function () {
+LazyDataFrame.prototype.getEnumerator = function () {
 	var self = this;
-	return self._valuesFn();
+	var self = this;
+	var rowIndex = -1;
+	var values = self._valuesFn(); //todo: change this.
+	return {
+		moveNext: function () {
+			return ++rowIndex < values.length;
+		},
+
+		getCurrent: function () {
+			return values[rowIndex];
+		}
+	};
 };
-
-
 
 module.exports = LazyDataFrame;

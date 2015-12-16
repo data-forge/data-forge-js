@@ -133,7 +133,7 @@ BaseDataFrame.prototype.where = function (filterSelectorPredicate) {
 	var cachedFilteredIndexAndValues = null;
 
 	//
-	// Lazy  execute the filtering.
+	// Lazy execute the filtering.
 	//
 	var executeLazyWhere = function () {
 
