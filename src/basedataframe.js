@@ -11,6 +11,15 @@ var ArrayEnumerator = require('./enumerators/array');
 var assert = require('chai').assert; 
 var E = require('linq');
 
+//
+// Helper function to validate an enumerator.
+//
+var validateEnumerator = function (enumerator) {
+	assert.isObject(enumerator, "Expected an 'enumerator' object.");
+	assert.isFunction(enumerator.moveNext, "Expected enumerator to have function 'moveNext'.");
+	assert.isFunction(enumerator.getCurrent, "Expected enumerator to have function 'getCurrent'.");
+};
+
 /**
  * Base class for data frames.
  *
@@ -1075,15 +1084,6 @@ BaseDataFrame.prototype.renameColumns = function (newColumnNames) {
 			return self.getIndex();
 		}
 	);
-};
-
-//
-// Helper function to validate an enumerator.
-//
-var validateEnumerator = function (enumerator) {
-	assert.isObject(enumerator, "Expected an 'enumerator' object.");
-	assert.isFunction(enumerator.moveNext, "Expected enumerator to have function 'moveNext'.");
-	assert.isFunction(enumerator.getCurrent, "Expected enumerator to have function 'getCurrent'.");
 };
 
 /**

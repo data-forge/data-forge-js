@@ -5,6 +5,7 @@ describe('BaseColumn', function () {
 	
 	var dataForge = require('../index');
 	var BaseColumn = require('../src/basecolumn');
+	var ArrayEnumerator = require('../src/enumerators/array');
 	
 	var expect = require('chai').expect; 
 	var assert = require('chai').assert; 
@@ -18,8 +19,8 @@ describe('BaseColumn', function () {
 		column.getName = function () {
 			return 'some-column';
 		};
-		column.getValues = function () {
-			return values;
+		column.getEnumerator = function () {
+			return new ArrayEnumerator(values);
 		};
 		column.getIndex = function () {
 			return new dataForge.Index("__test__", index);
@@ -27,6 +28,12 @@ describe('BaseColumn', function () {
 		return column;		
 	};
 	
+	it('can bake values from enumerator', function () {
+
+		var column = initColumn([0, 1, 2, 3], [100, 300, 200, 5]);
+		expect(column.getValues()).to.eql([100, 300, 200, 5]);
+	});	
+
 	it('can skip', function () {
 		var column = initColumn([0, 1, 2, 3], [100, 300, 200, 5]);
 		var skipped = column.skip(2);		
@@ -522,4 +529,5 @@ describe('BaseColumn', function () {
 
 		expect(truncated.getValues()).to.eql([null, undefined, 1, new Date(2015, 1, 1)]);
 	});
+
 });

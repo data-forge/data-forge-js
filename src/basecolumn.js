@@ -9,11 +9,20 @@ var E = require('linq');
 var moment = require('moment');
 var ArrayEnumerator = require('./enumerators/array');
 
+//
+// Helper function to validate an enumerator.
+//
+var validateEnumerator = function (enumerator) {
+	assert.isObject(enumerator, "Expected an 'enumerator' object.");
+	assert.isFunction(enumerator.moveNext, "Expected enumerator to have function 'moveNext'.");
+	assert.isFunction(enumerator.getCurrent, "Expected enumerator to have function 'getCurrent'.");
+};
+
 /**
  * Base class for columns.
  *
  * getName - Get the name of the column.
- * getValues - Get the values for each entry in the series.
+ * getEnumerator - Get the enumerator for the column.
  * getIndex - Get the index for the column.
  */
 var BaseColumn = function () {	
@@ -745,6 +754,24 @@ BaseColumn.prototype.truncateStrings = function (maxLength) {
 
 			return value;
 		});
+};
+
+/*
+ * Extract values from the column. This forces lazy evaluation to complete.
+ */
+BaseColumn.prototype.getValues = function () {
+
+	var self = this;
+	var enumerator = self.getEnumerator();
+	validateEnumerator(enumerator);
+
+	var values = [];
+
+	while (enumerator.moveNext()) {
+		values.push(enumerator.getCurrent());
+	}
+
+	return values;
 };
 
 
