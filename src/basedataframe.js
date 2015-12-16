@@ -92,11 +92,20 @@ BaseDataFrame.prototype.skip = function (numRows) {
 			return self.getColumnNames();
 		},
 		function () {
-			return new ArrayEnumerator(
-				E.from(self.getValues())
-					.skip(numRows)
-					.toArray()
-			);
+			var enumerator = self.getEnumerator();
+
+			return {
+				moveNext: function () {
+					while (--numRows >= 0 && enumerator.moveNext()) {
+						// Skip first rows.
+					}
+					return enumerator.moveNext();
+				},
+
+				getCurrent: function () {
+					return enumerator.getCurrent();
+				},
+			};
 		},
 		function () {
 			return self.getIndex().skip(numRows);
