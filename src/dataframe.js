@@ -128,4 +128,6 @@ DataFrame.prototype.getEnumerator = function () {
 	return new ArrayEnumerator(self._values);
 };
 
+//todo: could override the get values fn... here just return the already baked values.
+
 module.exports = DataFrame;
