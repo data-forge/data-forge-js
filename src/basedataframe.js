@@ -895,7 +895,7 @@ BaseDataFrame.prototype.resetIndex = function () {
 			return self.getColumnNames();
 		},
 		function () {
-			return new ArrayEnumerator(self.getValues());
+			return self.getEnumerator();
 		},
 		function () {
 			return new LazyIndex( //todo: broad-cast index
