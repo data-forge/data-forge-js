@@ -24,6 +24,7 @@ var dataForge = {
 	
 	DataFrame: require('./src/dataframe'),
 	LazyDataFrame: require('./src/lazydataframe'),
+	LazyDataFrame2: require('./src/lazydataframe2'),
 	Column: require('./src/column'),
 	LazyColumn: require('./src/lazycolumn'),
 	Index: require('./src/index'),
