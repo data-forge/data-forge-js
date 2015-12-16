@@ -129,11 +129,20 @@ BaseDataFrame.prototype.take = function (numRows) {
 			return self.getColumnNames();
 		},
 		function () {
-			return new ArrayEnumerator(
-				E.from(self.getValues())
-					.take(numRows)
-					.toArray()
-			);
+			var enumerator = self.getEnumerator();
+
+			return {
+				moveNext: function () {
+					if (--numRows >= 0) {
+						return enumerator.moveNext();
+					}
+					return false;
+				},
+
+				getCurrent: function () {
+					return enumerator.getCurrent();
+				},
+			};
 		},
 		function () {
 			return self.getIndex().take(numRows);
