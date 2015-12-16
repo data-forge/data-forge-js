@@ -43,10 +43,11 @@ BaseColumn.prototype.skip = function (numRows) {
 	return new LazyColumn(
 		self.getName(),
 		function () {
-			return E
+			return new ArrayEnumerator(E
 				.from(self.getValues())
 				.skip(numRows)
-				.toArray();
+				.toArray()
+			);
 		},
 		function () {
 			return self.getIndex().skip(numRows);
@@ -68,10 +69,11 @@ BaseColumn.prototype.take = function (numRows) {
 	return new LazyColumn(
 		self.getName(),
 		function () {
-			return E
+			return new ArrayEnumerator(E
 				.from(self.getValues())
 				.take(numRows)
-				.toArray();
+				.toArray()
+			);
 		},
 		function () {
 			return self.getIndex().take(numRows);
@@ -118,11 +120,12 @@ BaseColumn.prototype.where = function (filterSelectorPredicate) {
 	return new LazyColumn(
 		self.getName(),
 		function () {
-			return E.from(executeLazyWhere())
+			return new ArrayEnumerator(E.from(executeLazyWhere())
 				.select(function (data) {
 					return data[1]; // Value
 				})
-				.toArray();
+				.toArray()
+			);
 		},
 		function () {
 			var LazyIndex = require('./lazyindex');
@@ -154,12 +157,13 @@ BaseColumn.prototype.select = function (selector) {
 	return new LazyColumn(
 		self.getName(),
 		function () {
-			return E
-				.from(self.getValues())
-				.select(function (value) {
-					return selector(value);
-				})
-				.toArray();
+			return new ArrayEnumerator(
+				E.from(self.getValues())
+					.select(function (value) {
+						return selector(value);
+					})
+					.toArray()
+			);
 		},
 		function () {
 			return self.getIndex();
@@ -204,7 +208,7 @@ BaseColumn.prototype.selectMany = function (selector) {
 		self.getName(),
 		function () {
 			lazyEvaluate();
-			return newValues;
+			return new ArrayEnumerator(newValues);
 		},
 		function () {
 			var LazyIndex = require('./lazyindex');
@@ -429,10 +433,12 @@ BaseColumn.prototype.getRowsSubset = function (index, count) {
 	return new LazyColumn(
 		self.getName(),
 		function () {
-			return E.from(self.getValues())
-				.skip(index)
-				.take(count)
-				.toArray();
+			return new ArrayEnumerator(
+				E.from(self.getValues())
+					.skip(index)
+					.take(count)
+					.toArray()
+			);
 		},
 		function () {
 			return self.getIndex().getRowsSubset(index, count);
@@ -476,11 +482,12 @@ BaseColumn.prototype.rollingWindow = function (period, fn) {
 	return new LazyColumn(
 		self.getName(), 
 		function () {
-			return E.from(newIndexAndValues)
+			return new ArrayEnumerator(E.from(newIndexAndValues)
 				.select(function (indexAndValue) {
 					return indexAndValue[1];
 				})
-				.toArray();
+				.toArray()
+			);
 		},
 		function () {
 			var LazyIndex = require('./lazyindex');
@@ -542,13 +549,12 @@ BaseColumn.prototype.reindex = function (newIndex) {
 			//
 			// Return the columns values in the order specified by the new index.
 			//
-			var newValues = E.from(newIndex.getValues())
+			return new ArrayEnumerator(E.from(newIndex.getValues())
 				.select(function (newIndexValue) {
 					return indexMap[newIndexValue];
 				})
-				.toArray();
-
-			return newValues;
+				.toArray()
+			);
 		},
 		function () {
 			return newIndex;

@@ -365,11 +365,12 @@ BaseDataFrame.prototype.getColumn = function (columnNameOrIndex) {
 	return new LazyColumn(
 		self.getColumnNames()[columnIndex],
 		function () {
-			return E.from(self.getValues())
+			return new ArrayEnumerator(E.from(self.getValues())
 				.select(function (entry) {
 					return entry[columnIndex];
 				})
-				.toArray();
+				.toArray()
+			);
 		},
 		function () {
 			return self.getIndex();

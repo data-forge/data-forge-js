@@ -15,17 +15,17 @@ var inherit = require('./inherit');
 /**
  * Represents a lazy-evaluated column in a data frame.
  */
-var LazyColumn = function (name, valuesFn, indexFn) {
+var LazyColumn = function (name, enumeratorFn, indexFn) {
 	assert.isString(name, "Expected 'name' parameter to Column constructor be a string.");
-	assert.isFunction(valuesFn, "Expected 'valuesFn' parameter to LazyColumn constructor be a function.");
+	assert.isFunction(enumeratorFn, "Expected 'enumeratorFn' parameter to LazyColumn constructor be a function.");
 
 	if (indexFn) {
-		assert.isFunction(valuesFn, "Expected 'indexFn' parameter to LazyColumn constructor to be a function.");
+		assert.isFunction(indexFn, "Expected 'indexFn' parameter to LazyColumn constructor to be a function.");
 	}
 
 	var self = this;
 	self._name = name;
-	self._valuesFn = valuesFn;	
+	self._enumeratorFn = enumeratorFn;	
 	self._indexFn = indexFn || 
 		// Default to generated index range.
 		function () {
@@ -53,7 +53,7 @@ LazyColumn.prototype.getName = function () {
  */
 LazyColumn.prototype.getEnumerator = function () {
 	var self = this;
-	return new ArrayEnumerator(self._valuesFn());
+	return self._enumeratorFn();
 };
 
 /*
