@@ -941,4 +941,29 @@ describe('BaseDataFrame', function () {
 		expect(columns[1].getValues()).to.eql(['c', 'b']);
 		expect(columns[2].getValues()).to.eql([3, 1]);
 	});
+
+	it('can extract values as array objects', function () {
+
+		var dataFrame = initDataFrame(
+			[ "Col1", "Col2", "Col3" ],
+			[
+				[300, 'c', 3],
+				[200, 'b', 1],
+			],
+			[5, 6]
+		);
+
+		expect(dataFrame.toObjects()).to.eql([
+			{
+				Col1: 300,
+				Col2: 'c',
+				Col3: 3,
+			},
+			{
+				Col1: 200,
+				Col2: 'b',
+				Col3: 1,
+			},
+		]);
+	});
 });

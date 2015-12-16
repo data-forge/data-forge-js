@@ -1057,5 +1057,28 @@ BaseDataFrame.prototype.renameColumns = function (newColumnNames) {
 	);
 };
 
+/**
+ * Bake the data frame to an array of JavaScript objects.
+ */
+BaseDataFrame.prototype.toObjects = function () {
+
+	var self = this;
+	return E.from(self.getValues())
+		.select(function (row) {
+			return E.from(self.getColumnNames())
+				.zip(row, function (columnName, columnValue) {
+					return [columnName, columnValue];
+				})
+				.toObject(
+					function (column) {
+						return column[0]; // Field name.
+					},
+					function (column) {
+						return column[1]; // Field value.
+					}
+				);
+		})
+		.toArray();
+};
 
 module.exports = BaseDataFrame;
