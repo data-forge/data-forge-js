@@ -7,7 +7,7 @@ describe('rolling window integration', function () {
 	var E = require('linq');
 	var expect = require('chai').expect;
 
-	it('blah', function () {
+	it('rolling window', function () {
 
 		var dataFrame = new dataForge.DataFrame({
 			columnNames: [ "Value" ],
