@@ -17,10 +17,21 @@ describe('LazyDataFrame2', function () {
 				];
 			},
 			function () {
-				return [
+				var rowIndex = -1;
+				var rows = [
 					[new Date(1975, 24, 2), 100, 'foo', 11],
 					[new Date(2015, 24, 2), 200, 'bar', 22],
 				];
+
+				return {
+					moveNext: function () {
+						return ++rowIndex < rows.length;
+					},
+
+					getCurrent: function () {
+						return rows[rowIndex];
+					},
+				};
 			}
 		);		
 	} 
@@ -35,7 +46,7 @@ describe('LazyDataFrame2', function () {
 		]);		
 	});
 	
-	it('can get values', function () {
+	it('can get enumerated values', function () {
 		
 		var lazyDataFrame = initExampleLazyDataFrame();		
 		expect(lazyDataFrame.getValues()).to.eql(			[

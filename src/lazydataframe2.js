@@ -58,7 +58,16 @@ LazyDataFrame2.prototype.getColumnNames = function () {
  */
 LazyDataFrame2.prototype.getValues = function () {
 	var self = this;
-	return self._valuesFn();
+	var values = [];
+	var enumerator = self._valuesFn();
+	assert.isObject(enumerator, "Expected LazyDataFrame to be supplied an 'enumerator' object.");
+	assert.isFunction(enumerator.moveNext, "Expected LazyDataFrame to be supplied an 'enumerator' object with function 'moveNext'.");
+	assert.isFunction(enumerator.getCurrent, "Expected LazyDataFrame to be supplied an 'enumerator' object with function 'getCurrent'.");
+
+	while (enumerator.moveNext()) {
+		values.push(enumerator.getCurrent());
+	}
+	return values;
 };
 
 module.exports = LazyDataFrame2;
