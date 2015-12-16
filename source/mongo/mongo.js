@@ -6,6 +6,8 @@
 
 module.exports = function (config) {
 
+	var dataForge = require("../../index.js");
+
 	var fs = require('fs');
 	var assert = require('chai').assert;
 	var E = require('linq');
@@ -43,7 +45,7 @@ module.exports = function (config) {
 	return {
 
 		//
-		// Write to mongodb.
+		// Read from mongodb.
 		//	
 		read: function () {
 
@@ -52,16 +54,26 @@ module.exports = function (config) {
 				.find(query, fields)
 				.toArray()
 				.then(function (docs) {
-					db.close();
 					return docs;
+				})
+				.catch(function (err) {
+					db.close();
+					throw err;
+
+				})
+				.then(function (docs) {
+					db.close();
+					return new dataForge.DataFrame({ rows: docs });
 				});
 		},
 		
 		//
-		// Read from monogdb.
+		// Write to monogdb.
 		//
-		write: function (documents) {
-			assert.isArray(documents, "Expected 'documents' parameter to 'mongo.write' to be an array.");
+		write: function (dataFrame) {
+			assert.isObject(dataFrame, "Expected 'dataFrame' parameter to 'mongo.write' to be a data frame object.");
+
+			var documents = dataFrame.toObjects();
 
 			var db = pmongo(connectionString, [collection]);
 			return E.from(documents)
