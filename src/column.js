@@ -6,6 +6,7 @@
 
 var BaseColumn = require('./basecolumn');
 var LazyIndex = require('./lazyindex');
+var ArrayEnumerator = require('./enumerators/array');
 
 var assert = require('chai').assert;
 var E = require('linq');
@@ -45,11 +46,11 @@ Column.prototype.getName = function () {
 }
 
 /**
- * Retreive the values of the column.
+ * Get an enumerator for the iterating the values of the column.
  */
-Column.prototype.getValues = function () {
+Column.prototype.getEnumerator = function () {
 	var self = this;
-	return self._values;
+	return new ArrayEnumerator(self._values);
 };
 
 /**
