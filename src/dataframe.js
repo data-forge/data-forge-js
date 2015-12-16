@@ -7,6 +7,7 @@
 var BaseDataFrame = require('./basedataframe');
 var LazyIndex = require('./lazyindex');
 
+var ArrayEnumerator = require('./array-enumerator');
 var assert = require('chai').assert;
 var E = require('linq');
 var fs = require('fs');
@@ -119,16 +120,7 @@ DataFrame.prototype.getColumnNames = function () {
  */
 DataFrame.prototype.getEnumerator = function () {
 	var self = this;
-	var rowIndex = -1;
-	return {
-		moveNext: function () {
-			return ++rowIndex < self._values.length;
-		},
-
-		getCurrent: function () {
-			return self._values[rowIndex];
-		}
-	};
+	return new ArrayEnumerator(self._values);
 };
 
 module.exports = DataFrame;
