@@ -7,7 +7,7 @@
 var assert = require('chai').assert; 
 var E = require('linq');
 var moment = require('moment');
-
+var ArrayEnumerator = require('./array-enumerator');
 
 /**
  * Base class for columns.
@@ -286,11 +286,13 @@ var executeOrderBy = function (self, batch) {
 			return self.getColumnNames();
 		},
 		function () {
-			return E.from(executeLazySort())
-				.select(function (row) {
-					return row[1]; // Extract the value (minus the index) from the sorted data.					
-				})
-				.toArray();
+			return new ArrayEnumerator(
+				E.from(executeLazySort())
+					.select(function (row) {
+						return row[1]; // Extract the value (minus the index) from the sorted data.					
+					})
+					.toArray()
+				);
 		},
 		function () {
 			var LazyIndex = require('./lazyindex');
@@ -710,14 +712,16 @@ BaseColumn.prototype.detectTypes = function () {
 					return accumulated;
 				});
 
-			return E.from(Object.keys(typeFrequencies))
-				.select(function (valueType) {
-					return [
-						valueType,
-						(typeFrequencies[valueType].count / totalValues) * 100
-					];
-				})
-				.toArray();
+			return new ArrayEnumerator(
+				E.from(Object.keys(typeFrequencies))
+					.select(function (valueType) {
+						return [
+							valueType,
+							(typeFrequencies[valueType].count / totalValues) * 100
+						];
+					})
+					.toArray()
+			);
 		}
 	);
 };

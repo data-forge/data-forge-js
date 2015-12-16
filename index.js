@@ -3,6 +3,7 @@
 var assert = require('chai').assert;
 var E = require('linq');
 var dropElement = require('./src/utils').dropElement;
+var ArrayEnumerator = require('./src/array-enumerator');
 require('sugar');
 
 /**
@@ -122,7 +123,7 @@ var dataForge = {
 				return ['key', 'lval', 'rval'];
 			},
 			function () {
-				return mergedValues;
+				return new ArrayEnumerator(mergedValues);
 			}
 		);
 	},
@@ -151,13 +152,15 @@ var dataForge = {
 			},
 			function () {
 				var concatenatedColumns = concatenateColumns();
-				return E.from(dataFrames)
-					.selectMany(function (dataFrame) {
-						return dataFrame
-							.remapColumns(concatenatedColumns)
-							.getValues();
-					})
-					.toArray();
+				return new ArrayEnumerator(
+					E.from(dataFrames)
+						.selectMany(function (dataFrame) {
+							return dataFrame
+								.remapColumns(concatenatedColumns)
+								.getValues();
+						})
+						.toArray()
+				);
 			},
 			function () {
 				var LazyIndex = require('./src/lazyindex');

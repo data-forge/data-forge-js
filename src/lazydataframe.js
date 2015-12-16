@@ -12,17 +12,18 @@ var assert = require('chai').assert;
 var E = require('linq');
 var inherit = require('./inherit');
 
-var LazyDataFrame = function (columnNamesFn, valuesFn, indexFn) {
+var LazyDataFrame = function (columnNamesFn, enumeratorFn, indexFn) {
 	assert.isFunction(columnNamesFn, "Expected 'columnNamesFn' parameter to LazyDataFrame constructor to be a function.");
-	assert.isFunction(valuesFn, "Expected 'valuesFn' parameter to LazyDataFrame constructor to be a function.");
+	assert.isFunction(enumeratorFn, "Expected 'enumeratorFn' parameter to LazyDataFrame constructor to be a function.");
 
 	if (indexFn) {
-		assert.isFunction(valuesFn, "Expected 'indexFn' parameter to LazyDataFrame constructor to be a function.");
+		assert.isFunction(indexFn, "Expected 'indexFn' parameter to LazyDataFrame constructor to be a function.");
 	}
-	
+
+
 	var self = this;
 	self._columnNamesFn = columnNamesFn;
-	self._valuesFn = valuesFn;	
+	self._enumeratorFn = enumeratorFn;	
 	self._indexFn = indexFn || 
 		// Default to generated index range.
 		function () {
@@ -58,18 +59,7 @@ LazyDataFrame.prototype.getColumnNames = function () {
  */
 LazyDataFrame.prototype.getEnumerator = function () {
 	var self = this;
-	var self = this;
-	var rowIndex = -1;
-	var values = self._valuesFn(); //todo: change this.
-	return {
-		moveNext: function () {
-			return ++rowIndex < values.length;
-		},
-
-		getCurrent: function () {
-			return values[rowIndex];
-		}
-	};
+	return self._enumeratorFn();
 };
 
 module.exports = LazyDataFrame;
