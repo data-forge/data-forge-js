@@ -23,6 +23,12 @@ describe('Index', function () {
 		return baseIndex;
 	};
 
+	it('can get values from index', function () {
+
+		var index = initIndex([0, 1, 2, 3]);
+		expect(index.getValues()).to.eql([0, 1, 2, 3]);
+	});
+
 	it('can skip', function () {
 
 		var index = initIndex([0, 1, 2, 3]);
