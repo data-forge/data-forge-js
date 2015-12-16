@@ -2,31 +2,42 @@
 
 describe('Index', function () {
 
-	var Index = require('../src/index');
+	var BaseIndex = require('../src/baseindex');
 
 	var expect = require('chai').expect;
+	var assert = require('chai').assert;
 
-	it('can get values from index', function () {
+	var initIndex = function (values) {
+		assert.isArray(values);
 
-		var index = new Index("__test__", [0, 1, 2, 3]);
-		expect(index.getValues()).to.eql([0, 1, 2, 3]);
-	});
+		var baseIndex = new BaseIndex();
+		
+		baseIndex.getName = function () {
+			return '==test-index==';
+		};
+
+		baseIndex.getValues = function () {
+			return values;
+		};
+		
+		return baseIndex;
+	};
 
 	it('can skip', function () {
 
-		var index = new Index("__test__", [0, 1, 2, 3]);
+		var index = initIndex([0, 1, 2, 3]);
 		expect(index.skip(2).getValues()).to.eql([2, 3]);
 	});
 
 	it('can take', function () {
 
-		var index = new Index("__test__", [0, 1, 2, 3]);
+		var index = initIndex([0, 1, 2, 3]);
 		expect(index.take(2).getValues()).to.eql([0, 1]);
 	});
 
 	it('can get subset of rows', function () {
 
-		var index = new Index("__test__", [0, 1, 2, 3]);
+		var index = initIndex([0, 1, 2, 3]);
 		var subset = index .getRowsSubset(1, 2);
 		expect(subset.getValues()).to.eql([1, 2]);
 	});

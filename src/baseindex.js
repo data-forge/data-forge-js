@@ -11,7 +11,7 @@ var E = require('linq');
  * Derives classes must implement:
  *
  *		getName - Get the name of theindex.
- *		getValues - Get the array of values from the index.
+ *		getEnumerator - Get an enumerator for iterating the values of the index.
  */
 var BaseIndex = function () {
 	
