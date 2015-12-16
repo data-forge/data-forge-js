@@ -1,0 +1,83 @@
+var moment = require('moment')
+var dataForge = require('c:/Projects/github/Panjas/index.js');
+var file = require('c:/Projects/github/Panjas/source/file.js');
+var csv = require('c:/Projects/github/Panjas/format/csv.js');
+var json = require('c:/Projects/github/Panjas/format/json.js');
+var js = require('c:/Projects/github/Panjas/format/js.js');
+var mongo = require('c:/Projects/github/Panjas/source/mongo/mongo.js');
+var E = require('linq')
+	-- Hopefully startup script can improve this.
+
+
+dataForge.from(file("NorthConnex Program.csv")).as(csv())
+
+dataForge.from(file("NorthConnex Program.csv")).as(csv()).then(function (result) { df = result; })
+	- Hopefully async can improve this.
+
+hg log -Tjson >  Qtest-gold-master-log.json
+
+
+x = df.detectTypes()
+
+df.take(10).toString() 		<-- Remember to expand!!
+
+df.take(10).truncateStrings(5).toString()
+
+
+
+
+Babel transform must be enabled to use async/await.
+
+
+dataForge.from(file("C:\\dev\\QTest\\GoldMaster\\Qtest-gold-master-log.json")).as(json()).then(function (result) { df = result; })
+
+x = df.getColumn('date').select(entry => moment.unix(entry[0]).toDate())
+df = df.setColumn('date', x)
+
+df = df.setColumn('desc', df.getColumn('desc').select(v => v.replace(/,/g, ' ')))
+
+//df = df.setColumn('modified', df.getColumn('modified').select(v => v.join(' ')))
+//df = df.setColumn('added', df.getColumn('added').select(v => v.join(' ')))
+//df = df.setColumn('removed', df.getColumn('removed').select(v => v.join(' ')))
+
+df = df.dropColumn('branch').dropColumn('phase').dropColumn('bookmarks').dropColumn('parents').dropColumn('manifest').dropColumn('extra').dropColumn('tags')
+df = df.dropColumn('modified').dropColumn('added').dropColumn('removed')
+
+
+
+df.as(csv()).to(file("QTest Repository History.csv"));
+
+-- Envizion --
+
+dataForge.from(mongo('localhost/envision/metrics')).as(js()).then(function (result) { df = result; });
+
+df.as(json()).toSync(file('c:/Projects/github/Panjas/metrics.json'))
+
+dataForge.from(file('c:/Projects/github/Panjas/json.test')).as(json()).then(function (result) { df = result; });
+
+events = df.where(function (row) { return row.Type === "event" && row.Name !== "heartbeat"; })
+events.as(json()).toSync(file('c:/Projects/github/Panjas/events.json'))
+
+lookAtEvents = events.where(function (row) { return row.Name.toLowerCase().indexOf('look') >= 0; })
+lookAtEvents.as(json()).toSync(file('c:/Projects/github/Panjas/lookatevents.json'))
+
+lookAtDirection = df.where(function (row) { return row.Name === "LookAtDirection"; })
+lookAtDirection.as(json()).toSync(file('c:/Projects/github/Panjas/lookatdir.json'))
+
+recordingEvents = lookAtEvents.where(function (row) { return row.Name.toLowerCase().indexOf('recording') >= 0; })
+recordingEvents.as(json()).toSync(file('c:/Projects/github/Panjas/recordingEvents.json'))
+
+var recordingStarts = recordingEvents.where(function (row) { return row.Name.toLowerCase().indexOf('start') >= 0; })
+var recordingStops = recordingEvents.where(function (row) { return row.Name.toLowerCase().indexOf('stop') >= 0; })
+
+var sessions = E.from(recordingStarts.getValues()).zip(recordingStops.getValues(), 
+	function (start, stop) {
+		return {
+			start: start[1],
+			end: stop[1],
+		};
+	}
+).toArray();
+
+
+
