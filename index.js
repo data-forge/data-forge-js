@@ -3,7 +3,7 @@
 var assert = require('chai').assert;
 var E = require('linq');
 var dropElement = require('./src/utils').dropElement;
-var ArrayEnumerator = require('./src/array-enumerator');
+var ArrayEnumerator = require('./src/enumerators/array');
 require('sugar');
 
 /**

@@ -4,7 +4,7 @@
 describe('data-forge', function () {
 	
 	var dataForge = require('../index');	
-	var ArrayEnumerator = require('../src/array-enumerator');	
+	var ArrayEnumerator = require('../src/enumerators/array');	
 
 	var expect = require('chai').expect;
 	var assert = require('chai').assert;

@@ -7,7 +7,7 @@
 var assert = require('chai').assert; 
 var E = require('linq');
 var moment = require('moment');
-var ArrayEnumerator = require('./array-enumerator');
+var ArrayEnumerator = require('./enumerators/array');
 
 /**
  * Base class for columns.

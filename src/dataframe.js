@@ -7,7 +7,7 @@
 var BaseDataFrame = require('./basedataframe');
 var LazyIndex = require('./lazyindex');
 
-var ArrayEnumerator = require('./array-enumerator');
+var ArrayEnumerator = require('./enumerators/array');
 var assert = require('chai').assert;
 var E = require('linq');
 var fs = require('fs');
