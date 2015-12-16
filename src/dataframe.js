@@ -13,6 +13,11 @@ var E = require('linq');
 var fs = require('fs');
 var inherit = require('./inherit');
 
+/**
+ * Constructor for DataFrame.
+ *
+ * @param {object} config - Specifies content and configuration for the data frame.
+ */
 var DataFrame = function (config) {
 
 	var columnNames;
