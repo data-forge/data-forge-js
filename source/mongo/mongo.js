@@ -13,14 +13,13 @@ module.exports = function (config) {
 	var E = require('linq');
 	var pmongo = require('promised-mongo');
 
-	var host = config.host || 'localhost';
+	var connectionString;
 	var collection;
-	var connectionString = host + '/' + config.db;
-	var query = config.query || {};
-	var fields = config.fields || {};
+	var query;
+	var fields;
+	var sortParams;
 
 	if (Object.isString(config)) {
-		host = config.host || 'localhost';
 		var connectionStringParts = config.split('/');
 		assert(connectionStringParts.length === 3, "Expected 'config' parameter to 'mongo data source' to be a connection string composed of 3 parts or a config object. Connection string format: <host>/<db>/<collection-name>");
 
@@ -29,17 +28,19 @@ module.exports = function (config) {
 
 		query = {};
 		fields = {};
+		sortParams = null;
 	}
 	else {
 		assert.isObject(config, "Expected 'config' parameter to 'mongo data source' to be an object.");
-		assert.isString(config.db, "Expected 'config.db' parameter to 'mongo data source' to be a string.");
+		assert.isString(config.database, "Expected 'config.database' parameter to 'mongo data source' to be a string.");
 		assert.isString(config.collection, "Expected 'config.collection' parameter to 'mongo data source' to be a string.");
 
-		host = config.host || 'localhost';
-		connectionString = host + '/' + config.db;
+		var host = config.host || 'localhost';
+		connectionString = host + '/' + config.database;
 		collection = config.collection;
 		query = config.query || {};
 		fields = config.fields || {};
+		sortParams = config.sort || null;
 	}
 
 	return {
@@ -50,9 +51,13 @@ module.exports = function (config) {
 		read: function () {
 
 			var db = pmongo(connectionString, [collection]);
-			return db[collection]
-				.find(query, fields)
-				.toArray()
+			var cursor = db[collection].find(query, fields);
+			
+			if (sortParams) {
+				cursor = cursor.sort(sortParams);
+			}
+
+			return cursor.toArray()
 				.then(function (docs) {
 					return docs;
 				})
