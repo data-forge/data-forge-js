@@ -6,18 +6,15 @@ var mongo = require('../../source/mongo/mongo');
 var csv = require('../../format/csv');
 var file = require('../../source/file');
 
-dataForge.from(mongo({
+mongo({
 		host: 'localhost:27017',
-		db: 'somed-b',
-		collection: 'some-collection',
-	}))
-	.as(json())
+		database: 'some-database',
+		collection: 'some-collection'
+	})
+	.read()
 	.then(function (dataFrame) {
 
 		console.log(dataFrame.toString());
-
-		var dataRange = dataFrame.skip(5).take(10);
-		console.log(dataRange.toString());
 
 		var subset = dataFrame.getColumnsSubset(['SomeColumn', 'SomeOtherColumn']);
 		console.log(subset.toString());
@@ -27,9 +24,9 @@ dataForge.from(mongo({
 		return subset
 			.as(json())
 			.to(mongo({
-				host: 'localhost',
-				db: 'test',
-				collection: "test",
+				host: 'localhost:27017',
+				db: 'some-other-database',
+				collection: 'some-other-collection',
 			}));
 	})
 	.catch(function (err) {
