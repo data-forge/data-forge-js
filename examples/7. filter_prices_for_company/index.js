@@ -25,9 +25,9 @@ var loadSharePricesForCompany = function (companyCode, filePath) {
 
 	companyCode = companyCode.toUpperCase();
 
-	loadSharePricesFile(filePath)
+	return loadSharePricesFile(filePath)
 		.where(function (row) {
-			return row.code.toUpperCase() === companyCode;
+			return row.Symbol.toUpperCase() === companyCode;
 		});
 };
 
@@ -41,5 +41,5 @@ var saveSharePricesFile = function (dataFrame, filePath) {
 	fs.writeFileSync(filePath, dataFrame.toCSV());
 };
 
-dataFrame = loadSharePricesForCompany('ABC', 'share_prices.csv')
+var dataFrame = loadSharePricesForCompany('ABC', 'share_prices.csv')
 saveSharePricesFile(dataFrame, 'output.csv');
