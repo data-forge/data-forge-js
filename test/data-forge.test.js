@@ -259,4 +259,75 @@ describe('data-forge', function () {
  		]);
 	});
 
+	it('can load from array of empty objects', function () {
+
+		var jsData = "[{}, {}]";
+		var dataFrame = dataForge.fromJSON(jsData);
+
+		expect(dataFrame.getColumnNames().length).to.eql(0);
+		expect(dataFrame.getValues()).to.eql([
+			[],
+			[],
+		]);
+	});
+
+	it('error loading from empty json string', function () {
+
+		var jsData = "";
+		expect(function () {
+				dataForge.fromJSON(jsData);
+			}).to.throw();
+	});
+
+	it('can load from json with json array', function () {
+
+		var jsData = "[]";
+		var dataFrame = dataForge.fromJSON(jsData);
+
+		expect(dataFrame.getColumnNames().length).to.eql(0);
+		expect(dataFrame.getValues().length).to.eql(0);
+	});
+
+	it('can load from json array', function () {
+
+		var jsData = 
+			'[' +
+				'{' +
+					'"Column1": "A",' +
+					'"Column2": 1' +
+				'},' +
+				'{' +
+					'"Column1": "B",' +
+					'"Column2": 2' +
+				'}' +
+			']';
+		var dataFrame = dataForge.fromJSON(jsData);
+
+		expect(dataFrame.getColumnNames()).to.eql(['Column1', 'Column2']);
+		expect(dataFrame.getValues()).to.eql([
+			['A', 1],
+			['B', 2],
+		]);
+	});
+
+	it('uneven columns loaded from json result in undefined values', function () {
+
+		var jsData = 
+			'[' +
+				'{' +
+					'"Column1": "A"' +
+				'},' +
+				'{' +
+					'"Column2": 2' +
+				'}' +
+			']';
+		var dataFrame = dataForge.fromJSON(jsData);
+
+		expect(dataFrame.getColumnNames()).to.eql(['Column1', 'Column2']);
+		expect(dataFrame.getValues()).to.eql([
+			['A', undefined],
+			[undefined, 2],
+		]);
+	});	
+
 });

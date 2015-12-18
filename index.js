@@ -6,6 +6,8 @@ var dropElement = require('./src/utils').dropElement;
 var ArrayEnumerator = require('./src/enumerators/array');
 require('sugar');
 
+var DataFrame = require('./src/dataframe');
+
 /**
  * Main namespace for Data-Forge.
  * 
@@ -23,12 +25,24 @@ require('sugar');
  */
 var dataForge = {
 	
-	DataFrame: require('./src/dataframe'),
+	DataFrame: DataFrame,
 	LazyDataFrame: require('./src/lazydataframe'),
 	Column: require('./src/column'),
 	LazyColumn: require('./src/lazycolumn'),
 	Index: require('./src/index'),
 	LazyIndex: require('./src/lazyindex'),
+
+	/**
+	 * Deserialize a data frame from a JSON text string.
+	 */
+	fromJSON: function (jsonTextString) {
+		assert.isString(jsonTextString, "Expected 'jsonTextString' parameter to 'dataForge.fromJSON' to be a string containing data encoded in the JSON format.");
+
+		return new DataFrame({
+				rows: JSON.parse(jsonTextString)
+			});
+	},
+
 
 	/**
 	 * Read a DataFrame asynchronously from a plugable data source.
