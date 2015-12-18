@@ -1000,4 +1000,35 @@ describe('BaseDataFrame', function () {
 			},
 		]);
 	});
+
+	it('can save empty data frame to json', function () {
+
+		var dataFrame = initDataFrame([], [], []);
+		expect(dataFrame.toJSON()).to.eql("[]");
+	});
+
+	it('can save data frame to json', function () {
+
+		var dataFrame = initDataFrame(
+			["Column1", "Column2"], 
+			[
+				['A', 1],
+				['B', 2],
+			],
+			[0, 1]
+		);
+
+		expect(dataFrame.toJSON()).to.eql(
+			'[\n' +
+			'    {\n' +
+			'        "Column1": "A",\n' +
+			'        "Column2": 1\n' +
+			'    },\n' +
+			'    {\n' +
+			'        "Column1": "B",\n' +
+			'        "Column2": 2\n' +
+			'    }\n' +
+			']'
+		);
+	});	
 });

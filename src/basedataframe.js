@@ -827,7 +827,7 @@ BaseDataFrame.prototype.setColumn = function (columnName, data) {
  * @param {int} index - Index where the subset starts.
  * @param {int} count - Number of rows to include in the subset.
  */
-BaseDataFrame.prototype.getRowsSubset = function (index, count) {
+BaseDataFrame.prototype.getRowsSubset = function (index, count) { //todo: change count to end index... and actually make this work with the index.
 	assert.isNumber(index, "Expected 'index' parameter to getRowsSubset to be an integer.");
 	assert.isNumber(index, "Expected 'count' parameter to getRowsSubset to be an integer.");
 
@@ -1147,6 +1147,14 @@ BaseDataFrame.prototype.toObjects = function () {
 				);
 		})
 		.toArray();
+};
+
+/**
+ * Serialize the data frame to JSON.
+ */
+BaseDataFrame.prototype.toJSON = function () {
+	var self = this;
+	return JSON.stringify(self.toObjects(), null, 4);
 };
 
 module.exports = BaseDataFrame;
