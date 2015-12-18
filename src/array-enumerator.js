@@ -9,7 +9,6 @@ var ArrayEnumerator = function (arr) {
 	assert.isArray(arr);
 
 	var self = this;
-
 	var rowIndex = -1;
 	
 	self.moveNext = function () {
