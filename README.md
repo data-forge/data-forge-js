@@ -281,7 +281,7 @@ First we can lazily iterate using an iterator. This is the lowest-level method o
 
 There are higher-level ways to extract the rows. Under the hood these use enumerators. These force lazy evaluation to complete (like the *toArray* function in LINQ).
 
-	var arrayOfArrays = dataFrame.toRows();
+	var arrayOfArrays = dataFrame.toValues();
 
 and
 

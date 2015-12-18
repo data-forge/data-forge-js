@@ -25,14 +25,14 @@ describe('rolling window integration', function () {
 				return [index[index.length-1], values[values.length-1]];
 			});
 
-		expect(newColumn.getIndex().getValues()).to.eql([14, 15, 16, 17, 18, 19, 20, 21]);
-		expect(newColumn.getValues()).to.eql([5, 6, 7, 8, 9, 10, 11, 12]);
+		expect(newColumn.getIndex().toValues()).to.eql([14, 15, 16, 17, 18, 19, 20, 21]);
+		expect(newColumn.toValues()).to.eql([5, 6, 7, 8, 9, 10, 11, 12]);
 
 		var newDataFrame = dataFrame.setColumn('Value2', newColumn);
 
-		expect(newDataFrame.getIndex().getValues()).to.eql([10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]);
+		expect(newDataFrame.getIndex().toValues()).to.eql([10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]);
 
-		expect(newDataFrame.getValues()).to.eql([
+		expect(newDataFrame.toValues()).to.eql([
 			[1, undefined],
 			[2, undefined],
 			[3, undefined],

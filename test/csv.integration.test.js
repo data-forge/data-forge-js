@@ -29,13 +29,13 @@ describe('csv.integration', function () {
 
 		var dataFrame = dataForge.fromCSV(csv);
 		var series1 = dataFrame.getColumn('Value1');
-		expect(series1.getValues()).to.eql([
+		expect(series1.toValues()).to.eql([
 			'100',
 			'300',
 		]);
 		
 		var series2 = dataFrame.getColumn('Value2');
-		expect(series2.getValues()).to.eql([
+		expect(series2.toValues()).to.eql([
 			'foo',
 			'bar',			
 		]);
@@ -47,7 +47,7 @@ describe('csv.integration', function () {
 			'Value3',			
 		]);
 		
-		expect(dataFrame.getValues()).to.eql([
+		expect(dataFrame.toValues()).to.eql([
 			['1975-2-24', '100', "foo", '22'],
 			['2015-10-23', '300', "bar", '23'],
 		]);
@@ -59,7 +59,7 @@ describe('csv.integration', function () {
 			'Value3',			
 		]);
 		
-		expect(dataFrame2.getValues()).to.eql([
+		expect(dataFrame2.toValues()).to.eql([
 			['100', '22'],
 			['300', '23'],			
 		]);

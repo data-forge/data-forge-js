@@ -112,8 +112,8 @@ var dataForge = {
 			throw new Error("Column with name '" + columnName + "' doesn't exist in 'rightColumnIndex'.");
 		}
 
-		var leftRows = leftDataFrame.getValues();
-		var rightRows = rightDataFrame.getValues();
+		var leftRows = leftDataFrame.toValues();
+		var rightRows = rightDataFrame.toValues();
 
 		var mergedValues = E.from(leftRows) // Merge values, drop index.
 			.selectMany(function (leftRow) {
@@ -169,7 +169,7 @@ var dataForge = {
 						.selectMany(function (dataFrame) {
 							return dataFrame
 								.remapColumns(concatenatedColumns)
-								.getValues();
+								.toValues();
 						})
 						.toArray()
 				);
@@ -181,7 +181,7 @@ var dataForge = {
 					function () {
 						return new ArrayEnumerator(E.from(dataFrames)
 							.selectMany(function (dataFrame) {
-								return dataFrame.getIndex().getValues();
+								return dataFrame.getIndex().toValues();
 							})
 							.toArray()
 						);

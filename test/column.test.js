@@ -14,7 +14,7 @@ describe('Column', function () {
 	it('default index is generated', function () {
 		
 		var column = initExampleColumn();		
-		expect(column.getIndex().getValues()).to.eql([			
+		expect(column.getIndex().toValues()).to.eql([			
 			0,
 			1			
 		]);		
@@ -23,7 +23,7 @@ describe('Column', function () {
 	it('can get index', function () {
 		
 		var column = initExampleColumn(new dataForge.Index("__test__", [5, 6]));
-		expect(column.getIndex().getValues()).to.eql([			
+		expect(column.getIndex().toValues()).to.eql([			
 			5,
 			6
 		]);		
@@ -32,7 +32,7 @@ describe('Column', function () {
 	it('can get column values', function () {
 		
 		var column = initExampleColumn();		
-		expect(column.getValues()).to.eql([			
+		expect(column.toValues()).to.eql([			
 			100,
 			200			
 		]);		

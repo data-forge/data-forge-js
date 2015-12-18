@@ -40,7 +40,7 @@ BaseIndex.prototype.skip = function (numRows) {
 	return new LazyIndex(
 		self.getName(),
 		function () {
-			return new ArrayEnumerator(E.from(self.getValues()).skip(numRows).toArray());
+			return new ArrayEnumerator(E.from(self.toValues()).skip(numRows).toArray());
 		}
 	);
 };
@@ -59,7 +59,7 @@ BaseIndex.prototype.take = function (numRows) {
 	return new LazyIndex(
 		self.getName(),
 		function () {
-			return new ArrayEnumerator(E.from(self.getValues()).take(numRows).toArray());
+			return new ArrayEnumerator(E.from(self.toValues()).take(numRows).toArray());
 		}
 	);
 };
@@ -81,7 +81,7 @@ BaseIndex.prototype.getRowsSubset = function (index, count) {
 	return new LazyIndex(
 		self.getName(),
 		function () {
-			return new ArrayEnumerator(E.from(self.getValues())
+			return new ArrayEnumerator(E.from(self.toValues())
 				.skip(index)
 				.take(count)
 				.toArray()
@@ -93,7 +93,7 @@ BaseIndex.prototype.getRowsSubset = function (index, count) {
 /*
  * Extract values from the index. This forces lazy evaluation to complete.
  */
-BaseIndex.prototype.getValues = function () {
+BaseIndex.prototype.toValues = function () {
 
 	var self = this;
 	var enumerator = self.getEnumerator();

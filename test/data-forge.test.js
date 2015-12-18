@@ -52,7 +52,7 @@ describe('data-forge', function () {
 			'lval',
 			'rval',
 		]);
-		expect(merged.getValues()).to.eql([
+		expect(merged.toValues()).to.eql([
 			['foo', 1, 4],
 			['foo', 1, 5],
 			['foo', 2, 4],
@@ -89,7 +89,7 @@ describe('data-forge', function () {
 			'lval',
 			'rval',
 		]);
-		expect(merged.getValues()).to.eql([
+		expect(merged.toValues()).to.eql([
 			['foo', 1, 4],
 			['foo', 1, 5],
 			['foo', 2, 4],
@@ -162,8 +162,8 @@ describe('data-forge', function () {
 	 	var result = dataForge.concat([df1, df2, df3]);
 
 	 	expect(result.getColumnNames()).to.eql(["1", "2"]);
-	 	expect(result.getIndex().getValues()).to.eql([0, 1, 0, 1, 0, 1]);
-	 	expect(result.getValues()).to.eql([
+	 	expect(result.getIndex().toValues()).to.eql([0, 1, 0, 1, 0, 1]);
+	 	expect(result.toValues()).to.eql([
  			[1, 2],
  			[3, 4],
  			[5, 6],
@@ -181,8 +181,8 @@ describe('data-forge', function () {
 	 	var result = dataForge.concat([df1, df2]);
 
 	 	expect(result.getColumnNames()).to.eql(["1", "2"]);
-	 	expect(result.getIndex().getValues()).to.eql([0, 1, 0, 1]);
-	 	expect(result.getValues()).to.eql([
+	 	expect(result.getIndex().toValues()).to.eql([0, 1, 0, 1]);
+	 	expect(result.toValues()).to.eql([
  			[1, 2],
  			[3, 4],
  			[5, 6],
@@ -198,8 +198,8 @@ describe('data-forge', function () {
 	 	var result = dataForge.concat([df1, df2]);
 
 	 	expect(result.getColumnNames()).to.eql(["1", "2", "3"]);
-	 	expect(result.getIndex().getValues()).to.eql([0, 1, 0, 1]);
-	 	expect(result.getValues()).to.eql([
+	 	expect(result.getIndex().toValues()).to.eql([0, 1, 0, 1]);
+	 	expect(result.toValues()).to.eql([
  			[1, 2, undefined],
  			[3, 4, undefined],
  			[undefined, 6, 5],
@@ -213,7 +213,7 @@ describe('data-forge', function () {
 		var dataFrame = dataForge.fromJSON(jsData);
 
 		expect(dataFrame.getColumnNames().length).to.eql(0);
-		expect(dataFrame.getValues()).to.eql([
+		expect(dataFrame.toValues()).to.eql([
 			[],
 			[],
 		]);
@@ -233,7 +233,7 @@ describe('data-forge', function () {
 		var dataFrame = dataForge.fromJSON(jsData);
 
 		expect(dataFrame.getColumnNames().length).to.eql(0);
-		expect(dataFrame.getValues().length).to.eql(0);
+		expect(dataFrame.toValues().length).to.eql(0);
 	});
 
 	it('can load from json array', function () {
@@ -252,7 +252,7 @@ describe('data-forge', function () {
 		var dataFrame = dataForge.fromJSON(jsData);
 
 		expect(dataFrame.getColumnNames()).to.eql(['Column1', 'Column2']);
-		expect(dataFrame.getValues()).to.eql([
+		expect(dataFrame.toValues()).to.eql([
 			['A', 1],
 			['B', 2],
 		]);
@@ -272,7 +272,7 @@ describe('data-forge', function () {
 		var dataFrame = dataForge.fromJSON(jsData);
 
 		expect(dataFrame.getColumnNames()).to.eql(['Column1', 'Column2']);
-		expect(dataFrame.getValues()).to.eql([
+		expect(dataFrame.toValues()).to.eql([
 			['A', undefined],
 			[undefined, 2],
 		]);

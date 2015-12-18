@@ -44,7 +44,7 @@ BaseColumn.prototype.skip = function (numRows) {
 		self.getName(),
 		function () {
 			return new ArrayEnumerator(E
-				.from(self.getValues())
+				.from(self.toValues())
 				.skip(numRows)
 				.toArray()
 			);
@@ -70,7 +70,7 @@ BaseColumn.prototype.take = function (numRows) {
 		self.getName(),
 		function () {
 			return new ArrayEnumerator(E
-				.from(self.getValues())
+				.from(self.toValues())
 				.take(numRows)
 				.toArray()
 			);
@@ -103,8 +103,8 @@ BaseColumn.prototype.where = function (filterSelectorPredicate) {
 		}
 
 		cachedFilteredIndexAndValues = E
-			.from(self.getIndex().getValues())
-			.zip(self.getValues(), function (index, value) {
+			.from(self.getIndex().toValues())
+			.zip(self.toValues(), function (index, value) {
 				return [index, value];
 			})
 			.where(function (data) {
@@ -159,7 +159,7 @@ BaseColumn.prototype.select = function (selector) {
 		self.getName(),
 		function () {
 			return new ArrayEnumerator(
-				E.from(self.getValues())
+				E.from(self.toValues())
 					.select(function (value) {
 						return selector(value);
 					})
@@ -191,8 +191,8 @@ BaseColumn.prototype.selectMany = function (selector) {
 			return;
 		}
 
-		newIndexAndNewValues = E.from(self.getIndex().getValues())
-			.zip(self.getValues(), function (index, value) {
+		newIndexAndNewValues = E.from(self.getIndex().toValues())
+			.zip(self.toValues(), function (index, value) {
 				return [index, selector(value)];
 			})
 			.toArray();
@@ -275,8 +275,8 @@ var executeOrderBy = function (self, batch) {
 			validateSortMethod(orderCmd.sortMethod);
 		});
 
-		var valuesWithIndex = E.from(self.getIndex().getValues())
-			.zip(self.getValues(), function (index, value) {
+		var valuesWithIndex = E.from(self.getIndex().toValues())
+			.zip(self.toValues(), function (index, value) {
 				return [index, value];
 			})
 			.toArray();	
@@ -436,7 +436,7 @@ BaseColumn.prototype.getRowsSubset = function (index, count) {
 		self.getName(),
 		function () {
 			return new ArrayEnumerator(
-				E.from(self.getValues())
+				E.from(self.toValues())
 					.skip(index)
 					.take(count)
 					.toArray()
@@ -463,8 +463,8 @@ BaseColumn.prototype.rollingWindow = function (period, fn) {
 
 	//todo: make this properly lazy
 
-	var index = self.getIndex().getValues();
-	var values = self.getValues();
+	var index = self.getIndex().toValues();
+	var values = self.toValues();
 
 	if (values.length == 0) {
 		var Column = require('./column');
@@ -530,8 +530,8 @@ BaseColumn.prototype.reindex = function (newIndex) {
 			var indexMap = {};
 			var indexExists = {};
 
-			E.from(self.getIndex().getValues())
-				.zip(self.getValues(), 
+			E.from(self.getIndex().toValues())
+				.zip(self.toValues(), 
 					function (indexValue, columnValue) {
 						return [indexValue, columnValue];
 					}
@@ -552,7 +552,7 @@ BaseColumn.prototype.reindex = function (newIndex) {
 			//
 			// Return the columns values in the order specified by the new index.
 			//
-			return new ArrayEnumerator(E.from(newIndex.getValues())
+			return new ArrayEnumerator(E.from(newIndex.toValues())
 				.select(function (newIndexValue) {
 					return indexMap[newIndexValue];
 				})
@@ -573,9 +573,9 @@ BaseColumn.prototype.toString = function () {
 	var self = this;
 	var Table = require('easy-table');
 
-	var index = self.getIndex().getValues();
+	var index = self.getIndex().toValues();
 	var header = [self.getIndex().getName(), self.getName()];
-	var rows = E.from(self.getValues())
+	var rows = E.from(self.toValues())
 			.select(function (value, rowIndex) { 
 				return [index[rowIndex], value];
 			})
@@ -705,7 +705,7 @@ BaseColumn.prototype.detectTypes = function () {
 			return ["type", "frequency"];
 		},
 		function () {
-			var values = self.getValues();
+			var values = self.toValues();
 			var totalValues = values.length;
 
 			var typeFrequencies = E.from(values)
@@ -768,7 +768,7 @@ BaseColumn.prototype.truncateStrings = function (maxLength) {
 /*
  * Extract values from the column. This forces lazy evaluation to complete.
  */
-BaseColumn.prototype.getValues = function () {
+BaseColumn.prototype.toValues = function () {
 
 	var self = this;
 	var enumerator = self.getEnumerator();

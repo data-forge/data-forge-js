@@ -15,7 +15,7 @@ describe('Index', function () {
 				return new ArrayEnumerator([0, 1, 2, 3]); 
 			}
 		);
-		expect(index.getValues()).to.eql([0, 1, 2, 3]);
+		expect(index.toValues()).to.eql([0, 1, 2, 3]);
 	});
 
 });

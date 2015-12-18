@@ -18,7 +18,7 @@ describe('LazyColumn', function () {
 	it('default index is generated', function () {
 		
 		var column = initExampleColumn();		
-		expect(column.getIndex().getValues()).to.eql([			
+		expect(column.getIndex().toValues()).to.eql([			
 			0,
 			1			
 		]);		
@@ -31,7 +31,7 @@ describe('LazyColumn', function () {
 				return new dataForge.Index("__test__", [5, 6])
 			}
 		);
-		expect(column.getIndex().getValues()).to.eql([			
+		expect(column.getIndex().toValues()).to.eql([			
 			5,
 			6
 		]);		
@@ -40,7 +40,7 @@ describe('LazyColumn', function () {
 	it('can get series values', function () {
 		
 		var series = initExampleColumn();		
-		expect(series.getValues()).to.eql([			
+		expect(series.toValues()).to.eql([			
 			100,
 			200			
 		]);		

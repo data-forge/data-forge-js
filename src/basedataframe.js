@@ -169,8 +169,8 @@ BaseDataFrame.prototype.where = function (filterSelectorPredicate) {
 		}
 
 		cachedFilteredIndexAndValues = E
-			.from(self.getIndex().getValues())
-			.zip(self.getValues(), function (index, values) {
+			.from(self.getIndex().toValues())
+			.zip(self.toValues(), function (index, values) {
 				return [index, values];
 			})
 			.where(function (data) {
@@ -230,7 +230,7 @@ BaseDataFrame.prototype.select = function (selector) {
 		}
 
 		newValues = E
-			.from(self.getValues())
+			.from(self.toValues())
 			.select(function (row) {
 				return selector(mapRowByColumns(self, row));
 			})
@@ -290,8 +290,8 @@ BaseDataFrame.prototype.selectMany = function (selector) {
 			return;
 		}
 
-		newValues = E.from(self.getIndex().getValues())
-			.zip(self.getValues(), function (index, row) {
+		newValues = E.from(self.getIndex().toValues())
+			.zip(self.toValues(), function (index, row) {
 				return [index, selector(mapRowByColumns(self, row))];
 			})
 			.toArray();
@@ -381,7 +381,7 @@ BaseDataFrame.prototype.getColumn = function (columnNameOrIndex) {
 	return new LazyColumn(
 		self.getColumnNames()[columnIndex],
 		function () {
-			return new ArrayEnumerator(E.from(self.getValues())
+			return new ArrayEnumerator(E.from(self.toValues())
 				.select(function (entry) {
 					return entry[columnIndex];
 				})
@@ -430,7 +430,7 @@ BaseDataFrame.prototype.getColumnsSubset = function (columnNames) {
 				.toArray();
 			
 			return new ArrayEnumerator(
-				E.from(self.getValues())
+				E.from(self.toValues())
 					.select(function (entry) {
 						return E.from(columnIndices)
 							.select(function (columnIndex) {
@@ -486,8 +486,8 @@ var executeOrderBy = function (self, batch) {
 			validateSortMethod(orderCmd.sortMethod);
 		});
 
-		var valuesWithIndex = E.from(self.getIndex().getValues())
-			.zip(self.getValues(), function (index, values) {
+		var valuesWithIndex = E.from(self.getIndex().toValues())
+			.zip(self.toValues(), function (index, values) {
 				return [index].concat(values);
 			})
 			.toArray();	
@@ -693,7 +693,7 @@ BaseDataFrame.prototype.dropColumn = function (columnOrColumns) {
 		function () {
 			var columnIndices = lazyGenerateColumnIndices();
 			return new ArrayEnumerator(
-				E.from(self.getValues())
+				E.from(self.toValues())
 					.select(function (row) {
 						return E.from(row)
 							.where(function (column, columnIndex) {
@@ -725,7 +725,7 @@ BaseDataFrame.prototype.setColumn = function (columnName, data) {
 		assert.isObject(data, "Expected 'data' parameter to 'setColumn' to be either an array or a column object.");
 		assert.isFunction(data.reindex, "Expected 'data' parameter to 'setColumn' to have a 'reindex' function that allows the column to be reindexed.");
 
-		data = data.reindex(self.getIndex()).getValues();
+		data = data.reindex(self.getIndex()).toValues();
 	}
 
 	var LazyDataFrame = require('./lazydataframe');
@@ -740,7 +740,7 @@ BaseDataFrame.prototype.setColumn = function (columnName, data) {
 			},
 			function () {
 				return new ArrayEnumerator(
-					E.from(self.getValues())
+					E.from(self.toValues())
 						.select(function (row, rowIndex) {
 							return row.concat([data[rowIndex]]);
 						})
@@ -770,7 +770,7 @@ BaseDataFrame.prototype.setColumn = function (columnName, data) {
 			},
 			function () {
 				return new ArrayEnumerator(
-					E.from(self.getValues())
+					E.from(self.toValues())
 						.select(function (row, rowIndex) {
 							return E.from(row)
 								.select(function (column, thisColumnIndex) {
@@ -813,7 +813,7 @@ BaseDataFrame.prototype.getRowsSubset = function (index, count) { //todo: change
 		},
 		function () {
 			return new ArrayEnumerator(
-				E.from(self.getValues())
+				E.from(self.toValues())
 					.skip(index)
 					.take(count)
 					.toArray()
@@ -841,13 +841,13 @@ BaseDataFrame.prototype.setIndex = function (columnNameOrIndex) {
 			return self.getColumnNames();
 		},
 		function () {
-			return new ArrayEnumerator(self.getValues());
+			return new ArrayEnumerator(self.toValues());
 		},
 		function () {
 			return new LazyIndex(
 				self.getColumn(columnNameOrIndex).getName(),
 				function () {
-					return new ArrayEnumerator(self.getColumn(columnNameOrIndex).getValues());
+					return new ArrayEnumerator(self.getColumn(columnNameOrIndex).toValues());
 				}
 			);
 		}		
@@ -873,7 +873,7 @@ BaseDataFrame.prototype.resetIndex = function () {
 			return new LazyIndex( //todo: broad-cast index
 				"__index___",
 				function () {
-					return new ArrayEnumerator(E.range(0, self.getValues().length).toArray());
+					return new ArrayEnumerator(E.range(0, self.toValues().length).toArray());
 				}
 			);
 		}		
@@ -888,9 +888,9 @@ BaseDataFrame.prototype.toString = function () {
 	var self = this;
 	var Table = require('easy-table');
 
-	var index = self.getIndex().getValues();
+	var index = self.getIndex().toValues();
 	var header = [self.getIndex().getName()].concat(self.getColumnNames());
-	var rows = E.from(self.getValues())
+	var rows = E.from(self.toValues())
 			.select(function (row, rowIndex) { 
 				return [index[rowIndex]].concat(row);
 			})
@@ -954,7 +954,7 @@ BaseDataFrame.prototype.detectTypes = function () {
 
 	var dataFrames = E.from(self.getColumns())
 		.select(function (column) {
-			var numValues = column.getValues().length;
+			var numValues = column.toValues().length;
 			var Column = require('./column');
 			//todo: broad-cast column
 			var columnNameColumn = new Column('column', E.range(0, numValues).select(function () { return column.getName(); }).toArray());
@@ -974,7 +974,7 @@ BaseDataFrame.prototype.truncateStrings = function (maxLength) {
 	assert.isNumber(maxLength, "Expected 'maxLength' parameter to 'truncateStrings' to be an integer.");
 
 	var self = this;
-	var truncatedValues = E.from(self.getValues())
+	var truncatedValues = E.from(self.toValues())
 		.select(function (row) {
 			return E.from(row)
 				.select(function (value) {
@@ -1021,7 +1021,7 @@ BaseDataFrame.prototype.remapColumns = function (columnNames) {
 		},
 		function () {
 			return new ArrayEnumerator(
-				E.from(self.getValues())
+				E.from(self.toValues())
 					.select(function (row) {
 						return E.from(columnNames)
 							.select(function (columnName) {
@@ -1078,16 +1078,16 @@ BaseDataFrame.prototype.renameColumns = function (newColumnNames) {
 };
 
 /**
- * Bake the data frame an array of rows.
+ * Bake the data frame to an array of rows.
  */
-BaseDataFrame.prototype.getValues = function () { //todo: toRows
+BaseDataFrame.prototype.toValues = function () {
 
 	var self = this;
 
 	var enumerator = self.getEnumerator();
 	validateEnumerator(enumerator);
 
-	var values = []; //todo: move this to the enumerator interface: eg a bake function.
+	var values = [];
 
 	while (enumerator.moveNext()) {
 		values.push(enumerator.getCurrent());
@@ -1103,7 +1103,7 @@ BaseDataFrame.prototype.toObjects = function () {
 
 	var self = this;
 	var columnNames = self.getColumnNames();
-	return E.from(self.getValues()) //todo: should this rely on get enumerator?
+	return E.from(self.toValues()) //todo: should this rely on get enumerator?
 		.select(function (row) {
 			return E.from(columnNames)
 				.zip(row, function (columnName, columnValue) {
@@ -1136,7 +1136,7 @@ BaseDataFrame.prototype.toCSV = function () {
 
 	var self = this;
 	var header = self.getColumnNames().join(',');
-	var rows = E.from(self.getValues())
+	var rows = E.from(self.toValues())
 			.select(function (row) {
 				return row.join(',');
 			})

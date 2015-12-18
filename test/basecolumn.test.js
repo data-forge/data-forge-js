@@ -31,21 +31,21 @@ describe('BaseColumn', function () {
 	it('can bake values from enumerator', function () {
 
 		var column = initColumn([0, 1, 2, 3], [100, 300, 200, 5]);
-		expect(column.getValues()).to.eql([100, 300, 200, 5]);
+		expect(column.toValues()).to.eql([100, 300, 200, 5]);
 	});	
 
 	it('can skip', function () {
 		var column = initColumn([0, 1, 2, 3], [100, 300, 200, 5]);
 		var skipped = column.skip(2);		
-		expect(skipped.getIndex().getValues()).to.eql([2, 3]);
-		expect(skipped.getValues()).to.eql([200, 5]);		
+		expect(skipped.getIndex().toValues()).to.eql([2, 3]);
+		expect(skipped.toValues()).to.eql([200, 5]);		
 	});
 
 	it('can take', function () {
 		var column = initColumn([0, 1, 2, 3], [100, 300, 200, 5]);
 		var skipped = column.take(2);		
-		expect(skipped.getIndex().getValues()).to.eql([0, 1]);
-		expect(skipped.getValues()).to.eql([100, 300]);		
+		expect(skipped.getIndex().toValues()).to.eql([0, 1]);
+		expect(skipped.toValues()).to.eql([100, 300]);		
 	});
 
 	it('can filter', function () {
@@ -53,8 +53,8 @@ describe('BaseColumn', function () {
 		var filtered = column.where(function (value) {
 				return value >= 100 && value < 300;
 			});
-		expect(filtered.getIndex().getValues()).to.eql([0, 2]);
-		expect(filtered.getValues()).to.eql([100, 200]);		
+		expect(filtered.getIndex().toValues()).to.eql([0, 2]);
+		expect(filtered.toValues()).to.eql([100, 200]);		
 	});
 
 	it('can select', function () {
@@ -62,8 +62,8 @@ describe('BaseColumn', function () {
 		var modified = column.select(function (value) {
 				return value + 10;
 			});
-		expect(modified.getIndex().getValues()).to.eql([0, 1, 2, 3]);
-		expect(modified.getValues()).to.eql([110, 310, 210, 15]);		
+		expect(modified.getIndex().toValues()).to.eql([0, 1, 2, 3]);
+		expect(modified.toValues()).to.eql([110, 310, 210, 15]);		
 	});
 
 	it('can select many', function () {
@@ -75,22 +75,22 @@ describe('BaseColumn', function () {
 					})
 					.toArray();
 			});
-		expect(modified.getIndex().getValues()).to.eql([0, 0, 1, 1, 2, 2, 3, 3]);
-		expect(modified.getValues()).to.eql([101, 102, 301, 302, 201, 202, 6, 7]);		
+		expect(modified.getIndex().toValues()).to.eql([0, 0, 1, 1, 2, 2, 3, 3]);
+		expect(modified.toValues()).to.eql([101, 102, 301, 302, 201, 202, 6, 7]);		
 	});
 
 	it('can sort values ascending', function () {		
 		var column = initColumn([0, 1, 2, 3], [100, 300, 200, 5]);
 		var sorted = column.order();
-		expect(sorted.getIndex().getValues()).to.eql([3, 0, 2, 1]);
-		expect(sorted.getValues()).to.eql([5, 100, 200, 300]);
+		expect(sorted.getIndex().toValues()).to.eql([3, 0, 2, 1]);
+		expect(sorted.toValues()).to.eql([5, 100, 200, 300]);
 	});
 	
 	it('can sort values descending', function () {		
 		var column = initColumn([0, 1, 2, 3], [100, 300, 200, 5]);
 		var sorted = column.orderDescending();
-		expect(sorted.getIndex().getValues()).to.eql([1, 2, 0, 3]);
-		expect(sorted.getValues()).to.eql([300, 200, 100, 5]);
+		expect(sorted.getIndex().toValues()).to.eql([1, 2, 0, 3]);
+		expect(sorted.toValues()).to.eql([300, 200, 100, 5]);
 	});
 
 	it('can sort nested objects using selector - ascending', function () {
@@ -122,8 +122,8 @@ describe('BaseColumn', function () {
 			.thenBy(function (row) {
 				return row.i;
 			});
-		expect(sorted.getIndex().getValues()).to.eql([3, 2, 1, 0]);
-		expect(sorted.getValues()).to.eql([
+		expect(sorted.getIndex().toValues()).to.eql([3, 2, 1, 0]);
+		expect(sorted.toValues()).to.eql([
 			{
 				i: 3,
 				v: 5
@@ -172,8 +172,8 @@ describe('BaseColumn', function () {
 			.thenByDescending(function (row) {
 				return row.i;
 			});
-		expect(sorted.getIndex().getValues()).to.eql([0, 1, 2, 3]);
-		expect(sorted.getValues()).to.eql([
+		expect(sorted.getIndex().toValues()).to.eql([0, 1, 2, 3]);
+		expect(sorted.toValues()).to.eql([
 			{
 				i: 1,
 				v: 300,
@@ -198,8 +198,8 @@ describe('BaseColumn', function () {
 
 		var column = initColumn([0, 1, 2, 3], [100, 300, 200, 5]);
 		var subset = column.getRowsSubset(1, 2);
-		expect(subset.getIndex().getValues()).to.eql([1, 2]);
-		expect(subset.getValues()).to.eql([300, 200]);
+		expect(subset.getIndex().toValues()).to.eql([1, 2]);
+		expect(subset.toValues()).to.eql([300, 200]);
 	});
 
 	it('can compute rolling window - from empty data set', function () {
@@ -209,7 +209,7 @@ describe('BaseColumn', function () {
 			return [rowIndex, values];
 		});
 
-		expect(newColumn.getValues().length).to.eql(0);
+		expect(newColumn.toValues().length).to.eql(0);
 	});
 
 	it('rolling window returns 0 values when there are not enough values in the data set', function () {
@@ -219,7 +219,7 @@ describe('BaseColumn', function () {
 			return [rowIndex, values];
 		});
 
-		expect(newColumn.getValues().length).to.eql(0);
+		expect(newColumn.toValues().length).to.eql(0);
 	});
 
 	it('can compute rolling window - odd data set with even period', function () {
@@ -229,10 +229,10 @@ describe('BaseColumn', function () {
 			return [rowIndex, values];
 		});
 
-		var index = newColumn.getIndex().getValues();
+		var index = newColumn.getIndex().toValues();
 		expect(index).to.eql([0, 1, 2, 3]);
 
-		var values = newColumn.getValues();
+		var values = newColumn.toValues();
 		expect(values.length).to.eql(4);
 		expect(values[0]).to.eql([0, 1]);
 		expect(values[1]).to.eql([1, 2]);
@@ -247,10 +247,10 @@ describe('BaseColumn', function () {
 			return [rowIndex, values];
 		});
 
-		var index = newColumn.getIndex().getValues();
+		var index = newColumn.getIndex().toValues();
 		expect(index).to.eql([0, 1, 2]);
 
-		var values = newColumn.getValues();
+		var values = newColumn.toValues();
 		expect(values.length).to.eql(3);
 		expect(values[0]).to.eql([0, 1, 2]);
 		expect(values[1]).to.eql([1, 2, 3]);
@@ -264,10 +264,10 @@ describe('BaseColumn', function () {
 			return [rowIndex+10, values];
 		});
 
-		var index = newColumn.getIndex().getValues();
+		var index = newColumn.getIndex().toValues();
 		expect(index).to.eql([10, 11, 12, 13, 14]);
 
-		var values = newColumn.getValues();
+		var values = newColumn.toValues();
 		expect(values.length).to.eql(5);
 		expect(values[0]).to.eql([0, 1]);
 		expect(values[1]).to.eql([1, 2]);
@@ -283,10 +283,10 @@ describe('BaseColumn', function () {
 			return [rowIndex, values];
 		});
 
-		var index = newColumn.getIndex().getValues();
+		var index = newColumn.getIndex().toValues();
 		expect(index).to.eql([0, 1, 2, 3]);
 
-		var values = newColumn.getValues();
+		var values = newColumn.toValues();
 		expect(values.length).to.eql(4);
 		expect(values[0]).to.eql([0, 1, 2]);
 		expect(values[1]).to.eql([1, 2, 3]);
@@ -301,10 +301,10 @@ describe('BaseColumn', function () {
 			return [index[index.length-1], values[values.length-1]];
 		});
 
-		var index = newColumn.getIndex().getValues();
+		var index = newColumn.getIndex().toValues();
 		expect(index).to.eql([2, 3, 4, 5]);
 
-		var values = newColumn.getValues();
+		var values = newColumn.toValues();
 		expect(values).to.eql([2, 3, 4, 5]);
 	});
 
@@ -314,8 +314,8 @@ describe('BaseColumn', function () {
 		var newIndex = new dataForge.Index("__test__", [3, 10, 1, 32])
 
 		var reindexed = column.reindex(newIndex);
-		expect(reindexed.getIndex().getValues()).to.eql([3, 10, 1, 32]);
-		expect(reindexed.getValues()).to.eql([5, undefined, 300, undefined]);
+		expect(reindexed.getIndex().toValues()).to.eql([3, 10, 1, 32]);
+		expect(reindexed.toValues()).to.eql([5, undefined, 300, undefined]);
 	});
 
 	it('reindexing a column with duplicate indicies throws', function () {
@@ -326,7 +326,7 @@ describe('BaseColumn', function () {
 		var reindexed = column.reindex(newIndex);
 
 		expect(function () {
-			reindexed.getValues(); // Force lazy evaluation to complete.
+			reindexed.toValues(); // Force lazy evaluation to complete.
 			
 		}).to.throw(Error);
 	});
@@ -335,8 +335,8 @@ describe('BaseColumn', function () {
 
 		var column = initColumn([0, 1, 2, 3], [1, 2, 4, 8]);
 		var pctChanged = column.percentChange();
-		expect(pctChanged.getIndex().getValues()).to.eql([1, 2, 3]);
-		expect(pctChanged.getValues()).to.eql([1, 1, 1]);
+		expect(pctChanged.getIndex().toValues()).to.eql([1, 2, 3]);
+		expect(pctChanged.toValues()).to.eql([1, 1, 1]);
 	});
 
 	it('can parse string column to int', function () {
@@ -344,8 +344,8 @@ describe('BaseColumn', function () {
 		var column = initColumn([10, 5, 2], ['1', '100', '5']);
 		var parsed = column.parseInts();
 
-		expect(parsed.getIndex().getValues()).to.eql([10, 5, 2]);
-		expect(parsed.getValues()).to.eql([1, 100, 5]);
+		expect(parsed.getIndex().toValues()).to.eql([10, 5, 2]);
+		expect(parsed.toValues()).to.eql([1, 100, 5]);
 	});
 
 	it('can parse string column to int - with empty string', function () {
@@ -353,8 +353,8 @@ describe('BaseColumn', function () {
 		var column = initColumn([10], ['']);
 		var parsed = column.parseInts();
 
-		expect(parsed.getIndex().getValues()).to.eql([10]);
-		expect(parsed.getValues()).to.eql([undefined]);
+		expect(parsed.getIndex().toValues()).to.eql([10]);
+		expect(parsed.toValues()).to.eql([undefined]);
 	});
 
 	it('can parse string column to int - with undefined', function () {
@@ -362,8 +362,8 @@ describe('BaseColumn', function () {
 		var column = initColumn([10], [undefined]);
 		var parsed = column.parseInts();
 
-		expect(parsed.getIndex().getValues()).to.eql([10]);
-		expect(parsed.getValues()).to.eql([undefined]);
+		expect(parsed.getIndex().toValues()).to.eql([10]);
+		expect(parsed.toValues()).to.eql([undefined]);
 	});
 
 	it('can parse string column to int - throws when source value is not a string', function () {
@@ -371,9 +371,9 @@ describe('BaseColumn', function () {
 		var column = initColumn([10], [5]);
 		var parsed = column.parseInts();
 
-		expect(parsed.getIndex().getValues()).to.eql([10]);
+		expect(parsed.getIndex().toValues()).to.eql([10]);
 		expect(function () { 
-			parsed.getValues();
+			parsed.toValues();
 		}).to.throw();
 	});
 
@@ -382,8 +382,8 @@ describe('BaseColumn', function () {
 		var column = initColumn([10, 5, 2], ['1', '100.2020', '5.5']);
 		var parsed = column.parseFloats();
 
-		expect(parsed.getIndex().getValues()).to.eql([10, 5, 2]);
-		expect(parsed.getValues()).to.eql([1, 100.2020, 5.5]);
+		expect(parsed.getIndex().toValues()).to.eql([10, 5, 2]);
+		expect(parsed.toValues()).to.eql([1, 100.2020, 5.5]);
 	});
 
 	it('can parse string column to float - with empty string', function () {
@@ -391,8 +391,8 @@ describe('BaseColumn', function () {
 		var column = initColumn([10], ['']);
 		var parsed = column.parseFloats();
 
-		expect(parsed.getIndex().getValues()).to.eql([10]);
-		expect(parsed.getValues()).to.eql([undefined]);
+		expect(parsed.getIndex().toValues()).to.eql([10]);
+		expect(parsed.toValues()).to.eql([undefined]);
 	});
 
 	it('can parse string column to float - with undefined', function () {
@@ -400,8 +400,8 @@ describe('BaseColumn', function () {
 		var column = initColumn([10], [undefined]);
 		var parsed = column.parseFloats();
 
-		expect(parsed.getIndex().getValues()).to.eql([10]);
-		expect(parsed.getValues()).to.eql([undefined]);
+		expect(parsed.getIndex().toValues()).to.eql([10]);
+		expect(parsed.toValues()).to.eql([undefined]);
 	});
 
 	it('can parse string column to float - throws when source value is not a string', function () {
@@ -409,9 +409,9 @@ describe('BaseColumn', function () {
 		var column = initColumn([10], [5]);
 		var parsed = column.parseFloats();
 
-		expect(parsed.getIndex().getValues()).to.eql([10]);
+		expect(parsed.getIndex().toValues()).to.eql([10]);
 		expect(function () { 
-			parsed.getValues();
+			parsed.toValues();
 		}).to.throw();
 	});
 
@@ -420,8 +420,8 @@ describe('BaseColumn', function () {
 		var column = initColumn([10, 5], ['1975-2-24', '2015-2-24']);
 		var parsed = column.parseDates();
 
-		expect(parsed.getIndex().getValues()).to.eql([10, 5]);
-		expect(parsed.getValues()).to.eql([new Date(1975, 1, 24), new Date(2015, 1, 24)]); // Note months are 0-based here.
+		expect(parsed.getIndex().toValues()).to.eql([10, 5]);
+		expect(parsed.toValues()).to.eql([new Date(1975, 1, 24), new Date(2015, 1, 24)]); // Note months are 0-based here.
 	});
 
 	it('can parse string column to date - with empty string', function () {
@@ -429,8 +429,8 @@ describe('BaseColumn', function () {
 		var column = initColumn([10], ['']);
 		var parsed = column.parseDates();
 
-		expect(parsed.getIndex().getValues()).to.eql([10]);
-		expect(parsed.getValues()).to.eql([undefined]);
+		expect(parsed.getIndex().toValues()).to.eql([10]);
+		expect(parsed.toValues()).to.eql([undefined]);
 	});
 
 	it('can parse string column to date - with undefined', function () {
@@ -438,8 +438,8 @@ describe('BaseColumn', function () {
 		var column = initColumn([10], [undefined]);
 		var parsed = column.parseDates();
 
-		expect(parsed.getIndex().getValues()).to.eql([10]);
-		expect(parsed.getValues()).to.eql([undefined]);
+		expect(parsed.getIndex().toValues()).to.eql([10]);
+		expect(parsed.toValues()).to.eql([undefined]);
 	});
 
 	it('can parse string column to date - throws when source value is not a string', function () {
@@ -447,9 +447,9 @@ describe('BaseColumn', function () {
 		var column = initColumn([10], [5]);
 		var parsed = column.parseDates();
 
-		expect(parsed.getIndex().getValues()).to.eql([10]);
+		expect(parsed.getIndex().toValues()).to.eql([10]);
 		expect(function () { 
-			parsed.getValues();
+			parsed.toValues();
 		}).to.throw();
 	});
 
@@ -458,8 +458,8 @@ describe('BaseColumn', function () {
 		var column = initColumn([1, 2, 3, 4, 5, 6], [1, null, undefined, "foo", 5.5, new Date(2015, 1, 1)]);
 		var converted = column.toStrings();
 
-		expect(converted.getIndex().getValues()).to.eql([1, 2, 3, 4, 5, 6]);
-		expect(converted.getValues()).to.eql([
+		expect(converted.getIndex().toValues()).to.eql([1, 2, 3, 4, 5, 6]);
+		expect(converted.toValues()).to.eql([
 			'1', 
 			null, 
 			undefined, 
@@ -475,8 +475,8 @@ describe('BaseColumn', function () {
 		var column = initColumn([1], [1]);
 		var types = column.detectTypes();
 		expect(types.getColumnNames()).to.eql(['type', 'frequency']);
-		expect(types.getIndex().getValues()).to.eql([0]);
-		expect(types.getValues()).to.eql([
+		expect(types.getIndex().toValues()).to.eql([0]);
+		expect(types.toValues()).to.eql([
 			['number', 100]
 		]);
 	});
@@ -486,8 +486,8 @@ describe('BaseColumn', function () {
 		var column = initColumn([1], [new Date(2015, 1, 1)]);
 		var types = column.detectTypes();
 		expect(types.getColumnNames()).to.eql(['type', 'frequency']);
-		expect(types.getIndex().getValues()).to.eql([0]);
-		expect(types.getValues()).to.eql([
+		expect(types.getIndex().toValues()).to.eql([0]);
+		expect(types.toValues()).to.eql([
 			['date', 100]
 		]);
 	});
@@ -497,8 +497,8 @@ describe('BaseColumn', function () {
 		var column = initColumn([1, 2], [1, 'foo']);
 		var types = column.detectTypes();
 		expect(types.getColumnNames()).to.eql(['type', 'frequency']);
-		expect(types.getIndex().getValues()).to.eql([0, 1]);
-		expect(types.getValues()).to.eql([
+		expect(types.getIndex().toValues()).to.eql([0, 1]);
+		expect(types.toValues()).to.eql([
 			['number', 50],
 			['string', 50],
 		]);
@@ -510,8 +510,8 @@ describe('BaseColumn', function () {
 		var column = initColumn([1, 2], ['foo', 'bar']);
 		var truncated = column.truncateStrings(2);
 
-		expect(truncated.getIndex().getValues()).to.eql([1, 2]);
-		expect(truncated.getValues()).to.eql(['fo', 'ba']);
+		expect(truncated.getIndex().toValues()).to.eql([1, 2]);
+		expect(truncated.toValues()).to.eql(['fo', 'ba']);
 	});
 
 	it('truncation ignores strings that are already short enough', function () {
@@ -519,7 +519,7 @@ describe('BaseColumn', function () {
 		var column = initColumn([1, 2], ['foo', 'bar']);
 		var truncated = column.truncateStrings(20);
 
-		expect(truncated.getValues()).to.eql(['foo', 'bar']);
+		expect(truncated.toValues()).to.eql(['foo', 'bar']);
 	});
 
 	it('truncation passes through other values', function () {
@@ -527,7 +527,7 @@ describe('BaseColumn', function () {
 		var column = initColumn([1, 2, 3, 4], [null, undefined, 1, new Date(2015, 1, 1)]);
 		var truncated = column.truncateStrings(20);
 
-		expect(truncated.getValues()).to.eql([null, undefined, 1, new Date(2015, 1, 1)]);
+		expect(truncated.toValues()).to.eql([null, undefined, 1, new Date(2015, 1, 1)]);
 	});
 
 });

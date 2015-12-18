@@ -22,7 +22,7 @@ describe('DataFrame', function () {
 			[new Date(2015, 24, 2), 200, 'bar', 22],
 		];
 		var dataFrame = new dataForge.DataFrame({ columnNames: columns, rows: rows });
-		expect(dataFrame.getValues()).to.eql(rows);
+		expect(dataFrame.toValues()).to.eql(rows);
 	});
 
 	it('default index is generated', function () {
@@ -33,7 +33,7 @@ describe('DataFrame', function () {
 			[new Date(2015, 24, 2), 200, 'bar', 22],
 		];
 		var dataFrame = new dataForge.DataFrame({ columnNames: columns, rows: rows });
-		expect(dataFrame.getIndex().getValues()).to.eql([0, 1 ]);
+		expect(dataFrame.getIndex().toValues()).to.eql([0, 1 ]);
 	});
 
 	it('there are no rows or columns when no columns or rows are specified', function () {
@@ -41,7 +41,7 @@ describe('DataFrame', function () {
 		var dataFrame = new dataForge.DataFrame();
 		expect(dataFrame.getColumnNames()).to.eql([]);
 		expect(dataFrame.getColumns()).to.eql([]);
-		expect(dataFrame.getValues()).to.eql([]);
+		expect(dataFrame.toValues()).to.eql([]);
 	})
 
 	it('there are no rows or columns when no columns or rows are specified', function () {
@@ -49,7 +49,7 @@ describe('DataFrame', function () {
 		var dataFrame = new dataForge.DataFrame({});
 		expect(dataFrame.getColumnNames()).to.eql([]);
 		expect(dataFrame.getColumns()).to.eql([]);
-		expect(dataFrame.getValues()).to.eql([]);
+		expect(dataFrame.toValues()).to.eql([]);
 	})
 
 	it('column names default to integer index when not specified', function () {
@@ -78,7 +78,7 @@ describe('DataFrame', function () {
 			});
 		
 		expect(dataFrame.getColumnNames()).to.eql(["Col1", "Col2"]);
-		expect(dataFrame.getValues()).to.eql([
+		expect(dataFrame.toValues()).to.eql([
 			[1, 'hello'],
 			[10, 'computer'],
 		])
@@ -87,10 +87,10 @@ describe('DataFrame', function () {
 		expect(columns.length).to.eql(2);
 
 		expect(columns[0].getName()).to.eql("Col1");
-		expect(columns[0].getValues()).to.eql([1, 10]);
+		expect(columns[0].toValues()).to.eql([1, 10]);
 
 		expect(columns[1].getName()).to.eql("Col2");
-		expect(columns[1].getValues()).to.eql(["hello", "computer"]);
+		expect(columns[1].toValues()).to.eql(["hello", "computer"]);
 	});
 
 	it('can initialize from array of objects with different fields', function () {
@@ -110,7 +110,7 @@ describe('DataFrame', function () {
 
 		expect(dataFrame.getColumnNames()).to.eql(["Col1", "Col2", "Col3", "Col4"]);
 
-		expect(dataFrame.getValues()).to.eql([
+		expect(dataFrame.toValues()).to.eql([
 			[1, 'hello', undefined, undefined],
 			[undefined, undefined, 10, 'computer'],
 		]);
@@ -119,16 +119,16 @@ describe('DataFrame', function () {
 		expect(columns.length).to.eql(4);
 
 		expect(columns[0].getName()).to.eql("Col1");
-		expect(columns[0].getValues()).to.eql([1, undefined]);
+		expect(columns[0].toValues()).to.eql([1, undefined]);
 
 		expect(columns[1].getName()).to.eql("Col2");
-		expect(columns[1].getValues()).to.eql(["hello", undefined]);
+		expect(columns[1].toValues()).to.eql(["hello", undefined]);
 
 		expect(columns[2].getName()).to.eql("Col3");
-		expect(columns[2].getValues()).to.eql([undefined, 10]);
+		expect(columns[2].toValues()).to.eql([undefined, 10]);
 
 		expect(columns[3].getName()).to.eql("Col4");
-		expect(columns[3].getValues()).to.eql([undefined, "computer"]);
+		expect(columns[3].toValues()).to.eql([undefined, "computer"]);
 	});
 
 	it('can initialize from array of objects with zero fields', function () {
@@ -142,6 +142,6 @@ describe('DataFrame', function () {
 
 		expect(dataFrame.getColumnNames()).to.eql([]);
 		expect(dataFrame.getColumns()).to.eql([]);
-		expect(dataFrame.getValues()).to.eql([[], []]);
+		expect(dataFrame.toValues()).to.eql([[], []]);
 	});	
 });

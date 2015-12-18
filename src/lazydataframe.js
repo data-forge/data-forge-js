@@ -31,7 +31,7 @@ var LazyDataFrame = function (columnNamesFn, enumeratorFn, indexFn) {
 			return new LazyIndex(
 				"__index__",
 				function () {
-					return new ArrayEnumerator(E.range(0, self.getValues().length).toArray());
+					return new ArrayEnumerator(E.range(0, self.toValues().length).toArray());
 				}
 			);
 		};
