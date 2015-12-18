@@ -13,7 +13,9 @@ var assert = require('chai').assert;
 var loadSharePricesFile = function (filePath) {
 	assert.isString(filePath);
 
-	return dataForge.fromCSV(fs.readFileSync(filePath, 'utf8'));
+	return dataForge
+		.fromCSV(fs.readFileSync(filePath, 'utf8'))
+		.parseFloats('Close');
 };
 
 //
@@ -35,8 +37,8 @@ var computeSimpleMovingAverage = function (dataFrame, period) {
 	var movingAvgColumn = dataFrame
 		.getColumn('Close')
 		.rollingWindow(period, 
-			function (values) {
-				return E.from(values).sum() / values.length;
+			function (index, values) {
+				return [index[index.length-1], E.from(values).sum() / values.length];
 			}
 		);
 
