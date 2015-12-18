@@ -20,5 +20,5 @@ db.someCollection.find().toArray()
 	})
 	.then(function () {
 		db.close();
-	});
+	});	
 
