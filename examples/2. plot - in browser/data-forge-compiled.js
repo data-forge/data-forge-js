@@ -1798,91 +1798,22 @@ module.exports = isArray || function (val) {
 },{}],6:[function(require,module,exports){
 
 window.dataForge = require('../../index');
-window.dataForge.csv = require('../../format/csv');
-window.dataForge.http = require('../../source/browser/http');
 window.moment = require('moment');
 window.E = require('linq');
 
-},{"../../format/csv":7,"../../index":8,"../../source/browser/http":49,"linq":46,"moment":47}],7:[function(require,module,exports){
-'use strict';
-
-//
-// Implements input/output for the CSV format.
-//
-
-var dataForge = require('../index');
-
-var E = require('linq');
-var assert = require('chai').assert;
-
-module.exports = function (options) {
-
-	if (!options) {
-		options = {};
-	}
-	if (!options.parse_dates) {
-		options.parse_dates = [];			
-	}
-
-	return {
-
-		//
-		// Load a DataFrame from CSV text data.
-		//
-		from: function (csvData) {
-			assert.isString(csvData, "Expected 'csvData' parameter to 'csv.from' to be a string.");
-			
-			var lines = csvData.split('\n');
-			var rows = E
-				.from(lines) // Ignore blank lines.
-				.where(function (line) {
-					return line.trim().length > 0;
-				})
-				.select(function (line) {
-					return E
-						.from(line.split(','))
-						.select(function (col) {
-							return col.trim();
-						})
-						.select(function (col) {
-							if (col.length === 0) {
-								return undefined;
-							}
-							else {
-								return col;
-							}
-						})
-						.toArray();					
-				})
-				.toArray();
-					
-			return dataForge.builder(rows, options);
-		},
-		
-		//
-		// Write DataFrame to csv text data.
-		//
-		to: function (dataFrame) {
-			
-			var header = dataFrame.getColumnNames().join(',');
-			var rows = E.from(dataFrame.getValues())
-					.select(function (row) {
-						return row.join(',');
-					})
-					.toArray();
-			return [header].concat(rows).join('\r\n');	
-		},	
-	};
-};
-},{"../index":8,"chai":9,"linq":46}],8:[function(require,module,exports){
+},{"../../index":7,"linq":45,"moment":46}],7:[function(require,module,exports){
 'use strict';
 
 var assert = require('chai').assert;
 var E = require('linq');
 var dropElement = require('./src/utils').dropElement;
+var ArrayEnumerator = require('./src/enumerators/array');
+require('sugar');
+
+var DataFrame = require('./src/dataframe');
 
 /**
- * Main namespace for Panjas.
+ * Main namespace for Data-Forge.
  * 
  * Nodejs:
  * 
@@ -1898,34 +1829,64 @@ var dropElement = require('./src/utils').dropElement;
  */
 var dataForge = {
 	
-	DataFrame: require('./src/dataframe'),
+	DataFrame: DataFrame,
 	LazyDataFrame: require('./src/lazydataframe'),
 	Column: require('./src/column'),
 	LazyColumn: require('./src/lazycolumn'),
-	builder: require('./src/builder'),	
 	Index: require('./src/index'),
+	LazyIndex: require('./src/lazyindex'),
 
 	/**
-	 * Read a DataFrame from a plugable data source.
+	 * Deserialize a data frame from a JSON text string.
 	 */
-	from: function (dataSourcePlugin) {
-		assert.isObject(dataSourcePlugin, "Expected 'dataSourcePlugin' parameter to 'dataForge.from' to be an object.");
-		assert.isFunction(dataSourcePlugin.read, "Expected 'dataSourcePlugin' parameter to 'dataForge.from' to be an object with a 'read' function.");
+	fromJSON: function (jsonTextString) {
+		assert.isString(jsonTextString, "Expected 'jsonTextString' parameter to 'dataForge.fromJSON' to be a string containing data encoded in the JSON format.");
+
+		return new DataFrame({
+				rows: JSON.parse(jsonTextString)
+			});
+	},
+
+	//
+	// Deserialize a data from a CSV text string.
+	//
+	fromCSV: function (csvTextString) {
+		assert.isString(csvTextString, "Expected 'csvTextString' parameter to 'dataForge.fromCSV' to be a string containing data encoded in the CSV format.");
 		
-		return {
-			/**
-			 * Convert DataFrame from a particular data format using a plugable format.
-			 */
-			as: function (formatPlugin) {
-				assert.isObject(formatPlugin, "Expected 'formatPlugin' parameter to 'dataForge.from' to be an object.");
-				assert.isFunction(formatPlugin.from, "Expected 'formatPlugin' parameter to 'dataForge.from' to be an object with a 'from' function.");
+		var lines = csvTextString.split('\n');
+		var rows = E
+			.from(lines) // Ignore blank lines.
+			.where(function (line) {
+				return line.trim().length > 0;
+			})
+			.select(function (line) {
+				return E
+					.from(line.split(','))
+					.select(function (col) {
+						return col.trim();
+					})
+					.select(function (col) {
+						if (col.length === 0) {
+							return undefined;
+						}
+						else {
+							return col;
+						}
+					})
+					.toArray();					
+			})
+			.toArray();
+
+		if (rows.length === 0) {
+			return new dataForge.DataFrame({ columnNames: [], rows: [] });
+		}
 				
-				return dataSourcePlugin.read()
-					.then(function (textData) {
-						return formatPlugin.from(textData);
-					});		
-			},		
-		};
+		var header = E.from(rows).first();
+		var remaining = E.from(rows).skip(1).toArray();
+		return new dataForge.DataFrame({
+				columnNames: header, 
+				rows: remaining
+			});
 	},
 
 	/**
@@ -1955,8 +1916,8 @@ var dataForge = {
 			throw new Error("Column with name '" + columnName + "' doesn't exist in 'rightColumnIndex'.");
 		}
 
-		var leftRows = leftDataFrame.getValues();
-		var rightRows = rightDataFrame.getValues();
+		var leftRows = leftDataFrame.toValues();
+		var rightRows = rightDataFrame.toValues();
 
 		var mergedValues = E.from(leftRows) // Merge values, drop index.
 			.selectMany(function (leftRow) {
@@ -1978,17 +1939,68 @@ var dataForge = {
 				return ['key', 'lval', 'rval'];
 			},
 			function () {
-				return mergedValues;
+				return new ArrayEnumerator(mergedValues);
+			}
+		);
+	},
+
+	/**
+	 * Concatenate multiple data frames into a single.
+	 *
+	 * @param {array} dataFrames - Array of data frames to concatenate.
+	 */
+	concat: function (dataFrames) {
+		assert.isArray(dataFrames, "Expected 'dataFrames' parameter to 'dataForge.concat' to be an array of data frames.");
+
+		var concatenateColumns = function () {
+			return E.from(dataFrames)
+				.selectMany(function (dataFrame) {
+					return dataFrame.getColumnNames();
+				})
+				.distinct()
+				.toArray();
+		};
+
+		var LazyDataFrame = require('./src/lazydataframe');
+		return new LazyDataFrame(
+			function () {
+				return concatenateColumns();
+			},
+			function () {
+				var concatenatedColumns = concatenateColumns();
+				return new ArrayEnumerator(
+					E.from(dataFrames)
+						.selectMany(function (dataFrame) {
+							return dataFrame
+								.remapColumns(concatenatedColumns)
+								.toValues();
+						})
+						.toArray()
+				);
+			},
+			function () {
+				var LazyIndex = require('./src/lazyindex');
+				return new LazyIndex(
+					"__concatenated__",
+					function () {
+						return new ArrayEnumerator(E.from(dataFrames)
+							.selectMany(function (dataFrame) {
+								return dataFrame.getIndex().toValues();
+							})
+							.toArray()
+						);
+					}
+				)
 			}
 		);
 	},
 };
 
 module.exports = dataForge;
-},{"./src/builder":53,"./src/column":54,"./src/dataframe":55,"./src/index":56,"./src/lazycolumn":58,"./src/lazydataframe":59,"./src/utils":61,"chai":9,"linq":46}],9:[function(require,module,exports){
+},{"./src/column":51,"./src/dataframe":52,"./src/enumerators/array":53,"./src/index":54,"./src/lazycolumn":56,"./src/lazydataframe":57,"./src/lazyindex":58,"./src/utils":59,"chai":8,"linq":45,"sugar":47}],8:[function(require,module,exports){
 module.exports = require('./lib/chai');
 
-},{"./lib/chai":10}],10:[function(require,module,exports){
+},{"./lib/chai":9}],9:[function(require,module,exports){
 /*!
  * chai
  * Copyright(c) 2011-2014 Jake Luer <jake@alogicalparadox.com>
@@ -2083,7 +2095,7 @@ exports.use(should);
 var assert = require('./chai/interface/assert');
 exports.use(assert);
 
-},{"./chai/assertion":11,"./chai/config":12,"./chai/core/assertions":13,"./chai/interface/assert":14,"./chai/interface/expect":15,"./chai/interface/should":16,"./chai/utils":30,"assertion-error":38}],11:[function(require,module,exports){
+},{"./chai/assertion":10,"./chai/config":11,"./chai/core/assertions":12,"./chai/interface/assert":13,"./chai/interface/expect":14,"./chai/interface/should":15,"./chai/utils":29,"assertion-error":37}],10:[function(require,module,exports){
 /*!
  * chai
  * http://chaijs.com
@@ -2216,7 +2228,7 @@ module.exports = function (_chai, util) {
   });
 };
 
-},{"./config":12}],12:[function(require,module,exports){
+},{"./config":11}],11:[function(require,module,exports){
 module.exports = {
 
   /**
@@ -2273,7 +2285,7 @@ module.exports = {
 
 };
 
-},{}],13:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 /*!
  * chai
  * http://chaijs.com
@@ -4091,7 +4103,7 @@ module.exports = function (chai, _) {
   });
 };
 
-},{}],14:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 /*!
  * chai
  * Copyright(c) 2011-2014 Jake Luer <jake@alogicalparadox.com>
@@ -5642,7 +5654,7 @@ module.exports = function (chai, util) {
   ('isNotFrozen', 'notFrozen');
 };
 
-},{}],15:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 /*!
  * chai
  * Copyright(c) 2011-2014 Jake Luer <jake@alogicalparadox.com>
@@ -5677,7 +5689,7 @@ module.exports = function (chai, util) {
   };
 };
 
-},{}],16:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 /*!
  * chai
  * Copyright(c) 2011-2014 Jake Luer <jake@alogicalparadox.com>
@@ -5777,7 +5789,7 @@ module.exports = function (chai, util) {
   chai.Should = loadShould;
 };
 
-},{}],17:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 /*!
  * Chai - addChainingMethod utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -5890,7 +5902,7 @@ module.exports = function (ctx, name, method, chainingBehavior) {
   });
 };
 
-},{"../config":12,"./flag":21,"./transferFlags":37}],18:[function(require,module,exports){
+},{"../config":11,"./flag":20,"./transferFlags":36}],17:[function(require,module,exports){
 /*!
  * Chai - addMethod utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -5935,7 +5947,7 @@ module.exports = function (ctx, name, method) {
   };
 };
 
-},{"../config":12,"./flag":21}],19:[function(require,module,exports){
+},{"../config":11,"./flag":20}],18:[function(require,module,exports){
 /*!
  * Chai - addProperty utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -5984,7 +5996,7 @@ module.exports = function (ctx, name, getter) {
   });
 };
 
-},{"../config":12,"./flag":21}],20:[function(require,module,exports){
+},{"../config":11,"./flag":20}],19:[function(require,module,exports){
 /*!
  * Chai - expectTypes utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -6027,7 +6039,7 @@ module.exports = function (obj, types) {
   }
 };
 
-},{"./flag":21,"assertion-error":38,"type-detect":43}],21:[function(require,module,exports){
+},{"./flag":20,"assertion-error":37,"type-detect":42}],20:[function(require,module,exports){
 /*!
  * Chai - flag utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -6061,7 +6073,7 @@ module.exports = function (obj, key, value) {
   }
 };
 
-},{}],22:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 /*!
  * Chai - getActual utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -6081,7 +6093,7 @@ module.exports = function (obj, args) {
   return args.length > 4 ? args[4] : obj._obj;
 };
 
-},{}],23:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 /*!
  * Chai - getEnumerableProperties utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -6108,7 +6120,7 @@ module.exports = function getEnumerableProperties(object) {
   return result;
 };
 
-},{}],24:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 /*!
  * Chai - message composition utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -6160,7 +6172,7 @@ module.exports = function (obj, args) {
   return flagMsg ? flagMsg + ': ' + msg : msg;
 };
 
-},{"./flag":21,"./getActual":22,"./inspect":31,"./objDisplay":32}],25:[function(require,module,exports){
+},{"./flag":20,"./getActual":21,"./inspect":30,"./objDisplay":31}],24:[function(require,module,exports){
 /*!
  * Chai - getName utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -6182,7 +6194,7 @@ module.exports = function (func) {
   return match && match[1] ? match[1] : "";
 };
 
-},{}],26:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 /*!
  * Chai - getPathInfo utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -6294,7 +6306,7 @@ function _getPathValue (parsed, obj, index) {
   return res;
 }
 
-},{"./hasProperty":29}],27:[function(require,module,exports){
+},{"./hasProperty":28}],26:[function(require,module,exports){
 /*!
  * Chai - getPathValue utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -6338,7 +6350,7 @@ module.exports = function(path, obj) {
   return info.value;
 }; 
 
-},{"./getPathInfo":26}],28:[function(require,module,exports){
+},{"./getPathInfo":25}],27:[function(require,module,exports){
 /*!
  * Chai - getProperties utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -6375,7 +6387,7 @@ module.exports = function getProperties(object) {
   return result;
 };
 
-},{}],29:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 /*!
  * Chai - hasProperty utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -6440,7 +6452,7 @@ module.exports = function hasProperty(name, obj) {
   return name in obj;
 };
 
-},{"type-detect":43}],30:[function(require,module,exports){
+},{"type-detect":42}],29:[function(require,module,exports){
 /*!
  * chai
  * Copyright(c) 2011 Jake Luer <jake@alogicalparadox.com>
@@ -6572,7 +6584,7 @@ exports.addChainableMethod = require('./addChainableMethod');
 
 exports.overwriteChainableMethod = require('./overwriteChainableMethod');
 
-},{"./addChainableMethod":17,"./addMethod":18,"./addProperty":19,"./expectTypes":20,"./flag":21,"./getActual":22,"./getMessage":24,"./getName":25,"./getPathInfo":26,"./getPathValue":27,"./hasProperty":29,"./inspect":31,"./objDisplay":32,"./overwriteChainableMethod":33,"./overwriteMethod":34,"./overwriteProperty":35,"./test":36,"./transferFlags":37,"deep-eql":39,"type-detect":43}],31:[function(require,module,exports){
+},{"./addChainableMethod":16,"./addMethod":17,"./addProperty":18,"./expectTypes":19,"./flag":20,"./getActual":21,"./getMessage":23,"./getName":24,"./getPathInfo":25,"./getPathValue":26,"./hasProperty":28,"./inspect":30,"./objDisplay":31,"./overwriteChainableMethod":32,"./overwriteMethod":33,"./overwriteProperty":34,"./test":35,"./transferFlags":36,"deep-eql":38,"type-detect":42}],30:[function(require,module,exports){
 // This is (almost) directly from Node.js utils
 // https://github.com/joyent/node/blob/f8c335d0caf47f16d31413f89aa28eda3878e3aa/lib/util.js
 
@@ -6907,7 +6919,7 @@ function objectToString(o) {
   return Object.prototype.toString.call(o);
 }
 
-},{"./getEnumerableProperties":23,"./getName":25,"./getProperties":28}],32:[function(require,module,exports){
+},{"./getEnumerableProperties":22,"./getName":24,"./getProperties":27}],31:[function(require,module,exports){
 /*!
  * Chai - flag utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -6958,7 +6970,7 @@ module.exports = function (obj) {
   }
 };
 
-},{"../config":12,"./inspect":31}],33:[function(require,module,exports){
+},{"../config":11,"./inspect":30}],32:[function(require,module,exports){
 /*!
  * Chai - overwriteChainableMethod utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -7013,7 +7025,7 @@ module.exports = function (ctx, name, method, chainingBehavior) {
   };
 };
 
-},{}],34:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 /*!
  * Chai - overwriteMethod utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -7066,7 +7078,7 @@ module.exports = function (ctx, name, method) {
   }
 };
 
-},{}],35:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 /*!
  * Chai - overwriteProperty utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -7122,7 +7134,7 @@ module.exports = function (ctx, name, getter) {
   });
 };
 
-},{}],36:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 /*!
  * Chai - test utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -7150,7 +7162,7 @@ module.exports = function (obj, args) {
   return negate ? !expr : expr;
 };
 
-},{"./flag":21}],37:[function(require,module,exports){
+},{"./flag":20}],36:[function(require,module,exports){
 /*!
  * Chai - transferFlags utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -7196,7 +7208,7 @@ module.exports = function (assertion, object, includeAll) {
   }
 };
 
-},{}],38:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
 /*!
  * assertion-error
  * Copyright(c) 2013 Jake Luer <jake@qualiancy.com>
@@ -7310,10 +7322,10 @@ AssertionError.prototype.toJSON = function (stack) {
   return props;
 };
 
-},{}],39:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 module.exports = require('./lib/eql');
 
-},{"./lib/eql":40}],40:[function(require,module,exports){
+},{"./lib/eql":39}],39:[function(require,module,exports){
 /*!
  * deep-eql
  * Copyright(c) 2013 Jake Luer <jake@alogicalparadox.com>
@@ -7572,10 +7584,10 @@ function objectEqual(a, b, m) {
   return true;
 }
 
-},{"buffer":2,"type-detect":41}],41:[function(require,module,exports){
+},{"buffer":2,"type-detect":40}],40:[function(require,module,exports){
 module.exports = require('./lib/type');
 
-},{"./lib/type":42}],42:[function(require,module,exports){
+},{"./lib/type":41}],41:[function(require,module,exports){
 /*!
  * type-detect
  * Copyright(c) 2013 jake luer <jake@alogicalparadox.com>
@@ -7719,9 +7731,9 @@ Library.prototype.test = function (obj, type) {
   }
 };
 
-},{}],43:[function(require,module,exports){
-arguments[4][41][0].apply(exports,arguments)
-},{"./lib/type":44,"dup":41}],44:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
+arguments[4][40][0].apply(exports,arguments)
+},{"./lib/type":43,"dup":40}],43:[function(require,module,exports){
 /*!
  * type-detect
  * Copyright(c) 2013 jake luer <jake@alogicalparadox.com>
@@ -7857,7 +7869,7 @@ Library.prototype.test = function(obj, type) {
   }
 };
 
-},{}],45:[function(require,module,exports){
+},{}],44:[function(require,module,exports){
 module.exports = Table
 
 function Table() {
@@ -8297,7 +8309,7 @@ Table.prototype.log = function() {
   console.log(this.toString())
 }
 
-},{}],46:[function(require,module,exports){
+},{}],45:[function(require,module,exports){
 /*--------------------------------------------------------------------------
  * linq.js - LINQ for JavaScript
  * ver 3.0.4-Beta5 (Jun. 20th, 2013)
@@ -11315,7 +11327,7 @@ Table.prototype.log = function() {
         root.Enumerable = Enumerable;
     }
 })(this);
-},{}],47:[function(require,module,exports){
+},{}],46:[function(require,module,exports){
 //! moment.js
 //! version : 2.10.6
 //! authors : Tim Wood, Iskren Chernev, Moment.js contributors
@@ -14511,7 +14523,7 @@ Table.prototype.log = function() {
     return _moment;
 
 }));
-},{}],48:[function(require,module,exports){
+},{}],47:[function(require,module,exports){
 (function (global){
 /*
  *  Sugar Library v1.4.1
@@ -23760,43 +23772,7 @@ Date.addLocale('zh-TW', {
 }).call(this);
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],49:[function(require,module,exports){
-'use strict';
-
-//
-// Module for getting data to the browser via HTTP.
-//
-
-module.exports = function (url) {
-
-	return {
-
-		//
-		// Invoke HTTP GET to retreive data.
-		//
-		read: function () {
-			return new Promise(function (resolve, reject) {
-				$.get(url)
-					.done(function (data) {
-						resolve(data);
-					})
-					.fail(function (err) {
-						reject(err);
-					});
-			});
-		},
-
-		//
-		// Invoke HTTP POST to push data.
-		//
-		write: function (textData) {
-			//todo:
-		},
-
-	};
-};
-
-},{}],50:[function(require,module,exports){
+},{}],48:[function(require,module,exports){
 'use strict';
 
 // 
@@ -23805,13 +23781,23 @@ module.exports = function (url) {
 
 var assert = require('chai').assert; 
 var E = require('linq');
+var moment = require('moment');
+var ArrayEnumerator = require('./enumerators/array');
 
+//
+// Helper function to validate an enumerator.
+//
+var validateEnumerator = function (enumerator) {
+	assert.isObject(enumerator, "Expected an 'enumerator' object.");
+	assert.isFunction(enumerator.moveNext, "Expected enumerator to have function 'moveNext'.");
+	assert.isFunction(enumerator.getCurrent, "Expected enumerator to have function 'getCurrent'.");
+};
 
 /**
  * Base class for columns.
  *
  * getName - Get the name of the column.
- * getValues - Get the values for each entry in the series.
+ * getEnumerator - Get the enumerator for the column.
  * getIndex - Get the index for the column.
  */
 var BaseColumn = function () {	
@@ -23832,10 +23818,11 @@ BaseColumn.prototype.skip = function (numRows) {
 	return new LazyColumn(
 		self.getName(),
 		function () {
-			return E
-				.from(self.getValues())
+			return new ArrayEnumerator(E
+				.from(self.toValues())
 				.skip(numRows)
-				.toArray();
+				.toArray()
+			);
 		},
 		function () {
 			return self.getIndex().skip(numRows);
@@ -23857,10 +23844,11 @@ BaseColumn.prototype.take = function (numRows) {
 	return new LazyColumn(
 		self.getName(),
 		function () {
-			return E
-				.from(self.getValues())
+			return new ArrayEnumerator(E
+				.from(self.toValues())
 				.take(numRows)
-				.toArray();
+				.toArray()
+			);
 		},
 		function () {
 			return self.getIndex().take(numRows);
@@ -23890,8 +23878,8 @@ BaseColumn.prototype.where = function (filterSelectorPredicate) {
 		}
 
 		cachedFilteredIndexAndValues = E
-			.from(self.getIndex().getValues())
-			.zip(self.getValues(), function (index, value) {
+			.from(self.getIndex().toValues())
+			.zip(self.toValues(), function (index, value) {
 				return [index, value];
 			})
 			.where(function (data) {
@@ -23907,22 +23895,24 @@ BaseColumn.prototype.where = function (filterSelectorPredicate) {
 	return new LazyColumn(
 		self.getName(),
 		function () {
-			return E.from(executeLazyWhere())
+			return new ArrayEnumerator(E.from(executeLazyWhere())
 				.select(function (data) {
 					return data[1]; // Value
 				})
-				.toArray();
+				.toArray()
+			);
 		},
 		function () {
 			var LazyIndex = require('./lazyindex');
 			return new LazyIndex(
 				self.getIndex().getName(),
 				function () {
-					return E.from(executeLazyWhere())
+					return new ArrayEnumerator(E.from(executeLazyWhere())
 						.select(function (data) {
 							return data[0]; // Index
 						})
-						.toArray();
+						.toArray()
+					);
 				}
 			);
 		}
@@ -23943,12 +23933,13 @@ BaseColumn.prototype.select = function (selector) {
 	return new LazyColumn(
 		self.getName(),
 		function () {
-			return E
-				.from(self.getValues())
-				.select(function (value) {
-					return selector(value);
-				})
-				.toArray();
+			return new ArrayEnumerator(
+				E.from(self.toValues())
+					.select(function (value) {
+						return selector(value);
+					})
+					.toArray()
+			);
 		},
 		function () {
 			return self.getIndex();
@@ -23975,8 +23966,8 @@ BaseColumn.prototype.selectMany = function (selector) {
 			return;
 		}
 
-		newIndexAndNewValues = E.from(self.getIndex().getValues())
-			.zip(self.getValues(), function (index, value) {
+		newIndexAndNewValues = E.from(self.getIndex().toValues())
+			.zip(self.toValues(), function (index, value) {
 				return [index, selector(value)];
 			})
 			.toArray();
@@ -23993,7 +23984,7 @@ BaseColumn.prototype.selectMany = function (selector) {
 		self.getName(),
 		function () {
 			lazyEvaluate();
-			return newValues;
+			return new ArrayEnumerator(newValues);
 		},
 		function () {
 			var LazyIndex = require('./lazyindex');
@@ -24013,7 +24004,7 @@ BaseColumn.prototype.selectMany = function (selector) {
 								.toArray();
 						})
 						.toArray();
-					return indexValues;
+					return new ArrayEnumerator(indexValues);
 				}
 			);
 		}
@@ -24059,8 +24050,8 @@ var executeOrderBy = function (self, batch) {
 			validateSortMethod(orderCmd.sortMethod);
 		});
 
-		var valuesWithIndex = E.from(self.getIndex().getValues())
-			.zip(self.getValues(), function (index, value) {
+		var valuesWithIndex = E.from(self.getIndex().toValues())
+			.zip(self.toValues(), function (index, value) {
 				return [index, value];
 			})
 			.toArray();	
@@ -24084,22 +24075,25 @@ var executeOrderBy = function (self, batch) {
 			return self.getColumnNames();
 		},
 		function () {
-			return E.from(executeLazySort())
-				.select(function (row) {
-					return row[1]; // Extract the value (minus the index) from the sorted data.					
-				})
-				.toArray();
+			return new ArrayEnumerator(
+				E.from(executeLazySort())
+					.select(function (row) {
+						return row[1]; // Extract the value (minus the index) from the sorted data.					
+					})
+					.toArray()
+				);
 		},
 		function () {
 			var LazyIndex = require('./lazyindex');
 			return new LazyIndex(
 				self.getIndex().getName(),
 				function () {
-					return E.from(executeLazySort())
+					return new ArrayEnumerator(E.from(executeLazySort())
 						.select(function (row) {
 							return row[0]; // Extract the index from the sorted data.
 						})
-						.toArray();
+						.toArray()
+					);
 				}
 			);
 		}
@@ -24137,7 +24131,7 @@ var orderThenBy = function (self, batch, nextSortMethod) {
 	validateSortMethod(nextSortMethod);
 	
 	return function (sortSelector) {
-		assert.isFunction(sortSelector, "Expected parameter 'sortSelector' to be a function")
+		assert.isFunction(sortSelector, "Expected parameter 'sortSelector' to be a function");
 
 		var extendedBatch = batch.concat([
 			{
@@ -24216,10 +24210,12 @@ BaseColumn.prototype.getRowsSubset = function (index, count) {
 	return new LazyColumn(
 		self.getName(),
 		function () {
-			return E.from(self.getValues())
-				.skip(index)
-				.take(count)
-				.toArray();
+			return new ArrayEnumerator(
+				E.from(self.toValues())
+					.skip(index)
+					.take(count)
+					.toArray()
+			);
 		},
 		function () {
 			return self.getIndex().getRowsSubset(index, count);
@@ -24242,8 +24238,8 @@ BaseColumn.prototype.rollingWindow = function (period, fn) {
 
 	//todo: make this properly lazy
 
-	var index = self.getIndex().getValues();
-	var values = self.getValues();
+	var index = self.getIndex().toValues();
+	var values = self.toValues();
 
 	if (values.length == 0) {
 		var Column = require('./column');
@@ -24263,11 +24259,12 @@ BaseColumn.prototype.rollingWindow = function (period, fn) {
 	return new LazyColumn(
 		self.getName(), 
 		function () {
-			return E.from(newIndexAndValues)
+			return new ArrayEnumerator(E.from(newIndexAndValues)
 				.select(function (indexAndValue) {
 					return indexAndValue[1];
 				})
-				.toArray();
+				.toArray()
+			);
 		},
 		function () {
 			var LazyIndex = require('./lazyindex');
@@ -24275,11 +24272,12 @@ BaseColumn.prototype.rollingWindow = function (period, fn) {
 			return new LazyIndex(
 				self.getIndex().getName(),
 				function () {
-					return E.from(newIndexAndValues)
+					return new ArrayEnumerator(E.from(newIndexAndValues)
 						.select(function (indexAndValue) {
 							return indexAndValue[0];
 						})
-						.toArray();					
+						.toArray()
+					);
 				}
 			);
 		}
@@ -24307,8 +24305,8 @@ BaseColumn.prototype.reindex = function (newIndex) {
 			var indexMap = {};
 			var indexExists = {};
 
-			E.from(self.getIndex().getValues())
-				.zip(self.getValues(), 
+			E.from(self.getIndex().toValues())
+				.zip(self.toValues(), 
 					function (indexValue, columnValue) {
 						return [indexValue, columnValue];
 					}
@@ -24329,13 +24327,12 @@ BaseColumn.prototype.reindex = function (newIndex) {
 			//
 			// Return the columns values in the order specified by the new index.
 			//
-			var newValues = E.from(newIndex.getValues())
+			return new ArrayEnumerator(E.from(newIndex.toValues())
 				.select(function (newIndexValue) {
 					return indexMap[newIndexValue];
 				})
-				.toArray();
-
-			return newValues;
+				.toArray()
+			);
 		},
 		function () {
 			return newIndex;
@@ -24351,9 +24348,9 @@ BaseColumn.prototype.toString = function () {
 	var self = this;
 	var Table = require('easy-table');
 
-	var index = self.getIndex().getValues();
+	var index = self.getIndex().toValues();
 	var header = [self.getIndex().getName(), self.getName()];
-	var rows = E.from(self.getValues())
+	var rows = E.from(self.toValues())
 			.select(function (value, rowIndex) { 
 				return [index[rowIndex], value];
 			})
@@ -24383,8 +24380,187 @@ BaseColumn.prototype.percentChange = function () {
 	});
 };
 
+/**
+ * Parse a column with string values to a column with int values.
+ */
+BaseColumn.prototype.parseInts = function () {
+
+	var self = this;
+	return self.select(function (value, valueIndex) {
+		if (value === undefined) {
+			return undefined;
+		}
+		else {
+			assert.isString(value, "Called parseInt on column '" + self.getName() + "', expected all values in the column to be strings, instead found a '" + typeof(value) + "' at index " + valueIndex);
+
+			if (value.length === 0) {
+				return undefined;
+			}
+
+			return parseInt(value);
+		}
+	});
+};
+
+/**
+ * Parse a column with string values to a column with float values.
+ */
+BaseColumn.prototype.parseFloats = function () {
+
+	var self = this;
+	return self.select(function (value, valueIndex) {
+		if (value === undefined) {
+			return undefined;
+		}
+		else {
+			assert.isString(value, "Called parseInt on column '" + self.getName() + "', expected all values in the column to be strings, instead found a '" + typeof(value) + "' at index " + valueIndex);
+
+			if (value.length === 0) {
+				return undefined;
+			}
+
+			return parseFloat(value);
+		}
+	});
+};
+
+/**
+ * Parse a column with string values to a column with date values.
+ */
+BaseColumn.prototype.parseDates = function () {
+
+	var self = this;
+	return self.select(function (value, valueIndex) {
+		if (value === undefined) {
+			return undefined;
+		}
+		else {
+			assert.isString(value, "Called parseInt on column '" + self.getName() + "', expected all values in the column to be strings, instead found a '" + typeof(value) + "' at index " + valueIndex);
+
+			if (value.length === 0) {
+				return undefined;
+			}
+
+			return moment(value).toDate();
+		}
+	});
+};
+
+/**
+ * Convert a column of values of different types to a column of string values.
+ */
+BaseColumn.prototype.toStrings = function () {
+
+	var self = this;
+	return self.select(function (value) {
+		if (value === undefined) {
+			return undefined;
+		}
+		else if (value === null) {
+			return null;
+		}
+		else {
+			return value.toString();	
+		}		
+	});
+};
+
+
+/** 
+  * Detect the actual types of the values that comprised the column and their frequency.
+  * Returns a new column containing the type information.
+  */
+BaseColumn.prototype.detectTypes = function () {
+
+	var self = this;
+
+	var LazyDataFrame = require('./lazydataframe');
+	return new LazyDataFrame(
+		function () {
+			return ["type", "frequency"];
+		},
+		function () {
+			var values = self.toValues();
+			var totalValues = values.length;
+
+			var typeFrequencies = E.from(values)
+				.select(function (value) {
+					var valueType = typeof(value);
+					if (valueType === 'object') {
+						if (Object.isDate(value)) {
+							valueType = 'date';
+						}
+					}
+					return valueType;
+				})
+				.aggregate({}, function (accumulated, valueType) {
+					var typeInfo = accumulated[valueType];
+					if (!typeInfo) {
+						typeInfo = {
+							count: 0
+						};
+						accumulated[valueType] = typeInfo;
+					}
+					++typeInfo.count;
+					return accumulated;
+				});
+
+			return new ArrayEnumerator(
+				E.from(Object.keys(typeFrequencies))
+					.select(function (valueType) {
+						return [
+							valueType,
+							(typeFrequencies[valueType].count / totalValues) * 100
+						];
+					})
+					.toArray()
+			);
+		}
+	);
+};
+
+/**
+ * Produces a new column with all string values truncated to the requested maximum length.
+ *
+ * @param {int} maxLength - The maximum length of the string values after truncation.
+ */
+BaseColumn.prototype.truncateStrings = function (maxLength) {
+	assert.isNumber(maxLength, "Expected 'maxLength' parameter to 'truncateStrings' to be an integer.");
+
+	var self = this;
+	return self
+		.select(function (value) {
+			if (Object.isString(value)) {
+				if (value.length > maxLength) {
+					return value.substring(0, maxLength);
+				}
+			}
+
+			return value;
+		});
+};
+
+/*
+ * Extract values from the column. This forces lazy evaluation to complete.
+ */
+BaseColumn.prototype.toValues = function () {
+
+	var self = this;
+	var enumerator = self.getEnumerator();
+	validateEnumerator(enumerator);
+
+	var values = [];
+
+	while (enumerator.moveNext()) {
+		values.push(enumerator.getCurrent());
+	}
+
+	return values;
+};
+
+
 module.exports = BaseColumn;
-},{"./column":54,"./lazycolumn":58,"./lazydataframe":59,"./lazyindex":60,"chai":9,"easy-table":45,"linq":46}],51:[function(require,module,exports){
+},{"./column":51,"./enumerators/array":53,"./lazycolumn":56,"./lazydataframe":57,"./lazyindex":58,"chai":8,"easy-table":44,"linq":45,"moment":46}],49:[function(require,module,exports){
 'use strict';
 
 // 
@@ -24393,9 +24569,19 @@ module.exports = BaseColumn;
 
 var LazyColumn = require('./lazycolumn');
 var LazyIndex = require('./lazyindex');
+var ArrayEnumerator = require('./enumerators/array');
 
 var assert = require('chai').assert; 
 var E = require('linq');
+
+//
+// Helper function to validate an enumerator.
+//
+var validateEnumerator = function (enumerator) {
+	assert.isObject(enumerator, "Expected an 'enumerator' object.");
+	assert.isFunction(enumerator.moveNext, "Expected enumerator to have function 'moveNext'.");
+	assert.isFunction(enumerator.getCurrent, "Expected enumerator to have function 'getCurrent'.");
+};
 
 /**
  * Base class for data frames.
@@ -24404,7 +24590,7 @@ var E = require('linq');
  *
  * getIndex - Get the index for the data frame.
  * getColumnNames - Get the columns for the data frame.
- * getValues - Get the values for the data frame.
+ * getEnumerator - Get a row enumerator for the data frame.
  */
 var BaseDataFrame = function () {
 };
@@ -24413,22 +24599,19 @@ var BaseDataFrame = function () {
 // Map a row of data to a JS object with column names as fields.
 //
 var mapRowByColumns = function (self, row) {
-	var copy = E.from(row).toArray();
 
-	E.from(self.getColumnNames())
-		.select(function (columnName, columnIndex) {
-			return [columnName, columnIndex];
+	return E.from(self.getColumnNames())
+		.zip(row, function (columnName, columnValue) {
+			return [columnName, columnValue];
 		})
-		.toArray()
-		.forEach(
+		.toObject(
 			function (column) {
-				var columnName = column[0];
-				var columnIndex = column[1];
-				copy[columnName] = copy[columnIndex];
+				return column[0];
+			},
+			function (column) {
+				return column[1];
 			}
 		);
-
-	return copy;
 };
 
 /**
@@ -24469,10 +24652,20 @@ BaseDataFrame.prototype.skip = function (numRows) {
 			return self.getColumnNames();
 		},
 		function () {
-			return E
-				.from(self.getValues())
-				.skip(numRows)
-				.toArray();
+			var enumerator = self.getEnumerator();
+
+			return {
+				moveNext: function () {
+					while (--numRows >= 0 && enumerator.moveNext()) {
+						// Skip first rows.
+					}
+					return enumerator.moveNext();
+				},
+
+				getCurrent: function () {
+					return enumerator.getCurrent();
+				},
+			};
 		},
 		function () {
 			return self.getIndex().skip(numRows);
@@ -24496,10 +24689,20 @@ BaseDataFrame.prototype.take = function (numRows) {
 			return self.getColumnNames();
 		},
 		function () {
-			return E
-				.from(self.getValues())
-				.take(numRows)
-				.toArray();
+			var enumerator = self.getEnumerator();
+
+			return {
+				moveNext: function () {
+					if (--numRows >= 0) {
+						return enumerator.moveNext();
+					}
+					return false;
+				},
+
+				getCurrent: function () {
+					return enumerator.getCurrent();
+				},
+			};
 		},
 		function () {
 			return self.getIndex().take(numRows);
@@ -24520,7 +24723,7 @@ BaseDataFrame.prototype.where = function (filterSelectorPredicate) {
 	var cachedFilteredIndexAndValues = null;
 
 	//
-	// Lazy  execute the filtering.
+	// Lazy execute the filtering.
 	//
 	var executeLazyWhere = function () {
 
@@ -24529,8 +24732,8 @@ BaseDataFrame.prototype.where = function (filterSelectorPredicate) {
 		}
 
 		cachedFilteredIndexAndValues = E
-			.from(self.getIndex().getValues())
-			.zip(self.getValues(), function (index, values) {
+			.from(self.getIndex().toValues())
+			.zip(self.toValues(), function (index, values) {
 				return [index, values];
 			})
 			.where(function (data) {
@@ -24541,28 +24744,30 @@ BaseDataFrame.prototype.where = function (filterSelectorPredicate) {
 		return cachedFilteredIndexAndValues;
 	}
 
-
 	var LazyDataFrame = require('./lazydataframe');
 	return new LazyDataFrame(
 		function () {
 			return self.getColumnNames();
 		},
 		function () {
-			return E.from(executeLazyWhere())
-				.select(function (data) {
-					return data[1]; // Row
-				})
-				.toArray();
+			return new ArrayEnumerator(
+				E.from(executeLazyWhere())
+					.select(function (data) {
+						return data[1]; // Row
+					})
+					.toArray()
+			);
 		},
 		function () {
 			return new LazyIndex(
 				self.getIndex().getName(),
 				function () {
-					return E.from(executeLazyWhere())
+					return new ArrayEnumerator(E.from(executeLazyWhere())
 						.select(function (data) {
 							return data[0]; // Index
 						})
-						.toArray();
+						.toArray()
+					);
 				}
 			);
 		}
@@ -24588,7 +24793,7 @@ BaseDataFrame.prototype.select = function (selector) {
 		}
 
 		newValues = E
-			.from(self.getValues())
+			.from(self.toValues())
 			.select(function (row) {
 				return selector(mapRowByColumns(self, row));
 			})
@@ -24610,16 +24815,17 @@ BaseDataFrame.prototype.select = function (selector) {
 		},
 		function () {
 			lazyEvaluate();
-			var newRows = E.from(newValues)
-				.select(function (value) {
-					return E.from(newColumnNames)
-						.select(function (columnName) {
-							return value[columnName];
-						})
-						.toArray();
-				})
-				.toArray();			
-			return newRows;
+			return new ArrayEnumerator(
+				E.from(newValues)
+					.select(function (value) {
+						return E.from(newColumnNames)
+							.select(function (columnName) {
+								return value[columnName];
+							})
+							.toArray();
+					})
+					.toArray()
+			);
 		},
 		function () {
 			return self.getIndex();
@@ -24647,8 +24853,8 @@ BaseDataFrame.prototype.selectMany = function (selector) {
 			return;
 		}
 
-		newValues = E.from(self.getIndex().getValues())
-			.zip(self.getValues(), function (index, row) {
+		newValues = E.from(self.getIndex().toValues())
+			.zip(self.toValues(), function (index, row) {
 				return [index, selector(mapRowByColumns(self, row))];
 			})
 			.toArray();
@@ -24689,7 +24895,7 @@ BaseDataFrame.prototype.selectMany = function (selector) {
 		},
 		function () {
 			lazyEvaluate();
-			return newRows;
+			return new ArrayEnumerator(newRows);
 		},
 		function () {
 			return new LazyIndex(
@@ -24707,7 +24913,7 @@ BaseDataFrame.prototype.selectMany = function (selector) {
 								.toArray();
 						})
 						.toArray();
-					return indexValues;
+					return new ArrayEnumerator(indexValues);
 				}
 			);
 		}
@@ -24738,11 +24944,12 @@ BaseDataFrame.prototype.getColumn = function (columnNameOrIndex) {
 	return new LazyColumn(
 		self.getColumnNames()[columnIndex],
 		function () {
-			return E.from(self.getValues())
+			return new ArrayEnumerator(E.from(self.toValues())
 				.select(function (entry) {
 					return entry[columnIndex];
 				})
-				.toArray();
+				.toArray()
+			);
 		},
 		function () {
 			return self.getIndex();
@@ -24785,39 +24992,22 @@ BaseDataFrame.prototype.getColumnsSubset = function (columnNames) {
 				})
 				.toArray();
 			
-			return E.from(self.getValues())
-				.select(function (entry) {
-					return E.from(columnIndices)
-						.select(function (columnIndex) {
-							return entry[columnIndex];					
-						})
-						.toArray();
-				})
-				.toArray();
+			return new ArrayEnumerator(
+				E.from(self.toValues())
+					.select(function (entry) {
+						return E.from(columnIndices)
+							.select(function (columnIndex) {
+								return entry[columnIndex];					
+							})
+							.toArray();
+					})
+					.toArray()
+			);
 		},
 		function () {
 			return self.getIndex();
 		}
 	);	 
-};
-
-//
-// Save the data frame via plugable output.
-//
-BaseDataFrame.prototype.as = function (formatPlugin) {
-	assert.isObject(formatPlugin, "Expected 'formatPlugin' parameter to 'DataFrame.as' to be an object.");
-	assert.isFunction(formatPlugin.to, "Expected 'formatPlugin' parameter to 'DataFrame.as' to be an object with a 'to' function.");
-
-	var self = this;	
-	return {
-		to: function (dataSourcePlugin) {
-			assert.isObject(dataSourcePlugin, "Expected 'dataSourcePlugin' parameter to 'DataFrame.as.to' to be an object.");
-			assert.isFunction(dataSourcePlugin.write, "Expected 'dataSourcePlugin' parameter to 'DataFrame.as.to' to be an object with a 'write' function.");
-			
-			var textData = formatPlugin.to(self);
-			return dataSourcePlugin.write(textData);
-		},		
-	};
 };
 
 //
@@ -24859,8 +25049,8 @@ var executeOrderBy = function (self, batch) {
 			validateSortMethod(orderCmd.sortMethod);
 		});
 
-		var valuesWithIndex = E.from(self.getIndex().getValues())
-			.zip(self.getValues(), function (index, values) {
+		var valuesWithIndex = E.from(self.getIndex().toValues())
+			.zip(self.toValues(), function (index, values) {
 				return [index].concat(values);
 			})
 			.toArray();	
@@ -24884,22 +25074,25 @@ var executeOrderBy = function (self, batch) {
 			return self.getColumnNames();
 		},
 		function () {
-			return E.from(executeLazySort())
-				.select(function (row) {
-					return E.from(row).skip(1).toArray(); // Extract the values (minus the index) from the sorted data.					
-				})
-				.toArray();
+			return new ArrayEnumerator(
+				E.from(executeLazySort())
+					.select(function (row) {
+						return E.from(row).skip(1).toArray(); // Extract the values (minus the index) from the sorted data.					
+					})
+					.toArray()
+			);
 		},
 		function () {
 			var LazyIndex = require('./lazyindex');
 			return new LazyIndex(
 				self.getIndex().getName(),
 				function () {
-					return E.from(executeLazySort())
+					return new ArrayEnumerator(E.from(executeLazySort())
 						.select(function (row) {
 							return row[0]; // Extract the index from the sorted data.
 						})
-						.toArray();
+						.toArray()
+					);
 				}
 			);
 		}
@@ -25062,15 +25255,17 @@ BaseDataFrame.prototype.dropColumn = function (columnOrColumns) {
 		},
 		function () {
 			var columnIndices = lazyGenerateColumnIndices();
-			return E.from(self.getValues())
-				.select(function (row) {
-					return E.from(row)
-						.where(function (column, columnIndex) {
-							return columnIndices.indexOf(columnIndex) < 0;
-						})
-						.toArray();
-				})
-				.toArray();
+			return new ArrayEnumerator(
+				E.from(self.toValues())
+					.select(function (row) {
+						return E.from(row)
+							.where(function (column, columnIndex) {
+								return columnIndices.indexOf(columnIndex) < 0;
+							})
+							.toArray();
+					})
+					.toArray()
+			);
 		},
 		function () {
 			return self.getIndex();
@@ -25093,7 +25288,7 @@ BaseDataFrame.prototype.setColumn = function (columnName, data) {
 		assert.isObject(data, "Expected 'data' parameter to 'setColumn' to be either an array or a column object.");
 		assert.isFunction(data.reindex, "Expected 'data' parameter to 'setColumn' to have a 'reindex' function that allows the column to be reindexed.");
 
-		data = data.reindex(self.getIndex()).getValues();
+		data = data.reindex(self.getIndex()).toValues();
 	}
 
 	var LazyDataFrame = require('./lazydataframe');
@@ -25107,11 +25302,13 @@ BaseDataFrame.prototype.setColumn = function (columnName, data) {
 				return self.getColumnNames().concat([columnName]);
 			},
 			function () {
-				return E.from(self.getValues())
-					.select(function (row, rowIndex) {
-						return row.concat([data[rowIndex]]);
-					})
-					.toArray();
+				return new ArrayEnumerator(
+					E.from(self.toValues())
+						.select(function (row, rowIndex) {
+							return row.concat([data[rowIndex]]);
+						})
+						.toArray()
+				);
 			},
 			function () {
 				return self.getIndex();
@@ -25135,20 +25332,22 @@ BaseDataFrame.prototype.setColumn = function (columnName, data) {
 					.toArray();
 			},
 			function () {
-				return E.from(self.getValues())
-					.select(function (row, rowIndex) {
-						return E.from(row)
-							.select(function (column, thisColumnIndex) {
-								if (thisColumnIndex === columnIndex) {
-									return data[rowIndex];
-								}
-								else {
-									return column;
-								}
-							})
-							.toArray();
-					})
-					.toArray();
+				return new ArrayEnumerator(
+					E.from(self.toValues())
+						.select(function (row, rowIndex) {
+							return E.from(row)
+								.select(function (column, thisColumnIndex) {
+									if (thisColumnIndex === columnIndex) {
+										return data[rowIndex];
+									}
+									else {
+										return column;
+									}
+								})
+								.toArray();
+						})
+						.toArray()
+				);
 			},
 			function () {
 				return self.getIndex();
@@ -25163,7 +25362,7 @@ BaseDataFrame.prototype.setColumn = function (columnName, data) {
  * @param {int} index - Index where the subset starts.
  * @param {int} count - Number of rows to include in the subset.
  */
-BaseDataFrame.prototype.getRowsSubset = function (index, count) {
+BaseDataFrame.prototype.getRowsSubset = function (index, count) { //todo: change count to end index... and actually make this work with the index.
 	assert.isNumber(index, "Expected 'index' parameter to getRowsSubset to be an integer.");
 	assert.isNumber(index, "Expected 'count' parameter to getRowsSubset to be an integer.");
 
@@ -25176,10 +25375,12 @@ BaseDataFrame.prototype.getRowsSubset = function (index, count) {
 			return self.columnNames();
 		},
 		function () {
-			return E.from(self.getValues())
-				.skip(index)
-				.take(count)
-				.toArray();
+			return new ArrayEnumerator(
+				E.from(self.toValues())
+					.skip(index)
+					.take(count)
+					.toArray()
+			);
 		},
 		function () {
 			return self.getIndex().getRowsSubset(index, count);
@@ -25203,13 +25404,13 @@ BaseDataFrame.prototype.setIndex = function (columnNameOrIndex) {
 			return self.getColumnNames();
 		},
 		function () {
-			return self.getValues();
+			return new ArrayEnumerator(self.toValues());
 		},
 		function () {
 			return new LazyIndex(
 				self.getColumn(columnNameOrIndex).getName(),
 				function () {
-					return self.getColumn(columnNameOrIndex).getValues();
+					return new ArrayEnumerator(self.getColumn(columnNameOrIndex).toValues());
 				}
 			);
 		}		
@@ -25229,13 +25430,13 @@ BaseDataFrame.prototype.resetIndex = function () {
 			return self.getColumnNames();
 		},
 		function () {
-			return self.getValues();
+			return self.getEnumerator();
 		},
 		function () {
-			return new LazyIndex(
+			return new LazyIndex( //todo: broad-cast index
 				"__index___",
 				function () {
-					return E.range(0, self.getValues().length).toArray();
+					return new ArrayEnumerator(E.range(0, self.toValues().length).toArray());
 				}
 			);
 		}		
@@ -25250,9 +25451,9 @@ BaseDataFrame.prototype.toString = function () {
 	var self = this;
 	var Table = require('easy-table');
 
-	var index = self.getIndex().getValues();
+	var index = self.getIndex().toValues();
 	var header = [self.getIndex().getName()].concat(self.getColumnNames());
-	var rows = E.from(self.getValues())
+	var rows = E.from(self.toValues())
 			.select(function (row, rowIndex) { 
 				return [index[rowIndex]].concat(row);
 			})
@@ -25269,14 +25470,268 @@ BaseDataFrame.prototype.toString = function () {
 	return t.toString();
 };
 
+/**
+ * Parse a column with string values to a column with int values.
+ */
+BaseDataFrame.prototype.parseInts = function (columnNameOrIndex) {
+
+	var self = this;
+	return self.setColumn(columnNameOrIndex, self.getColumn(columnNameOrIndex).parseInts());
+};
+
+/**
+ * Parse a column with string values to a column with float values.
+ */
+BaseDataFrame.prototype.parseFloats = function (columnNameOrIndex) {
+
+	var self = this;
+	return self.setColumn(columnNameOrIndex, self.getColumn(columnNameOrIndex).parseFloats());
+};
+
+/**
+ * Parse a column with string values to a column with date values.
+ */
+BaseDataFrame.prototype.parseDates = function (columnNameOrIndex) {
+
+	var self = this;
+	return self.setColumn(columnNameOrIndex, self.getColumn(columnNameOrIndex).parseDates());
+};
+
+/**
+ * Convert a column of values of different types to a column of string values.
+ */
+BaseDataFrame.prototype.toStrings = function (columnNameOrIndex) {
+
+	var self = this;
+	return self.setColumn(columnNameOrIndex, self.getColumn(columnNameOrIndex).toString());
+};
+
+/**
+ * Detect actual types and their frequencies contained within columns in the data frame.
+ */
+BaseDataFrame.prototype.detectTypes = function () {
+
+	var self = this;
+
+	var DataFrame = require('./dataframe');
+
+	var dataFrames = E.from(self.getColumns())
+		.select(function (column) {
+			var numValues = column.toValues().length;
+			var Column = require('./column');
+			//todo: broad-cast column
+			var columnNameColumn = new Column('column', E.range(0, numValues).select(function () { return column.getName(); }).toArray());
+			return column.detectTypes().setColumn('column', columnNameColumn);
+		})
+		.toArray();
+	var dataForge = require('../index');
+	return dataForge.concat(dataFrames);
+};
+
+/**
+ * Produces a new data frame with all string values truncated to the requested maximum length.
+ *
+ * @param {int} maxLength - The maximum length of the string values after truncation.
+ */
+BaseDataFrame.prototype.truncateStrings = function (maxLength) {
+	assert.isNumber(maxLength, "Expected 'maxLength' parameter to 'truncateStrings' to be an integer.");
+
+	var self = this;
+	var truncatedValues = E.from(self.toValues())
+		.select(function (row) {
+			return E.from(row)
+				.select(function (value) {
+					if (Object.isString(value)) {
+						if (value.length > maxLength) {
+							return value.substring(0, maxLength);
+						}
+					}
+
+					return value;
+				})
+				.toArray();
+		})
+		.toArray();
+
+	var DataFrame = require('./dataframe');
+	return new DataFrame({
+			columnNames: self.getColumnNames(),
+			rows: truncatedValues,
+			index: self.getIndex(),
+		});
+};
+
+/**
+ * Create a new data frame with columns reordered.
+ * New column names create new columns (with undefined values), omitting existing column names causes those columns to be dropped.
+ * 
+ * @param {array} columnNames - The new order for columns. 
+ */
+BaseDataFrame.prototype.remapColumns = function (columnNames) {
+
+	assert.isArray(columnNames, "Expected parameter 'columnNames' to remapColumns to be an array with column names.");
+
+	columnNames.forEach(function (columnName) {
+		assert.isString(columnName, "Expected parameter 'columnNames' to remapColumns to be an array with column names.");
+	});
+
+	var self = this;
+
+ 	var LazyDataFrame = require('./lazydataframe');
+	return new LazyDataFrame(
+		function () {
+			return columnNames;
+		},
+		function () {
+			return new ArrayEnumerator(
+				E.from(self.toValues())
+					.select(function (row) {
+						return E.from(columnNames)
+							.select(function (columnName) {
+								var columnIndex = self.getColumnIndex(columnName);
+								if (columnIndex >= 0) {
+									return row[columnIndex];
+								}
+								else { 
+									// Column doesn't exist.
+									return undefined;
+								}
+							})
+							.toArray();
+					})
+					.toArray()
+			);
+		},
+		function () {
+			return self.getIndex();
+		}		
+	);
+};
+
+/**
+ * Create a new data frame with different column names.
+ *
+ * @param {string array} newColumnNames - Array of strings, with an element for each existing column that specifies the new name of that column.
+ */
+BaseDataFrame.prototype.renameColumns = function (newColumnNames) {
+
+	var self = this;
+
+	var numExistingColumns = self.getColumnNames().length;
+
+	assert.isArray(newColumnNames, "Expected parameter 'newColumnNames' to renameColumns to be an array with column names.");
+	assert(newColumnNames.length === numExistingColumns, "Expected 'newColumnNames' array to have an element for each existing column. There are " + numExistingColumns + "existing columns.");
+
+	newColumnNames.forEach(function (newColumnName) {
+		assert.isString(newColumnName, "Expected new column name to be a string, intead got " + typeof(newColumnName));
+	});
+
+ 	var LazyDataFrame = require('./lazydataframe');
+	return new LazyDataFrame(
+		function () {
+			return newColumnNames;
+		},
+		function () {
+			return self.getEnumerator();
+		},
+		function () {
+			return self.getIndex();
+		}
+	);
+};
+
+/**
+ * Bake the data frame to an array of rows.
+ */
+BaseDataFrame.prototype.toValues = function () {
+
+	var self = this;
+
+	var enumerator = self.getEnumerator();
+	validateEnumerator(enumerator);
+
+	var values = [];
+
+	while (enumerator.moveNext()) {
+		values.push(enumerator.getCurrent());
+	}
+
+	return values;
+};
+
+/**
+ * Bake the data frame to an array of JavaScript objects.
+ */
+BaseDataFrame.prototype.toObjects = function () {
+
+	var self = this;
+	var columnNames = self.getColumnNames();
+	return E.from(self.toValues()) //todo: should this rely on get enumerator?
+		.select(function (row) {
+			return E.from(columnNames)
+				.zip(row, function (columnName, columnValue) {
+					return [columnName, columnValue];
+				})
+				.toObject(
+					function (column) {
+						return column[0]; // Field name.
+					},
+					function (column) {
+						return column[1]; // Field value.
+					}
+				);
+		})
+		.toArray();
+};
+
+/**
+ * Serialize the data frame to JSON.
+ */
+BaseDataFrame.prototype.toJSON = function () {
+	var self = this;
+	return JSON.stringify(self.toObjects(), null, 4);
+};
+
+/**
+ * Serialize the data frame to CSV.
+ */
+BaseDataFrame.prototype.toCSV = function () {
+
+	var self = this;
+	var header = self.getColumnNames().join(',');
+	var rows = E.from(self.toValues())
+			.select(function (row) {
+				return row.join(',');
+			})
+			.select(function (col) { // Strip newlines... these don't work in CSV files.
+				if (Object.isString(col)) { //todo: not necessar if all columns are converted to strings.
+					return col.replace(/\r\n/g, ' ').replace(/\n/g, ' ');
+				}
+				else {
+					return col;
+				}
+			})					
+			.toArray();
+	return [header].concat(rows).join('\r\n');	
+};
+
 module.exports = BaseDataFrame;
-},{"./lazycolumn":58,"./lazydataframe":59,"./lazyindex":60,"chai":9,"easy-table":45,"linq":46}],52:[function(require,module,exports){
+},{"../index":7,"./column":51,"./dataframe":52,"./enumerators/array":53,"./lazycolumn":56,"./lazydataframe":57,"./lazyindex":58,"chai":8,"easy-table":44,"linq":45}],50:[function(require,module,exports){
 'use strict';
 
-var assert = require('chai').assert;
+var ArrayEnumerator = require('./enumerators/array');
 
 var assert = require('chai').assert;
 var E = require('linq');
+
+//
+// Helper function to validate an enumerator.
+//
+var validateEnumerator = function (enumerator) {
+	assert.isObject(enumerator, "Expected an 'enumerator' object.");
+	assert.isFunction(enumerator.moveNext, "Expected enumerator to have function 'moveNext'.");
+	assert.isFunction(enumerator.getCurrent, "Expected enumerator to have function 'getCurrent'.");
+};
 
 /**
  * Base class for indexes.
@@ -25284,7 +25739,7 @@ var E = require('linq');
  * Derives classes must implement:
  *
  *		getName - Get the name of theindex.
- *		getValues - Get the array of values from the index.
+ *		getEnumerator - Get an enumerator for iterating the values of the index.
  */
 var BaseIndex = function () {
 	
@@ -25304,7 +25759,7 @@ BaseIndex.prototype.skip = function (numRows) {
 	return new LazyIndex(
 		self.getName(),
 		function () {
-			return E.from(self.getValues()).skip(numRows).toArray();
+			return new ArrayEnumerator(E.from(self.toValues()).skip(numRows).toArray());
 		}
 	);
 };
@@ -25323,7 +25778,7 @@ BaseIndex.prototype.take = function (numRows) {
 	return new LazyIndex(
 		self.getName(),
 		function () {
-			return E.from(self.getValues()).take(numRows).toArray();
+			return new ArrayEnumerator(E.from(self.toValues()).take(numRows).toArray());
 		}
 	);
 };
@@ -25345,105 +25800,36 @@ BaseIndex.prototype.getRowsSubset = function (index, count) {
 	return new LazyIndex(
 		self.getName(),
 		function () {
-			return E.from(self.getValues())
+			return new ArrayEnumerator(E.from(self.toValues())
 				.skip(index)
 				.take(count)
-				.toArray();
+				.toArray()
+			);
 		}
 	);
 };
 
+/*
+ * Extract values from the index. This forces lazy evaluation to complete.
+ */
+BaseIndex.prototype.toValues = function () {
+
+	var self = this;
+	var enumerator = self.getEnumerator();
+	validateEnumerator(enumerator);
+
+	var values = [];
+
+	while (enumerator.moveNext()) {
+		values.push(enumerator.getCurrent());
+	}
+
+	return values;
+};
+
 
 module.exports = BaseIndex;
-},{"./lazyindex":60,"chai":9,"linq":46}],53:[function(require,module,exports){
-'use strict';
-
-//
-// Builds a DataFrame from raw data.
-// Input data is an array of arrays... including header and index.
-//
-
-var DataFrame = require('./dataframe');
-
-var E = require('linq');
-var moment = require('moment');
-require('sugar');
-
-//
-// http://pietschsoft.com/post/2008/01/14/javascript-inttryparse-equivalent
-//
-function tryParseFloat(str, defaultValue) {
-     var retValue = defaultValue;
-     if (str) {
-         if(str.length > 0) {
-             if (!isNaN(str)) {
-                 retValue = parseFloat(str);
-             }
-         }
-     }
-     return retValue;
-}
-
-module.exports = function (rows, options) {
-	
-	if (!options) {
-		options = {};
-	}
-	if (!options.parse_dates) {
-		options.parse_dates = [];		
-	}
-
-	if (rows.length == 0) {
-		// Handle empty set of rows.
-		return new DataFrame([], []);
-	}
-	
-	var columnNames = rows[0];
-	var values = E 
-		.from(rows)
-		.skip(1) // Skip header.
-		.toArray();	
-		
-	var parseDates = E
-		.from(columnNames)
-		.select(function (columnName) {
-			return options.parse_dates.indexOf(columnName) >= 0;
-		})	
-		.toArray();				
-	var values = E 
-		.from(rows)
-		.skip(1) // Skip header.
-		.select(function (row) {
-			return E
-				.from(row)
-				.select(function (col) { // Auto-parse numbers.
-					var val = tryParseFloat(col, null);
-					if (val == null) {
-						return col;
-					}
-					else {
-						return val;
-					}					
-				})
-				.toArray();					
-		})
-		.select(function (row) { // Parse requested dates.
-			var out = [];
-			for (var i = 0; i < row.length; ++i) {
-				if (parseDates[i]) {
-					out.push(moment(row[i]).toDate());	
-				}
-				else {
-					out.push(row[i]);
-				}						
-			} 			
-			return out;			
-		})
-		.toArray();	
-		
-	return new DataFrame(columnNames, values); 
-};
-},{"./dataframe":55,"linq":46,"moment":47,"sugar":48}],54:[function(require,module,exports){
+},{"./enumerators/array":53,"./lazyindex":58,"chai":8,"linq":45}],51:[function(require,module,exports){
 'use strict';
 
 //
@@ -25452,6 +25838,7 @@ module.exports = function (rows, options) {
 
 var BaseColumn = require('./basecolumn');
 var LazyIndex = require('./lazyindex');
+var ArrayEnumerator = require('./enumerators/array');
 
 var assert = require('chai').assert;
 var E = require('linq');
@@ -25475,7 +25862,7 @@ var Column = function (name, values, index) {
 		new LazyIndex(
 			"__index___",
 			function () {
-				return E.range(0, values.length).toArray();
+				return new ArrayEnumerator(E.range(0, values.length).toArray());
 			}
 		);
 };
@@ -25491,11 +25878,11 @@ Column.prototype.getName = function () {
 }
 
 /**
- * Retreive the values of the column.
+ * Get an enumerator for the iterating the values of the column.
  */
-Column.prototype.getValues = function () {
+Column.prototype.getEnumerator = function () {
 	var self = this;
-	return self._values;
+	return new ArrayEnumerator(self._values);
 };
 
 /**
@@ -25507,7 +25894,7 @@ Column.prototype.getIndex = function () {
 };
 
 module.exports = Column;
-},{"./basecolumn":50,"./inherit":57,"./lazyindex":60,"chai":9,"linq":46}],55:[function(require,module,exports){
+},{"./basecolumn":48,"./enumerators/array":53,"./inherit":55,"./lazyindex":58,"chai":8,"linq":45}],52:[function(require,module,exports){
 'use strict';
 
 //
@@ -25517,27 +25904,97 @@ module.exports = Column;
 var BaseDataFrame = require('./basedataframe');
 var LazyIndex = require('./lazyindex');
 
+var ArrayEnumerator = require('./enumerators/array');
 var assert = require('chai').assert;
 var E = require('linq');
 var fs = require('fs');
 var inherit = require('./inherit');
 
-var DataFrame = function (columnNames, values, index) {
-	assert.isArray(columnNames, "Expected 'columnNames' parameter to DataFrame constructor to be an array.");
-	assert.isArray(values, "Expected 'values' parameter to DataFrame constructor to be an array.");
+/**
+ * Constructor for DataFrame.
+ *
+ * @param {object} config - Specifies content and configuration for the data frame.
+ */
+var DataFrame = function (config) {
 
-	if (index) {
-		assert.isObject(index, "Expected 'index' parameter to DataFrame constructor to be an object.");
+	var columnNames;
+	var rows;
+
+	if (config) {
+		assert.isObject(config, "Expected 'config' parameter to DataFrame constructor to be an object with options for initialisation.");
+
+		if (config.index) {
+			assert.isObject(config.index, "Expected 'index' member of 'config' parameter to DataFrame constructor to be an object.");
+		}
+
+		if (config.columnNames) {
+			assert.isArray(config.columnNames, "Expected 'columnNames' member of 'config' parameter to DataFrame constructor to be an array of strings.");
+			assert.isArray(config.rows, "Expected 'rows' member of 'config' parameter to DataFrame constructor to be an array of rows.");
+
+			config.columnNames.forEach(function (columnName) {
+				assert.isString(columnName, "Expected 'columnNames' member of 'config' parameter to DataFrame constructor to be an array of strings.");
+			});
+
+			config.rows.forEach(function (row) {
+				assert.isArray(row, "Expect 'rows' member of 'config' parameter to DataFrame constructor to be an array of arrays or an array of objects.");
+			});				
+
+			columnNames = config.columnNames;
+			rows = config.rows;
+		}
+		else if (config.rows) {
+			assert.isArray(config.rows, "Expected 'rows' member of 'config' parameter to DataFrame constructor to be an array of rows.");
+			
+			if (config.rows.length > 0) {
+				if (Object.isObject(config.rows[0])) {
+					config.rows.forEach(function (row) {
+						assert.isObject(row, "Expect 'rows' member of 'config' parameter to DataFrame constructor to be array of objects or arrays, do not mix and match arrays and objects in 'rows'.");
+					});	
+
+					// Derive column names from object fields.
+					columnNames = E.from(config.rows)
+						.selectMany(function (row) {
+							return Object.keys(row);
+						})
+						.distinct()
+						.toArray();
+
+					rows = E.from(config.rows)
+						.select(function (row) {
+							return E.from(columnNames)
+								.select(function (columnName) {
+									return row[columnName];
+								})
+								.toArray();
+						})
+						.toArray();
+				}
+				else {
+					config.rows.forEach(function (row) {
+						assert.isArray(row, "Expect 'rows' member of 'config' parameter to DataFrame constructor to be array of objects or arrays, do not mix and match arrays and objects in 'rows'.");
+					});				
+
+					// Default column names.
+					columnNames = E.range(0, config.rows[0].length)
+						.select(function (columnIndex) {
+							return columnIndex.toString();
+						})
+						.toArray();
+
+					rows = config.rows;
+				}
+			}
+		}
 	}
-	
+
 	var self = this;
-	self._columnNames = columnNames;
-	self._values = values;
-	self._index = index || 
+	self._columnNames = columnNames || [];
+	self._values = rows || [];
+	self._index = (config && config.index) || 
 		new LazyIndex(
 			"__index___",
 			function () {
-				return E.range(0, values.length).toArray();
+				return new ArrayEnumerator(E.range(0, self._values.length).toArray());
 			}
 		);
 };
@@ -25561,18 +26018,46 @@ DataFrame.prototype.getColumnNames = function () {
 };
 
 /**
- * Get the values of all rows in the data frame.
+ * Get an enumerator to enumerate the rows of the DataFrame.
  */
-DataFrame.prototype.getValues = function () {
+DataFrame.prototype.getEnumerator = function () {
 	var self = this;
-	return self._values;
+	return new ArrayEnumerator(self._values);
 };
 
+//todo: could override the get values fn... here just return the already baked values.
+
 module.exports = DataFrame;
-},{"./basedataframe":51,"./inherit":57,"./lazyindex":60,"chai":9,"fs":1,"linq":46}],56:[function(require,module,exports){
+},{"./basedataframe":49,"./enumerators/array":53,"./inherit":55,"./lazyindex":58,"chai":8,"fs":1,"linq":45}],53:[function(require,module,exports){
+'use strict';
+
+var assert = require('chai').assert;
+
+//
+// Data-forge enumerator for iterating a standard JavaScript array.
+//
+var ArrayEnumerator = function (arr) {
+	assert.isArray(arr);
+
+	var self = this;
+
+	var rowIndex = -1;
+	
+	self.moveNext = function () {
+		return ++rowIndex < arr.length;
+	};
+
+	self.getCurrent = function () {
+		return arr[rowIndex];
+	};
+};
+
+module.exports = ArrayEnumerator;
+},{"chai":8}],54:[function(require,module,exports){
 'use strict';
 
 var BaseIndex = require('./baseindex');
+var ArrayEnumerator = require('./enumerators/array');
 
 var assert = require('chai').assert;
 var E = require('linq');
@@ -25601,15 +26086,15 @@ Index.prototype.getName = function () {
 };
 
 /**
- * Get the array of values from the index.
+ * Get an enumerator to iterate the values of the index.
  */
-Index.prototype.getValues = function () {
+Index.prototype.getEnumerator = function () {
 	var self = this;
-	return self._values;
+	return new ArrayEnumerator(self._values);
 };
 
 module.exports = Index;
-},{"./baseindex":52,"./inherit":57,"chai":9,"linq":46}],57:[function(require,module,exports){
+},{"./baseindex":50,"./enumerators/array":53,"./inherit":55,"chai":8,"linq":45}],55:[function(require,module,exports){
 'use strict';
 
 //
@@ -25631,7 +26116,7 @@ function inherit(destination, source) {
 
 
 module.exports = inherit;
-},{}],58:[function(require,module,exports){
+},{}],56:[function(require,module,exports){
 'use strict';
 
 //
@@ -25640,6 +26125,7 @@ module.exports = inherit;
 
 var BaseColumn = require('./basecolumn');
 var LazyIndex = require('./lazyindex');
+var ArrayEnumerator = require('./enumerators/array');
 
 var assert = require('chai').assert;
 var E = require('linq');
@@ -25648,24 +26134,24 @@ var inherit = require('./inherit');
 /**
  * Represents a lazy-evaluated column in a data frame.
  */
-var LazyColumn = function (name, valuesFn, indexFn) {
+var LazyColumn = function (name, enumeratorFn, indexFn) {
 	assert.isString(name, "Expected 'name' parameter to Column constructor be a string.");
-	assert.isFunction(valuesFn, "Expected 'valuesFn' parameter to LazyColumn constructor be a function.");
+	assert.isFunction(enumeratorFn, "Expected 'enumeratorFn' parameter to LazyColumn constructor be a function.");
 
 	if (indexFn) {
-		assert.isFunction(valuesFn, "Expected 'indexFn' parameter to LazyColumn constructor to be a function.");
+		assert.isFunction(indexFn, "Expected 'indexFn' parameter to LazyColumn constructor to be a function.");
 	}
 
 	var self = this;
 	self._name = name;
-	self._valuesFn = valuesFn;	
+	self._enumeratorFn = enumeratorFn;	
 	self._indexFn = indexFn || 
 		// Default to generated index range.
 		function () {
 			return new LazyIndex(
 				"__index__",
 				function () {
-					return E.range(0, self.getValues().length).toArray();
+					return new ArrayEnumerator(E.range(0, self.toValues().length).toArray());
 				}
 			);
 		};
@@ -25682,11 +26168,11 @@ LazyColumn.prototype.getName = function () {
 }
 
 /**
- * Retreive the values of the column.
+ * Get an enumerator for the iterating the values of the column.
  */
-LazyColumn.prototype.getValues = function () {
+LazyColumn.prototype.getEnumerator = function () {
 	var self = this;
-	return self._valuesFn();
+	return self._enumeratorFn();
 };
 
 /*
@@ -25698,7 +26184,7 @@ LazyColumn.prototype.getIndex = function () {
 };
 
 module.exports = LazyColumn;
-},{"./basecolumn":50,"./inherit":57,"./lazyindex":60,"chai":9,"linq":46}],59:[function(require,module,exports){
+},{"./basecolumn":48,"./enumerators/array":53,"./inherit":55,"./lazyindex":58,"chai":8,"linq":45}],57:[function(require,module,exports){
 'use strict';
 
 //
@@ -25708,29 +26194,31 @@ module.exports = LazyColumn;
 var LazyColumn = require('./lazycolumn');
 var BaseDataFrame = require('./basedataframe');
 var LazyIndex = require('./lazyindex');
+var ArrayEnumerator = require('./enumerators/array');
 
 var assert = require('chai').assert;
 var E = require('linq');
 var inherit = require('./inherit');
 
-var LazyDataFrame = function (columnNamesFn, valuesFn, indexFn) {
+var LazyDataFrame = function (columnNamesFn, enumeratorFn, indexFn) {
 	assert.isFunction(columnNamesFn, "Expected 'columnNamesFn' parameter to LazyDataFrame constructor to be a function.");
-	assert.isFunction(valuesFn, "Expected 'valuesFn' parameter to LazyDataFrame constructor to be a function.");
+	assert.isFunction(enumeratorFn, "Expected 'enumeratorFn' parameter to LazyDataFrame constructor to be a function.");
 
 	if (indexFn) {
-		assert.isFunction(valuesFn, "Expected 'indexFn' parameter to LazyDataFrame constructor to be a function.");
+		assert.isFunction(indexFn, "Expected 'indexFn' parameter to LazyDataFrame constructor to be a function.");
 	}
-	
+
+
 	var self = this;
 	self._columnNamesFn = columnNamesFn;
-	self._valuesFn = valuesFn;	
+	self._enumeratorFn = enumeratorFn;	
 	self._indexFn = indexFn || 
 		// Default to generated index range.
 		function () {
 			return new LazyIndex(
 				"__index__",
 				function () {
-					return E.range(0, self.getValues().length).toArray();
+					return new ArrayEnumerator(E.range(0, self.toValues().length).toArray());
 				}
 			);
 		};
@@ -25755,20 +26243,19 @@ LazyDataFrame.prototype.getColumnNames = function () {
 };
 
 /**
- * Get the values of all rows in the data frame.
+ * Get an enumerator to enumerate the rows of the DataFrame.
  */
-LazyDataFrame.prototype.getValues = function () {
+LazyDataFrame.prototype.getEnumerator = function () {
 	var self = this;
-	return self._valuesFn();
+	return self._enumeratorFn();
 };
 
-
-
 module.exports = LazyDataFrame;
-},{"./basedataframe":51,"./inherit":57,"./lazycolumn":58,"./lazyindex":60,"chai":9,"linq":46}],60:[function(require,module,exports){
+},{"./basedataframe":49,"./enumerators/array":53,"./inherit":55,"./lazycolumn":56,"./lazyindex":58,"chai":8,"linq":45}],58:[function(require,module,exports){
 'use strict';
 
 var BaseIndex = require('./baseindex');
+var ArrayEnumerator = require('./enumerators/array');
 
 var assert = require('chai').assert;
 var E = require('linq');
@@ -25777,13 +26264,13 @@ var inherit = require('./inherit');
 /**
  * Implements an lazy-evaluated index for a data frame or column.
  */
-var LazyIndex = function (name, valuesFn) {
-	assert.isString(name, "Expected 'name' parameter to Index constructor to be a string.");
-	assert.isFunction(valuesFn, "Expected 'valuesFn' parameter to Index constructor to be a function.");
+var LazyIndex = function (name, enumeratorFn) {
+	assert.isString(name, "Expected 'name' parameter to LazyIndex constructor to be a string.");
+	assert.isFunction(enumeratorFn, "Expected 'enumeratorFn' parameter to LazyIndex constructor to be a function.");
 
 	var self = this;
 	self._name = name;
-	self._valuesFn = valuesFn;
+	self._enumeratorFn = enumeratorFn;
 };
 
 var parent = inherit(LazyIndex, BaseIndex);
@@ -25797,15 +26284,15 @@ LazyIndex.prototype.getName = function () {
 };
 
 /**
- * Get the array of values from the index.
+ * Get an enumerator to iterate the values of the index.
  */
-LazyIndex.prototype.getValues = function () {
+LazyIndex.prototype.getEnumerator = function () {
 	var self = this;
-	return self._valuesFn();
+	return self._enumeratorFn();
 };
 
 module.exports = LazyIndex;
-},{"./baseindex":52,"./inherit":57,"chai":9,"linq":46}],61:[function(require,module,exports){
+},{"./baseindex":50,"./enumerators/array":53,"./inherit":55,"chai":8,"linq":45}],59:[function(require,module,exports){
 'use strict';
 
 var E = require('linq');
@@ -25823,4 +26310,4 @@ module.exports = {
 	},
 
 };
-},{"linq":46}]},{},[6]);
+},{"linq":45}]},{},[6]);

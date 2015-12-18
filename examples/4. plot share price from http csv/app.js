@@ -3,28 +3,42 @@
 $(function() {
 	
 	//
+	// Get CSV data via HTTP.
+	//
+    var get = function (url) {
+        return new Promise(function (resolve, reject) {
+            $.get(url)
+                .done(function (data) {
+                    resolve(data);
+                })
+                .fail(function (err) {
+                    reject(err);
+                });
+        });
+    };
+
+	//
 	// Load as single CSV file containing share prices.
 	//
-	var loadFile = function (url) {
-	
-		return dataForge
-			.from(dataForge.http(url))
-			.as(dataForge.csv());
+	var loadCSV = function (url) {
+		return get(url)
+			.then(function (csv) {
+				return dataForge.fromCSV(csv);
+			})
+			.then(function (dataFrame) {
+				return dataFrame.parseDates('Date');
+			});
 	};
 
 	//
 	// Helper function for plotting.
 	//
 	var plot = function (id, dataFrame) {
-
-		var data = E.from(dataFrame.getValues()) // Assume first column is date, second column is value to plot.
+		var data = E.from(dataFrame.toObjects()) // Assume first column is date, second column is value to plot.
 			.select(function (entry) {
-				var dateStr = entry[0].toString();
-				var date = moment(dateStr).toDate(); //todo: use auto date parsing.
-
 				return [
-					date.getTime(),
-					entry[1]
+					entry.Date.getTime(),
+					entry.Close
 				]; 
 			})
 			.toArray();
@@ -42,7 +56,7 @@ $(function() {
 		);
 	};
 
-	loadFile('share_prices.csv')
+	loadCSV('share_prices.csv')
 		.then(function (dataFrame) {
 			//
 			// Plot the data frame.

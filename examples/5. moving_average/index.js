@@ -1,8 +1,7 @@
 'use strict';
 
 var dataForge = require("../../index.js");
-var csv = require('../../format/csv');
-var file = require('../../source/file');
+var fs = require('fs');
 
 var glob = require('glob');
 var E = require('linq');
@@ -13,8 +12,8 @@ var assert = require('chai').assert;
 //
 var loadSharePricesFile = function (filePath) {
 	assert.isString(filePath);
-	
-	return dataForge.from(file(filePath)).as(csv());
+
+	return dataForge.fromCSV(fs.readFileSync(filePath, 'utf8'));
 };
 
 //
@@ -24,7 +23,7 @@ var saveSharePricesFile = function (dataFrame, filePath) {
 	assert.isObject(dataFrame);
 	assert.isString(filePath);
 
-	return dataFrame.as(csv()).to(file(filePath));
+	fs.writeFileSync(filePath, dataFrame.toCSV());
 };
 
 //
@@ -45,13 +44,6 @@ var computeSimpleMovingAverage = function (dataFrame, period) {
 	return dataFrame.setColumn('SMA', movingAvgColumn);
 };
 
-loadSharePricesFile('share_prices.csv')
-	.then(function (dataFrame) {
-		return computeSimpleMovingAverage(dataFrame, 30); // 30 day moving average.
-	})
-	.then(function (dataFrame) {
-		return saveSharePricesFile(dataFrame, 'output.csv');
-	})
-	.catch(function (err) {
-		console.error(err.stack);
-	});
+var dataFrame = loadSharePricesFile('share_prices.csv');
+var withMovingAvg = computeSimpleMovingAverage(dataFrame, 30); // 30 day moving average.
+saveSharePricesFile(withMovingAvg, 'output.csv');
