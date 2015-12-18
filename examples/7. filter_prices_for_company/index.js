@@ -1,20 +1,19 @@
 'use strict';
 
 var dataForge = require("../../index.js");
-var csv = require('../../format/csv');
-var file = require('../../source/file');
+var fs = require('fs');
 
 var glob = require('glob');
 var E = require('linq');
 var assert = require('chai').assert;
 
 //
-// Load single CSV containing share prices.
+// Load as single CSV file containing share prices.
 //
-var loadFile = function (filePath) {
+var loadSharePricesFile = function (filePath) {
 	assert.isString(filePath);
-	
-	return dataForge.from(file(filePath)).as(csv());
+
+	return dataForge.fromCSV(fs.readFileSync(filePath, 'utf8'));
 };
 
 //
@@ -26,31 +25,21 @@ var loadSharePricesForCompany = function (companyCode, filePath) {
 
 	companyCode = companyCode.toUpperCase();
 
-	return loadFile(filePath)
-		.then(function (dataFrame) {
-			assert.isObject(dataFrame);
-
-			return dataFrame
-				.where(function (row) {
-					return row.code.toUpperCase() === companyCode;
-				});
-		})
+	loadSharePricesFile(filePath)
+		.where(function (row) {
+			return row.code.toUpperCase() === companyCode;
+		});
 };
 
 //
 // Save data frame to a CSV file.
 //
-var saveFile = function (dataFrame, filePath) {
+var saveSharePricesFile = function (dataFrame, filePath) {
 	assert.isObject(dataFrame);
 	assert.isString(filePath);
 
-	return dataFrame.as(csv()).to(file(filePath));
+	fs.writeFileSync(filePath, dataFrame.toCSV());
 };
 
-loadSharePricesForCompany('ABC', 'share_prices.csv')
-	.then(function (dataFrame) {
-		return saveFile(dataFrame, 'output.csv');
-	})
-	.catch(function (err) {
-		console.error(err.stack);
-	});
+dataFrame = loadSharePricesForCompany('ABC', 'share_prices.csv')
+saveSharePricesFile(dataFrame, 'output.csv');

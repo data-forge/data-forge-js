@@ -1,8 +1,7 @@
 'use strict';
 
 var dataForge = require("../../index.js");
-var csv = require('../../format/csv');
-var file = require('../../source/file');
+var fs = require('fs');
 
 var glob = require('glob');
 var E = require('linq');
@@ -13,8 +12,8 @@ var assert = require('chai').assert;
 //
 var loadSharePricesFile = function (filePath) {
 	assert.isString(filePath);
-	
-	return dataForge.from(file(filePath)).as(csv());
+
+	return dataForge.fromCSV(fs.readFileSync(filePath, 'utf8'));
 };
 
 //
@@ -22,15 +21,8 @@ var loadSharePricesFile = function (filePath) {
 // 
 var loadSharePrices = function () {
 	var filePaths = glob.sync("./data/prices/*");
-	var loadFilePromises = E.from(filePaths).select(loadSharePricesFile).toArray();
-	return Promise.all(loadFilePromises)
-		.then(function (dataFrames) {
-			// Concatenate all data frames.
-			return E.from(dataFrames)
-				.aggregrate(function (previous, next) {
-					return previous.concat(next);
-				});
-		});
+	var loaded = E.from(filePaths).select(loadSharePricesFile).toArray();
+	return dataForge.concat(loaded);
 };
 
 //
@@ -40,13 +32,8 @@ var saveSharePricesFile = function (dataFrame, filePath) {
 	assert.isObject(dataFrame);
 	assert.isString(filePath);
 
-	return dataFrame.as(csv()).to(file(filePath));
+	fs.writeFileSync(filePath, dataFrame.toCSV());
 };
 
-loadSharePrices()
-	.then(function (dataFrame) {
-		return saveSharePricesFile(dataFrame, 'output.csv');
-	})
-	.catch(function (err) {
-		console.error(err.stack);
-	});
+var dataFrame = loadSharePrices();
+saveSharePricesFile(dataFrame, 'output.csv');
