@@ -23,58 +23,6 @@ describe('data-forge', function () {
 		);
 	};
 
-	it('can load data async', function () {
-
-		var someTestData = 'some-test-data';
-		var promise = Promise.resolve(someTestData);
-		var mockDataFrame = {};
-
-		var mockDataSource = {
-			read: function () {
-				return promise;
-			}
-		};
-
-		var mockDataFormat = {
-			from: function (data) {
-				expect(data).to.eql(someTestData);
-				return mockDataFrame;
-			}
-		};
-
-		return dataForge
-			.from(mockDataSource)
-			.as(mockDataFormat)
-			.then(function (dataFrame) {
-				expect(dataFrame).to.eql(mockDataFrame);
-			});
-	});
-
-	it('can load data sync', function () {
-
-		var someTestData = 'some-test-data';
-		var mockDataFrame = {};
-
-		var mockDataSource = {
-			readSync: function () {
-				return someTestData;
-			}
-		};
-
-		var mockDataFormat = {
-			from: function (data) {
-				expect(data).to.eql(someTestData);
-				return mockDataFrame;
-			}
-		};
-
-		var dataFrame = dataForge
-			.fromSync(mockDataSource)
-			.as(mockDataFormat);
-
-		expect(dataFrame).to.eql(mockDataFrame);
-	});
-	
 	it('can merge on column', function () {
 
 		var left = initDataFrame(

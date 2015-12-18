@@ -43,48 +43,46 @@ var dataForge = {
 			});
 	},
 
-
-	/**
-	 * Read a DataFrame asynchronously from a plugable data source.
-	 */
-	from: function (dataSourcePlugin) {
-		assert.isObject(dataSourcePlugin, "Expected 'dataSourcePlugin' parameter to 'dataForge.from' to be an object.");
-		assert.isFunction(dataSourcePlugin.read, "Expected 'dataSourcePlugin' parameter to 'dataForge.from' to be an object with a 'read' function.");
+	//
+	// Deserialize a data from a CSV text string.
+	//
+	fromCSV: function (csvTextString) {
+		assert.isString(csvTextString, "Expected 'csvTextString' parameter to 'dataForge.fromCSV' to be a string containing data encoded in the CSV format.");
 		
-		return {
-			/**
-			 * Convert DataFrame from a particular data format using a plugable format.
-			 */
-			as: function (formatPlugin) {
-				assert.isObject(formatPlugin, "Expected 'formatPlugin' parameter to 'dataForge.from' to be an object.");
-				assert.isFunction(formatPlugin.from, "Expected 'formatPlugin' parameter to 'dataForge.from' to be an object with a 'from' function.");
-				
-				return dataSourcePlugin.read()
-					.then(function (textData) {
-						return formatPlugin.from(textData);
-					});		
-			},		
-		};
-	},
+		var lines = csvTextString.split('\n');
+		var rows = E
+			.from(lines) // Ignore blank lines.
+			.where(function (line) {
+				return line.trim().length > 0;
+			})
+			.select(function (line) {
+				return E
+					.from(line.split(','))
+					.select(function (col) {
+						return col.trim();
+					})
+					.select(function (col) {
+						if (col.length === 0) {
+							return undefined;
+						}
+						else {
+							return col;
+						}
+					})
+					.toArray();					
+			})
+			.toArray();
 
-	/**
-	 * Read a DataFrame synchronously from a plugable data source.
-	 */
-	fromSync: function (dataSourcePlugin) {
-		assert.isObject(dataSourcePlugin, "Expected 'dataSourcePlugin' parameter to 'dataForge.from' to be an object.");
-		assert.isFunction(dataSourcePlugin.readSync, "Expected 'dataSourcePlugin' parameter to 'dataForge.from' to be an object with a 'readSync' function.");
-		
-		return {
-			/**
-			 * Convert DataFrame from a particular data format using a plugable format.
-			 */
-			as: function (formatPlugin) {
-				assert.isObject(formatPlugin, "Expected 'formatPlugin' parameter to 'dataForge.from' to be an object.");
-				assert.isFunction(formatPlugin.from, "Expected 'formatPlugin' parameter to 'dataForge.from' to be an object with a 'from' function.");
+		if (rows.length === 0) {
+			return new dataForge.DataFrame({ columnNames: [], rows: [] });
+		}
 				
-				return formatPlugin.from(dataSourcePlugin.readSync());
-			},		
-		};
+		var header = E.from(rows).first();
+		var remaining = E.from(rows).skip(1).toArray();
+		return new dataForge.DataFrame({
+				columnNames: header, 
+				rows: remaining
+			});
 	},
 
 	/**

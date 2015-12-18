@@ -296,75 +296,6 @@ describe('BaseDataFrame', function () {
 		]);
 	});
 	
-	it('can save data frame async', function () {
-		
-		var dataFrame = initDataFrame(
-			[ "Date", "Value1", "Value2", "Value3" ],
-			[
-				[new Date(1975, 24, 2), 100, 'foo', 11],
-				[new Date(2015, 24, 2), 200, 'bar', 22],
-			],
-			[5, 6]
-		);
-
-		var formattedText = "some-text";
-		var promise = {};
-
-		var mockDataFormat = {
-			to: function (outputDataFrame) {
-				expect(outputDataFrame).to.equal(dataFrame);
-				return formattedText;				
-			},
-		};
-		
-		var mockDataSource = {
-			write: function (textData, options) {
-				expect(textData).to.equal(formattedText);					
-				return promise;				
-			},
-		};
-		
-		var result = dataFrame
-			.as(mockDataFormat)
-			.to(mockDataSource);
-			
-		expect(result).to.equal(promise);
-	});
-	
-	it('can save data frameasync', function () {
-		
-		var dataFrame = initDataFrame(
-			[ "Date", "Value1", "Value2", "Value3" ],
-			[
-				[new Date(1975, 24, 2), 100, 'foo', 11],
-				[new Date(2015, 24, 2), 200, 'bar', 22],
-			],
-			[5, 6]
-		);
-
-		var formattedText = "some-text";
-		var hasWrittenData = false;
-
-		var mockDataFormat = {
-			to: function (outputDataFrame) {
-				expect(outputDataFrame).to.equal(dataFrame);
-				return formattedText;				
-			},
-		};
-		
-		var mockDataSource = {
-			writeSync: function (textData) {
-				expect(textData).to.equal(formattedText);					
-				hasWrittenData = true;
-			},
-		};
-		
-		dataFrame
-			.as(mockDataFormat)
-			.toSync(mockDataSource);
-
-		expect(hasWrittenData).to.eql(true);
-	});	
 	it('can sort by single column ascending', function () {
 		
 		var dataFrame = initDataFrame(
@@ -1029,6 +960,54 @@ describe('BaseDataFrame', function () {
 			'        "Column2": 2\n' +
 			'    }\n' +
 			']'
+		);
+	});	
+
+	it('can save empty data frame to csv', function () {
+
+		var dataFrame = initDataFrame([], [], []);
+		var csvData = dataFrame.toCSV();
+		assert.isString(csvData);
+		expect(csvData.length).to.eql(0);
+	});
+
+	it('can save data frame to csv', function () {
+
+		var dataFrame = initDataFrame(
+				["Column1", "Column2"], 
+				[
+					['A', 1],
+					['B', 2],
+				],
+				[0, 1]
+			);
+
+		var csvData = dataFrame.toCSV();
+		assert.isString(csvData);
+		expect(csvData).to.eql(
+			"Column1,Column2\r\n" +
+			"A,1\r\n" +
+			"B,2"
+		);
+	});
+
+	it('newlines are automatically stripped from strings when saving a csv', function () {
+
+		var dataFrame = initDataFrame(
+				["Column1"], 
+				[
+					['First line\nsecond line\nthird line'],
+					['1st line\r\n2nd line'],
+				],
+				[0, 1]
+			);
+
+		var csvData = dataFrame.toCSV();
+		assert.isString(csvData);
+		expect(csvData).to.eql(
+			"Column1\r\n" +
+			"First line second line third line\r\n" +
+			"1st line 2nd line"
 		);
 	});	
 });

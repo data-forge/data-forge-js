@@ -451,31 +451,6 @@ BaseDataFrame.prototype.getColumnsSubset = function (columnNames) {
 };
 
 //
-// Save the data frame via plugable output.
-//
-BaseDataFrame.prototype.as = function (formatPlugin) {
-	assert.isObject(formatPlugin, "Expected 'formatPlugin' parameter to 'DataFrame.as' to be an object.");
-	assert.isFunction(formatPlugin.to, "Expected 'formatPlugin' parameter to 'DataFrame.as' to be an object with a 'to' function.");
-
-	var self = this;	
-	return {
-		to: function (dataSourcePlugin) {
-			assert.isObject(dataSourcePlugin, "Expected 'dataSourcePlugin' parameter to 'DataFrame.as.to' to be an object.");
-			assert.isFunction(dataSourcePlugin.write, "Expected 'dataSourcePlugin' parameter to 'DataFrame.as.to' to be an object with a 'write' function.");
-			
-			return dataSourcePlugin.write(formatPlugin.to(self));
-		},		
-
-		toSync: function (dataSourcePlugin) {
-			assert.isObject(dataSourcePlugin, "Expected 'dataSourcePlugin' parameter to 'DataFrame.as.to' to be an object.");
-			assert.isFunction(dataSourcePlugin.writeSync, "Expected 'dataSourcePlugin' parameter to 'DataFrame.as.to' to be an object with a 'writeSync' function.");
-			
-			return dataSourcePlugin.writeSync(formatPlugin.to(self));
-		},		
-	};
-};
-
-//
 // Throw an exception if the sort method doesn't make sense.
 //
 var validateSortMethod = function (sortMethod) {
@@ -1155,6 +1130,29 @@ BaseDataFrame.prototype.toObjects = function () {
 BaseDataFrame.prototype.toJSON = function () {
 	var self = this;
 	return JSON.stringify(self.toObjects(), null, 4);
+};
+
+/**
+ * Serialize the data frame to CSV.
+ */
+BaseDataFrame.prototype.toCSV = function () {
+
+	var self = this;
+	var header = self.getColumnNames().join(',');
+	var rows = E.from(self.getValues())
+			.select(function (row) {
+				return row.join(',');
+			})
+			.select(function (col) { // Strip newlines... these don't work in CSV files.
+				if (Object.isString(col)) { //todo: not necessar if all columns are converted to strings.
+					return col.replace(/\r\n/g, ' ').replace(/\n/g, ' ');
+				}
+				else {
+					return col;
+				}
+			})					
+			.toArray();
+	return [header].concat(rows).join('\r\n');	
 };
 
 module.exports = BaseDataFrame;
