@@ -28,8 +28,6 @@ See here for [generated API docs](./docs/api.md) that are taking shape.
   - [Browser installation and setup](#browser-installation-and-setup)
   - [Getting the code](#getting-the-code)
 - [Key Concepts](#key-concepts)
-  - [Data Source](#data-source)
-  - [Data Format](#data-format)
   - [Data Frame](#data-frame)
   - [Row](#row)
   - [Column](#column)
@@ -135,14 +133,6 @@ Clone, fork or download the code from Github:
 # Key Concepts
 
 This section explains the key concepts related to *data-forge*.
-
-## Data Source
-
-A plugin to load data from or save data to a particular data source. Examples include *file*, [*mongodb*](https://en.wikipedia.org/wiki/MongoDB) and [*HTTP*](https://en.wikipedia.org/wiki/Hypertext_Transfer_Protocol) ([REST API](https://en.wikipedia.org/wiki/Representational_state_transfer)) for NodeJS and just *HTTP* for the browser.
-
-## Data Format
-
-A plugin to load or save data in a particular format. Examples include [*CSV*](https://en.wikipedia.org/wiki/Comma-separated_values) and [*JSON*](https://en.wikipedia.org/wiki/JSON). 
 
 ## Data Frame
 
