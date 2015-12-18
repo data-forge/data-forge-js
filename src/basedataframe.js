@@ -36,22 +36,19 @@ var BaseDataFrame = function () {
 // Map a row of data to a JS object with column names as fields.
 //
 var mapRowByColumns = function (self, row) {
-	var copy = E.from(row).toArray();
 
-	E.from(self.getColumnNames())
-		.select(function (columnName, columnIndex) {
-			return [columnName, columnIndex];
+	return E.from(self.getColumnNames())
+		.zip(row, function (columnName, columnValue) {
+			return [columnName, columnValue];
 		})
-		.toArray()
-		.forEach(
+		.toObject(
 			function (column) {
-				var columnName = column[0];
-				var columnIndex = column[1];
-				copy[columnName] = copy[columnIndex];
+				return column[0];
+			},
+			function (column) {
+				return column[1];
 			}
 		);
-
-	return copy;
 };
 
 /**

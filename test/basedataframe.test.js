@@ -456,7 +456,7 @@ describe('BaseDataFrame', function () {
 		]);
 	});
 
-	it('can sort by selector descending - using column indicies', function () {
+	it('can sort by selector descending', function () {
 		
 		var dataFrame = initDataFrame(
 			[ "Date", "Value1", "Value2", "Value3" ],
@@ -470,10 +470,10 @@ describe('BaseDataFrame', function () {
 		);
 		var sorted = dataFrame
 			.orderByDescending(function (row) {
-				return row[2];
+				return row.Value2;
 			})
 			.thenByDescending(function (row) {
-				return row[1];
+				return row.Value1;
 			});
 		expect(sorted.getIndex().getValues()).to.eql([8, 5, 7, 6]);
 		expect(sorted.getValues()).to.eql([
