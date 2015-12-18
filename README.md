@@ -23,6 +23,7 @@ See here for [generated API docs](./docs/api.md) that are taking shape.
 - [Project Aims](#project-aims)
 - [Driving Principles](#driving-principles)
 - [Implementation](#implementation)
+  - [](#)
 - [Installation](#installation)
   - [NodeJS installation and setup](#nodejs-installation-and-setup)
   - [Browser installation and setup](#browser-installation-and-setup)
@@ -34,42 +35,45 @@ See here for [generated API docs](./docs/api.md) that are taking shape.
   - [Row](#row)
   - [Column](#column)
   - [Index](#index)
+  - [Iterator](#iterator)
 - [Basic Usage](#basic-usage)
   - [Creating a Data Frame](#creating-a-data-frame)
-  - [Immutability and Chained Functions](#immutability-and-chained-functions)
+  - [Setting an index](#setting-an-index)
 - [Working with data](#working-with-data)
-  - [Loading data](#loading-data)
-  - [Saving data](#saving-data)
-  - [Data Sources and Formats](#data-sources-and-formats)
-    - [NodeJS data sources](#nodejs-data-sources)
-    - [Browser data sources](#browser-data-sources)
-    - [Data formats](#data-formats)
-    - [Custom data source](#custom-data-source)
-    - [Custom data format](#custom-data-format)
+  - [Enumerating rows](#enumerating-rows)
+  - [Enumerating columns](#enumerating-columns)
+  - [Enumerating the index](#enumerating-the-index)
+  - [Direct column access](#direct-column-access)
+  - [Adding a column](#adding-a-column)
+  - [Replacing a column](#replacing-a-column)
+  - [Removing a column](#removing-a-column)
+- [Immutability and Chained Functions](#immutability-and-chained-functions)
+- [Working with other data sources](#working-with-other-data-sources)
+  - [MongoDB](#mongodb)
+  - [SQL](#sql)
+  - [HTTP (REST APIs)](#http-rest-apis)
+  - [Massive files](#massive-files)
+  - [Custom iterators](#custom-iterators)
 - [Data exploration and visualization](#data-exploration-and-visualization)
   - [Console output](#console-output)
   - [Visual output](#visual-output)
-- [Accessing the data](#accessing-the-data)
-  - [Accessing all values](#accessing-all-values)
   - [Column access](#column-access)
-  - [Accessing column values](#accessing-column-values)
 - [Data transformation](#data-transformation)
   - [Data frame transformation](#data-frame-transformation)
   - [Column transformation](#column-transformation)
   - [Data frame and column filtering](#data-frame-and-column-filtering)
   - [LINQ functions](#linq-functions)
-  - [Adding a column](#adding-a-column)
-  - [Replacing a column](#replacing-a-column)
-  - [Removing a column](#removing-a-column)
   - [Data frame aggregation](#data-frame-aggregation)
   - [Data frame window](#data-frame-window)
 - [Examples](#examples)
   - [Working with CSV files](#working-with-csv-files)
   - [Working with JSON files](#working-with-json-files)
-  - [Working with MongoDB](#working-with-mongodb)
+  - [Working a massive CSV file](#working-a-massive-csv-file)
+  - [Working with a MongoDB collection](#working-with-a-mongodb-collection)
+  - [Working with a massive MongoDB collection](#working-with-a-massive-mongodb-collection)
   - [Working with HTTP](#working-with-http)
-    - [NodeJS](#nodejs)
-    - [Browser](#browser)
+  - [Working with HTTP in the browser](#working-with-http-in-the-browser)
+  - [Working with HTTP in AngularJS](#working-with-http-in-angularjs)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -164,11 +168,13 @@ A single *named* column of data in a *data frame*. Contains a slice of data acro
 
 Used to index a data frame for operations such as *merge*. If not specified an integer index (starting at 0) is generated based on row position. An index can be explicitly set by promoting a column to an index.
 
-## Enumerator
+## Iterator
 
-An enumerator is used to iterate the rows of a data frame or column. Enumerators allow lazy evaluation (row by row evaluation) of data frames and columns.
+An object that iterates the rows of a data frame or column. Iterators allow lazy evaluation (row by row evaluation) of data frames and columns.
 
-This is the same concept as an enumerator in C#. 
+This is the same concept as an enumerator in C#.
+
+todo: can have links here to JS resources explaining iterators. 
 
 # Basic Usage 
 
@@ -176,7 +182,7 @@ This is the same concept as an enumerator in C#.
 
 The DataFrame constructor is passed a *config* object that specifies the initial contents of the data frame. 
 
-A data frame can be simply created from column names and rows:
+Create a data frame from column names and rows:
 
 	var dataFrame = new dataForge.DataFrame({
 			columnNames: ["Col1", "Col2", "Col3"],
@@ -187,9 +193,7 @@ A data frame can be simply created from column names and rows:
 			]
 		});
 
-That example generates an index with the values *0, 1, 2*.
-
-A data frame can also be created from an array of JavaScript objects:
+ data frame can also be created from an array of JavaScript objects:
 
 	var dataFrame = new dataForge.DataFrame({
 			rows: [
@@ -211,13 +215,17 @@ A data frame can also be created from an array of JavaScript objects:
 			]
 		});
 
-An index can be explicitly be provided:
+## Setting an index
+
+The previous examples each generated an index with the values *0, 1, 2*.
+
+An index can be explicitly be provided creating a data frame:
 
 	var dataFrame = new dataForge.DataFrame({
 			columnNames: <column-names>,
 			rows: <rows>,
 			index: new dataForge.Index([5, 10, 100])
-		})
+		});
 
 Or an existing column can be promoted to an index:
  
@@ -227,7 +235,7 @@ Be aware that promoting a column to an index in *data-forge* doesn't remove the 
 
 	var dataFrame = new dataForge.DataFrame(someConfig).setIndex("Col3").dropColumn("Col3");
 
-See the [examples section](#examples) for examples of loading various data formats.
+An index is required for certain operations like *merge*.
 
 # Working with data
 
@@ -265,65 +273,94 @@ The *from/to* functions can be used in combination with NodeJS `fs` functions fo
 
 	fs.writeFileSync('some-other-csv-file.csv', dataFrame.toCSV());
 
+See the [examples section](#examples) for examples of loading various data sources and formats.
 	
 ## Enumerating rows
 
-The rows can be extracted from a data frame or column in multiple ways.
+Rows can be extracted from a data frame in several ways.
 
-First we can lazily iterate a data frame using an enumerator. This is the lowest-level method of accessing the rows of a data frame. It is enumerators that allow data frames and columns to be lazily evaluated (same as with LINQ in C#).
+First we can lazily iterate using an iterator. This is the lowest-level method of accessing the rows of a data frame. Using iterators allows data frames and columns to be lazily evaluated (same as with LINQ in C#).
 
-	var enumerator = dataFrame.getEnumerator();
-	while (enumerator.moveNext()) {
-		var row = enumerator.getCurrent();
+	var iterator = dataFrame.getIterator();
+	while (iterator.moveNext()) {
+		var row = iterator.getCurrent();
 		// do something with the row.
 	}
 
-There are higher-level ways to extract the rows. Under the hood these use enumerators. They force lazy evaluation to complete (like the *toArray* function in LINQ).
+There are higher-level ways to extract the rows. Under the hood these use enumerators. These force lazy evaluation to complete (like the *toArray* function in LINQ).
 
-	var arrayOfArrays = dataFrame.getRows();
+	var arrayOfArrays = dataFrame.toRows();
 
 and
 
 	var arrayOfObjects = dataFrame.toObjects();
 
+Create a new data frame from a subset of rows:
+
+	var startIndex = ... // Starting row index to include in subset. 
+	var endIndex = ... // Ending row index to include in subset.
+	var rowSubset = dataFrame.getRowsSubset(startIndex, endIndex);
 
 ## Enumerating columns
 
-You can get the names of columns:
+Get the names of the columns:
 
 	var arrayOfColumnNames = dataFrame.getColumnNames();
 
-You can get all columns:
+Get an array of all columns:
 
 	var arrayOfColumns = dataFrame.getColumns();
 
-You can use an enumerator to lazily iterate an individual column:
+Use an iterator to lazily iterate an individual column:
 
-	var enumerator = someColumn.getEnumerator();
-	while (enumerator.moveNext()) {
-		var row = enumerator.getCurrent();
+	var iterator = someColumn.getIterator();
+	while (iterator.moveNext()) {
+		var row = iterator.getCurrent();
 		// do something with the row.
 	}
 
-You can pull out an array of values for an individual column. Note that this could be an expensive operation. 
-To slice a column out of the entire data frame lazy evaluation is forced to complete.  
+Slice out an array of values for an individual column. Note that this could be an expensive operation. 
+Lazy evaluation of the entire data frame will be forced to complete.  
 
-	var arrayOfValues = someColumn.getValues();
+	var arrayOfValues = someColumn.toValues();
+
+Create a new data frame from a sub-set of columns:
+
+	var columnSubset = df.getColumnsSubset(["Some-Column", "Some-Other-Column"]);
+
+## Enumerating the index
+
+The index can also be lazily iterated:
+
+	var iterator = dataFrame.getIndex().getIterator();
+	while (iterator.moveNext()) {
+		var row = iterator.getCurrent();
+		// do something with the row.
+	}
+
+Its values can also be sliced retrieved as a single array;
+
+	var arrayOfValues = dataFrame.getIndex().toValues();
 
 ## Direct column access
 
-todo:
-get column (name or index)
+Individual columns can be extracted by name:
+
+	var column = dataFrame.getColumn("some-column");
+
+Or by zero-based index:
+
+	var column = dataFrame.getColumn(5);
 
 ## Adding a column
 
-New columns can be added to a data frame. Again note that this doesn't change the original data frame, but generates a new data frame that contains the additional column.
+New columns can be added to a data frame. This doesn't change the original data frame, it generates a new data frame that contains the additional column.
 
 	var newDf = df.setColumn("Some-New-Column", newColumnObject); 
 
 ## Replacing a column
 
-We can replace an existing column using the same function:
+`setColumn` can also replace an existing column:
 
 	var newDf = df.setColumn("Some-Existing-Column", newColumnObject);
 
@@ -336,18 +373,11 @@ A column can easily be removed:
 	var newDf = df.dropColumn('Column-to-be-dropped');
 
 
-## Indicies
-
-todo
-
-enumerator, get values, etc
-
-
-## Immutability and Chained Functions
+# Immutability and Chained Functions
 
 You may have noticed in previous examples that multiple functions have been chained.
 
-*data-forge* supports only [immutable](https://en.wikipedia.org/wiki/Immutable_object) operations. Each operation returns a new immutable data frame. No *in place* operations are supported (one of the things I found confusing about *Pandas*). 
+*data-forge* supports only [immutable](https://en.wikipedia.org/wiki/Immutable_object) operations. Each operation returns a new immutable data frame or column. No *in place* operations are supported (one of the things I found confusing about *Pandas*). 
 
 This is why, in the following example, the final data frame is captured after all operations are applied:
 
@@ -361,36 +391,9 @@ Consider an alternate structure:
 
 Here *df1*, *df2* and *df3* are separate data frames with the results of the previous operations applied. These data frames are all immutable and cannot be changed. Any function that transforms a data frame returns a new and independent data frame. This is great, but may require some getting used to!
   
-# Working with other data sources
-
-## MongoDB
-
-todo
-
-## SQL
-
-todo
-
-## HTTP (REST APIs)
-
-todo
-
-## Massive files
-
-todo
-
-## Custom iterators
-
-todo
-
-	dataForge.from(someIterator)
-
-
 # Data exploration and visualization
 
 In order to understand the data we are working
-
-todo: need to put detectTypes and detectedValues here. 
 
 ## Console output
 
@@ -411,41 +414,11 @@ As you explore a data set you may want to understand what data types you are wor
 	var typesDf = df.detectTypes(); // <-- Create a data frame with the types from the source data frame.
 	console.log(typesDf.toString());
 
+todo: need to mention detectValues here.
 
 ## Visual output
 
 More on this soon. If you need to get started now the [Github repo](https://github.com/Real-Serious-Games/data-forge-js) has [examples](https://github.com/Real-Serious-Games/data-forge-js/tree/master/examples) showing how to use *data-forge* with [Flot](http://www.flotcharts.org/).
-
-## Column access
-
-todo: move this up
-
-There are several ways to access columns.
-
-An entire column can be extracted using `getColumn`. The column is specified by name:
-
-	var column = df.getColumn("Some-Column");
-	console.log(column.toString());
-
-Or by (zero-based) index: 
-
-	var column = df.getColumn(2); // <-- Get column at array-index 2. 
-	console.log(column.toString());
-
-Get the names of all columns via `getColumnNames`:
-
-	console.log(df.getColumnNames());
-
-Get all column objects via `getColumn`:
-
-	var columns = df.getColumns();
-	columns.forEach(function (column) {
-		console.log(column.toString());
-	});
-
-Create a new data frame from a sub-set of columns:
-
-	var subset = df.getColumnsSubset(["Some-Column", "Some-Other-Column"]);
 
 # Data transformation
 
@@ -632,7 +605,7 @@ Same as previous example, except use skip and take to only process a window of t
 		
 ## Working with HTTP in the browser
 
-todo:
+todo: this section needs to be replaced
 
 Note the differences in the way plugins are referenced than in the NodeJS version.
 
@@ -662,7 +635,7 @@ Javascript:
 
 ## Working with HTTP in AngularJS
 
-todo:
+todo: this section needs to be replaced
 
 HTML:
 
@@ -687,7 +660,7 @@ Javascript:
 			console.error(err && err.stack || err); // <-- Handle errors.
 		});
 
-
+ 
 
 
 
