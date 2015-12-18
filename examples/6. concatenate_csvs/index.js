@@ -20,7 +20,7 @@ var loadSharePricesFile = function (filePath) {
 // Load a directory full of files containing share prices.
 // 
 var loadSharePrices = function () {
-	var filePaths = glob.sync("./data/prices/*");
+	var filePaths = glob.sync("./prices/*");
 	var loaded = E.from(filePaths).select(loadSharePricesFile).toArray();
 	return dataForge.concat(loaded);
 };
