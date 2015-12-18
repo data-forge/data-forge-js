@@ -1,35 +1,24 @@
 'use strict';
 
 var dataForge = require("../../index.js");
-var json = require('../../format/json');
-var mongo = require('../../source/mongo/mongo');
-var csv = require('../../format/csv');
-var file = require('../../source/file');
 
-mongo({
-		host: 'localhost:27017',
-		database: 'some-database',
-		collection: 'some-collection'
-	})
-	.read()
-	.then(function (dataFrame) {
+var pmongo = require('promised-mongo');
+var db = pmongo('localhost/some-database', ['someCollection', 'someOtherCollection']);
+
+db.someCollection.find().toArray()
+	.then(function (documents) {
 
 		console.log(dataFrame.toString());
 
 		var subset = dataFrame.getColumnsSubset(['SomeColumn', 'SomeOtherColumn']);
 		console.log(subset.toString());
 
-		//return subset.as(csv()).to(file('test.csv'));
-
-		return subset
-			.as(json())
-			.to(mongo({
-				host: 'localhost:27017',
-				db: 'some-other-database',
-				collection: 'some-other-collection',
-			}));
+		return db.someOtherCollection.insert(subset.toObjects());
 	})
 	.catch(function (err) {
 		console.error((err && err.stack) || err);
+	})
+	.then(function () {
+		db.close();
 	});
 
