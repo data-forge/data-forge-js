@@ -99,7 +99,7 @@ General implementation goals:
 
 ----------
 
-The rest of the README defines the setup and usage of data-forge. Certain features described here are not implemented yet. 
+The rest of the README defines the setup and usage of Data-Forge. Certain features described here are not implemented yet. 
 
 # Installation
 
@@ -113,6 +113,26 @@ Require the module into your script:
 
 	var dataForge = require('data-forge');
 
+### Data-Forge plugins under Node.js
+
+Plugins are typically loaded into the Data-Forge namespace as follows, using *data-forge-from-yahoo* (todo: link to repo) as an example. 
+
+Install via NPM:
+
+	npm install --save data-forge-from-yahoo
+
+Required and *use*:
+
+	var dataForge = require('data-forge');
+	dataForge.use(require('data-forge-from-yahoo'));
+
+You can use functions defined by the plugin, eg
+
+	dataForge.fromYahoo('MSFT')
+		.then(function (dataFrame) {
+			// ... use the data returned from Yahoo ...
+		}); 
+
 ## Browser installation and setup
 
 Install via [Bower](https://en.wikipedia.org/wiki/Bower_(software)):
@@ -124,7 +144,27 @@ Include the main script in your HTML file:
 	<script src="bower_components/data-forge/data-forge.js"></script>
 
 You can now access the global `dataForge` variable.
+
+### Data-Forge plugins under the browser
+
+As in the Node.js example, plugins are typically loaded into the Data-Forge namespace. Example using *data-forge-from-yahoo*. 
+
+Install via Bower:
+
+	bower install --save data-forge-from-yahoo
+
+Include in your HTML file:
+
+	<script src="bower_components/data-forge/data-forge.js"></script>
+	<script src="bower_components/data-forge-from-yahoo/data-forge-from-yahoo.js"></script>
+
+Use functions defined by the plugin, eg:
  
+	dataForge.fromYahoo('MSFT')
+		.then(function (dataFrame) {
+			// ... use the data returned from Yahoo ...
+		}); 
+
 ## Getting the code
 
 Clone, fork or download the code from Github:
