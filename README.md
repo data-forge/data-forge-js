@@ -25,13 +25,16 @@ See here for [generated API docs](./docs/api.md) that are taking shape.
 - [Implementation](#implementation)
 - [Installation](#installation)
   - [NodeJS installation and setup](#nodejs-installation-and-setup)
+    - [Data-Forge plugins under Node.js](#data-forge-plugins-under-nodejs)
   - [Browser installation and setup](#browser-installation-and-setup)
+    - [Data-Forge plugins under the browser](#data-forge-plugins-under-the-browser)
   - [Getting the code](#getting-the-code)
 - [Key Concepts](#key-concepts)
   - [Data Frame](#data-frame)
   - [Row](#row)
   - [Column](#column)
   - [Index](#index)
+  - [Lazy Evaluation](#lazy-evaluation)
   - [Iterator](#iterator)
 - [Basic Usage](#basic-usage)
   - [Creating a Data Frame](#creating-a-data-frame)
@@ -97,7 +100,7 @@ General implementation goals:
 
 ----------
 
-The rest of the README defines the setup and usage of data-forge. Certain features described here are not implemented yet. 
+The rest of the README defines the setup and usage of Data-Forge. Certain features described here are not implemented yet. 
 
 # Installation
 
@@ -111,6 +114,26 @@ Require the module into your script:
 
 	var dataForge = require('data-forge');
 
+### Data-Forge plugins under Node.js
+
+Plugins are typically loaded into the Data-Forge namespace as follows, using *data-forge-from-yahoo* (todo: link to repo) as an example. 
+
+Install via NPM:
+
+	npm install --save data-forge-from-yahoo
+
+Required and *use*:
+
+	var dataForge = require('data-forge');
+	dataForge.use(require('data-forge-from-yahoo'));
+
+You can use functions defined by the plugin, eg
+
+	dataForge.fromYahoo('MSFT')
+		.then(function (dataFrame) {
+			// ... use the data returned from Yahoo ...
+		}); 
+
 ## Browser installation and setup
 
 Install via [Bower](https://en.wikipedia.org/wiki/Bower_(software)):
@@ -122,41 +145,61 @@ Include the main script in your HTML file:
 	<script src="bower_components/data-forge/data-forge.js"></script>
 
 You can now access the global `dataForge` variable.
+
+### Data-Forge plugins under the browser
+
+As in the Node.js example, plugins are typically loaded into the Data-Forge namespace. Example using *data-forge-from-yahoo* (todo: link to repo). 
+
+Install via Bower:
+
+	bower install --save data-forge-from-yahoo
+
+Include in your HTML file:
+
+	<script src="bower_components/data-forge/data-forge.js"></script>
+	<script src="bower_components/data-forge-from-yahoo/data-forge-from-yahoo.js"></script>
+
+Use functions defined by the plugin, eg:
  
+	dataForge.fromYahoo('MSFT')
+		.then(function (dataFrame) {
+			// ... use the data returned from Yahoo ...
+		}); 
+
 ## Getting the code
 
-Clone, fork or download the code from Github:
+Install via NPM and Bower as described in previous sections or clone, fork or download the code from GitHub:
 
 [https://github.com/Real-Serious-Games/data-forge-js](https://github.com/Real-Serious-Games/data-forge-js)
 
 
 # Key Concepts
 
-This section explains the key concepts related to *data-forge*.
+This section explains the key concepts of *Data-Forge*.
 
 ## Data Frame
 
-This is the *main* concept. A matrix of data structured as rows and columns. Has an implicit or explicit index. Think of it as a spreadsheet in memory.
+This is the *main* concept. A matrix of data structured as rows and columns. Can be considered a sequence of rows. Has an implicit or explicit index. Think of it as a spreadsheet in memory. 
 
 ## Row
 
-A single *indexed* row of data in a *data frame*. Contains a slice of data across columns. Has an implicit or explicit index. A sequence of values is associated with a row.
+A single row of data in a *data frame*. Contains a slice of data across columns. Has an implicit or explicit index. An JavaScript object or an array of values is associated with each row.
 
 ## Column
 
-A single *named* column of data in a *data frame*. Contains a slice of data across rows. A sequence of values is associated with a column. All values in a column are generally expected to have the same type, although this is not a requirement of *data-forge-js*.  
+A single *named* column of data in a *data frame*. Contains a slice of data through all rows. A sequence of values is associated with a column. All values in a column are generally expected to have the same type, although this is not a requirement of *data-forge-js*. 
 
 ## Index 
 
 Used to index a data frame for operations such as *merge*. If not specified an integer index (starting at 0) is generated based on row position. An index can be explicitly set by promoting a column to an index.
 
+## Lazy Evaluation
+
+Data frames and columns are only fully evaluated when necessary. Operations that are applied to data frames and columns are queued up and only executed when the full data is required, for example when serializing to csv or json (`toCSV` or `toJSON`) or when baking to values (`toValues` or `toObjects`). A data frame or column can be forcibly evaluated by calling the `bake` function. 
+
 ## Iterator
 
-An object that iterates the rows of a data frame or column. Iterators allow lazy evaluation (row by row evaluation) of data frames and columns.
-
-This is the same concept as an enumerator in C#.
-
-todo: can have links here to JS resources explaining iterators. 
+An object that iterates the rows of a data frame or column. Iterators allow lazy evaluation (row by row evaluation) of data frames and columns. This is the same concept as an [iterator in JavaScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Iterators_and_Generators) or an [enumerator in C#](https://msdn.microsoft.com/en-us/library/system.collections.ienumerator(v=vs.110).aspx).
 
 # Basic Usage 
 
@@ -175,7 +218,7 @@ Create a data frame from column names and rows:
 			]
 		});
 
- data frame can also be created from an array of JavaScript objects:
+A data frame can also be created from an array of JavaScript objects:
 
 	var dataFrame = new dataForge.DataFrame({
 			rows: [
@@ -201,7 +244,7 @@ Create a data frame from column names and rows:
 
 The previous examples each generated an index with the values *0, 1, 2*.
 
-An index can be explicitly be provided creating a data frame:
+An index can explicitly be provided when creating a data frame:
 
 	var dataFrame = new dataForge.DataFrame({
 			columnNames: <column-names>,
@@ -213,41 +256,43 @@ Or an existing column can be promoted to an index:
  
 	var dataFrame = new dataForge.DataFrame(someConfig).setIndex("Col3");
 
-Be aware that promoting a column to an index in *data-forge* doesn't remove the column (as it does in *Pandas*). You can easily achieve this by calling *dropColumn*:
+Be aware that promoting a column to an index in Data-Forge doesn't remove the column (as it does in Pandas). You can easily achieve this by calling `dropColumn`:
 
 	var dataFrame = new dataForge.DataFrame(someConfig).setIndex("Col3").dropColumn("Col3");
 
-An index is required for certain operations like *merge*.
+An index is required for certain operations like `merge`.
 
 # Working with data
 
 Data-Forge has built-in support for serializing and deserializing common data formats.
 
-CSV: 
+## CSV 
 
 	var dataFrame = dataForge.fromCSV("<csv-string-data>");
 
 	var csvTextData = dataFrame.toCSV();
 
-JSON:
+## JSON
 
 	var dataFrame = dataForge.fromJSON("<json-string-data>");
 
 	var jsonTextData = dataFrame.toJSON();
 
-XML:
+## XML
 
 	var dataFrame = dataForge.fromXML("<xml-string-data>");
 
 	var xmlTextData = dataFrame.toXML();
 
-YAML:
+## YAML
 
 	var dataFrame = dataForge.fromYAML("<yaml-string-data>");
 
 	var yamlTextData = dataFrame.toYAML();
 
-The *from/to* functions can be used in combination with NodeJS `fs` functions for reading and writing files, eg:
+## Reading and writing files in Node.js
+
+The *from* / *to* functions can be used in combination with Node.js `fs` functions for reading and writing files, eg:
 
 	var fs = require('fs');
 
@@ -256,7 +301,7 @@ The *from/to* functions can be used in combination with NodeJS `fs` functions fo
 	fs.writeFileSync('some-other-csv-file.csv', dataFrame.toCSV());
 
 See the [examples section](#examples) for examples of loading various data sources and formats.
-	
+
 ## Enumerating rows
 
 Rows can be extracted from a data frame in several ways.
@@ -269,7 +314,7 @@ First we can lazily iterate using an iterator. This is the lowest-level method o
 		// do something with the row.
 	}
 
-There are higher-level ways to extract the rows. Under the hood these use enumerators. These force lazy evaluation to complete (like the *toArray* function in LINQ).
+There are higher-level ways to extract the rows. Under the hood these use iterators. These force lazy evaluation to complete (like the *toArray* function in LINQ).
 
 	var arrayOfArrays = dataFrame.toValues();
 
@@ -320,7 +365,7 @@ The index can also be lazily iterated:
 		// do something with the row.
 	}
 
-Its values can also be sliced retrieved as a single array;
+Retrieve an array of an index's values:
 
 	var arrayOfValues = dataFrame.getIndex().toValues();
 
@@ -375,28 +420,37 @@ Here *df1*, *df2* and *df3* are separate data frames with the results of the pre
   
 # Data exploration and visualization
 
-In order to understand the data we are working
+In order to understand the data we are working with we must explore it, understand the data types involved and composition of the values.
 
 ## Console output
 
-The data frame, index and column classes all provide a `toString` function that can be used to visualize data on the console.
+Data frame, index and column all provide a `toString` function that can be used to dump data to the console in a readable format.
 
-You can also query for data frame values, column names and column values (described further below) so you can dump whatever you want to the console.
+Use the LINQ functions `skip` and `take` to preview a subset of the data (more on LINQ functions soon):
 
-If you want to preview a subset of the data you can use the LINQ functions `skip` and `take` (more on LINQ functions soon):
+	// Skip 10 rows, then dump 20 rows.
+	console.log(df.skip(10).take(20).toString()); 
 
-	console.log(df.skip(10).take(20).toString()); // <-- Skip 10 rows, then dump 20 rows.
+Or more conveniently: 
 
-There is also a convenient function for getting a subset of rows:
-
-	console.log(df.getRowsSubset(10, 20).toString()); // <-- Get a range of 20 rows starting at index 10.
+	// Get a range of rows starting at row index 10 and ending at (but not including) row index 20.
+	console.log(df.getRowsSubset(10, 20).toString()); 
 
 As you explore a data set you may want to understand what data types you are working with. You can use the `detectTypes` function to produce a new data frame with information on the data types in the data frame you are exploring:
 
-	var typesDf = df.detectTypes(); // <-- Create a data frame with the types from the source data frame.
+	// Create a data frame with details of the types from the source data frame.
+	var typesDf = df.detectTypes(); 
 	console.log(typesDf.toString());
 
-todo: need to mention detectValues here.
+todo: show example output here.
+
+You also probably want to understand the composition of values in the data frame. This can be done using `detectValues` that examines the values and reports on their frequency: 
+
+	// Create a data frame with the information on the frequency of values from the source data frame.
+	var valuesDf = df.detectValues(); 
+	console.log(valuesDf.toString());
+
+todo: show example output here.
 
 ## Visual output
 
