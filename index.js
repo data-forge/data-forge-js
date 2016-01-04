@@ -30,7 +30,7 @@ var dataForge = {
 	BaseDataFrame: require('./src/basedataframe'),
 	Column: require('./src/column'),
 	LazyColumn: require('./src/lazycolumn'),
-	BaseColum: require('./src/basecolumn'),
+	BaseColumn: require('./src/basecolumn'),
 	Index: require('./src/index'),
 	LazyIndex: require('./src/lazyindex'),
 	BaseIndex: require('./src/baseindex'),
