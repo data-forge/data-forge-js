@@ -1,22 +1,7 @@
 'use strict';
 
-var dataForge = require("../../index.js");
-var csv = require('../../format/csv');
-var file = require('../../source/file');
-
-var glob = require('glob');
-var E = require('linq');
-var assert = require('chai').assert;
 var fs = require('fs');
-
-//
-// Load single CSV containing dividends.
-//
-var loadFile = function (filePath) {
-	assert.isString(filePath);
-	
-	return dataForge.from(file(filePath)).as(csv());
-};
+var dataForge = require("../../index.js");
 
 //
 // Summarise dividends by year.
@@ -40,24 +25,8 @@ var summarizeDividends = function (dataFrame) {
 					});
 			}
 		);
-	});
 };
 
-//
-// Save data frame to a CSV file.
-//
-var saveFile = function (dataFrame, filePath) {
-	assert.isObject(dataFrame);
-	assert.isString(filePath);
-
-	return dataFrame.as(csv()).to(file(filePath));
-};
-
-loadFile('dividends.csv') // Open dividends for a single company.
-	.then(summarizeDividends)
-	.then(function (summary) {
-		fs.writeFileSync('output.json', JSON.stringify(summary, null, 4));
-	})
-	.catch(function (err) {
-		console.error(err.stack);
-	});
+var dataFrame = dataForge.fromCSV(fs.readFileSync('dividends.csv', 'utf8'));
+var summary = summarizeDividends(dataFrame);
+fs.writeFileSync('output.json', summary.toJSON());

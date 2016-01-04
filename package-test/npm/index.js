@@ -13,7 +13,12 @@ var values = E
 	})
 	.toArray();
 
-var dataFrame = new dataForge.DataFrame(["index", "Sin", "Cos"], values).setIndex("index").dropColumn("index");
+var dataFrame = new dataForge.DataFrame({
+		columnNames: ["index", "Sin", "Cos"], 
+		rows: values
+	})
+	.setIndex("index")
+	.dropColumn("index");
 
 console.log(dataFrame.skip(4).take(5).toString());
 

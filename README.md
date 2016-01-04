@@ -28,8 +28,6 @@ See here for [generated API docs](./docs/api.md) that are taking shape.
   - [Browser installation and setup](#browser-installation-and-setup)
   - [Getting the code](#getting-the-code)
 - [Key Concepts](#key-concepts)
-  - [Data Source](#data-source)
-  - [Data Format](#data-format)
   - [Data Frame](#data-frame)
   - [Row](#row)
   - [Column](#column)
