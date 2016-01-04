@@ -25,13 +25,16 @@ See here for [generated API docs](./docs/api.md) that are taking shape.
 - [Implementation](#implementation)
 - [Installation](#installation)
   - [NodeJS installation and setup](#nodejs-installation-and-setup)
+    - [Data-Forge plugins under Node.js](#data-forge-plugins-under-nodejs)
   - [Browser installation and setup](#browser-installation-and-setup)
+    - [Data-Forge plugins under the browser](#data-forge-plugins-under-the-browser)
   - [Getting the code](#getting-the-code)
 - [Key Concepts](#key-concepts)
   - [Data Frame](#data-frame)
   - [Row](#row)
   - [Column](#column)
   - [Index](#index)
+  - [Lazy Evaluation](#lazy-evaluation)
   - [Iterator](#iterator)
 - [Basic Usage](#basic-usage)
   - [Creating a Data Frame](#creating-a-data-frame)
@@ -215,7 +218,7 @@ Create a data frame from column names and rows:
 			]
 		});
 
- data frame can also be created from an array of JavaScript objects:
+A data frame can also be created from an array of JavaScript objects:
 
 	var dataFrame = new dataForge.DataFrame({
 			rows: [
@@ -241,7 +244,7 @@ Create a data frame from column names and rows:
 
 The previous examples each generated an index with the values *0, 1, 2*.
 
-An index can be explicitly be provided creating a data frame:
+An index can explicitly be provided when creating a data frame:
 
 	var dataFrame = new dataForge.DataFrame({
 			columnNames: <column-names>,
@@ -253,41 +256,43 @@ Or an existing column can be promoted to an index:
  
 	var dataFrame = new dataForge.DataFrame(someConfig).setIndex("Col3");
 
-Be aware that promoting a column to an index in *data-forge* doesn't remove the column (as it does in *Pandas*). You can easily achieve this by calling *dropColumn*:
+Be aware that promoting a column to an index in Data-Forge doesn't remove the column (as it does in Pandas). You can easily achieve this by calling `dropColumn`:
 
 	var dataFrame = new dataForge.DataFrame(someConfig).setIndex("Col3").dropColumn("Col3");
 
-An index is required for certain operations like *merge*.
+An index is required for certain operations like `merge`.
 
 # Working with data
 
 Data-Forge has built-in support for serializing and deserializing common data formats.
 
-CSV: 
+## CSV 
 
 	var dataFrame = dataForge.fromCSV("<csv-string-data>");
 
 	var csvTextData = dataFrame.toCSV();
 
-JSON:
+## JSON
 
 	var dataFrame = dataForge.fromJSON("<json-string-data>");
 
 	var jsonTextData = dataFrame.toJSON();
 
-XML:
+## XML
 
 	var dataFrame = dataForge.fromXML("<xml-string-data>");
 
 	var xmlTextData = dataFrame.toXML();
 
-YAML:
+## YAML
 
 	var dataFrame = dataForge.fromYAML("<yaml-string-data>");
 
 	var yamlTextData = dataFrame.toYAML();
 
-The *from/to* functions can be used in combination with NodeJS `fs` functions for reading and writing files, eg:
+## Reading and writing files in Node.js
+
+The *from* / *to* functions can be used in combination with Node.js `fs` functions for reading and writing files, eg:
 
 	var fs = require('fs');
 
@@ -296,7 +301,7 @@ The *from/to* functions can be used in combination with NodeJS `fs` functions fo
 	fs.writeFileSync('some-other-csv-file.csv', dataFrame.toCSV());
 
 See the [examples section](#examples) for examples of loading various data sources and formats.
-	
+
 ## Enumerating rows
 
 Rows can be extracted from a data frame in several ways.
@@ -309,7 +314,7 @@ First we can lazily iterate using an iterator. This is the lowest-level method o
 		// do something with the row.
 	}
 
-There are higher-level ways to extract the rows. Under the hood these use enumerators. These force lazy evaluation to complete (like the *toArray* function in LINQ).
+There are higher-level ways to extract the rows. Under the hood these use iterators. These force lazy evaluation to complete (like the *toArray* function in LINQ).
 
 	var arrayOfArrays = dataFrame.toValues();
 
@@ -360,7 +365,7 @@ The index can also be lazily iterated:
 		// do something with the row.
 	}
 
-Its values can also be sliced retrieved as a single array;
+Retrieve an array of an index's values:
 
 	var arrayOfValues = dataFrame.getIndex().toValues();
 
@@ -415,28 +420,37 @@ Here *df1*, *df2* and *df3* are separate data frames with the results of the pre
   
 # Data exploration and visualization
 
-In order to understand the data we are working
+In order to understand the data we are working with we must explore it, understand the data types involved and composition of the values.
 
 ## Console output
 
-The data frame, index and column classes all provide a `toString` function that can be used to visualize data on the console.
+Data frame, index and column all provide a `toString` function that can be used to dump data to the console in a readable format.
 
-You can also query for data frame values, column names and column values (described further below) so you can dump whatever you want to the console.
+Use the LINQ functions `skip` and `take` to preview a subset of the data (more on LINQ functions soon):
 
-If you want to preview a subset of the data you can use the LINQ functions `skip` and `take` (more on LINQ functions soon):
+	// Skip 10 rows, then dump 20 rows.
+	console.log(df.skip(10).take(20).toString()); 
 
-	console.log(df.skip(10).take(20).toString()); // <-- Skip 10 rows, then dump 20 rows.
+Or more conveniently: 
 
-There is also a convenient function for getting a subset of rows:
-
-	console.log(df.getRowsSubset(10, 20).toString()); // <-- Get a range of 20 rows starting at index 10.
+	// Get a range of rows starting at row index 10 and ending at (but not including) row index 20.
+	console.log(df.getRowsSubset(10, 20).toString()); 
 
 As you explore a data set you may want to understand what data types you are working with. You can use the `detectTypes` function to produce a new data frame with information on the data types in the data frame you are exploring:
 
-	var typesDf = df.detectTypes(); // <-- Create a data frame with the types from the source data frame.
+	// Create a data frame with details of the types from the source data frame.
+	var typesDf = df.detectTypes(); 
 	console.log(typesDf.toString());
 
-todo: need to mention detectValues here.
+todo: show example output here.
+
+You also probably want to understand the composition of values in the data frame. This can be done using `detectValues` that examines the values and reports on their frequency: 
+
+	// Create a data frame with the information on the frequency of values from the source data frame.
+	var valuesDf = df.detectValues(); 
+	console.log(valuesDf.toString());
+
+todo: show example output here.
 
 ## Visual output
 
