@@ -147,7 +147,7 @@ You can now access the global `dataForge` variable.
 
 ### Data-Forge plugins under the browser
 
-As in the Node.js example, plugins are typically loaded into the Data-Forge namespace. Example using *data-forge-from-yahoo*. 
+As in the Node.js example, plugins are typically loaded into the Data-Forge namespace. Example using *data-forge-from-yahoo* (todo: link to repo). 
 
 Install via Bower:
 
@@ -167,46 +167,38 @@ Use functions defined by the plugin, eg:
 
 ## Getting the code
 
-Clone, fork or download the code from Github:
+Install via NPM and Bower as described in previous sections or clone, fork or download the code from GitHub:
 
 [https://github.com/Real-Serious-Games/data-forge-js](https://github.com/Real-Serious-Games/data-forge-js)
 
 
 # Key Concepts
 
-This section explains the key concepts related to *data-forge*.
-
-## Data Source
-
-A plugin to load data from or save data to a particular data source. Examples include *file*, [*mongodb*](https://en.wikipedia.org/wiki/MongoDB) and [*HTTP*](https://en.wikipedia.org/wiki/Hypertext_Transfer_Protocol) ([REST API](https://en.wikipedia.org/wiki/Representational_state_transfer)) for NodeJS and just *HTTP* for the browser.
-
-## Data Format
-
-A plugin to load or save data in a particular format. Examples include [*CSV*](https://en.wikipedia.org/wiki/Comma-separated_values) and [*JSON*](https://en.wikipedia.org/wiki/JSON). 
+This section explains the key concepts of *Data-Forge*.
 
 ## Data Frame
 
-This is the *main* concept. A matrix of data structured as rows and columns. Has an implicit or explicit index. Think of it as a spreadsheet in memory.
+This is the *main* concept. A matrix of data structured as rows and columns. Can be considered a sequence of rows. Has an implicit or explicit index. Think of it as a spreadsheet in memory. 
 
 ## Row
 
-A single *indexed* row of data in a *data frame*. Contains a slice of data across columns. Has an implicit or explicit index. A sequence of values is associated with a row.
+A single row of data in a *data frame*. Contains a slice of data across columns. Has an implicit or explicit index. An JavaScript object or an array of values is associated with each row.
 
 ## Column
 
-A single *named* column of data in a *data frame*. Contains a slice of data across rows. A sequence of values is associated with a column. All values in a column are generally expected to have the same type, although this is not a requirement of *data-forge-js*.  
+A single *named* column of data in a *data frame*. Contains a slice of data through all rows. A sequence of values is associated with a column. All values in a column are generally expected to have the same type, although this is not a requirement of *data-forge-js*. 
 
 ## Index 
 
 Used to index a data frame for operations such as *merge*. If not specified an integer index (starting at 0) is generated based on row position. An index can be explicitly set by promoting a column to an index.
 
+## Lazy Evaluation
+
+Data frames and columns are only fully evaluated when necessary. Operations that are applied to data frames and columns are queued up and only executed when the full data is required, for example when serializing to csv or json (`toCSV` or `toJSON`) or when baking to values (`toValues` or `toObjects`). A data frame or column can be forcibly evaluated by calling the `bake` function. 
+
 ## Iterator
 
-An object that iterates the rows of a data frame or column. Iterators allow lazy evaluation (row by row evaluation) of data frames and columns.
-
-This is the same concept as an enumerator in C#.
-
-todo: can have links here to JS resources explaining iterators. 
+An object that iterates the rows of a data frame or column. Iterators allow lazy evaluation (row by row evaluation) of data frames and columns. This is the same concept as an [iterator in JavaScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Iterators_and_Generators) or an [enumerator in C#](https://msdn.microsoft.com/en-us/library/system.collections.ienumerator(v=vs.110).aspx).
 
 # Basic Usage 
 
