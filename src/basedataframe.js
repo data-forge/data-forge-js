@@ -416,7 +416,7 @@ BaseDataFrame.prototype.getColumnsSubset = function (columnNames) {
 
 	var self = this;
 	
-	assert.isArray(columnNames, "Expected 'columnName' parameter to 'subset' to be an array.");	
+	assert.isArray(columnNames, "Expected 'columnName' parameter to 'getColumnsSubset' to be an array.");	
 	
 	return new LazyDataFrame(
 		function () {

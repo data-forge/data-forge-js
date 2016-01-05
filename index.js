@@ -27,10 +27,25 @@ var dataForge = {
 	
 	DataFrame: DataFrame,
 	LazyDataFrame: require('./src/lazydataframe'),
+	BaseDataFrame: require('./src/basedataframe'),
 	Column: require('./src/column'),
 	LazyColumn: require('./src/lazycolumn'),
+	BaseColumn: require('./src/basecolumn'),
 	Index: require('./src/index'),
 	LazyIndex: require('./src/lazyindex'),
+	BaseIndex: require('./src/baseindex'),
+
+	/**
+	 * Install a plugin in the dataForge namespace.
+	 */
+	use: function (plugin) {
+
+		assert.isFunction(plugin, "Expected 'plugin' parameter to 'use' to be a function.");
+
+		var self = this;
+		plugin(self);
+	},
+
 
 	/**
 	 * Deserialize a data frame from a JSON text string.
