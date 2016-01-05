@@ -1010,4 +1010,30 @@ describe('BaseDataFrame', function () {
 			"1st line 2nd line"
 		);
 	});	
+
+	it('can bake data frame', function () {
+
+		var dataFrame = initDataFrame(
+				["Column1", "Column2"], 
+				[
+					['A', 1],
+					['B', 2],
+				],
+				[10, 11]
+			);
+
+		var baked = dataFrame.bake();
+		expect(baked).not.to.equal(dataFrame);
+		expect(baked).to.be.an.instanceOf(dataForge.DataFrame);
+		expect(baked.getIndex()).not.to.equal(dataFrame.getIndex());
+		expect(baked.getIndex()).to.be.an.instanceOf(dataForge.Index);
+		expect(baked.getIndex().toValues()).to.eql([10, 11]);
+		expect(baked.getColumnNames()).to.eql(["Column1", "Column2"]);
+		expect(baked.toValues()).to.eql([
+				['A', 1],
+				['B', 2],
+		]);
+
+
+	});
 });

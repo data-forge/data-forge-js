@@ -783,5 +783,15 @@ BaseColumn.prototype.toValues = function () {
 	return values;
 };
 
+/**
+ * Forces lazy evaluation to complete and 'bakes' the column into memory.
+ */
+BaseColumn.prototype.bake = function () {
+
+	var self = this;
+
+	var Column = require('./column');
+	return new Column(self.getName(), self.toValues(), self.getIndex().bake());
+};
 
 module.exports = BaseColumn;

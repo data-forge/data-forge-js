@@ -4,6 +4,7 @@ describe('Index', function () {
 
 	var BaseIndex = require('../src/baseindex');
 	var ArrayEnumerator = require('../src/enumerators/array');
+	var dataForge = require('../index');
 
 	var expect = require('chai').expect;
 	var assert = require('chai').assert;
@@ -45,7 +46,18 @@ describe('Index', function () {
 	it('can get subset of rows', function () {
 
 		var index = initIndex([0, 1, 2, 3]);
-		var subset = index .getRowsSubset(1, 2);
+		var subset = index.getRowsSubset(1, 2);
 		expect(subset.toValues()).to.eql([1, 2]);
+	});
+
+	it('can bake index', function () {
+
+		var values = [10, 21, 32, 43];
+		var index = initIndex(values);
+		var baked = index.bake();
+
+		expect(baked).not.to.equal(index);
+		expect(baked).to.be.an.instanceOf(dataForge.Index);
+		expect(baked.toValues()).to.eql(values);
 	});
 });

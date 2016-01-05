@@ -1152,4 +1152,19 @@ BaseDataFrame.prototype.toCSV = function () {
 	return [header].concat(rows).join('\r\n');	
 };
 
+/**
+ * Forces lazy evaluation to complete and 'bakes' the data frame into memory.
+ */
+BaseDataFrame.prototype.bake = function () {
+
+	var self = this;
+
+	var DataFrame = require('./dataframe');
+	return new DataFrame({
+			columnNames: self.getColumnNames(),
+			rows: self.toValues(),
+			index: self.getIndex().bake(),
+		});
+};
+
 module.exports = BaseDataFrame;

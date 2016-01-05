@@ -108,5 +108,15 @@ BaseIndex.prototype.toValues = function () {
 	return values;
 };
 
+/*
+ * Forces lazy evaluation to complete and 'bakes' the index into memory.
+ */
+BaseIndex.prototype.bake = function () {
+
+	var self = this;
+
+	var Index = require('./index');
+	return new Index(self.getName(), self.toValues());
+};
 
 module.exports = BaseIndex;

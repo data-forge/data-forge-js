@@ -530,4 +530,18 @@ describe('BaseColumn', function () {
 		expect(truncated.toValues()).to.eql([null, undefined, 1, new Date(2015, 1, 1)]);
 	});
 
+	it('can bake column', function () {
+
+		var indicies = [1, 2];
+		var values = ['foo', 'bar'];
+		var column = initColumn(indicies, values);
+		var baked = column.bake();
+
+		expect(baked).not.to.equal(column);
+		expect(baked).to.be.an.instanceOf(dataForge.Column);
+		expect(baked.getIndex()).to.be.an.instanceOf(dataForge.Index);
+		expect(baked.getIndex().toValues()).to.eql(indicies);
+		expect(baked.toValues()).to.eql(values);
+	});
+
 });
