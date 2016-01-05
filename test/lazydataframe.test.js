@@ -4,7 +4,7 @@
 describe('LazyDataFrame', function () {
 	
 	var dataForge = require('../index');
-	var ArrayEnumerator = require('../src/iterators/array');
+	var ArrayIterator = require('../src/iterators/array');
 	
 	var expect = require('chai').expect;
 	
@@ -18,7 +18,7 @@ describe('LazyDataFrame', function () {
 				];
 			},
 			function () {
-				return new ArrayEnumerator(
+				return new ArrayIterator(
 					[
 						[new Date(1975, 24, 2), 100, 'foo', 11],
 						[new Date(2015, 24, 2), 200, 'bar', 22],

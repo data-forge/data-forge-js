@@ -5,7 +5,7 @@ describe('BaseColumn', function () {
 	
 	var dataForge = require('../index');
 	var BaseColumn = require('../src/basecolumn');
-	var ArrayEnumerator = require('../src/iterators/array');
+	var ArrayIterator = require('../src/iterators/array');
 	
 	var expect = require('chai').expect; 
 	var assert = require('chai').assert; 
@@ -20,7 +20,7 @@ describe('BaseColumn', function () {
 			return 'some-column';
 		};
 		column.getEnumerator = function () {
-			return new ArrayEnumerator(values);
+			return new ArrayIterator(values);
 		};
 		column.getIndex = function () {
 			return new dataForge.Index("__test__", index);

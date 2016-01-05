@@ -3,7 +3,7 @@
 describe('Index', function () {
 
 	var BaseIndex = require('../src/baseindex');
-	var ArrayEnumerator = require('../src/iterators/array');
+	var ArrayIterator = require('../src/iterators/array');
 	var dataForge = require('../index');
 
 	var expect = require('chai').expect;
@@ -19,7 +19,7 @@ describe('Index', function () {
 		};
 
 		baseIndex.getEnumerator = function () {
-			return new ArrayEnumerator(values);
+			return new ArrayIterator(values);
 		};
 		
 		return baseIndex;

@@ -6,7 +6,7 @@
 
 var BaseColumn = require('./basecolumn');
 var LazyIndex = require('./lazyindex');
-var ArrayEnumerator = require('./iterators/array');
+var ArrayIterator = require('./iterators/array');
 
 var assert = require('chai').assert;
 var E = require('linq');
@@ -30,7 +30,7 @@ var Column = function (name, values, index) {
 		new LazyIndex(
 			"__index___",
 			function () {
-				return new ArrayEnumerator(E.range(0, values.length).toArray());
+				return new ArrayIterator(E.range(0, values.length).toArray());
 			}
 		);
 };
@@ -50,7 +50,7 @@ Column.prototype.getName = function () {
  */
 Column.prototype.getEnumerator = function () {
 	var self = this;
-	return new ArrayEnumerator(self._values);
+	return new ArrayIterator(self._values);
 };
 
 /**

@@ -5,7 +5,7 @@ var assert = require('chai').assert;
 //
 // Data-forge enumerator for iterating a standard JavaScript array.
 //
-var ArrayEnumerator = function (arr) {
+var ArrayIterator = function (arr) {
 	assert.isArray(arr);
 
 	var self = this;
@@ -20,4 +20,4 @@ var ArrayEnumerator = function (arr) {
 	};
 };
 
-module.exports = ArrayEnumerator;
+module.exports = ArrayIterator;

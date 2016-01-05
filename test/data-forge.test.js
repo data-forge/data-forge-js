@@ -4,7 +4,7 @@
 describe('data-forge', function () {
 	
 	var dataForge = require('../index');	
-	var ArrayEnumerator = require('../src/iterators/array');	
+	var ArrayIterator = require('../src/iterators/array');	
 
 	var expect = require('chai').expect;
 	var assert = require('chai').assert;
@@ -18,7 +18,7 @@ describe('data-forge', function () {
 				return columns;
 			},
 			function () {
-				return new ArrayEnumerator(values);
+				return new ArrayIterator(values);
 			}
 		);
 	};

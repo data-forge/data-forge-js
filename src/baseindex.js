@@ -1,6 +1,6 @@
 'use strict';
 
-var ArrayEnumerator = require('./iterators/array');
+var ArrayIterator = require('./iterators/array');
 
 var assert = require('chai').assert;
 var E = require('linq');
@@ -40,7 +40,7 @@ BaseIndex.prototype.skip = function (numRows) {
 	return new LazyIndex(
 		self.getName(),
 		function () {
-			return new ArrayEnumerator(E.from(self.toValues()).skip(numRows).toArray());
+			return new ArrayIterator(E.from(self.toValues()).skip(numRows).toArray());
 		}
 	);
 };
@@ -59,7 +59,7 @@ BaseIndex.prototype.take = function (numRows) {
 	return new LazyIndex(
 		self.getName(),
 		function () {
-			return new ArrayEnumerator(E.from(self.toValues()).take(numRows).toArray());
+			return new ArrayIterator(E.from(self.toValues()).take(numRows).toArray());
 		}
 	);
 };
@@ -81,7 +81,7 @@ BaseIndex.prototype.getRowsSubset = function (index, count) {
 	return new LazyIndex(
 		self.getName(),
 		function () {
-			return new ArrayEnumerator(E.from(self.toValues())
+			return new ArrayIterator(E.from(self.toValues())
 				.skip(index)
 				.take(count)
 				.toArray()

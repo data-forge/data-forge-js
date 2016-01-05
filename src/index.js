@@ -1,7 +1,7 @@
 'use strict';
 
 var BaseIndex = require('./baseindex');
-var ArrayEnumerator = require('./iterators/array');
+var ArrayIterator = require('./iterators/array');
 
 var assert = require('chai').assert;
 var E = require('linq');
@@ -34,7 +34,7 @@ Index.prototype.getName = function () {
  */
 Index.prototype.getEnumerator = function () {
 	var self = this;
-	return new ArrayEnumerator(self._values);
+	return new ArrayIterator(self._values);
 };
 
 module.exports = Index;

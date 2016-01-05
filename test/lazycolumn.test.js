@@ -4,13 +4,13 @@
 describe('LazyColumn', function () {
 	
 	var dataForge = require('../index');
-	var ArrayEnumerator = require('../src/iterators/array');
+	var ArrayIterator = require('../src/iterators/array');
 	
 	var expect = require('chai').expect; 
 	
 	var initExampleColumn = function (indexFn) {
 		var valuesFn = function () {
-			return new ArrayEnumerator([100, 200]);
+			return new ArrayIterator([100, 200]);
 		};
 		return new dataForge.LazyColumn('some-column', valuesFn, indexFn);
 	};

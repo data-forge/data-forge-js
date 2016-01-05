@@ -7,7 +7,7 @@
 var assert = require('chai').assert; 
 var E = require('linq');
 var moment = require('moment');
-var ArrayEnumerator = require('./iterators/array');
+var ArrayIterator = require('./iterators/array');
 
 //
 // Helper function to validate an enumerator.
@@ -43,7 +43,7 @@ BaseColumn.prototype.skip = function (numRows) {
 	return new LazyColumn(
 		self.getName(),
 		function () {
-			return new ArrayEnumerator(E
+			return new ArrayIterator(E
 				.from(self.toValues())
 				.skip(numRows)
 				.toArray()
@@ -69,7 +69,7 @@ BaseColumn.prototype.take = function (numRows) {
 	return new LazyColumn(
 		self.getName(),
 		function () {
-			return new ArrayEnumerator(E
+			return new ArrayIterator(E
 				.from(self.toValues())
 				.take(numRows)
 				.toArray()
@@ -120,7 +120,7 @@ BaseColumn.prototype.where = function (filterSelectorPredicate) {
 	return new LazyColumn(
 		self.getName(),
 		function () {
-			return new ArrayEnumerator(E.from(executeLazyWhere())
+			return new ArrayIterator(E.from(executeLazyWhere())
 				.select(function (data) {
 					return data[1]; // Value
 				})
@@ -132,7 +132,7 @@ BaseColumn.prototype.where = function (filterSelectorPredicate) {
 			return new LazyIndex(
 				self.getIndex().getName(),
 				function () {
-					return new ArrayEnumerator(E.from(executeLazyWhere())
+					return new ArrayIterator(E.from(executeLazyWhere())
 						.select(function (data) {
 							return data[0]; // Index
 						})
@@ -158,7 +158,7 @@ BaseColumn.prototype.select = function (selector) {
 	return new LazyColumn(
 		self.getName(),
 		function () {
-			return new ArrayEnumerator(
+			return new ArrayIterator(
 				E.from(self.toValues())
 					.select(function (value) {
 						return selector(value);
@@ -209,7 +209,7 @@ BaseColumn.prototype.selectMany = function (selector) {
 		self.getName(),
 		function () {
 			lazyEvaluate();
-			return new ArrayEnumerator(newValues);
+			return new ArrayIterator(newValues);
 		},
 		function () {
 			var LazyIndex = require('./lazyindex');
@@ -229,7 +229,7 @@ BaseColumn.prototype.selectMany = function (selector) {
 								.toArray();
 						})
 						.toArray();
-					return new ArrayEnumerator(indexValues);
+					return new ArrayIterator(indexValues);
 				}
 			);
 		}
@@ -300,7 +300,7 @@ var executeOrderBy = function (self, batch) {
 			return self.getColumnNames();
 		},
 		function () {
-			return new ArrayEnumerator(
+			return new ArrayIterator(
 				E.from(executeLazySort())
 					.select(function (row) {
 						return row[1]; // Extract the value (minus the index) from the sorted data.					
@@ -313,7 +313,7 @@ var executeOrderBy = function (self, batch) {
 			return new LazyIndex(
 				self.getIndex().getName(),
 				function () {
-					return new ArrayEnumerator(E.from(executeLazySort())
+					return new ArrayIterator(E.from(executeLazySort())
 						.select(function (row) {
 							return row[0]; // Extract the index from the sorted data.
 						})
@@ -435,7 +435,7 @@ BaseColumn.prototype.getRowsSubset = function (index, count) {
 	return new LazyColumn(
 		self.getName(),
 		function () {
-			return new ArrayEnumerator(
+			return new ArrayIterator(
 				E.from(self.toValues())
 					.skip(index)
 					.take(count)
@@ -484,7 +484,7 @@ BaseColumn.prototype.rollingWindow = function (period, fn) {
 	return new LazyColumn(
 		self.getName(), 
 		function () {
-			return new ArrayEnumerator(E.from(newIndexAndValues)
+			return new ArrayIterator(E.from(newIndexAndValues)
 				.select(function (indexAndValue) {
 					return indexAndValue[1];
 				})
@@ -497,7 +497,7 @@ BaseColumn.prototype.rollingWindow = function (period, fn) {
 			return new LazyIndex(
 				self.getIndex().getName(),
 				function () {
-					return new ArrayEnumerator(E.from(newIndexAndValues)
+					return new ArrayIterator(E.from(newIndexAndValues)
 						.select(function (indexAndValue) {
 							return indexAndValue[0];
 						})
@@ -552,7 +552,7 @@ BaseColumn.prototype.reindex = function (newIndex) {
 			//
 			// Return the columns values in the order specified by the new index.
 			//
-			return new ArrayEnumerator(E.from(newIndex.toValues())
+			return new ArrayIterator(E.from(newIndex.toValues())
 				.select(function (newIndexValue) {
 					return indexMap[newIndexValue];
 				})
@@ -730,7 +730,7 @@ BaseColumn.prototype.detectTypes = function () {
 					return accumulated;
 				});
 
-			return new ArrayEnumerator(
+			return new ArrayIterator(
 				E.from(Object.keys(typeFrequencies))
 					.select(function (valueType) {
 						return [
