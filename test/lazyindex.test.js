@@ -3,7 +3,7 @@
 describe('Index', function () {
 
 	var LazyIndex = require('../src/lazyindex');
-	var ArrayEnumerator = require('../src/enumerators/array');
+	var ArrayEnumerator = require('../src/iterators/array');
 
 	var expect = require('chai').expect;
 

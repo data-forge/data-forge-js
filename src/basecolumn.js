@@ -7,7 +7,7 @@
 var assert = require('chai').assert; 
 var E = require('linq');
 var moment = require('moment');
-var ArrayEnumerator = require('./enumerators/array');
+var ArrayEnumerator = require('./iterators/array');
 
 //
 // Helper function to validate an enumerator.

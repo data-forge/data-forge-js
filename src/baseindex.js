@@ -1,6 +1,6 @@
 'use strict';
 
-var ArrayEnumerator = require('./enumerators/array');
+var ArrayEnumerator = require('./iterators/array');
 
 var assert = require('chai').assert;
 var E = require('linq');

@@ -5,7 +5,7 @@ describe('BaseColumn', function () {
 	
 	var dataForge = require('../index');
 	var BaseColumn = require('../src/basecolumn');
-	var ArrayEnumerator = require('../src/enumerators/array');
+	var ArrayEnumerator = require('../src/iterators/array');
 	
 	var expect = require('chai').expect; 
 	var assert = require('chai').assert; 

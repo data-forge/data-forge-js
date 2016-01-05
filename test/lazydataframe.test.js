@@ -4,7 +4,7 @@
 describe('LazyDataFrame', function () {
 	
 	var dataForge = require('../index');
-	var ArrayEnumerator = require('../src/enumerators/array');
+	var ArrayEnumerator = require('../src/iterators/array');
 	
 	var expect = require('chai').expect;
 	

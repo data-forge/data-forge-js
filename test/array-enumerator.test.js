@@ -2,7 +2,7 @@
 
 describe('array enumerator', function () {
 
-	var ArrayEnumerator = require('../src/enumerators/array');
+	var ArrayEnumerator = require('../src/iterators/array');
 	var expect = require('chai').expect;
 
 	it('cannot move next for empty enumerator', function () {

@@ -1,7 +1,7 @@
 'use strict';
 
 var BaseIndex = require('./baseindex');
-var ArrayEnumerator = require('./enumerators/array');
+var ArrayEnumerator = require('./iterators/array');
 
 var assert = require('chai').assert;
 var E = require('linq');
