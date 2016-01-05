@@ -9,10 +9,10 @@ $(function() {
 		var index = dataFrame.getColumn(indexColumnName).toValues();
 		var remainingColumns = dataFrame.dropColumn(indexColumnName).getColumns();
 
-		var flotSeries = E.from(remainingColumns)
+		var flotSeries = Enumerable.from(remainingColumns)
 			.select(function (column) {
 				var name = column.getName();
-				var data = E.from(index)
+				var data = Enumerable.from(index)
 					.zip(column.toValues(), function (index, value) {
 						return [index, value];
 					})
