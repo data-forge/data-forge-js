@@ -30,9 +30,9 @@ LazyIndex.prototype.getName = function () {
 };
 
 /**
- * Get an enumerator to iterate the values of the index.
+ * Get an iterator to iterate the values of the index.
  */
-LazyIndex.prototype.getEnumerator = function () {
+LazyIndex.prototype.getIterator = function () {
 	var self = this;
 	return self._enumeratorFn();
 };

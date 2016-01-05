@@ -49,9 +49,9 @@ LazyColumn.prototype.getName = function () {
 }
 
 /**
- * Get an enumerator for the iterating the values of the column.
+ * Get an iterator for the iterating the values of the column.
  */
-LazyColumn.prototype.getEnumerator = function () {
+LazyColumn.prototype.getIterator = function () {
 	var self = this;
 	return self._enumeratorFn();
 };

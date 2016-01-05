@@ -19,7 +19,7 @@ describe('BaseColumn', function () {
 		column.getName = function () {
 			return 'some-column';
 		};
-		column.getEnumerator = function () {
+		column.getIterator = function () {
 			return new ArrayIterator(values);
 		};
 		column.getIndex = function () {

@@ -121,9 +121,9 @@ DataFrame.prototype.getColumnNames = function () {
 };
 
 /**
- * Get an enumerator to enumerate the rows of the DataFrame.
+ * Get an iterator to enumerate the rows of the DataFrame.
  */
-DataFrame.prototype.getEnumerator = function () {
+DataFrame.prototype.getIterator = function () {
 	var self = this;
 	return new ArrayIterator(self._values);
 };

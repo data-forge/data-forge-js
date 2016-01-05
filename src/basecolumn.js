@@ -10,19 +10,19 @@ var moment = require('moment');
 var ArrayIterator = require('./iterators/array');
 
 //
-// Helper function to validate an enumerator.
+// Helper function to validate an iterator.
 //
-var validateEnumerator = function (enumerator) {
-	assert.isObject(enumerator, "Expected an 'enumerator' object.");
-	assert.isFunction(enumerator.moveNext, "Expected enumerator to have function 'moveNext'.");
-	assert.isFunction(enumerator.getCurrent, "Expected enumerator to have function 'getCurrent'.");
+var validateIterator = function (iterator) {
+	assert.isObject(iterator, "Expected an 'iterator' object.");
+	assert.isFunction(iterator.moveNext, "Expected iterator to have function 'moveNext'.");
+	assert.isFunction(iterator.getCurrent, "Expected iterator to have function 'getCurrent'.");
 };
 
 /**
  * Base class for columns.
  *
  * getName - Get the name of the column.
- * getEnumerator - Get the enumerator for the column.
+ * getIterator - Get the iterator for the column.
  * getIndex - Get the index for the column.
  */
 var BaseColumn = function () {	
@@ -771,13 +771,13 @@ BaseColumn.prototype.truncateStrings = function (maxLength) {
 BaseColumn.prototype.toValues = function () {
 
 	var self = this;
-	var enumerator = self.getEnumerator();
-	validateEnumerator(enumerator);
+	var iterator = self.getIterator();
+	validateIterator(iterator);
 
 	var values = [];
 
-	while (enumerator.moveNext()) {
-		values.push(enumerator.getCurrent());
+	while (iterator.moveNext()) {
+		values.push(iterator.getCurrent());
 	}
 
 	return values;

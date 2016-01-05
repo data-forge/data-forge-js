@@ -18,7 +18,7 @@ describe('Index', function () {
 			return '==test-index==';
 		};
 
-		baseIndex.getEnumerator = function () {
+		baseIndex.getIterator = function () {
 			return new ArrayIterator(values);
 		};
 		

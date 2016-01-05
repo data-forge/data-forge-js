@@ -12,12 +12,12 @@ var assert = require('chai').assert;
 var E = require('linq');
 
 //
-// Helper function to validate an enumerator.
+// Helper function to validate an iterator.
 //
-var validateEnumerator = function (enumerator) {
-	assert.isObject(enumerator, "Expected an 'enumerator' object.");
-	assert.isFunction(enumerator.moveNext, "Expected enumerator to have function 'moveNext'.");
-	assert.isFunction(enumerator.getCurrent, "Expected enumerator to have function 'getCurrent'.");
+var validateEnumerator = function (iterator) {
+	assert.isObject(iterator, "Expected an 'iterator' object.");
+	assert.isFunction(iterator.moveNext, "Expected iterator to have function 'moveNext'.");
+	assert.isFunction(iterator.getCurrent, "Expected iterator to have function 'getCurrent'.");
 };
 
 /**
@@ -27,7 +27,7 @@ var validateEnumerator = function (enumerator) {
  *
  * getIndex - Get the index for the data frame.
  * getColumnNames - Get the columns for the data frame.
- * getEnumerator - Get a row enumerator for the data frame.
+ * getIterator - Get a row iterator for the data frame.
  */
 var BaseDataFrame = function () {
 };
@@ -89,18 +89,18 @@ BaseDataFrame.prototype.skip = function (numRows) {
 			return self.getColumnNames();
 		},
 		function () {
-			var enumerator = self.getEnumerator();
+			var iterator = self.getIterator();
 
 			return {
 				moveNext: function () {
-					while (--numRows >= 0 && enumerator.moveNext()) {
+					while (--numRows >= 0 && iterator.moveNext()) {
 						// Skip first rows.
 					}
-					return enumerator.moveNext();
+					return iterator.moveNext();
 				},
 
 				getCurrent: function () {
-					return enumerator.getCurrent();
+					return iterator.getCurrent();
 				},
 			};
 		},
@@ -126,18 +126,18 @@ BaseDataFrame.prototype.take = function (numRows) {
 			return self.getColumnNames();
 		},
 		function () {
-			var enumerator = self.getEnumerator();
+			var iterator = self.getIterator();
 
 			return {
 				moveNext: function () {
 					if (--numRows >= 0) {
-						return enumerator.moveNext();
+						return iterator.moveNext();
 					}
 					return false;
 				},
 
 				getCurrent: function () {
-					return enumerator.getCurrent();
+					return iterator.getCurrent();
 				},
 			};
 		},
@@ -867,7 +867,7 @@ BaseDataFrame.prototype.resetIndex = function () {
 			return self.getColumnNames();
 		},
 		function () {
-			return self.getEnumerator();
+			return self.getIterator();
 		},
 		function () {
 			return new LazyIndex( //todo: broad-cast index
@@ -1069,7 +1069,7 @@ BaseDataFrame.prototype.renameColumns = function (newColumnNames) {
 			return newColumnNames;
 		},
 		function () {
-			return self.getEnumerator();
+			return self.getIterator();
 		},
 		function () {
 			return self.getIndex();
@@ -1084,13 +1084,13 @@ BaseDataFrame.prototype.toValues = function () {
 
 	var self = this;
 
-	var enumerator = self.getEnumerator();
-	validateEnumerator(enumerator);
+	var iterator = self.getIterator();
+	validateEnumerator(iterator);
 
 	var values = [];
 
-	while (enumerator.moveNext()) {
-		values.push(enumerator.getCurrent());
+	while (iterator.moveNext()) {
+		values.push(iterator.getCurrent());
 	}
 
 	return values;
@@ -1103,7 +1103,7 @@ BaseDataFrame.prototype.toObjects = function () {
 
 	var self = this;
 	var columnNames = self.getColumnNames();
-	return E.from(self.toValues()) //todo: should this rely on get enumerator?
+	return E.from(self.toValues()) //todo: should this rely on get iterator?
 		.select(function (row) {
 			return E.from(columnNames)
 				.zip(row, function (columnName, columnValue) {

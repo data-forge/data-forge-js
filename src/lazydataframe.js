@@ -56,9 +56,9 @@ LazyDataFrame.prototype.getColumnNames = function () {
 };
 
 /**
- * Get an enumerator to enumerate the rows of the DataFrame.
+ * Get an iterator to enumerate the rows of the DataFrame.
  */
-LazyDataFrame.prototype.getEnumerator = function () {
+LazyDataFrame.prototype.getIterator = function () {
 	var self = this;
 	return self._enumeratorFn();
 };

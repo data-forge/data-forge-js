@@ -46,9 +46,9 @@ Column.prototype.getName = function () {
 }
 
 /**
- * Get an enumerator for the iterating the values of the column.
+ * Get an iterator for the iterating the values of the column.
  */
-Column.prototype.getEnumerator = function () {
+Column.prototype.getIterator = function () {
 	var self = this;
 	return new ArrayIterator(self._values);
 };

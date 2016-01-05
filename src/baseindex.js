@@ -6,12 +6,12 @@ var assert = require('chai').assert;
 var E = require('linq');
 
 //
-// Helper function to validate an enumerator.
+// Helper function to validate an iterator.
 //
-var validateEnumerator = function (enumerator) {
-	assert.isObject(enumerator, "Expected an 'enumerator' object.");
-	assert.isFunction(enumerator.moveNext, "Expected enumerator to have function 'moveNext'.");
-	assert.isFunction(enumerator.getCurrent, "Expected enumerator to have function 'getCurrent'.");
+var validateEnumerator = function (iterator) {
+	assert.isObject(iterator, "Expected an 'iterator' object.");
+	assert.isFunction(iterator.moveNext, "Expected iterator to have function 'moveNext'.");
+	assert.isFunction(iterator.getCurrent, "Expected iterator to have function 'getCurrent'.");
 };
 
 /**
@@ -20,7 +20,7 @@ var validateEnumerator = function (enumerator) {
  * Derives classes must implement:
  *
  *		getName - Get the name of theindex.
- *		getEnumerator - Get an enumerator for iterating the values of the index.
+ *		getIterator - Get an iterator for iterating the values of the index.
  */
 var BaseIndex = function () {
 	
@@ -96,13 +96,13 @@ BaseIndex.prototype.getRowsSubset = function (index, count) {
 BaseIndex.prototype.toValues = function () {
 
 	var self = this;
-	var enumerator = self.getEnumerator();
-	validateEnumerator(enumerator);
+	var iterator = self.getIterator();
+	validateEnumerator(iterator);
 
 	var values = [];
 
-	while (enumerator.moveNext()) {
-		values.push(enumerator.getCurrent());
+	while (iterator.moveNext()) {
+		values.push(iterator.getCurrent());
 	}
 
 	return values;

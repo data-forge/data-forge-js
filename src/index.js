@@ -30,9 +30,9 @@ Index.prototype.getName = function () {
 };
 
 /**
- * Get an enumerator to iterate the values of the index.
+ * Get an iterator to iterate the values of the index.
  */
-Index.prototype.getEnumerator = function () {
+Index.prototype.getIterator = function () {
 	var self = this;
 	return new ArrayIterator(self._values);
 };

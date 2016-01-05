@@ -21,7 +21,7 @@ describe('BaseDataFrame', function () {
 			return columns; 
 		};
 
-		dataFrame.getEnumerator = function () {
+		dataFrame.getIterator = function () {
 			var valueIndex = -1;
 
 			return {
