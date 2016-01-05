@@ -456,6 +456,8 @@ todo: show example output here.
 
 More on this soon. If you need to get started now the [Github repo](https://github.com/Real-Serious-Games/data-forge-js) has [examples](https://github.com/Real-Serious-Games/data-forge-js/tree/master/examples) showing how to use *data-forge* with [Flot](http://www.flotcharts.org/).
 
+todo: Put a link to the article on using Highstock.
+
 # Data transformation
 
 ## Data frame transformation
@@ -470,11 +472,11 @@ An entire data frame can be transformed using the [LINQ](https://en.wikipedia.or
 			};
 		});
 
-The assigned index is maintained for the transformed data frame.
+The source index is preserved to the transformed data frame.
 
 The more advanced [`selectMany`](http://www.dotnetperls.com/selectmany) function is also available.
 
-Note: Data frames are immutable, the original data frame is unmodified.
+Note: Data frames are immutable, the original data frame remains unmodified.
 
 ## Column transformation
 
@@ -486,7 +488,7 @@ Columns can also be transformed using `select`:
 			return transform(value); 	// <-- Apply a transformation to each value in the column.
 		});
 
-The column index is maintained for the transformed column.
+The source index is preserved to the transformed column.
 
 Note: Columns are immutable, the original column is unmodified.
 
@@ -496,7 +498,7 @@ Data frames and columns can be filtered using the [LINQ](https://en.wikipedia.or
 
 	var newDf = df
 		.where(function (row) {
-			// .. return true to include the row in the new data frame, return false to exclude it ...
+			// ... return true to include the row in the new data frame, return false to exclude it ...
 		});
 
 ## LINQ functions
@@ -505,15 +507,15 @@ Most of the other [LINQ functions](https://code.msdn.microsoft.com/101-LINQ-Samp
 
 More documentation will be here soon on supported LINQ functions.
 
-## Data frame aggregation
+## Data frame - aggregation
 
-todo
+todo: Coming soon
 
-## Data frame window
+## Data frame - rolling window
 
-todo
+todo: Coming soon
 
-# Examples
+# Node.js examples
 
 ## Working with CSV files
 
@@ -638,7 +640,9 @@ Same as previous example, except use skip and take to only process a window of t
 		.catch(function (err) {
 			console.error(err);
 		});
-		
+
+# Browser examples
+
 ## Working with HTTP in the browser
 
 todo: this section needs to be replaced
@@ -697,6 +701,8 @@ Javascript:
 		});
 
  
+## Visualisation with Flot
 
+## Visualisation with Highstock
 
 
