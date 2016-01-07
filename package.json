@@ -1,6 +1,6 @@
 {
   "name": "data-forge",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "JavaScript data transformation and analysis toolkit inspired by Pandas and LINQ.",
   "main": "index.js",
   "scripts": {
@@ -8,14 +8,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/real-serious-games/data-forge-js.git"
+    "url": "git+https://github.com/data-forge/data-forge-js.git"
   },
   "author": "ashley.davis@realseriousgames.com",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/real-serious-games/data-forge-js/issues"
+    "url": "https://github.com/data-forge/data-forge-js/issues"
   },
-  "homepage": "https://github.com/real-serious-games/data-forge-js#readme",
+  "homepage": "https://github.com/data-forge/data-forge-js#readme",
   "dependencies": {
     "chai": "^3.4.0",
     "csv": "^0.4.6",
