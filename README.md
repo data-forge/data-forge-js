@@ -116,7 +116,7 @@ Require the module into your script:
 
 ### Data-Forge plugins under Node.js
 
-Plugins are typically loaded into the Data-Forge namespace as follows, using *data-forge-from-yahoo* (todo: link to repo) as an example. 
+Plugins are typically loaded into the Data-Forge namespace as follows, using [*data-forge-from-yahoo*](https://www.npmjs.com/package/data-forge-from-yahoo) as an example. 
 
 Install via NPM:
 
@@ -148,7 +148,7 @@ You can now access the global `dataForge` variable.
 
 ### Data-Forge plugins under the browser
 
-As in the Node.js example, plugins are typically loaded into the Data-Forge namespace. Example using *data-forge-from-yahoo* (todo: link to repo). 
+As in the Node.js example, plugins are typically loaded into the Data-Forge namespace. Example using [*data-forge-from-yahoo*](https://www.npmjs.com/package/data-forge-from-yahoo). 
 
 Install via Bower:
 
@@ -442,7 +442,17 @@ As you explore a data set you may want to understand what data types you are wor
 	var typesDf = df.detectTypes(); 
 	console.log(typesDf.toString());
 
-todo: show example output here.
+For example, here is the output with data from Yahoo:
+
+	__index__  		  type    frequency  column
+	----------------  ------  ---------  ---------
+	0                 date    100        Date
+	1                 number  100        Open
+	2                 number  100        High
+	3                 number  100        Low
+	4                 number  100        Close
+	5                 number  100        Volume
+	6                 number  100        Adj Close
 
 You also probably want to understand the composition of values in the data frame. This can be done using `detectValues` that examines the values and reports on their frequency: 
 
@@ -450,13 +460,13 @@ You also probably want to understand the composition of values in the data frame
 	var valuesDf = df.detectValues(); 
 	console.log(valuesDf.toString());
 
-todo: show example output here.
+todo: output
 
 ## Visual output
 
-More on this soon. If you need to get started now the [Github repo](https://github.com/Real-Serious-Games/data-forge-js) has [examples](https://github.com/Real-Serious-Games/data-forge-js/tree/master/examples) showing how to use *data-forge* with [Flot](http://www.flotcharts.org/).
+The [Github repo](https://github.com/Real-Serious-Games/data-forge-js) has [examples](https://github.com/Real-Serious-Games/data-forge-js/tree/master/examples) showing how to use *data-forge* with [Flot](http://www.flotcharts.org/).
 
-todo: Put a link to the article on using Highstock.
+There is a [Code Project article](http://www.codeproject.com/Articles/1069489/Highstock-plus-Data-Forge-plus-Yahoo) on using Highstock with Data-Forge to chart Yahoo financial data.
 
 # Data transformation
 
