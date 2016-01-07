@@ -192,7 +192,7 @@ var dataForge = {
 			function () {
 				var LazyIndex = require('./src/lazyindex');
 				return new LazyIndex(
-					"__concatenated__",
+					"__index__",
 					function () {
 						return new ArrayEnumerator(E.from(dataFrames)
 							.selectMany(function (dataFrame) {
