@@ -809,6 +809,27 @@ describe('BaseDataFrame', function () {
 		]);
 	});
 
+	it('can detect values', function () {
+
+		var dataFrame = initDataFrame(
+			[ "Date", "Value1" ],
+			[
+				[new Date(1975, 24, 2), 'foo'],
+				[new Date(2015, 24, 2), 'foo'],
+			],
+			[5, 6]
+		);
+
+		var detectedTypes = dataFrame.detectValues();
+		expect(detectedTypes.getColumnNames()).to.eql(["Value", "Frequency", "Column"]);
+		expect(detectedTypes.getIndex().toValues()).to.eql([0, 1, 2]);
+		expect(detectedTypes.toValues()).to.eql([
+			[new Date(1975, 24, 2), 50, "Date"],
+			[new Date(2015, 24, 2), 50, "Date"],
+			['foo', 100, "Value1"],
+		]);
+	});
+
 	it('can truncate string values', function () {
 
 		var dataFrame = initDataFrame(

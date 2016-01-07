@@ -966,6 +966,27 @@ BaseDataFrame.prototype.detectTypes = function () {
 };
 
 /**
+ * Detect values and their frequencies contained within columns in the data frame.
+ */
+BaseDataFrame.prototype.detectValues = function () {
+
+	var self = this;
+
+	var DataFrame = require('./dataframe');
+
+	var dataFrames = E.from(self.getColumns())
+		.select(function (column) {
+			var numValues = column.toValues().length;
+			var Column = require('./column');
+			//todo: broad-cast column
+			var columnNameColumn = new Column('Column', E.range(0, numValues).select(function () { return column.getName(); }).toArray());
+			return column.detectValues().setColumn('Column', columnNameColumn);
+		})
+		.toArray();
+	var dataForge = require('../index');
+	return dataForge.concat(dataFrames).resetIndex();
+};
+/**
  * Produces a new data frame with all string values truncated to the requested maximum length.
  *
  * @param {int} maxLength - The maximum length of the string values after truncation.

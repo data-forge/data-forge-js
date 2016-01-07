@@ -690,7 +690,6 @@ BaseColumn.prototype.toStrings = function () {
 	});
 };
 
-
 /** 
   * Detect the actual types of the values that comprised the column and their frequency.
   * Returns a new column containing the type information.
@@ -736,6 +735,53 @@ BaseColumn.prototype.detectTypes = function () {
 						return [
 							valueType,
 							(typeFrequencies[valueType].count / totalValues) * 100
+						];
+					})
+					.toArray()
+			);
+		}
+	);
+};
+
+/** 
+  * Detect the frequency of values in the column.
+  * Returns a new column containing the information.
+  */
+BaseColumn.prototype.detectValues = function () {
+
+	var self = this;
+
+	var LazyDataFrame = require('./lazydataframe');
+	return new LazyDataFrame(
+		function () {
+			return ["Value", "Frequency"];
+		},
+		function () {
+			var values = self.toValues();
+			var totalValues = values.length;
+
+			var valueFrequencies = E.from(values)
+				.aggregate({}, function (accumulated, value) {
+					var valueKey = value.toString() + "-" + typeof(value);
+					var valueInfo = accumulated[valueKey];
+					if (!valueInfo) {
+						valueInfo = {
+							count: 0,
+							value: value,
+						};
+						accumulated[valueKey] = valueInfo;
+					}
+					++valueInfo.count;
+					return accumulated;
+				});
+
+			return new ArrayIterator(
+				E.from(Object.keys(valueFrequencies))
+					.select(function (valueKey) {
+						var valueInfo = valueFrequencies[valueKey];
+						return [
+							valueInfo.value,
+							(valueInfo.count / totalValues) * 100
 						];
 					})
 					.toArray()

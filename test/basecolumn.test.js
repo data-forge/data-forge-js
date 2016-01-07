@@ -502,7 +502,17 @@ describe('BaseColumn', function () {
 			['number', 50],
 			['string', 50],
 		]);
+	});
 
+	it('can detect values', function () {
+		var column = initColumn([1, 2], [1, 'foo']);
+		var values = column.detectValues();
+		expect(values.getColumnNames()).to.eql(['Value', 'Frequency']);
+		expect(values.getIndex().toValues()).to.eql([0, 1]);
+		expect(values.toValues()).to.eql([
+			[1, 50],
+			['foo', 50],
+		]);
 	});
 
 	it('can truncate string values', function () {
