@@ -444,7 +444,7 @@ As you explore a data set you may want to understand what data types you are wor
 
 For example, here is the output with data from Yahoo:
 
-	__index__  		  type    frequency  column
+	__index__  		  Type    Frequency  Column
 	----------------  ------  ---------  ---------
 	0                 date    100        Date
 	1                 number  100        Open

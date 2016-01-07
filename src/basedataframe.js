@@ -957,8 +957,8 @@ BaseDataFrame.prototype.detectTypes = function () {
 			var numValues = column.toValues().length;
 			var Column = require('./column');
 			//todo: broad-cast column
-			var columnNameColumn = new Column('column', E.range(0, numValues).select(function () { return column.getName(); }).toArray());
-			return column.detectTypes().setColumn('column', columnNameColumn);
+			var columnNameColumn = new Column('Column', E.range(0, numValues).select(function () { return column.getName(); }).toArray());
+			return column.detectTypes().setColumn('Column', columnNameColumn);
 		})
 		.toArray();
 	var dataForge = require('../index');

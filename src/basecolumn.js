@@ -702,7 +702,7 @@ BaseColumn.prototype.detectTypes = function () {
 	var LazyDataFrame = require('./lazydataframe');
 	return new LazyDataFrame(
 		function () {
-			return ["type", "frequency"];
+			return ["Type", "Frequency"];
 		},
 		function () {
 			var values = self.toValues();
