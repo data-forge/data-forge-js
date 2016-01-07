@@ -645,64 +645,86 @@ Same as previous example, except use skip and take to only process a window of t
 
 ## Working with HTTP in the browser
 
-todo: this section needs to be replaced
+This example depends on the [jQuery](http://jquery.com/) [get function](https://api.jquery.com/jquery.get/). 
 
 Note the differences in the way plugins are referenced than in the NodeJS version.
 
-HTML:
+**HTML**
 
+	<script src="bower_components/jquery/dist/jquery.js"></script>
 	<script src="bower_components/data-forge/data-forge.js"></script>
 
-Javascript:
+**Javascript for JSON**
 
 	var url = "http://somewhere.com/rest/api";
+	$.get(url, 
+		function (data) {
+			var dataFrame = new dataForge.DataFrame({ rows: data });
+			// ... work with the data frame ...
+		}
+	);
 
-	dataForge.from(dataForge.http(url))				// <-- HTTP GET data from REST API.
-		.as(dataForge.json())						// <-- Deserialize the file from JSON.
-		.then(function (dataFrame) {
-			// ... transform the data frame ...		// <-- Transform the data.
+	var someDataFrame = ...
+	$.post(url, someDataFrame.toObjects(),
+		function (data) {
+			// ...
+		}
+	);
+	
+**Javascript for CSV**
 
-			return dataFrame.as(dataForge.json())	// <-- Serialize the file to JSON.
-				.to(dataForge.http(url));			// <-- HTTP POST data to REST API.
-		})
-		.then(function () {
-			console.log('Success!');				// <-- Success!
-		});	
-		.catch(function (err) {
-			console.error(err && err.stack || err); // <-- Handle errors.
-		});
+	var url = "http://somewhere.com/rest/api";
+	$.get(url, 
+		function (data) {
+			var dataFrame = dataForge.fromCSV();
+			// ... work with the data frame ...
+		}
+	);
+
+	var someDataFrame = ...
+	$.post(url, someDataFrame.toCSV(),
+		function (data) {
+			// ...
+		}
+	);
 
 
 ## Working with HTTP in AngularJS
 
-todo: this section needs to be replaced
+**HTML**
 
-HTML:
-
+	<script src="bower_components/angular/angular.js"></script>
 	<script src="bower_components/data-forge/data-forge.js"></script>
 
-Javascript:
+**Javascript**
+
+	// Assume [$http](https://docs.angularjs.org/api/ng/service/$http) is injected into your controller.
 
 	var url = "http://somewhere.com/rest/api";
-
-	dataForge.from(dataForge.http(url))				// <-- HTTP GET data from REST API.
-		.as(dataForge.json())						// <-- Deserialize the file from JSON.
-		.then(function (dataFrame) {
-			// ... transform the data frame ...		// <-- Transform the data.
-
-			return dataFrame.as(dataForge.json())	// <-- Serialize the file to JSON.
-				.to(dataForge.http(url));			// <-- HTTP POST data to REST API.
+	$http.get(url)
+		.then(function (data) {
+			var dataFrame = new dataForge.DataFrame(data);
+			// ... work with the data frame ...			
 		})
-		.then(function () {
-			console.log('Success!');				// <-- Success!
-		});	
 		.catch(function (err) {
-			console.error(err && err.stack || err); // <-- Handle errors.
+			// ... handle error ...
 		});
 
+	var someDataFrame = ...
+	$http.post(url, someDataFrame.toObjects())
+		.then(function () {
+			// ... handle success ...
+		})
+		.catch(function (err) {
+			// ... handle error ...
+		});
  
 ## Visualisation with Flot
 
+todo
+
 ## Visualisation with Highstock
+
+todo
 
 
