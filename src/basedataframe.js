@@ -962,7 +962,7 @@ BaseDataFrame.prototype.detectTypes = function () {
 		})
 		.toArray();
 	var dataForge = require('../index');
-	return dataForge.concat(dataFrames);
+	return dataForge.concat(dataFrames).resetIndex();
 };
 
 /**
