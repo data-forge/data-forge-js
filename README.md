@@ -460,8 +460,6 @@ You also probably want to understand the composition of values in the data frame
 	var valuesDf = df.detectValues(); 
 	console.log(valuesDf.toString());
 
-todo: output
-
 ## Visual output
 
 The [Github repo](https://github.com/Real-Serious-Games/data-forge-js) has [examples](https://github.com/Real-Serious-Games/data-forge-js/tree/master/examples) showing how to use *data-forge* with [Flot](http://www.flotcharts.org/).
