@@ -600,8 +600,9 @@ BaseColumn.prototype.percentChange = function () {
 
 	var self = this;
 	return self.rollingWindow(2, function (index, window) {
-		var amountChange = window[1] - window[0];
-		return [index[1], amountChange / window[0]];
+		var amountChange = window[1] - window[0]; // Compute amount of change.
+		var pctChange = amountChange / window[0]; // Compute % change.
+		return [index[1], pctChange]; // Return new index and value.
 	});
 };
 
