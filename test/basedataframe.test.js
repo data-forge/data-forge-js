@@ -711,7 +711,7 @@ describe('BaseDataFrame', function () {
 			],
 			[5, 6, 7, 8]
 		);
-		var subset = dataFrame.getRowsSubset(1, 2);
+		var subset = dataFrame.getRowsSubset(1, 3);
 		expect(subset.getIndex().toValues()).to.eql([6, 7]);
 		expect(subset.toValues()).to.eql([
 			[new Date(1975, 24, 2), 200, 'b', 1],

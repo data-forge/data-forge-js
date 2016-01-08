@@ -67,12 +67,13 @@ BaseIndex.prototype.take = function (numRows) {
 /**
  * Get a subset of rows from the index.
  *
- * @param {int} index - Index where the subset starts.
- * @param {int} count - Number of rows to include in the subset.
+ * @param {int} startIndex - Index where the subset starts.
+ * @param {int} endIndex - Marks the end of the subset, one row past the last row to include.
  */
-BaseIndex.prototype.getRowsSubset = function (index, count) {
-	assert.isNumber(index, "Expected 'index' parameter to getRowsSubset to be an integer.");
-	assert.isNumber(index, "Expected 'count' parameter to getRowsSubset to be an integer.");
+BaseIndex.prototype.getRowsSubset = function (startIndex, endIndex) {
+	assert.isNumber(startIndex, "Expected 'startIndex' parameter to getRowsSubset to be an integer.");
+	assert.isNumber(endIndex, "Expected 'endIndex' parameter to getRowsSubset to be an integer.");
+	assert(endIndex >= startIndex, "Expected 'endIndex' parameter to getRowsSubset to be greater than or equal to 'startIndex' parameter.");
 
 	var self = this;
 
@@ -81,10 +82,11 @@ BaseIndex.prototype.getRowsSubset = function (index, count) {
 	return new LazyIndex(
 		self.getName(),
 		function () {
-			return new ArrayIterator(E.from(self.toValues())
-				.skip(index)
-				.take(count)
-				.toArray()
+			return new ArrayIterator(
+				E.from(self.toValues())
+					.skip(startIndex)
+					.take(endIndex - startIndex)
+					.toArray()
 			);
 		}
 	);

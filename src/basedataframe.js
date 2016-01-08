@@ -796,12 +796,13 @@ BaseDataFrame.prototype.setColumn = function (columnName, data) {
 /**
  * Get a subset of rows from the data frame.
  *
- * @param {int} index - Index where the subset starts.
- * @param {int} count - Number of rows to include in the subset.
+ * @param {int} startIndex - Index where the subset starts.
+ * @param {int} endIndex - Marks the end of the subset, one row past the last row to include.
  */
-BaseDataFrame.prototype.getRowsSubset = function (index, count) { //todo: change count to end index... and actually make this work with the index.
-	assert.isNumber(index, "Expected 'index' parameter to getRowsSubset to be an integer.");
-	assert.isNumber(index, "Expected 'count' parameter to getRowsSubset to be an integer.");
+BaseDataFrame.prototype.getRowsSubset = function (startIndex, endIndex) {
+	assert.isNumber(startIndex, "Expected 'startIndex' parameter to getRowsSubset to be an integer.");
+	assert.isNumber(endIndex, "Expected 'endIndex' parameter to getRowsSubset to be an integer.");
+	assert(endIndex >= startIndex, "Expected 'endIndex' parameter to getRowsSubset to be greater than or equal to 'startIndex' parameter.");
 
 	var self = this;
 
@@ -814,13 +815,13 @@ BaseDataFrame.prototype.getRowsSubset = function (index, count) { //todo: change
 		function () {
 			return new ArrayIterator(
 				E.from(self.toValues())
-					.skip(index)
-					.take(count)
+					.skip(startIndex)
+					.take(endIndex - startIndex)
 					.toArray()
 			);
 		},
 		function () {
-			return self.getIndex().getRowsSubset(index, count);
+			return self.getIndex().getRowsSubset(startIndex, endIndex);
 		}
 	);
 };

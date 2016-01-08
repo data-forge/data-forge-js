@@ -197,7 +197,7 @@ describe('BaseColumn', function () {
 	it('can get subset of rows', function () {
 
 		var column = initColumn([0, 1, 2, 3], [100, 300, 200, 5]);
-		var subset = column.getRowsSubset(1, 2);
+		var subset = column.getRowsSubset(1, 3);
 		expect(subset.getIndex().toValues()).to.eql([1, 2]);
 		expect(subset.toValues()).to.eql([300, 200]);
 	});

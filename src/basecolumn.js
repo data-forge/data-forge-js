@@ -421,12 +421,13 @@ BaseColumn.prototype.orderByDescending = function (sortSelector) {
 /**
  * Get a subset of rows from the column.
  *
- * @param {int} index - Index where the subset starts.
- * @param {int} count - Number of rows to include in the subset.
+ * @param {int} startIndex - Index where the subset starts.
+ * @param {int} endIndex - Marks the end of the subset, one row past the last row to include.
  */
-BaseColumn.prototype.getRowsSubset = function (index, count) {
-	assert.isNumber(index, "Expected 'index' parameter to getRowsSubset to be an integer.");
-	assert.isNumber(index, "Expected 'count' parameter to getRowsSubset to be an integer.");
+BaseColumn.prototype.getRowsSubset = function (startIndex, endIndex) {
+	assert.isNumber(startIndex, "Expected 'startIndex' parameter to getRowsSubset to be an integer.");
+	assert.isNumber(endIndex, "Expected 'endIndex' parameter to getRowsSubset to be an integer.");
+	assert(endIndex >= startIndex, "Expected 'endIndex' parameter to getRowsSubset to be greater than or equal to 'startIndex' parameter.");
 
 	var self = this;
 
@@ -437,13 +438,13 @@ BaseColumn.prototype.getRowsSubset = function (index, count) {
 		function () {
 			return new ArrayIterator(
 				E.from(self.toValues())
-					.skip(index)
-					.take(count)
+					.skip(startIndex)
+					.take(endIndex - startIndex)
 					.toArray()
 			);
 		},
 		function () {
-			return self.getIndex().getRowsSubset(index, count);
+			return self.getIndex().getRowsSubset(startIndex, endIndex);
 		}
 	);
 };

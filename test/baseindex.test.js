@@ -46,7 +46,7 @@ describe('Index', function () {
 	it('can get subset of rows', function () {
 
 		var index = initIndex([0, 1, 2, 3]);
-		var subset = index.getRowsSubset(1, 2);
+		var subset = index.getRowsSubset(1, 3);
 		expect(subset.toValues()).to.eql([1, 2]);
 	});
 
