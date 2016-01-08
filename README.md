@@ -515,13 +515,42 @@ Most of the other [LINQ functions](https://code.msdn.microsoft.com/101-LINQ-Samp
 
 More documentation will be here soon on supported LINQ functions.
 
-## Data frame - aggregation
+## Aggregation
 
 todo: Coming soon
 
-## Data frame - rolling window
+## Rolling window
 
-todo: Coming soon
+The rolling window function allows you to consider only a window of rows at a time. The window rolls across a column and, based on the results of your function, produces a new column with summarized or aggregated data. 
+
+The `percentChange` function that is included is probably the simplest example use of `rollingWindow`. It computes a new column with the percentage increase of each value in the source column.
+
+The implementation of `percentChange` looks a bit like this:
+    
+	var windowSize = 2;
+	var pctChangeColumn = sourceColumn
+		.rollingWindow(windowSize, 
+			function (indices, values) {
+				var amountChange = values[1] - values[0]; // Compute amount of change.
+				var pctChange = amountChange / values[0]; // Compute % change.
+				return [indices[1], pctChange]; // Return new index and value.
+			}
+		);
+   
+`percentChange` is simple because it only considers a window size of 2.
+
+Now consider an example that requires a variable window size. Here is some code that computes a *simple moving average* (derived from *[data-forge-indicators](https://github.com/data-forge/data-forge-indicators)*):
+
+	var Enumerable = require('linq');
+
+	var smaPeriod = ... variable window size ...
+ 	var smaColumn = sourceColumn
+		.rollingWindow(smaPeriod, function (indices, values) {
+        	return [indices[indices.length-1], Enumerable.from(values).sum() / period];
+	    	}
+		);	
+
+Note that [linqjs](https://www.npmjs.com/package/linq) is used to sum the values of the window (however many there might be).
 
 # Node.js examples
 
