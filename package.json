@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/data-forge/data-forge-js#readme",
   "dependencies": {
+    "babyparse": "^0.4.3",
     "chai": "^3.4.0",
     "csv": "^0.4.6",
     "easy-table": "^1.0.0",

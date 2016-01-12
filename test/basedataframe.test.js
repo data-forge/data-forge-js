@@ -1012,26 +1012,6 @@ describe('BaseDataFrame', function () {
 		);
 	});
 
-	it('newlines are automatically stripped from strings when saving a csv', function () {
-
-		var dataFrame = initDataFrame(
-				["Column1"], 
-				[
-					['First line\nsecond line\nthird line'],
-					['1st line\r\n2nd line'],
-				],
-				[0, 1]
-			);
-
-		var csvData = dataFrame.toCSV();
-		assert.isString(csvData);
-		expect(csvData).to.eql(
-			"Column1\r\n" +
-			"First line second line third line\r\n" +
-			"1st line 2nd line"
-		);
-	});	
-
 	it('can bake data frame', function () {
 
 		var dataFrame = initDataFrame(

@@ -7,6 +7,7 @@
 var LazyColumn = require('./lazycolumn');
 var LazyIndex = require('./lazyindex');
 var ArrayIterator = require('./iterators/array');
+var BabyParse = require('babyparse');
 
 var assert = require('chai').assert; 
 var E = require('linq');
@@ -1157,6 +1158,10 @@ BaseDataFrame.prototype.toJSON = function () {
 BaseDataFrame.prototype.toCSV = function () {
 
 	var self = this;
+	var data = [self.getColumnNames()].concat(self.toValues());
+	return BabyParse.unparse(data);
+
+	/*Old csv stringify.
 	var header = self.getColumnNames().join(',');
 	var rows = E.from(self.toValues())
 			.select(function (row) {
@@ -1172,6 +1177,7 @@ BaseDataFrame.prototype.toCSV = function () {
 			})					
 			.toArray();
 	return [header].concat(rows).join('\r\n');	
+	*/
 };
 
 /**

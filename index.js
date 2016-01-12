@@ -5,6 +5,7 @@ var E = require('linq');
 var dropElement = require('./src/utils').dropElement;
 var ArrayEnumerator = require('./src/iterators/array');
 require('sugar');
+var BabyParse = require('babyparse');
 
 var DataFrame = require('./src/dataframe');
 
@@ -63,7 +64,11 @@ var dataForge = {
 	//
 	fromCSV: function (csvTextString) {
 		assert.isString(csvTextString, "Expected 'csvTextString' parameter to 'dataForge.fromCSV' to be a string containing data encoded in the CSV format.");
+
+		var parsed = BabyParse.parse(csvTextString);
+		var rows = parsed.data;
 		
+		/* Old csv parsing.
 		var lines = csvTextString.split('\n');
 		var rows = E
 			.from(lines) // Ignore blank lines.
@@ -87,15 +92,30 @@ var dataForge = {
 					.toArray();					
 			})
 			.toArray();
+		*/
 
 		if (rows.length === 0) {
 			return new dataForge.DataFrame({ columnNames: [], rows: [] });
 		}
 				
-		var header = E.from(rows).first();
-		var remaining = E.from(rows).skip(1).toArray();
+		var columnNames = E.from(E.from(rows).first())
+				.select(function (columnName) {
+					return columnName.trim();
+				})
+				.toArray();
+
+		var remaining = E.from(rows)
+			.skip(1)
+			.select(function (row) {
+				return E.from(row)
+					.select(function (cell) {
+						return cell.trim();
+					})
+					.toArray()
+			})
+			.toArray();
 		return new dataForge.DataFrame({
-				columnNames: header, 
+				columnNames: columnNames, 
 				rows: remaining
 			});
 	},
