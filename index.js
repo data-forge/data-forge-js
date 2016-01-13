@@ -150,6 +150,10 @@ var dataForge = {
 		var leftRows = leftDataFrame.toValues();
 		var rightRows = rightDataFrame.toValues();
 
+		var mergedColumnNames = [columnName]
+			.concat(dropElement(leftDataFrame.getColumnNames(), leftColumnIndex))
+			.concat(dropElement(rightDataFrame.getColumnNames(), rightColumnIndex));
+
 		var mergedValues = E.from(leftRows) // Merge values, drop index.
 			.selectMany(function (leftRow) {
 				return E
@@ -167,7 +171,7 @@ var dataForge = {
 
 		return new LazyDataFrame(
 			function () {
-				return ['key', 'lval', 'rval'];
+				return mergedColumnNames;
 			},
 			function () {
 				return new ArrayEnumerator(mergedValues);

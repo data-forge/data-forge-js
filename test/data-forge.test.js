@@ -27,8 +27,8 @@ describe('data-forge', function () {
 
 		var left = initDataFrame(
 			[
-				'key',
-				'lval',
+				'merge-key',
+				'left-val',
 			],
 			[
 				['foo', 1],
@@ -37,26 +37,28 @@ describe('data-forge', function () {
 		);
 		var right = initDataFrame(
 			[
-				'key',
-				'rval',
+				'merge-key',
+				'right-val',
+				'other-right-value'
 			],
 			[
-				['foo', 4],
-				['foo', 5],
+				['foo', 4, 100],
+				['foo', 5, 200],
 			]
 		);
 
-		var merged = dataForge.merge(left, right, 'key');
+		var merged = dataForge.merge(left, right, 'merge-key');
 		expect(merged.getColumnNames()).to.eql([
-			'key',
-			'lval',
-			'rval',
+			'merge-key',
+			'left-val',
+			'right-val',
+			'other-right-value',
 		]);
 		expect(merged.toValues()).to.eql([
-			['foo', 1, 4],
-			['foo', 1, 5],
-			['foo', 2, 4],
-			['foo', 2, 5],
+			['foo', 1, 4, 100],
+			['foo', 1, 5, 200],
+			['foo', 2, 4, 100],
+			['foo', 2, 5, 200],
 		]);
 	});
 
