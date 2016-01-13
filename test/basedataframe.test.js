@@ -196,7 +196,7 @@ describe('BaseDataFrame', function () {
 		]);		
 	});
 
-	it('throws expection when pulling a non-existing column name', function () {
+	it('throws exception when pulling a non-existing column name', function () {
 		
 		expect(function () {
 			var dataFrame = initDataFrame(
@@ -208,7 +208,7 @@ describe('BaseDataFrame', function () {
 				[5, 6]
 			);
 			dataFrame.getColumn('non-existing column name');			
-		}).to.throw(Error).with.property('message').that.equals("In call to 'getColumn' failed to find column 'non-existing column name'.");
+		}).to.throw(Error);
 	});
 
 	it('can retreive column by name', function () {
@@ -1036,5 +1036,55 @@ describe('BaseDataFrame', function () {
 		]);
 
 
+	});
+
+	it('can rename column - specified by name', function () {
+
+		var oldColumnName = "Column2";
+		var dataFrame = initDataFrame(
+				["Column1", oldColumnName, "Column3"], 
+				[
+					['A', 1],
+					['B', 2],
+				],
+				[10, 11]
+			);
+
+		var newColumnName = "NewColumnName";
+		var renamed = dataFrame.renameColumn(oldColumnName, newColumnName);
+
+		expect(dataFrame.getColumnNames()[1]).to.eql(oldColumnName);
+		expect(dataFrame.getColumn(oldColumnName).getName()).to.eql(oldColumnName);
+		expect(dataFrame.getColumn(1).getName()).to.eql(oldColumnName);
+
+		expect(renamed.getColumnNames()[1]).to.eql(newColumnName);
+		expect(renamed.getColumn(newColumnName)).to.be.ok;
+		expect(renamed.getColumn(newColumnName).getName()).to.eql(newColumnName);
+		expect(renamed.getColumn(1).getName()).to.eql(newColumnName);
+	});
+
+	it('can rename column - specified by index', function () {
+
+		var oldColumnName = "Column2";
+		var dataFrame = initDataFrame(
+				["Column1", oldColumnName, "Column3"], 
+				[
+					['A', 1],
+					['B', 2],
+				],
+				[10, 11]
+			);
+
+		var newColumnName = "NewColumnName";
+		var renamed = dataFrame.renameColumn(1, newColumnName);
+
+		expect(dataFrame.getColumnNames()[1]).to.eql(oldColumnName);
+		expect(dataFrame.getColumn(oldColumnName).getName()).to.eql(oldColumnName);
+		expect(dataFrame.getColumn(1).getName()).to.eql(oldColumnName);
+
+		expect(renamed.getColumnNames()[1]).to.eql(newColumnName);
+		expect(renamed.getColumn(newColumnName)).to.be.ok;
+		expect(renamed.getColumn(newColumnName).getName()).to.eql(newColumnName);
+		expect(renamed.getColumn(1).getName()).to.eql(newColumnName);
 	});
 });

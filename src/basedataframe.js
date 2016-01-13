@@ -21,6 +21,27 @@ var validateEnumerator = function (iterator) {
 	assert.isFunction(iterator.getCurrent, "Expected iterator to have function 'getCurrent'.");
 };
 
+//
+// Help function to grab a column index from a 'column name or index' parameter.
+//
+var parseColumnNameOrIndex = function (dataFrame, columnNameOrIndex) {
+
+	if (Object.isString(columnNameOrIndex)) {
+		var columnIndex = dataFrame.getColumnIndex(columnNameOrIndex);
+		if (columnIndex < 0) {
+			throw new Error("Failed to find column with name '" + columnNameOrIndex + "'.");
+		}
+		return columnIndex;
+	}
+	else {	
+		assert.isNumber(columnNameOrIndex, "Expected 'columnNameOrIndex' parameter e either a string or index that specifies an existing column.");
+
+		return columnNameOrIndex;
+	}
+}
+
+
+
 /**
  * Base class for data frames.
  *
@@ -366,19 +387,8 @@ BaseDataFrame.prototype.selectMany = function (selector) {
 BaseDataFrame.prototype.getColumn = function (columnNameOrIndex) {
 	var self = this;
 
-	var columnIndex;
-	if (Object.isString(columnNameOrIndex)) {
-		columnIndex = self.getColumnIndex(columnNameOrIndex);
-		if (columnIndex < 0) {
-			throw new Error("In call to 'getColumn' failed to find column '" + columnNameOrIndex + "'.");
-		}
-	}
-	else {	
-		assert.isNumber(columnNameOrIndex, "Expected 'columnNameOrIndex' parameter to 'getColumn' to be either a string or index that specifies the column to retreive.");
+	var columnIndex = parseColumnNameOrIndex(self, columnNameOrIndex);
 
-		columnIndex = columnNameOrIndex;
-	}
-	
 	return new LazyColumn(
 		self.getColumnNames()[columnIndex],
 		function () {
@@ -911,6 +921,8 @@ BaseDataFrame.prototype.toString = function () {
 
 /**
  * Parse a column with string values to a column with int values.
+ *
+ * @param {string|int} columnNameOrIndex - Specifies the column to parse.
  */
 BaseDataFrame.prototype.parseInts = function (columnNameOrIndex) {
 
@@ -920,6 +932,8 @@ BaseDataFrame.prototype.parseInts = function (columnNameOrIndex) {
 
 /**
  * Parse a column with string values to a column with float values.
+ *
+ * @param {string|int} columnNameOrIndex - Specifies the column to parse.
  */
 BaseDataFrame.prototype.parseFloats = function (columnNameOrIndex) {
 
@@ -929,6 +943,8 @@ BaseDataFrame.prototype.parseFloats = function (columnNameOrIndex) {
 
 /**
  * Parse a column with string values to a column with date values.
+ *
+ * @param {string|int} columnNameOrIndex - Specifies the column to parse.
  */
 BaseDataFrame.prototype.parseDates = function (columnNameOrIndex) {
 
@@ -938,6 +954,8 @@ BaseDataFrame.prototype.parseDates = function (columnNameOrIndex) {
 
 /**
  * Convert a column of values of different types to a column of string values.
+ *
+ * * @param {string|int} columnNameOrIndex - Specifies the column to convert.
  */
 BaseDataFrame.prototype.toStrings = function (columnNameOrIndex) {
 
@@ -1089,6 +1107,35 @@ BaseDataFrame.prototype.renameColumns = function (newColumnNames) {
  	var LazyDataFrame = require('./lazydataframe');
 	return new LazyDataFrame(
 		function () {
+			return newColumnNames;
+		},
+		function () {
+			return self.getIterator();
+		},
+		function () {
+			return self.getIndex();
+		}
+	);
+};
+
+/*
+ * Create a new data frame with a single column renamed.
+ * 
+ * @param {string|int} columnNameOrIndex - Specifies the column to rename.
+ * @param {string} newColumnName - The new name for the specified column.
+ */
+BaseDataFrame.prototype.renameColumn = function (columnNameOrIndex, newColumnName) {
+
+	var self = this;
+	var columnIndex = parseColumnNameOrIndex(self, columnNameOrIndex);
+
+	assert.isString(newColumnName, "Expected 'newColumnName' parameter to 'renameColumn' to be a string.");
+
+	var LazyDataFrame = require('./lazydataframe');
+	return new LazyDataFrame(
+		function () {
+			var newColumnNames = self.getColumnNames().slice(0); // Clone array.
+			newColumnNames[columnIndex] = newColumnName;
 			return newColumnNames;
 		},
 		function () {
