@@ -21,7 +21,6 @@ var validateIterator = function (iterator) {
 /**
  * Base class for series.
  *
- * getName - Get the name of the series.
  * getIterator - Get the iterator for the series.
  * getIndex - Get the index for the series.
  */
@@ -37,10 +36,10 @@ var BaseSeries = function () {
 BaseSeries.prototype.skip = function (numRows) {
 	assert.isNumber(numRows, "Expected 'numRows' parameter to 'skip' function to be a number.");
 
-	var Lazyseries = require('./lazyseries'); // Require here to prevent circular ref.
+	var LazySeries = require('./lazyseries'); // Require here to prevent circular ref.
 	
 	var self = this;
-	return new Lazyseries(
+	return new LazySeries(
 		self.getName(),
 		function () {
 			return new ArrayIterator(E
@@ -63,10 +62,10 @@ BaseSeries.prototype.skip = function (numRows) {
 BaseSeries.prototype.take = function (numRows) {
 	assert.isNumber(numRows, "Expected 'numRows' parameter to 'take' function to be a number.");
 
-	var Lazyseries = require('./lazyseries'); // Require here to prevent circular ref.
+	var LazySeries = require('./lazyseries'); // Require here to prevent circular ref.
 	
 	var self = this;
-	return new Lazyseries(
+	return new LazySeries(
 		self.getName(),
 		function () {
 			return new ArrayIterator(E
@@ -116,8 +115,8 @@ BaseSeries.prototype.where = function (filterSelectorPredicate) {
 	}
 
 
-	var Lazyseries = require('./lazyseries');
-	return new Lazyseries(
+	var LazySeries = require('./lazyseries');
+	return new LazySeries(
 		self.getName(),
 		function () {
 			return new ArrayIterator(E.from(executeLazyWhere())
@@ -154,8 +153,8 @@ BaseSeries.prototype.select = function (selector) {
 
 	var self = this;
 
-	var Lazyseries = require('./lazyseries');
-	return new Lazyseries(
+	var LazySeries = require('./lazyseries');
+	return new LazySeries(
 		self.getName(),
 		function () {
 			return new ArrayIterator(
@@ -204,8 +203,8 @@ BaseSeries.prototype.selectMany = function (selector) {
 			.toArray();
 	};
 
-	var Lazyseries = require('./lazyseries');
-	return new Lazyseries(
+	var LazySeries = require('./lazyseries');
+	return new LazySeries(
 		self.getName(),
 		function () {
 			lazyEvaluate();
@@ -431,9 +430,9 @@ BaseSeries.prototype.getRowsSubset = function (startIndex, endIndex) {
 
 	var self = this;
 
-	var Lazyseries = require('./lazyseries'); // Require here to prevent circular ref.
+	var LazySeries = require('./lazyseries'); // Require here to prevent circular ref.
 
-	return new Lazyseries(
+	return new LazySeries(
 		self.getName(),
 		function () {
 			return new ArrayIterator(
@@ -480,9 +479,9 @@ BaseSeries.prototype.rollingWindow = function (period, fn) {
 		})
 		.toArray();
 
-	var Lazyseries = require('./lazyseries');
+	var LazySeries = require('./lazyseries');
 
-	return new Lazyseries(
+	return new LazySeries(
 		self.getName(), 
 		function () {
 			return new ArrayIterator(E.from(newIndexAndValues)
@@ -520,9 +519,9 @@ BaseSeries.prototype.reindex = function (newIndex) {
 
 	var self = this;
 
-	var Lazyseries = require('./lazyseries');
+	var LazySeries = require('./lazyseries');
 
-	return new Lazyseries(
+	return new LazySeries(
 		self.getName(),
 		function () {
 			//
