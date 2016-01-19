@@ -207,7 +207,7 @@ describe('BaseDataFrame', function () {
 				],
 				[5, 6]
 			);
-			dataFrame.getColumn('non-existing column name');			
+			dataFrame.setSeries('non-existing column name');			
 		}).to.throw(Error);
 	});
 
@@ -221,17 +221,18 @@ describe('BaseDataFrame', function () {
 			],
 			[5, 6]
 		);
-		var column1 = dataFrame.getColumn('Value1');
-		expect(column1.getSeries().getIndex().toValues()).to.eql([5, 6]);
-		expect(column1.getSeries().toValues()).to.eql([100, 200]);
 		
-		var column2 = dataFrame.getColumn('Value2');
-		expect(column2.getSeries().getIndex().toValues()).to.eql([5, 6]);
-		expect(column2.getSeries().toValues()).to.eql(['foo', 'bar']);
+		var series1 = dataFrame.getSeries('Value1');
+		expect(series1.getIndex().toValues()).to.eql([5, 6]);
+		expect(series1.toValues()).to.eql([100, 200]);
 		
-		var column3 = dataFrame.getColumn('Value3');
-		expect(column3.getSeries().getIndex().toValues()).to.eql([5, 6]);
-		expect(column3.getSeries().toValues()).to.eql([11, 22]);
+		var series2 = dataFrame.getSeries('Value2');
+		expect(series2.getIndex().toValues()).to.eql([5, 6]);
+		expect(series2.toValues()).to.eql(['foo', 'bar']);
+		
+		var series3 = dataFrame.getSeries('Value3');
+		expect(series3.getIndex().toValues()).to.eql([5, 6]);
+		expect(series3.toValues()).to.eql([11, 22]);
 	});
 
 	it('can retreive column by index', function () {
@@ -244,17 +245,17 @@ describe('BaseDataFrame', function () {
 			],
 			[5, 6]
 		);
-		var column1 = dataFrame.getColumn(1);
-		expect(column1.getSeries().getIndex().toValues()).to.eql([5, 6]);
-		expect(column1.getSeries().toValues()).to.eql([100, 200]);
+		var series1 = dataFrame.getSeries(1);
+		expect(series1.getIndex().toValues()).to.eql([5, 6]);
+		expect(series1.toValues()).to.eql([100, 200]);
 		
-		var column2 = dataFrame.getColumn(2);
-		expect(column2.getSeries().getIndex().toValues()).to.eql([5, 6]);
-		expect(column2.getSeries().toValues()).to.eql(['foo', 'bar']);
+		var series2 = dataFrame.getSeries(2);
+		expect(series2.getIndex().toValues()).to.eql([5, 6]);
+		expect(series2.toValues()).to.eql(['foo', 'bar']);
 		
-		var column3 = dataFrame.getColumn(3);
-		expect(column3.getSeries().getIndex().toValues()).to.eql([5, 6]);
-		expect(column3.getSeries().toValues()).to.eql([11, 22]);
+		var series3 = dataFrame.getSeries(3);
+		expect(series3.getIndex().toValues()).to.eql([5, 6]);
+		expect(series3.toValues()).to.eql([11, 22]);
 	});
 
 	it('can retreive columns', function () {
@@ -612,7 +613,7 @@ describe('BaseDataFrame', function () {
 			],
 			[5, 6, 7, 8]
 		);
-		var modified = dataFrame.setColumn('Value4', [1, 2, 3, 4]);
+		var modified = dataFrame.setSeries('Value4', [1, 2, 3, 4]);
 		expect(modified.getIndex().toValues()).to.eql([5, 6, 7, 8]);
 		expect(modified.getColumnNames()).to.eql([
 			"Date",
@@ -641,7 +642,7 @@ describe('BaseDataFrame', function () {
 			],
 			[5, 6, 7, 8]
 		);
-		var modified = dataFrame.setColumn('Value1', [1, 2, 3, 4]);
+		var modified = dataFrame.setSeries('Value1', [1, 2, 3, 4]);
 		expect(modified.getIndex().toValues()).to.eql([5, 6, 7, 8]);
 		expect(modified.toValues()).to.eql([
 			[new Date(2011, 24, 2), 1, 'c', 3],
@@ -671,7 +672,7 @@ describe('BaseDataFrame', function () {
 			],
 			[5, 6, 7, 8]
 		);
-		var modified = dataFrame2.setColumn('Value4', dataFrame1.getColumn('Value2'));
+		var modified = dataFrame2.setSeries('Value4', dataFrame1.getSeries('Value2'));
 		expect(modified.getColumnNames()).to.eql([
 			"Date",
 			"Value1",
@@ -703,9 +704,8 @@ describe('BaseDataFrame', function () {
 		var newColumnName = "new column";
 		var newIndex = new dataForge.Index([0, 5, 2, 7]);
 		var newSeries = new dataForge.Series([4, 3, 2, 1], newIndex);
-		var newColumn = new dataForge.Column(newColumnName, newSeries);
-		var modified = dataFrame.setColumn(newColumnName, newColumn);
-		var mergedColumn = modified.getColumn(newColumnName);
+		var modified = dataFrame.setSeries(newColumnName, newSeries);
+		var mergedSeries = modified.getSeries(newColumnName);
 
 		expect(modified.getIndex().toValues()).to.eql([5, 6, 7, 8]);
 		expect(modified.getColumnNames()).to.eql([
@@ -722,8 +722,8 @@ describe('BaseDataFrame', function () {
 			[new Date(2015, 24, 2), 100, 'd', 4, undefined],
 		]);
 
-		expect(mergedColumn.getSeries().getIndex().toValues()).to.eql([5, 6, 7, 8]);
-		expect(mergedColumn.getSeries().toValues()).to.eql([3, undefined, 1, undefined]);
+		expect(mergedSeries.getIndex().toValues()).to.eql([5, 6, 7, 8]);
+		expect(mergedSeries.toValues()).to.eql([3, undefined, 1, undefined]);
 	});
 
 	it('can get subset of rows', function () {
@@ -1082,13 +1082,9 @@ describe('BaseDataFrame', function () {
 		var renamed = dataFrame.renameColumn(oldColumnName, newColumnName);
 
 		expect(dataFrame.getColumnNames()[1]).to.eql(oldColumnName);
-		expect(dataFrame.getColumn(oldColumnName).getName()).to.eql(oldColumnName);
-		expect(dataFrame.getColumn(1).getName()).to.eql(oldColumnName);
 
 		expect(renamed.getColumnNames()[1]).to.eql(newColumnName);
-		expect(renamed.getColumn(newColumnName)).to.be.ok;
-		expect(renamed.getColumn(newColumnName).getName()).to.eql(newColumnName);
-		expect(renamed.getColumn(1).getName()).to.eql(newColumnName);
+		expect(renamed.getSeries(newColumnName)).to.be.ok;
 	});
 
 	it('can rename column - specified by index', function () {
@@ -1107,13 +1103,9 @@ describe('BaseDataFrame', function () {
 		var renamed = dataFrame.renameColumn(1, newColumnName);
 
 		expect(dataFrame.getColumnNames()[1]).to.eql(oldColumnName);
-		expect(dataFrame.getColumn(oldColumnName).getName()).to.eql(oldColumnName);
-		expect(dataFrame.getColumn(1).getName()).to.eql(oldColumnName);
 
 		expect(renamed.getColumnNames()[1]).to.eql(newColumnName);
-		expect(renamed.getColumn(newColumnName)).to.be.ok;
-		expect(renamed.getColumn(newColumnName).getName()).to.eql(newColumnName);
-		expect(renamed.getColumn(1).getName()).to.eql(newColumnName);
+		expect(renamed.getSeries(newColumnName)).to.be.ok;
 	});
 
 	it('renaming non-existing column has no effect', function () {

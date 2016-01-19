@@ -28,14 +28,14 @@ describe('csv.integration', function () {
 			"2015-10-23, 300, bar, 23";
 
 		var dataFrame = dataForge.fromCSV(csv);
-		var series1 = dataFrame.getColumn('Value1');
-		expect(series1.getSeries().toValues()).to.eql([
+		var series1 = dataFrame.getSeries('Value1');
+		expect(series1.toValues()).to.eql([
 			'100',
 			'300',
 		]);
 		
-		var series2 = dataFrame.getColumn('Value2');
-		expect(series2.getSeries().toValues()).to.eql([
+		var series2 = dataFrame.getSeries('Value2');
+		expect(series2.toValues()).to.eql([
 			'foo',
 			'bar',			
 		]);
