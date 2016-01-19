@@ -4,7 +4,7 @@
 // Base class for data frame classes.
 //
 
-var LazyColumn = require('./lazycolumn');
+var Column = require('./column');
 var LazySeries = require('./lazyseries');
 var LazyIndex = require('./lazyindex');
 var ArrayIterator = require('./iterators/array');
@@ -388,23 +388,21 @@ BaseDataFrame.prototype.getColumn = function (columnNameOrIndex) {
 
 	var columnIndex = parseColumnNameOrIndex(self, columnNameOrIndex, true);
 
-	return new LazyColumn(
+	return new Column(
 		self.getColumnNames()[columnIndex],
-		function () {
-			return new LazySeries(
-				function () {
-					return new ArrayIterator(E.from(self.toValues())
-						.select(function (entry) {
-							return entry[columnIndex];
-						})
-						.toArray()
-					);					
-				},
-				function () {
-					return self.getIndex();
-				}
-			);
-		}
+		new LazySeries(
+			function () {
+				return new ArrayIterator(E.from(self.toValues())
+					.select(function (entry) {
+						return entry[columnIndex];
+					})
+					.toArray()
+				);					
+			},
+			function () {
+				return self.getIndex();
+			}
+		)
 	);
 };
 

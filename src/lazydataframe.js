@@ -4,7 +4,6 @@
 // Implements a lazily evaluated data frame.
 //
 
-var LazyColumn = require('./lazycolumn');
 var BaseDataFrame = require('./basedataframe');
 var LazyIndex = require('./lazyindex');
 var ArrayIterator = require('./iterators/array');

@@ -4,7 +4,6 @@
 // Implements a time series data structure.
 //
 
-var BaseColumn = require('./basecolumn');
 var LazyIndex = require('./lazyindex');
 var ArrayIterator = require('./iterators/array');
 
@@ -26,15 +25,13 @@ var Column = function (name, series) {
 	self._series = series;	
 };
 
-var parent = inherit(Column, BaseColumn);
-
 /**
  * Retreive the name of the column.
  */
 Column.prototype.getName = function () {
 	var self = this;
 	return self._name;
-}
+};
 
 /**
  * Retreive the time-series for the column.
@@ -42,6 +39,33 @@ Column.prototype.getName = function () {
 Column.prototype.getSeries = function () {
 	var self = this;
 	return self._series;
-}
+};
+
+/** 
+ * Format the column for display as a string.
+ */
+Column.prototype.toString = function () {
+
+	var self = this;
+	var Table = require('easy-table');
+
+	var index = self.getIndex().toValues();
+	var header = [self.getIndex().getName(), self.getName()];
+	var rows = E.from(self.getSeries().toValues())
+			.select(function (value, rowIndex) { 
+				return [index[rowIndex], value];
+			})
+			.toArray()
+
+	var t = new Table();
+	rows.forEach(function (row, rowIndex) {
+		row.forEach(function (cell, cellIndex) {
+			t.cell(header[cellIndex], cell);
+		});
+		t.newRow();
+	});
+
+	return t.toString();
+};
 
 module.exports = Column;
