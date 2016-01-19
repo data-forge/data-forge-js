@@ -19,7 +19,6 @@ var validateEnumerator = function (iterator) {
  *
  * Derives classes must implement:
  *
- *		getName - Get the name of theindex.
  *		getIterator - Get an iterator for iterating the values of the index.
  */
 var BaseIndex = function () {
@@ -38,7 +37,6 @@ BaseIndex.prototype.skip = function (numRows) {
 
 	var self = this;
 	return new LazyIndex(
-		self.getName(),
 		function () {
 			return new ArrayIterator(E.from(self.toValues()).skip(numRows).toArray());
 		}
@@ -57,7 +55,6 @@ BaseIndex.prototype.take = function (numRows) {
 
 	var self = this;
 	return new LazyIndex(
-		self.getName(),
 		function () {
 			return new ArrayIterator(E.from(self.toValues()).take(numRows).toArray());
 		}
@@ -80,7 +77,6 @@ BaseIndex.prototype.getRowsSubset = function (startIndex, endIndex) {
 	var LazyIndex = require('./lazyindex');
 
 	return new LazyIndex(
-		self.getName(),
 		function () {
 			return new ArrayIterator(
 				E.from(self.toValues())
@@ -118,7 +114,7 @@ BaseIndex.prototype.bake = function () {
 	var self = this;
 
 	var Index = require('./index');
-	return new Index(self.getName(), self.toValues());
+	return new Index(self.toValues());
 };
 
 module.exports = BaseIndex;

@@ -15,8 +15,7 @@ var inherit = require('./inherit');
 /**
  * Represents a time series.
  */
-var Series = function (name, values, index) {
-	assert.isString(name, "Expected 'name' parameter to Series constructor be a string.");
+var Series = function (values, index) {
 	assert.isArray(values, "Expected 'values' parameter to Series constructor be an array.");
 
 	if (index) {
@@ -24,11 +23,9 @@ var Series = function (name, values, index) {
 	}
 
 	var self = this;
-	self._name = name;
 	self._values = values;	
 	self._index = index || 
 		new LazyIndex(
-			"__index___",
 			function () {
 				return new ArrayIterator(E.range(0, values.length).toArray());
 			}
@@ -36,14 +33,6 @@ var Series = function (name, values, index) {
 };
 
 var parent = inherit(Series, BaseSeries);
-
-/**
- * Retreive the name of the series.
- */
-Series.prototype.getName = function () {
-	var self = this;
-	return self._name;
-}
 
 /**
  * Get an iterator for the iterating the values of the series.

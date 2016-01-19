@@ -16,7 +16,7 @@ describe('rolling window integration', function () {
 					return [i];
 				})
 				.toArray(),
-			index: new dataForge.Index("__test__", E.range(10, 12).toArray())
+			index: new dataForge.Index(E.range(10, 12).toArray())
 		});
 
 		var newColumn = dataFrame

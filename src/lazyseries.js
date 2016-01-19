@@ -13,10 +13,9 @@ var E = require('linq');
 var inherit = require('./inherit');
 
 /**
- * Represents a lazy-evaluated series in a data frame.
+ * Represents a lazy-evaluated time-series.
  */
-var LazySeries = function (name, enumeratorFn, indexFn) {
-	assert.isString(name, "Expected 'name' parameter to Series constructor be a string.");
+var LazySeries = function (enumeratorFn, indexFn) {
 	assert.isFunction(enumeratorFn, "Expected 'enumeratorFn' parameter to LazySeries constructor be a function.");
 
 	if (indexFn) {
@@ -24,13 +23,11 @@ var LazySeries = function (name, enumeratorFn, indexFn) {
 	}
 
 	var self = this;
-	self._name = name;
 	self._enumeratorFn = enumeratorFn;	
 	self._indexFn = indexFn || 
 		// Default to generated index range.
 		function () {
 			return new LazyIndex(
-				"__index__",
 				function () {
 					return new ArrayIterator(E.range(0, self.toValues().length).toArray());
 				}
@@ -39,14 +36,6 @@ var LazySeries = function (name, enumeratorFn, indexFn) {
 };
 
 var parent = inherit(LazySeries, BaseSeries);
-
-/**
- * Retreive the name of the series.
- */
-LazySeries.prototype.getName = function () {
-	var self = this;
-	return self._name;
-}
 
 /**
  * Get an iterator for the iterating the values of the series.

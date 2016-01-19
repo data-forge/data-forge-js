@@ -36,7 +36,7 @@ describe('BaseDataFrame', function () {
 		};
 		
 		dataFrame.getIndex = function () {
-			return new dataForge.Index("__test__", index);
+			return new dataForge.Index(index);
 		};
 		
 		return dataFrame;
@@ -700,7 +700,7 @@ describe('BaseDataFrame', function () {
 			[5, 6, 7, 8]
 		);
 		var newColumnName = "new column";
-		var newColumn = new dataForge.Column(newColumnName, [4, 3, 2, 1], new dataForge.Index("__test__", [0, 5, 2, 7]))
+		var newColumn = new dataForge.Column(newColumnName, [4, 3, 2, 1], new dataForge.Index([0, 5, 2, 7]))
 		var modified = dataFrame.setColumn(newColumnName, newColumn);
 		var mergedColumn = modified.getColumn(newColumnName);
 

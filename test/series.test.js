@@ -1,19 +1,19 @@
 'use strict';
 
 
-describe('Column', function () {
+describe('Series', function () {
 	
 	var dataForge = require('../index');
 	
 	var expect = require('chai').expect; 
 	
-	var initExampleColumn = function (index) {
-		return new dataForge.Column('some-column', [100, 200], index);
+	var initExampleSeries = function (index) {
+		return new dataForge.Series([100, 200], index);
 	};
 
 	it('default index is generated', function () {
 		
-		var column = initExampleColumn();		
+		var column = initExampleSeries();		
 		expect(column.getIndex().toValues()).to.eql([			
 			0,
 			1			
@@ -22,7 +22,7 @@ describe('Column', function () {
 
 	it('can get index', function () {
 		
-		var column = initExampleColumn(new dataForge.Index("__test__", [5, 6]));
+		var column = initExampleSeries(new dataForge.Index([5, 6]));
 		expect(column.getIndex().toValues()).to.eql([			
 			5,
 			6
@@ -31,7 +31,7 @@ describe('Column', function () {
 	
 	it('can get column values', function () {
 		
-		var column = initExampleColumn();		
+		var column = initExampleSeries();		
 		expect(column.toValues()).to.eql([			
 			100,
 			200			

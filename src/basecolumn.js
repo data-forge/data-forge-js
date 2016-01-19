@@ -130,7 +130,6 @@ BaseColumn.prototype.where = function (filterSelectorPredicate) {
 		function () {
 			var LazyIndex = require('./lazyindex');
 			return new LazyIndex(
-				self.getIndex().getName(),
 				function () {
 					return new ArrayIterator(E.from(executeLazyWhere())
 						.select(function (data) {
@@ -215,7 +214,6 @@ BaseColumn.prototype.selectMany = function (selector) {
 			var LazyIndex = require('./lazyindex');
 
 			return new LazyIndex(
-				self.getIndex().getName(),
 				function () {
 					lazyEvaluate();
 					var indexValues = E.from(newIndexAndNewValues)
@@ -311,7 +309,6 @@ var executeOrderBy = function (self, batch) {
 		function () {
 			var LazyIndex = require('./lazyindex');
 			return new LazyIndex(
-				self.getIndex().getName(),
 				function () {
 					return new ArrayIterator(E.from(executeLazySort())
 						.select(function (row) {
@@ -496,7 +493,6 @@ BaseColumn.prototype.rollingWindow = function (period, fn) {
 			var LazyIndex = require('./lazyindex');
 
 			return new LazyIndex(
-				self.getIndex().getName(),
 				function () {
 					return new ArrayIterator(E.from(newIndexAndValues)
 						.select(function (indexAndValue) {

@@ -219,7 +219,6 @@ BaseDataFrame.prototype.where = function (filterSelectorPredicate) {
 		},
 		function () {
 			return new LazyIndex(
-				self.getIndex().getName(),
 				function () {
 					return new ArrayIterator(E.from(executeLazyWhere())
 						.select(function (data) {
@@ -358,7 +357,6 @@ BaseDataFrame.prototype.selectMany = function (selector) {
 		},
 		function () {
 			return new LazyIndex(
-				self.getIndex().getName(),
 				function () {
 					lazyEvaluate();
 					var indexValues = E.from(newValues)
@@ -533,7 +531,6 @@ var executeOrderBy = function (self, batch) {
 		function () {
 			var LazyIndex = require('./lazyindex');
 			return new LazyIndex(
-				self.getIndex().getName(),
 				function () {
 					return new ArrayIterator(E.from(executeLazySort())
 						.select(function (row) {
@@ -842,7 +839,6 @@ BaseDataFrame.prototype.setIndex = function (columnNameOrIndex) {
 		},
 		function () {
 			return new LazyIndex(
-				self.getColumn(columnNameOrIndex).getName(),
 				function () {
 					return new ArrayIterator(self.getColumn(columnNameOrIndex).toValues());
 				}
@@ -868,7 +864,6 @@ BaseDataFrame.prototype.resetIndex = function () {
 		},
 		function () {
 			return new LazyIndex( //todo: broad-cast index
-				"__index___",
 				function () {
 					return new ArrayIterator(E.range(0, self.toValues().length).toArray());
 				}

@@ -40,7 +40,6 @@ BaseSeries.prototype.skip = function (numRows) {
 	
 	var self = this;
 	return new LazySeries(
-		self.getName(),
 		function () {
 			return new ArrayIterator(E
 				.from(self.toValues())
@@ -66,7 +65,6 @@ BaseSeries.prototype.take = function (numRows) {
 	
 	var self = this;
 	return new LazySeries(
-		self.getName(),
 		function () {
 			return new ArrayIterator(E
 				.from(self.toValues())
@@ -117,7 +115,6 @@ BaseSeries.prototype.where = function (filterSelectorPredicate) {
 
 	var LazySeries = require('./lazyseries');
 	return new LazySeries(
-		self.getName(),
 		function () {
 			return new ArrayIterator(E.from(executeLazyWhere())
 				.select(function (data) {
@@ -129,7 +126,6 @@ BaseSeries.prototype.where = function (filterSelectorPredicate) {
 		function () {
 			var LazyIndex = require('./lazyindex');
 			return new LazyIndex(
-				self.getIndex().getName(),
 				function () {
 					return new ArrayIterator(E.from(executeLazyWhere())
 						.select(function (data) {
@@ -155,7 +151,6 @@ BaseSeries.prototype.select = function (selector) {
 
 	var LazySeries = require('./lazyseries');
 	return new LazySeries(
-		self.getName(),
 		function () {
 			return new ArrayIterator(
 				E.from(self.toValues())
@@ -205,7 +200,6 @@ BaseSeries.prototype.selectMany = function (selector) {
 
 	var LazySeries = require('./lazyseries');
 	return new LazySeries(
-		self.getName(),
 		function () {
 			lazyEvaluate();
 			return new ArrayIterator(newValues);
@@ -214,7 +208,6 @@ BaseSeries.prototype.selectMany = function (selector) {
 			var LazyIndex = require('./lazyindex');
 
 			return new LazyIndex(
-				self.getIndex().getName(),
 				function () {
 					lazyEvaluate();
 					var indexValues = E.from(newIndexAndNewValues)
@@ -310,7 +303,6 @@ var executeOrderBy = function (self, batch) {
 		function () {
 			var LazyIndex = require('./lazyindex');
 			return new LazyIndex(
-				self.getIndex().getName(),
 				function () {
 					return new ArrayIterator(E.from(executeLazySort())
 						.select(function (row) {
@@ -433,7 +425,6 @@ BaseSeries.prototype.getRowsSubset = function (startIndex, endIndex) {
 	var LazySeries = require('./lazyseries'); // Require here to prevent circular ref.
 
 	return new LazySeries(
-		self.getName(),
 		function () {
 			return new ArrayIterator(
 				E.from(self.toValues())
@@ -467,8 +458,8 @@ BaseSeries.prototype.rollingWindow = function (period, fn) {
 	var values = self.toValues();
 
 	if (values.length == 0) {
-		var series = require('./series');
-		return new series(self.getName(), []);
+		var Series = require('./series');
+		return new Series([]);
 	}
 
 	var newIndexAndValues = E.range(0, values.length-period+1)
@@ -482,7 +473,6 @@ BaseSeries.prototype.rollingWindow = function (period, fn) {
 	var LazySeries = require('./lazyseries');
 
 	return new LazySeries(
-		self.getName(), 
 		function () {
 			return new ArrayIterator(E.from(newIndexAndValues)
 				.select(function (indexAndValue) {
@@ -495,7 +485,6 @@ BaseSeries.prototype.rollingWindow = function (period, fn) {
 			var LazyIndex = require('./lazyindex');
 
 			return new LazyIndex(
-				self.getIndex().getName(),
 				function () {
 					return new ArrayIterator(E.from(newIndexAndValues)
 						.select(function (indexAndValue) {
@@ -522,7 +511,6 @@ BaseSeries.prototype.reindex = function (newIndex) {
 	var LazySeries = require('./lazyseries');
 
 	return new LazySeries(
-		self.getName(),
 		function () {
 			//
 			// Generate a map to relate an index value to a series value.
@@ -574,7 +562,7 @@ BaseSeries.prototype.toString = function () {
 	var Table = require('easy-table');
 
 	var index = self.getIndex().toValues();
-	var header = [self.getIndex().getName(), self.getName()];
+	var header = ["__index__", "__value__"];
 	var rows = E.from(self.toValues())
 			.select(function (value, rowIndex) { 
 				return [index[rowIndex], value];
@@ -617,7 +605,7 @@ BaseSeries.prototype.parseInts = function () {
 			return undefined;
 		}
 		else {
-			assert.isString(value, "Called parseInt on series '" + self.getName() + "', expected all values in the series to be strings, instead found a '" + typeof(value) + "' at index " + valueIndex);
+			assert.isString(value, "Called parseInt on series, expected all values in the series to be strings, instead found a '" + typeof(value) + "' at index " + valueIndex);
 
 			if (value.length === 0) {
 				return undefined;
@@ -639,7 +627,7 @@ BaseSeries.prototype.parseFloats = function () {
 			return undefined;
 		}
 		else {
-			assert.isString(value, "Called parseInt on series '" + self.getName() + "', expected all values in the series to be strings, instead found a '" + typeof(value) + "' at index " + valueIndex);
+			assert.isString(value, "Called parseInt on series, expected all values in the series to be strings, instead found a '" + typeof(value) + "' at index " + valueIndex);
 
 			if (value.length === 0) {
 				return undefined;
@@ -661,7 +649,7 @@ BaseSeries.prototype.parseDates = function () {
 			return undefined;
 		}
 		else {
-			assert.isString(value, "Called parseInt on series '" + self.getName() + "', expected all values in the series to be strings, instead found a '" + typeof(value) + "' at index " + valueIndex);
+			assert.isString(value, "Called parseInt on series, expected all values in the series to be strings, instead found a '" + typeof(value) + "' at index " + valueIndex);
 
 			if (value.length === 0) {
 				return undefined;
@@ -837,8 +825,8 @@ BaseSeries.prototype.bake = function () {
 
 	var self = this;
 
-	var series = require('./series');
-	return new series(self.getName(), self.toValues(), self.getIndex().bake());
+	var Series = require('./series');
+	return new Series(self.toValues(), self.getIndex().bake());
 };
 
 module.exports = BaseSeries;

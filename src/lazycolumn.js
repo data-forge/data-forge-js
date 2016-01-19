@@ -30,7 +30,6 @@ var LazyColumn = function (name, enumeratorFn, indexFn) {
 		// Default to generated index range.
 		function () {
 			return new LazyIndex(
-				"__index__",
 				function () {
 					return new ArrayIterator(E.range(0, self.toValues().length).toArray());
 				}

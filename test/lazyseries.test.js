@@ -12,7 +12,7 @@ describe('LazySeries', function () {
 		var valuesFn = function () {
 			return new ArrayIterator([100, 200]);
 		};
-		return new dataForge.LazySeries('some-series', valuesFn, indexFn);
+		return new dataForge.LazySeries(valuesFn, indexFn);
 	};
 	
 	it('default index is generated', function () {
@@ -28,7 +28,7 @@ describe('LazySeries', function () {
 		
 		var series = initExampleSeries(
 			function () {
-				return new dataForge.Index("__test__", [5, 6])
+				return new dataForge.Index([5, 6])
 			}
 		);
 		expect(series.getIndex().toValues()).to.eql([			

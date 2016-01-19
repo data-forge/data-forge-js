@@ -22,7 +22,7 @@ describe('Column', function () {
 
 	it('can get index', function () {
 		
-		var column = initExampleColumn(new dataForge.Index("__test__", [5, 6]));
+		var column = initExampleColumn(new dataForge.Index([5, 6]));
 		expect(column.getIndex().toValues()).to.eql([			
 			5,
 			6

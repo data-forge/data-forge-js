@@ -28,7 +28,6 @@ var Column = function (name, values, index) {
 	self._values = values;	
 	self._index = index || 
 		new LazyIndex(
-			"__index___",
 			function () {
 				return new ArrayIterator(E.range(0, values.length).toArray());
 			}

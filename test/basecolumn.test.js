@@ -23,7 +23,7 @@ describe('BaseColumn', function () {
 			return new ArrayIterator(values);
 		};
 		column.getIndex = function () {
-			return new dataForge.Index("__test__", index);
+			return new dataForge.Index(index);
 		};
 		return column;		
 	};
@@ -311,7 +311,7 @@ describe('BaseColumn', function () {
 	it('can reindex column', function () {
 
 		var column = initColumn([0, 1, 2, 3], [100, 300, 200, 5]);
-		var newIndex = new dataForge.Index("__test__", [3, 10, 1, 32])
+		var newIndex = new dataForge.Index([3, 10, 1, 32])
 
 		var reindexed = column.reindex(newIndex);
 		expect(reindexed.getIndex().toValues()).to.eql([3, 10, 1, 32]);
@@ -321,7 +321,7 @@ describe('BaseColumn', function () {
 	it('reindexing a column with duplicate indicies throws', function () {
 
 		var column = initColumn([0, 1, 1, 3], [100, 300, 200, 5]);
-		var newIndex = new dataForge.Index("__test__", [3, 10, 1, 32])
+		var newIndex = new dataForge.Index([3, 10, 1, 32])
 
 		var reindexed = column.reindex(newIndex);
 

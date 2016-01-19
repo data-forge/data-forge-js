@@ -16,14 +16,11 @@ describe('BaseSeries', function () {
 		assert.isArray(values);
 
 		var series = new BaseSeries();
-		series.getName = function () {
-			return 'some-series';
-		};
 		series.getIterator = function () {
 			return new ArrayIterator(values);
 		};
 		series.getIndex = function () {
-			return new dataForge.Index("__test__", index);
+			return new dataForge.Index(index);
 		};
 		return series;		
 	};
@@ -311,7 +308,7 @@ describe('BaseSeries', function () {
 	it('can reindex series', function () {
 
 		var series = initSeries([0, 1, 2, 3], [100, 300, 200, 5]);
-		var newIndex = new dataForge.Index("__test__", [3, 10, 1, 32])
+		var newIndex = new dataForge.Index([3, 10, 1, 32])
 
 		var reindexed = series.reindex(newIndex);
 		expect(reindexed.getIndex().toValues()).to.eql([3, 10, 1, 32]);
@@ -321,7 +318,7 @@ describe('BaseSeries', function () {
 	it('reindexing a series with duplicate indicies throws', function () {
 
 		var series = initSeries([0, 1, 1, 3], [100, 300, 200, 5]);
-		var newIndex = new dataForge.Index("__test__", [3, 10, 1, 32])
+		var newIndex = new dataForge.Index([3, 10, 1, 32])
 
 		var reindexed = series.reindex(newIndex);
 

@@ -95,7 +95,6 @@ var DataFrame = function (config) {
 	self._values = rows || [];
 	self._index = (config && config.index) || 
 		new LazyIndex(
-			"__index___",
 			function () {
 				return new ArrayIterator(E.range(0, self._values.length).toArray());
 			}
