@@ -399,9 +399,7 @@ BaseDataFrame.prototype.getColumn = function (columnNameOrIndex) {
 					.toArray()
 				);					
 			},
-			function () {
-				return self.getIndex();
-			}
+			self.getIndex()
 		)
 	);
 };

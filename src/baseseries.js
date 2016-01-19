@@ -47,9 +47,7 @@ BaseSeries.prototype.skip = function (numRows) {
 				.toArray()
 			);
 		},
-		function () {
-			return self.getIndex().skip(numRows);
-		}
+		self.getIndex().skip(numRows)
 	); 	
 };
 
@@ -72,9 +70,7 @@ BaseSeries.prototype.take = function (numRows) {
 				.toArray()
 			);
 		},
-		function () {
-			return self.getIndex().take(numRows);
-		}
+		self.getIndex().take(numRows)
 	); 	
 };
 
@@ -114,6 +110,8 @@ BaseSeries.prototype.where = function (filterSelectorPredicate) {
 
 
 	var LazySeries = require('./lazyseries');
+	var LazyIndex = require('./lazyindex');
+
 	return new LazySeries(
 		function () {
 			return new ArrayIterator(E.from(executeLazyWhere())
@@ -123,19 +121,16 @@ BaseSeries.prototype.where = function (filterSelectorPredicate) {
 				.toArray()
 			);
 		},
-		function () {
-			var LazyIndex = require('./lazyindex');
-			return new LazyIndex(
-				function () {
-					return new ArrayIterator(E.from(executeLazyWhere())
-						.select(function (data) {
-							return data[0]; // Index
-						})
-						.toArray()
-					);
-				}
-			);
-		}
+		new LazyIndex(
+			function () {
+				return new ArrayIterator(E.from(executeLazyWhere())
+					.select(function (data) {
+						return data[0]; // Index
+					})
+					.toArray()
+				);
+			}
+		)
 	); 	
 };
 
@@ -160,9 +155,7 @@ BaseSeries.prototype.select = function (selector) {
 					.toArray()
 			);
 		},
-		function () {
-			return self.getIndex();
-		}
+		self.getIndex()
 	); 	
 };
 
@@ -199,32 +192,30 @@ BaseSeries.prototype.selectMany = function (selector) {
 	};
 
 	var LazySeries = require('./lazyseries');
+	var LazyIndex = require('./lazyindex');
+
 	return new LazySeries(
 		function () {
 			lazyEvaluate();
 			return new ArrayIterator(newValues);
 		},
-		function () {
-			var LazyIndex = require('./lazyindex');
-
-			return new LazyIndex(
-				function () {
-					lazyEvaluate();
-					var indexValues = E.from(newIndexAndNewValues)
-						.selectMany(function (data) {
-							var index = data[0];
-							var values = data[1];
-							return E.range(0, values.length)
-								.select(function (_) {
-									return index;
-								})
-								.toArray();
-						})
-						.toArray();
-					return new ArrayIterator(indexValues);
-				}
-			);
-		}
+		new LazyIndex(
+			function () {
+				lazyEvaluate();
+				var indexValues = E.from(newIndexAndNewValues)
+					.selectMany(function (data) {
+						var index = data[0];
+						var values = data[1];
+						return E.range(0, values.length)
+							.select(function (_) {
+								return index;
+							})
+							.toArray();
+					})
+					.toArray();
+				return new ArrayIterator(indexValues);
+			}
+		)
 	); 	
 };
 
@@ -433,9 +424,7 @@ BaseSeries.prototype.getRowsSubset = function (startIndex, endIndex) {
 					.toArray()
 			);
 		},
-		function () {
-			return self.getIndex().getRowsSubset(startIndex, endIndex);
-		}
+		self.getIndex().getRowsSubset(startIndex, endIndex)
 	);
 };
 
@@ -471,6 +460,7 @@ BaseSeries.prototype.rollingWindow = function (period, fn) {
 		.toArray();
 
 	var LazySeries = require('./lazyseries');
+	var LazyIndex = require('./lazyindex');
 
 	return new LazySeries(
 		function () {
@@ -481,20 +471,16 @@ BaseSeries.prototype.rollingWindow = function (period, fn) {
 				.toArray()
 			);
 		},
-		function () {
-			var LazyIndex = require('./lazyindex');
-
-			return new LazyIndex(
-				function () {
-					return new ArrayIterator(E.from(newIndexAndValues)
-						.select(function (indexAndValue) {
-							return indexAndValue[0];
-						})
-						.toArray()
-					);
-				}
-			);
-		}
+		new LazyIndex(
+			function () {
+				return new ArrayIterator(E.from(newIndexAndValues)
+					.select(function (indexAndValue) {
+						return indexAndValue[0];
+					})
+					.toArray()
+				);
+			}
+		)
 	);
 };
 
@@ -547,9 +533,7 @@ BaseSeries.prototype.reindex = function (newIndex) {
 				.toArray()
 			);
 		},
-		function () {
-			return newIndex;
-		}
+		newIndex
 	);
 };
 

@@ -15,24 +15,22 @@ var inherit = require('./inherit');
 /**
  * Represents a lazy-evaluated time-series.
  */
-var LazySeries = function (enumeratorFn, indexFn) {
+var LazySeries = function (enumeratorFn, index) {
 	assert.isFunction(enumeratorFn, "Expected 'enumeratorFn' parameter to LazySeries constructor be a function.");
 
-	if (indexFn) {
-		assert.isFunction(indexFn, "Expected 'indexFn' parameter to LazySeries constructor to be a function.");
+	if (index) {
+		assert.isObject(index, "Expected 'index' parameter to LazySeries constructor to be an index object.");
 	}
 
 	var self = this;
 	self._enumeratorFn = enumeratorFn;	
-	self._indexFn = indexFn || 
+	self._index = index || 
 		// Default to generated index range.
-		function () {
-			return new LazyIndex(
-				function () {
-					return new ArrayIterator(E.range(0, self.toValues().length).toArray());
-				}
-			);
-		};
+		new LazyIndex(
+			function () {
+				return new ArrayIterator(E.range(0, self.toValues().length).toArray()); //todo: index should use the enumerator.
+			}
+		);
 };
 
 var parent = inherit(LazySeries, BaseSeries);
@@ -50,7 +48,7 @@ LazySeries.prototype.getIterator = function () {
  */
 LazySeries.prototype.getIndex = function () {
 	var self = this;
-	return self._indexFn();
+	return self._index;
 };
 
 module.exports = LazySeries;

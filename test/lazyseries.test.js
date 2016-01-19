@@ -8,11 +8,11 @@ describe('LazySeries', function () {
 	
 	var expect = require('chai').expect; 
 	
-	var initExampleSeries = function (indexFn) {
+	var initExampleSeries = function (index) {
 		var valuesFn = function () {
 			return new ArrayIterator([100, 200]);
 		};
-		return new dataForge.LazySeries(valuesFn, indexFn);
+		return new dataForge.LazySeries(valuesFn, index);
 	};
 	
 	it('default index is generated', function () {
@@ -26,11 +26,7 @@ describe('LazySeries', function () {
 
 	it('can get index', function () {
 		
-		var series = initExampleSeries(
-			function () {
-				return new dataForge.Index([5, 6])
-			}
-		);
+		var series = initExampleSeries(new dataForge.Index([5, 6]));
 		expect(series.getIndex().toValues()).to.eql([			
 			5,
 			6
