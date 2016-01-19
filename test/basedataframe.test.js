@@ -576,6 +576,30 @@ describe('BaseDataFrame', function () {
 		]);
 	});
 
+	it('dropping non-existing column has no effect', function () {
+		
+		var columnNames = [ "Date", "Value1", "Value2", "Value3" ];
+		var dataFrame = initDataFrame(
+			columnNames,
+			[
+				[new Date(2011, 24, 2), 300, 'c', 3],
+				[new Date(1975, 24, 2), 200, 'b', 1],
+				[new Date(2013, 24, 2), 20, 'c', 22],
+				[new Date(2015, 24, 2), 100, 'd', 4],
+			],
+			[5, 6, 7, 8]
+		);
+		var modified = dataFrame.dropColumn('non-existing-column');
+		expect(modified.getIndex().toValues()).to.eql([5, 6, 7, 8]);
+		expect(modified.getColumnNames()).to.eql(columnNames);
+		expect(modified.toValues()).to.eql([
+				[new Date(2011, 24, 2), 300, 'c', 3],
+				[new Date(1975, 24, 2), 200, 'b', 1],
+				[new Date(2013, 24, 2), 20, 'c', 22],
+				[new Date(2015, 24, 2), 100, 'd', 4],
+		]);
+	});
+
 	it('can add column', function () {
 		
 		var dataFrame = initDataFrame(

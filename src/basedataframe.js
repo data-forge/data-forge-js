@@ -667,34 +667,20 @@ BaseDataFrame.prototype.dropColumn = function (columnOrColumns) {
 	}
 
 	var self = this;
-
-	var cachedColumnIndices = null;
-
-	var lazyGenerateColumnIndices = function () {
-
-		if (cachedColumnIndices) {
-			return cachedColumnIndices;
-		}
-
-		cachedColumnIndices = E.from(columnOrColumns)
-			.select(function (columnName)  {
-				assert.isString(columnName);
-				var columnIndex = self.getColumnIndex(columnName);
-				if (columnIndex < 0) {
-					throw new Error("In call to 'dropColumn' failed to find column '" + columnName + "'.");
-				}
-				return columnIndex;
-			})
-			.toArray();
-		return cachedColumnIndices;
-	};
-
+	var columnIndices = E.from(columnOrColumns)
+		.select(function (columnName, index)  {
+			assert.isString(columnName, "Expected column names specifed in parameter 'columnOrColumns' to be string values. Index " + index + " is a " + typeof(columnName));
+			return self.getColumnIndex(columnName);
+		})
+		.where(function (columnIndex) {
+			return columnIndex >= 0;
+		})
+		.toArray();
 
 	var LazyDataFrame = require('./lazydataframe');
 
 	return new LazyDataFrame(
 		function () {
-			var columnIndices = lazyGenerateColumnIndices();
 			return E.from(self.getColumnNames())
 				.where(function (columnName, columnIndex) {
 					return columnIndices.indexOf(columnIndex) < 0;
@@ -702,7 +688,6 @@ BaseDataFrame.prototype.dropColumn = function (columnOrColumns) {
 				.toArray();
 		},
 		function () {
-			var columnIndices = lazyGenerateColumnIndices();
 			return new ArrayIterator(
 				E.from(self.toValues())
 					.select(function (row) {
