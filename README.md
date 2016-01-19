@@ -32,6 +32,7 @@ See here for [generated API docs](./docs/api.md) that are taking shape.
 - [Key Concepts](#key-concepts)
   - [Data Frame](#data-frame)
   - [Row](#row)
+  - [Series](#series)
   - [Column](#column)
   - [Index](#index)
   - [Lazy Evaluation](#lazy-evaluation)
@@ -40,10 +41,15 @@ See here for [generated API docs](./docs/api.md) that are taking shape.
   - [Creating a Data Frame](#creating-a-data-frame)
   - [Setting an index](#setting-an-index)
 - [Working with data](#working-with-data)
-  - [Enumerating rows](#enumerating-rows)
-  - [Enumerating columns](#enumerating-columns)
-  - [Enumerating the index](#enumerating-the-index)
-  - [Direct column access](#direct-column-access)
+  - [CSV](#csv)
+  - [JSON](#json)
+  - [XML](#xml)
+  - [YAML](#yaml)
+  - [Reading and writing files in Node.js](#reading-and-writing-files-in-nodejs)
+  - [Extracting rows from a data frame](#extracting-rows-from-a-data-frame)
+  - [Extracting columns and series from a data frame](#extracting-columns-and-series-from-a-data-frame)
+  - [Enumerating a series](#enumerating-a-series)
+  - [Enumerating an index](#enumerating-an-index)
   - [Adding a column](#adding-a-column)
   - [Replacing a column](#replacing-a-column)
   - [Removing a column](#removing-a-column)
@@ -53,20 +59,23 @@ See here for [generated API docs](./docs/api.md) that are taking shape.
   - [Visual output](#visual-output)
 - [Data transformation](#data-transformation)
   - [Data frame transformation](#data-frame-transformation)
-  - [Column transformation](#column-transformation)
-  - [Data frame and column filtering](#data-frame-and-column-filtering)
+  - [Series transformation](#series-transformation)
+  - [Data frame and series filtering](#data-frame-and-series-filtering)
   - [LINQ functions](#linq-functions)
-  - [Data frame aggregation](#data-frame-aggregation)
-  - [Data frame window](#data-frame-window)
-- [Examples](#examples)
+  - [Aggregation](#aggregation)
+  - [Rolling window](#rolling-window)
+- [Node.js examples](#nodejs-examples)
   - [Working with CSV files](#working-with-csv-files)
   - [Working with JSON files](#working-with-json-files)
   - [Working a massive CSV file](#working-a-massive-csv-file)
   - [Working with a MongoDB collection](#working-with-a-mongodb-collection)
   - [Working with a massive MongoDB collection](#working-with-a-massive-mongodb-collection)
   - [Working with HTTP](#working-with-http)
+- [Browser examples](#browser-examples)
   - [Working with HTTP in the browser](#working-with-http-in-the-browser)
   - [Working with HTTP in AngularJS](#working-with-http-in-angularjs)
+  - [Visualisation with Flot](#visualisation-with-flot)
+  - [Visualisation with Highstock](#visualisation-with-highstock)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -185,9 +194,15 @@ This is the *main* concept. A matrix of data structured as rows and columns. Can
 
 A single row of data in a *data frame*. Contains a slice of data across columns. Has an implicit or explicit index. An JavaScript object or an array of values is associated with each row.
 
+## Series
+
+A sequence of indexed values. These are often time-series, where the values are indexed by date/time.
+
+All values in a series are generally expected to have the same type, although this is not a requirement of *data-forge-js*.
+
 ## Column
 
-A single *named* column of data in a *data frame*. Contains a slice of data through all rows. A sequence of values is associated with a column. All values in a column are generally expected to have the same type, although this is not a requirement of *data-forge-js*. 
+A single *named* series of data in a *data frame*. Each column is simple a series with a name, the values of the series are the values of the column. A column is a slice of data through all rows. 
 
 ## Index 
 
@@ -195,11 +210,13 @@ Used to index a data frame for operations such as *merge*. If not specified an i
 
 ## Lazy Evaluation
 
-Data frames and columns are only fully evaluated when necessary. Operations that are applied to data frames and columns are queued up and only executed when the full data is required, for example when serializing to csv or json (`toCSV` or `toJSON`) or when baking to values (`toValues` or `toObjects`). A data frame or column can be forcibly evaluated by calling the `bake` function. 
+Data frames, series and index are only fully evaluated when necessary. Operations are queued up and only fully evaluated as needed and when required, for example when serializing to csv or json (`toCSV` or `toJSON`) or when baking to values (`toValues` or `toObjects`). 
+
+A data frame, series or index can be forcibly evaluated by calling the `bake` function. 
 
 ## Iterator
 
-An object that iterates the rows of a data frame or column. Iterators allow lazy evaluation (row by row evaluation) of data frames and columns. This is the same concept as an [iterator in JavaScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Iterators_and_Generators) or an [enumerator in C#](https://msdn.microsoft.com/en-us/library/system.collections.ienumerator(v=vs.110).aspx).
+An object that iterates the rows of a data frame, series or index. Iterators allow lazy evaluation (row by row evaluation) of data frames, series and index. This is the same concept as an [iterator in JavaScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Iterators_and_Generators) or an [enumerator in C#](https://msdn.microsoft.com/en-us/library/system.collections.ienumerator(v=vs.110).aspx).
 
 # Basic Usage 
 
@@ -302,11 +319,11 @@ The *from* / *to* functions can be used in combination with Node.js `fs` functio
 
 See the [examples section](#examples) for examples of loading various data sources and formats.
 
-## Enumerating rows
+## Extracting rows from a data frame
 
 Rows can be extracted from a data frame in several ways.
 
-First we can lazily iterate using an iterator. This is the lowest-level method of accessing the rows of a data frame. Using iterators allows data frames and columns to be lazily evaluated (same as with LINQ in C#).
+First we can lazily iterate using an iterator. This is the lowest-level method of accessing the rows of a data frame. Using iterators allows data frames and series to be lazily evaluated (same as with LINQ in C#).
 
 	var iterator = dataFrame.getIterator();
 	while (iterator.moveNext()) {
@@ -328,7 +345,7 @@ Create a new data frame from a subset of rows:
 	var endIndex = ... // Ending row index to include in subset.
 	var rowSubset = dataFrame.getRowsSubset(startIndex, endIndex);
 
-## Enumerating columns
+## Extracting columns and series from a data frame
 
 Get the names of the columns:
 
@@ -338,24 +355,47 @@ Get an array of all columns:
 
 	var arrayOfColumns = dataFrame.getColumns();
 
-Use an iterator to lazily iterate an individual column:
+Get a series from a column:
 
-	var iterator = someColumn.getIterator();
-	while (iterator.moveNext()) {
-		var row = iterator.getCurrent();
-		// do something with the row.
-	}
+	var series = column.getSeries();
 
-Slice out an array of values for an individual column. Note that this could be an expensive operation. 
-Lazy evaluation of the entire data frame will be forced to complete.  
+Get the series for a column by name:
 
-	var arrayOfValues = someColumn.toValues();
+	var series = dataFrame.getSeries('some-series'); 
+
+Get the series for a column by index:
+
+	var series = dataFrame.getSeries(5); 
 
 Create a new data frame from a sub-set of columns:
 
 	var columnSubset = df.getColumnsSubset(["Some-Column", "Some-Other-Column"]);
 
-## Enumerating the index
+## Enumerating a series
+
+Use an iterator to lazily iterate a series:
+
+	var iterator = someSeries.getIterator();
+	while (iterator.moveNext()) {
+		var row = iterator.getCurrent();
+		// do something with the row.
+	}
+
+
+Extract out an array of values from a series. Note that this could be an expensive operation. 
+Lazy evaluation of the entire data frame may be forced to complete.  
+
+	var arrayOfValues = someSeries.toValues();
+
+## Enumerating an index
+
+Getting the index from a data frame:
+
+	var index = dataFrame.getIndex();
+
+Getting the index from a series:
+
+	var index = someSeries.getIndex();
 
 The index can also be lazily iterated:
 
@@ -367,29 +407,19 @@ The index can also be lazily iterated:
 
 Retrieve an array of an index's values:
 
-	var arrayOfValues = dataFrame.getIndex().toValues();
-
-## Direct column access
-
-Individual columns can be extracted by name:
-
-	var column = dataFrame.getColumn("some-column");
-
-Or by zero-based index:
-
-	var column = dataFrame.getColumn(5);
+	var arrayOfValues = index.toValues();
 
 ## Adding a column
 
 New columns can be added to a data frame. This doesn't change the original data frame, it generates a new data frame that contains the additional column.
 
-	var newDf = df.setColumn("Some-New-Column", newColumnObject); 
+	var newDf = df.setSeries("Some-New-Column", someNewSeries); 
 
 ## Replacing a column
 
 `setColumn` can also replace an existing column:
 
-	var newDf = df.setColumn("Some-Existing-Column", newColumnObject);
+	var newDf = df.setSeries("Some-Existing-Column", someNewSeries);
 
 Again note that it is only the new data frame that includes the modified column.
 
@@ -424,7 +454,7 @@ In order to understand the data we are working with we must explore it, understa
 
 ## Console output
 
-Data frame, index and column all provide a `toString` function that can be used to dump data to the console in a readable format.
+Data frame, index and series all provide a `toString` function that can be used to dump data to the console in a readable format.
 
 Use the LINQ functions `skip` and `take` to preview a subset of the data (more on LINQ functions soon):
 
@@ -486,23 +516,23 @@ The more advanced [`selectMany`](http://www.dotnetperls.com/selectmany) function
 
 Note: Data frames are immutable, the original data frame remains unmodified.
 
-## Column transformation
+## Series transformation
 
-Columns can also be transformed using `select`:
+Series can be transformed using `select`:
 
-	var oldColumn = df.getColumn("Some-Column");
-	var newColumn = oldColumn
+	var oldSeries = df.getSeries("Some-Column");
+	var newSeries = oldSeries
 		.select(function (value) {
 			return transform(value); 	// <-- Apply a transformation to each value in the column.
 		});
 
-The source index is preserved to the transformed column.
+The source index is preserved to the transformed series.
 
-Note: Columns are immutable, the original column is unmodified.
+Note: Series are immutable, the original series is unmodified.
 
-## Data frame and column filtering
+## Data frame and series filtering
 
-Data frames and columns can be filtered using the [LINQ](https://en.wikipedia.org/wiki/Language_Integrated_Query)-style [`where`](http://www.dotnetperls.com/where) function:
+Data frames and series can be filtered using the [LINQ](https://en.wikipedia.org/wiki/Language_Integrated_Query)-style [`where`](http://www.dotnetperls.com/where) function:
 
 	var newDf = df
 		.where(function (row) {
@@ -521,15 +551,14 @@ todo: Coming soon
 
 ## Rolling window
 
-The rolling window function allows you to consider only a window of rows at a time. The window rolls across a column and, based on the results of your function, produces a new column with summarized or aggregated data. 
+The rolling window function allows you to consider only a window of rows at a time. The window rolls across a series and, based on the results of your function, produces a new series with summarized or aggregated data. 
 
-The `percentChange` function that is included is probably the simplest example use of `rollingWindow`. It computes a new column with the percentage increase of each value in the source column.
+The `percentChange` function that is included is probably the simplest example use of `rollingWindow`. It computes a new series with the percentage increase of each value in the source series.
 
 The implementation of `percentChange` looks a bit like this:
     
 	var windowSize = 2;
-	var pctChangeColumn = sourceColumn
-		.rollingWindow(windowSize, 
+	var pctChangeSeries = sourceSeries.rollingWindow(windowSize, 
 			function (indices, values) {
 				var amountChange = values[1] - values[0]; // Compute amount of change.
 				var pctChange = amountChange / values[0]; // Compute % change.
@@ -544,9 +573,9 @@ Now consider an example that requires a variable window size. Here is some code 
 	var Enumerable = require('linq');
 
 	var smaPeriod = ... variable window size ...
- 	var smaColumn = sourceColumn
-		.rollingWindow(smaPeriod, function (indices, values) {
-        	return [indices[indices.length-1], Enumerable.from(values).sum() / period];
+ 	var smSeries = sourceSeries.rollingWindow(smaPeriod, 
+			function (indices, values) {
+	    		return [indices[indices.length-1], Enumerable.from(values).sum() / period];
 	    	}
 		);	
 
