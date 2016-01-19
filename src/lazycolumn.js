@@ -15,26 +15,15 @@ var inherit = require('./inherit');
 /**
  * Represents a lazy-evaluated column in a data frame.
  */
-var LazyColumn = function (name, enumeratorFn, indexFn) {
-	assert.isString(name, "Expected 'name' parameter to Column constructor be a string.");
-	assert.isFunction(enumeratorFn, "Expected 'enumeratorFn' parameter to LazyColumn constructor be a function.");
+var LazyColumn = function (name, seriesFn) {
 
-	if (indexFn) {
-		assert.isFunction(indexFn, "Expected 'indexFn' parameter to LazyColumn constructor to be a function.");
-	}
+	assert(arguments.length == 2, "Expected 2 arguments to LazyColumn constructor");	
+	assert.isString(name, "Expected 'name' parameter to LazyColumn constructor be a string.");
+	assert.isFunction(seriesFn, "Expected 'seriesFn' parameter to LazyColumn constructor be a function.");
 
 	var self = this;
 	self._name = name;
-	self._enumeratorFn = enumeratorFn;	
-	self._indexFn = indexFn || 
-		// Default to generated index range.
-		function () {
-			return new LazyIndex(
-				function () {
-					return new ArrayIterator(E.range(0, self.toValues().length).toArray());
-				}
-			);
-		};
+	self._seriesFn = seriesFn;
 };
 
 var parent = inherit(LazyColumn, BaseColumn);
@@ -48,19 +37,11 @@ LazyColumn.prototype.getName = function () {
 }
 
 /**
- * Get an iterator for the iterating the values of the column.
+ * Retreive the time-series for the column.
  */
-LazyColumn.prototype.getIterator = function () {
+LazyColumn.prototype.getSeries = function () {
 	var self = this;
-	return self._enumeratorFn();
-};
-
-/*
- * Retreive the index for this column.
- */
-LazyColumn.prototype.getIndex = function () {
-	var self = this;
-	return self._indexFn();
-};
+	return self._seriesFn();
+}
 
 module.exports = LazyColumn;

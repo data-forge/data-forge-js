@@ -9,29 +9,36 @@ describe('LazyColumn', function () {
 	var expect = require('chai').expect; 
 	
 	var initExampleColumn = function (indexFn) {
-		var valuesFn = function () {
-			return new ArrayIterator([100, 200]);
+		
+		var seriesFn = function () {
+			var valuesFn = function () {
+				return new ArrayIterator([100, 200]);
+			};
+
+			return new dataForge.LazySeries(valuesFn, indexFn);
 		};
-		return new dataForge.LazyColumn('some-column', valuesFn, indexFn);
+
+		return new dataForge.LazyColumn('some-column', seriesFn);
 	};
 	
 	it('default index is generated', function () {
 		
 		var column = initExampleColumn();		
-		expect(column.getIndex().toValues()).to.eql([			
+		expect(column.getSeries().getIndex().toValues()).to.eql([			
 			0,
 			1			
 		]);		
 	});
 
-	it('can get index', function () {
+	it('can get series index', function () {
 		
 		var column = initExampleColumn(
 			function () {
 				return new dataForge.Index([5, 6])
 			}
 		);
-		expect(column.getIndex().toValues()).to.eql([			
+
+		expect(column.getSeries().getIndex().toValues()).to.eql([			
 			5,
 			6
 		]);		
@@ -39,8 +46,8 @@ describe('LazyColumn', function () {
 
 	it('can get series values', function () {
 		
-		var series = initExampleColumn();		
-		expect(series.toValues()).to.eql([			
+		var column = initExampleColumn();		
+		expect(column.getSeries().toValues()).to.eql([			
 			100,
 			200			
 		]);		

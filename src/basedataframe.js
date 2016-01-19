@@ -5,6 +5,7 @@
 //
 
 var LazyColumn = require('./lazycolumn');
+var LazySeries = require('./lazyseries');
 var LazyIndex = require('./lazyindex');
 var ArrayIterator = require('./iterators/array');
 var BabyParse = require('babyparse');
@@ -390,15 +391,19 @@ BaseDataFrame.prototype.getColumn = function (columnNameOrIndex) {
 	return new LazyColumn(
 		self.getColumnNames()[columnIndex],
 		function () {
-			return new ArrayIterator(E.from(self.toValues())
-				.select(function (entry) {
-					return entry[columnIndex];
-				})
-				.toArray()
+			return new LazySeries(
+				function () {
+					return new ArrayIterator(E.from(self.toValues())
+						.select(function (entry) {
+							return entry[columnIndex];
+						})
+						.toArray()
+					);					
+				},
+				function () {
+					return self.getIndex();
+				}
 			);
-		},
-		function () {
-			return self.getIndex();
 		}
 	);
 };
@@ -716,9 +721,9 @@ BaseDataFrame.prototype.setColumn = function (columnName, data) {
 
 	if (!Object.isArray(data)) {
 		assert.isObject(data, "Expected 'data' parameter to 'setColumn' to be either an array or a column object.");
-		assert.isFunction(data.reindex, "Expected 'data' parameter to 'setColumn' to have a 'reindex' function that allows the column to be reindexed.");
+		assert.isFunction(data.getSeries().reindex, "Expected 'data' parameter to 'setColumn' to have a 'reindex' function that allows the column to be reindexed.");
 
-		data = data.reindex(self.getIndex()).toValues();
+		data = data.getSeries().reindex(self.getIndex()).toValues();
 	}
 
 	var LazyDataFrame = require('./lazydataframe');
@@ -840,7 +845,7 @@ BaseDataFrame.prototype.setIndex = function (columnNameOrIndex) {
 		function () {
 			return new LazyIndex(
 				function () {
-					return new ArrayIterator(self.getColumn(columnNameOrIndex).toValues());
+					return new ArrayIterator(self.getColumn(columnNameOrIndex).getSeries().toValues());
 				}
 			);
 		}		
@@ -954,11 +959,13 @@ BaseDataFrame.prototype.detectTypes = function () {
 
 	var dataFrames = E.from(self.getColumns())
 		.select(function (column) {
-			var numValues = column.toValues().length;
+			var numValues = column.getSeries().toValues().length;
+			var Series = require('./series');
 			var Column = require('./column');
 			//todo: broad-cast column
-			var columnNameColumn = new Column('Column', E.range(0, numValues).select(function () { return column.getName(); }).toArray());
-			return column.detectTypes().setColumn('Column', columnNameColumn);
+			var series = new Series(E.range(0, numValues).select(function () { return column.getName(); }).toArray());
+			var columnNameColumn = new Column('Column', series);
+			return column.getSeries().detectTypes().setColumn('Column', columnNameColumn);
 		})
 		.toArray();
 	var dataForge = require('../index');
@@ -976,11 +983,13 @@ BaseDataFrame.prototype.detectValues = function () {
 
 	var dataFrames = E.from(self.getColumns())
 		.select(function (column) {
-			var numValues = column.toValues().length;
+			var numValues = column.getSeries().toValues().length;
+			var Series = require('./series');
 			var Column = require('./column');
 			//todo: broad-cast column
-			var columnNameColumn = new Column('Column', E.range(0, numValues).select(function () { return column.getName(); }).toArray());
-			return column.detectValues().setColumn('Column', columnNameColumn);
+			var series = new Series(E.range(0, numValues).select(function () { return column.getName(); }).toArray());
+			var columnNameColumn = new Column('Column', series);
+			return column.getSeries().detectValues().setColumn('Column', columnNameColumn);
 		})
 		.toArray();
 	var dataForge = require('../index');

@@ -15,23 +15,15 @@ var inherit = require('./inherit');
 /**
  * Represents a column in a data frame.
  */
-var Column = function (name, values, index) {
-	assert.isString(name, "Expected 'name' parameter to Column constructor be a string.");
-	assert.isArray(values, "Expected 'values' parameter to Column constructor be an array.");
+var Column = function (name, series) {
 
-	if (index) {
-		assert.isObject(index, "Expected 'index' parameter to Column constructor to be an object.");
-	}
+	assert(arguments.length == 2, "Expected 2 arguments to Column constructor");
+	assert.isString(name, "Expected 'name' parameter to Column constructor be a string.");
+	assert.isObject(series, "Expected 'series' parameter to Column constructor be an time-series object.");
 
 	var self = this;
 	self._name = name;
-	self._values = values;	
-	self._index = index || 
-		new LazyIndex(
-			function () {
-				return new ArrayIterator(E.range(0, values.length).toArray());
-			}
-		);
+	self._series = series;	
 };
 
 var parent = inherit(Column, BaseColumn);
@@ -45,19 +37,11 @@ Column.prototype.getName = function () {
 }
 
 /**
- * Get an iterator for the iterating the values of the column.
+ * Retreive the time-series for the column.
  */
-Column.prototype.getIterator = function () {
+Column.prototype.getSeries = function () {
 	var self = this;
-	return new ArrayIterator(self._values);
-};
-
-/**
- * Retreive the index of the column.
- */
-Column.prototype.getIndex = function () {
-	var self = this;
-	return self._index;
-};
+	return self._series;
+}
 
 module.exports = Column;

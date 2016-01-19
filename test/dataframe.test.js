@@ -87,10 +87,10 @@ describe('DataFrame', function () {
 		expect(columns.length).to.eql(2);
 
 		expect(columns[0].getName()).to.eql("Col1");
-		expect(columns[0].toValues()).to.eql([1, 10]);
+		expect(columns[0].getSeries().toValues()).to.eql([1, 10]);
 
 		expect(columns[1].getName()).to.eql("Col2");
-		expect(columns[1].toValues()).to.eql(["hello", "computer"]);
+		expect(columns[1].getSeries().toValues()).to.eql(["hello", "computer"]);
 	});
 
 	it('can initialize from array of objects with different fields', function () {
@@ -119,16 +119,16 @@ describe('DataFrame', function () {
 		expect(columns.length).to.eql(4);
 
 		expect(columns[0].getName()).to.eql("Col1");
-		expect(columns[0].toValues()).to.eql([1, undefined]);
+		expect(columns[0].getSeries().toValues()).to.eql([1, undefined]);
 
 		expect(columns[1].getName()).to.eql("Col2");
-		expect(columns[1].toValues()).to.eql(["hello", undefined]);
+		expect(columns[1].getSeries().toValues()).to.eql(["hello", undefined]);
 
 		expect(columns[2].getName()).to.eql("Col3");
-		expect(columns[2].toValues()).to.eql([undefined, 10]);
+		expect(columns[2].getSeries().toValues()).to.eql([undefined, 10]);
 
 		expect(columns[3].getName()).to.eql("Col4");
-		expect(columns[3].toValues()).to.eql([undefined, "computer"]);
+		expect(columns[3].getSeries().toValues()).to.eql([undefined, "computer"]);
 	});
 
 	it('can initialize from array of objects with zero fields', function () {

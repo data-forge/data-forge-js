@@ -8,31 +8,32 @@ describe('Column', function () {
 	var expect = require('chai').expect; 
 	
 	var initExampleColumn = function (index) {
-		return new dataForge.Column('some-column', [100, 200], index);
+		var series = new dataForge.Series([100, 200], index);
+		return new dataForge.Column('some-column', series);
 	};
 
 	it('default index is generated', function () {
 		
 		var column = initExampleColumn();		
-		expect(column.getIndex().toValues()).to.eql([			
+		expect(column.getSeries().getIndex().toValues()).to.eql([			
 			0,
 			1			
 		]);		
 	});
 
-	it('can get index', function () {
+	it('can get series index', function () {
 		
 		var column = initExampleColumn(new dataForge.Index([5, 6]));
-		expect(column.getIndex().toValues()).to.eql([			
+		expect(column.getSeries().getIndex().toValues()).to.eql([			
 			5,
 			6
 		]);		
 	});
 	
-	it('can get column values', function () {
+	it('can get series values', function () {
 		
 		var column = initExampleColumn();		
-		expect(column.toValues()).to.eql([			
+		expect(column.getSeries().toValues()).to.eql([			
 			100,
 			200			
 		]);		

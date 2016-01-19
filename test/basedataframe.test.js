@@ -222,16 +222,16 @@ describe('BaseDataFrame', function () {
 			[5, 6]
 		);
 		var column1 = dataFrame.getColumn('Value1');
-		expect(column1.getIndex().toValues()).to.eql([5, 6]);
-		expect(column1.toValues()).to.eql([100, 200]);
+		expect(column1.getSeries().getIndex().toValues()).to.eql([5, 6]);
+		expect(column1.getSeries().toValues()).to.eql([100, 200]);
 		
 		var column2 = dataFrame.getColumn('Value2');
-		expect(column2.getIndex().toValues()).to.eql([5, 6]);
-		expect(column2.toValues()).to.eql(['foo', 'bar']);
+		expect(column2.getSeries().getIndex().toValues()).to.eql([5, 6]);
+		expect(column2.getSeries().toValues()).to.eql(['foo', 'bar']);
 		
 		var column3 = dataFrame.getColumn('Value3');
-		expect(column3.getIndex().toValues()).to.eql([5, 6]);
-		expect(column3.toValues()).to.eql([11, 22]);
+		expect(column3.getSeries().getIndex().toValues()).to.eql([5, 6]);
+		expect(column3.getSeries().toValues()).to.eql([11, 22]);
 	});
 
 	it('can retreive column by index', function () {
@@ -245,16 +245,16 @@ describe('BaseDataFrame', function () {
 			[5, 6]
 		);
 		var column1 = dataFrame.getColumn(1);
-		expect(column1.getIndex().toValues()).to.eql([5, 6]);
-		expect(column1.toValues()).to.eql([100, 200]);
+		expect(column1.getSeries().getIndex().toValues()).to.eql([5, 6]);
+		expect(column1.getSeries().toValues()).to.eql([100, 200]);
 		
 		var column2 = dataFrame.getColumn(2);
-		expect(column2.getIndex().toValues()).to.eql([5, 6]);
-		expect(column2.toValues()).to.eql(['foo', 'bar']);
+		expect(column2.getSeries().getIndex().toValues()).to.eql([5, 6]);
+		expect(column2.getSeries().toValues()).to.eql(['foo', 'bar']);
 		
 		var column3 = dataFrame.getColumn(3);
-		expect(column3.getIndex().toValues()).to.eql([5, 6]);
-		expect(column3.toValues()).to.eql([11, 22]);
+		expect(column3.getSeries().getIndex().toValues()).to.eql([5, 6]);
+		expect(column3.getSeries().toValues()).to.eql([11, 22]);
 	});
 
 	it('can retreive columns', function () {
@@ -271,10 +271,10 @@ describe('BaseDataFrame', function () {
 		expect(columns.length).to.eql(4);
 
 		expect(columns[0].getName()).to.eql('Date');
-		expect(columns[0].toValues()).to.eql([new Date(1975, 24, 2), new Date(2015, 24, 2)]);
+		expect(columns[0].getSeries().toValues()).to.eql([new Date(1975, 24, 2), new Date(2015, 24, 2)]);
 
 		expect(columns[2].getName()).to.eql('Value2');
-		expect(columns[2].toValues()).to.eql(['foo', 'bar']);
+		expect(columns[2].getSeries().toValues()).to.eql(['foo', 'bar']);
 	});
 	
 	it('can retreive column subset as new dataframe', function () 
@@ -699,8 +699,11 @@ describe('BaseDataFrame', function () {
 			],
 			[5, 6, 7, 8]
 		);
+		
 		var newColumnName = "new column";
-		var newColumn = new dataForge.Column(newColumnName, [4, 3, 2, 1], new dataForge.Index([0, 5, 2, 7]))
+		var newIndex = new dataForge.Index([0, 5, 2, 7]);
+		var newSeries = new dataForge.Series([4, 3, 2, 1], newIndex);
+		var newColumn = new dataForge.Column(newColumnName, newSeries);
 		var modified = dataFrame.setColumn(newColumnName, newColumn);
 		var mergedColumn = modified.getColumn(newColumnName);
 
@@ -719,8 +722,8 @@ describe('BaseDataFrame', function () {
 			[new Date(2015, 24, 2), 100, 'd', 4, undefined],
 		]);
 
-		expect(mergedColumn.getIndex().toValues()).to.eql([5, 6, 7, 8]);
-		expect(mergedColumn.toValues()).to.eql([3, undefined, 1, undefined]);
+		expect(mergedColumn.getSeries().getIndex().toValues()).to.eql([5, 6, 7, 8]);
+		expect(mergedColumn.getSeries().toValues()).to.eql([3, undefined, 1, undefined]);
 	});
 
 	it('can get subset of rows', function () {
@@ -948,9 +951,9 @@ describe('BaseDataFrame', function () {
 		expect(renamed.getColumnNames()).to.eql(newColumnNames);
 		var columns = renamed.getColumns();
 		expect(columns.length).to.eql(3);
-		expect(columns[0].toValues()).to.eql([300, 200]);
-		expect(columns[1].toValues()).to.eql(['c', 'b']);
-		expect(columns[2].toValues()).to.eql([3, 1]);
+		expect(columns[0].getSeries().toValues()).to.eql([300, 200]);
+		expect(columns[1].getSeries().toValues()).to.eql(['c', 'b']);
+		expect(columns[2].getSeries().toValues()).to.eql([3, 1]);
 	});
 
 	it('can extract values as array objects', function () {
