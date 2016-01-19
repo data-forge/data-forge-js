@@ -24,11 +24,11 @@ var validateEnumerator = function (iterator) {
 //
 // Help function to grab a column index from a 'column name or index' parameter.
 //
-var parseColumnNameOrIndex = function (dataFrame, columnNameOrIndex) {
+var parseColumnNameOrIndex = function (dataFrame, columnNameOrIndex, failForNonExistantColumn) {
 
 	if (Object.isString(columnNameOrIndex)) {
 		var columnIndex = dataFrame.getColumnIndex(columnNameOrIndex);
-		if (columnIndex < 0) {
+		if (failForNonExistantColumn && columnIndex < 0) {
 			throw new Error("Failed to find column with name '" + columnNameOrIndex + "'.");
 		}
 		return columnIndex;
@@ -387,7 +387,7 @@ BaseDataFrame.prototype.selectMany = function (selector) {
 BaseDataFrame.prototype.getColumn = function (columnNameOrIndex) {
 	var self = this;
 
-	var columnIndex = parseColumnNameOrIndex(self, columnNameOrIndex);
+	var columnIndex = parseColumnNameOrIndex(self, columnNameOrIndex, true);
 
 	return new LazyColumn(
 		self.getColumnNames()[columnIndex],
@@ -1112,7 +1112,7 @@ BaseDataFrame.prototype.renameColumns = function (newColumnNames) {
 BaseDataFrame.prototype.renameColumn = function (columnNameOrIndex, newColumnName) {
 
 	var self = this;
-	var columnIndex = parseColumnNameOrIndex(self, columnNameOrIndex);
+	var columnIndex = parseColumnNameOrIndex(self, columnNameOrIndex, false);
 
 	assert.isString(newColumnName, "Expected 'newColumnName' parameter to 'renameColumn' to be a string.");
 

@@ -942,6 +942,7 @@ describe('BaseDataFrame', function () {
 			],
 			[5, 6]
 		);
+
 		var newColumnNames = ["Val1", "Val2", "Val3"];
 		var renamed = dataFrame.renameColumns(newColumnNames);
 		expect(renamed.getColumnNames()).to.eql(newColumnNames);
@@ -1111,4 +1112,26 @@ describe('BaseDataFrame', function () {
 		expect(renamed.getColumn(newColumnName).getName()).to.eql(newColumnName);
 		expect(renamed.getColumn(1).getName()).to.eql(newColumnName);
 	});
+
+	it('renaming non-existing column has no effect', function () {
+
+		var columnNames = ["Column1", "Column2", "Column3"];
+		var dataFrame = initDataFrame(
+				columnNames, 
+				[
+					['A', 1],
+					['B', 2],
+				],
+				[10, 11]
+			);
+
+		var renamed = dataFrame.renameColumn("some-column-that-doesnt-exist", "new-column-name");
+
+		expect(dataFrame.getColumnNames()).to.eql(columnNames);
+		expect(dataFrame.getIndex().toValues()).to.eql([10, 11]);
+		expect(dataFrame.toValues()).to.eql([
+			['A', 1],
+			['B', 2],
+		]);
+	});	
 });
