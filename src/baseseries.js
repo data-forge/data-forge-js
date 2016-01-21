@@ -813,4 +813,17 @@ BaseSeries.prototype.bake = function () {
 	return new Series(self.toValues(), self.getIndex().bake());
 };
 
+/**
+ * Retreive the data as pairs of [index, value].
+ */
+BaseSeries.prototype.toPairs = function () {
+
+	var self = this;
+	return E.from(self.getIndex().toValues())
+		.zip(self.toValues(), function (index, value) {
+			return [index, value];
+		})
+		.toArray();
+};
+
 module.exports = BaseSeries;

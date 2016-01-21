@@ -1224,6 +1224,19 @@ BaseDataFrame.prototype.toCSV = function () {
 };
 
 /**
+ * Retreive the data as pairs of [index, objects].
+ */
+BaseDataFrame.prototype.toPairs = function () {
+
+	var self = this;
+	return E.from(self.getIndex().toValues())
+		.zip(self.toObjects(), function (index, row) {
+			return [index, row];
+		})
+		.toArray();
+};
+
+/**
  * Forces lazy evaluation to complete and 'bakes' the data frame into memory.
  */
 BaseDataFrame.prototype.bake = function () {

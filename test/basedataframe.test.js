@@ -1151,4 +1151,20 @@ describe('BaseDataFrame', function () {
 			['B', 2],
 		]);
 	});	
+
+	it('can get pairs', function () {
+
+		var dataFrame = initDataFrame(
+				["Column1", "Column2"], 
+				[
+					['A', 1],
+					['B', 2],
+				],
+				[10, 11]
+			);
+		expect(dataFrame.toPairs()).to.eql([
+			[10, { Column1: 'A', Column2: 1 }],
+			[11, { Column1: 'B', Column2: 2 }],
+		]);
+	});
 });

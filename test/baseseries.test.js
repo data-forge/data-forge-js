@@ -551,4 +551,15 @@ describe('BaseSeries', function () {
 		expect(baked.toValues()).to.eql(values);
 	});
 
+	it('can get pairs', function () {
+		var indicies = [1, 2];
+		var values = ['foo', 'bar'];
+		var series = initSeries(indicies, values);
+		
+
+		expect(series.toPairs()).to.eql([
+				[1, 'foo'],
+				[2, 'bar'],
+			]);
+	});
 });
