@@ -1278,4 +1278,13 @@ BaseDataFrame.prototype.bake = function () {
 		});
 };
 
+/**
+ * Count the number of rows in the data frame.
+ */
+BaseDataFrame.prototype.count = function () {
+
+	var self = this;
+	return self.toValues().length; //todo: will be cheaper to just enumerate.
+};
+
 module.exports = BaseDataFrame;

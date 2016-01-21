@@ -117,4 +117,13 @@ BaseIndex.prototype.bake = function () {
 	return new Index(self.toValues());
 };
 
+/**
+ * Count the number of rows in the index.
+ */
+BaseIndex.prototype.count = function () {
+
+	var self = this;
+	return self.toValues().length; //todo: will be cheaper to just enumerate.
+};
+
 module.exports = BaseIndex;

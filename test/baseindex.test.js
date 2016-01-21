@@ -60,4 +60,11 @@ describe('Index', function () {
 		expect(baked).to.be.an.instanceOf(dataForge.Index);
 		expect(baked.toValues()).to.eql(values);
 	});
+
+	it('can get size', function () {
+
+		var values = [10, 21, 32, 43];
+		var index = initIndex(values);
+		expect(index.count()).to.eql(values.length);
+	})
 });

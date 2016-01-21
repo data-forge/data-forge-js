@@ -826,4 +826,14 @@ BaseSeries.prototype.toPairs = function () {
 		.toArray();
 };
 
+/**
+ * Count the number of rows in the series.
+ */
+BaseSeries.prototype.count = function () {
+
+	var self = this;
+	return self.toValues().length; //todo: will be cheaper to just enumerate.
+};
+
+
 module.exports = BaseSeries;

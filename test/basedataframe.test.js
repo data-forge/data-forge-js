@@ -1202,4 +1202,17 @@ describe('BaseDataFrame', function () {
 			[11, { Column1: 'B', Column2: 2 }],
 		]);
 	});
+
+	it('can get size', function () {
+
+		var dataFrame = initDataFrame(
+				["Column1", "Column2"], 
+				[
+					['A', 1],
+					['B', 2],
+				],
+				[10, 11]
+			);
+		expect(dataFrame.count()).to.eql(2);
+	});
 });

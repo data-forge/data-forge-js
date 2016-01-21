@@ -554,12 +554,19 @@ describe('BaseSeries', function () {
 	it('can get pairs', function () {
 		var indicies = [1, 2];
 		var values = ['foo', 'bar'];
-		var series = initSeries(indicies, values);
-		
+		var series = initSeries(indicies, values);		
 
 		expect(series.toPairs()).to.eql([
 				[1, 'foo'],
 				[2, 'bar'],
 			]);
 	});
+
+	it('can get size', function () {
+
+		var indicies = [1, 2];
+		var values = ['foo', 'bar'];
+		var series = initSeries(indicies, values);		
+		expect(series.count()).to.eql(values.length);
+	})
 });
