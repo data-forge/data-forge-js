@@ -399,6 +399,19 @@ BaseDataFrame.prototype.getSeries = function (columnNameOrIndex) {
 	);
 };
 
+/*
+ * Returns true if the column with the requested name exists in the data frame.
+ *
+ * @param {string} columnName - Name of the column to check.
+ */
+BaseDataFrame.prototype.hasSeries = function (columnName) {
+
+	assert.isString(columnName);
+
+	var self = this;
+	return self.getColumnIndex(columnName) >= 0;
+};
+
 /** 
  * Retreive a collection of all columns.
  */

@@ -211,6 +211,23 @@ describe('BaseDataFrame', function () {
 		}).to.throw(Error);
 	});
 
+	it('can check that column exists', function () {
+		
+		var dataFrame = initDataFrame(
+			[ "Date", "Value1", "Value2", "Value3" ],
+			[
+				[new Date(1975, 24, 2), 100, 'foo', 11],
+				[new Date(2015, 24, 2), 200, 'bar', 22],
+			],
+			[5, 6]
+		);
+		
+		expect(dataFrame.hasSeries('non-existing-column')).to.eql(false);
+		expect(dataFrame.hasSeries('Value1')).to.eql(true);
+		expect(dataFrame.hasSeries('Value2')).to.eql(true);
+		expect(dataFrame.hasSeries('Value3')).to.eql(true);
+	});
+
 	it('can retreive column by name', function () {
 		
 		var dataFrame = initDataFrame(
