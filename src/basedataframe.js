@@ -376,7 +376,7 @@ BaseDataFrame.prototype.selectMany = function (selector) {
 	); 	
 };
 
-/*
+/**
  * Retreive a time-series from a column of the data-frame.
  *
  * @param {string|int} columnNameOrIndex - Name or index of the column to retreive.
@@ -399,7 +399,7 @@ BaseDataFrame.prototype.getSeries = function (columnNameOrIndex) {
 	);
 };
 
-/*
+/**
  * Returns true if the column with the requested name exists in the data frame.
  *
  * @param {string} columnName - Name of the column to check.
@@ -410,6 +410,20 @@ BaseDataFrame.prototype.hasSeries = function (columnName) {
 
 	var self = this;
 	return self.getColumnIndex(columnName) >= 0;
+};
+
+/**
+ * 
+ * Verify the existance of a column and return it.
+ * Throws an exception if the column doesn't exist.
+ *
+ * @param {string|int} columnNameOrIndex - Name or index of the column to retreive.
+ */
+BaseDataFrame.prototype.expectSeries = function (columnNameOrIndex) {
+
+	var self = this;
+	parseColumnNameOrIndex(self, columnNameOrIndex, true);
+	return self;
 };
 
 /** 

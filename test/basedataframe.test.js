@@ -228,6 +228,24 @@ describe('BaseDataFrame', function () {
 		expect(dataFrame.hasSeries('Value3')).to.eql(true);
 	});
 
+	it('can expect that a column exists', function () {
+		
+		var dataFrame = initDataFrame(
+			[ "Value1" ],
+			[
+				[100],
+				[200],
+			],
+			[5, 6]
+		);
+		
+		expect(function () {
+				dataFrame.expectSeries('non-existing-column')
+			}).to.throw();
+
+		expect(dataFrame.expectSeries('Value1')).to.eql(dataFrame);
+	});
+
 	it('can retreive column by name', function () {
 		
 		var dataFrame = initDataFrame(
