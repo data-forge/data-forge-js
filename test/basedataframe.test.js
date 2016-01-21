@@ -726,6 +726,28 @@ describe('BaseDataFrame', function () {
 		expect(mergedSeries.toValues()).to.eql([3, undefined, 1, undefined]);
 	});
 
+	it('can set column procedurally from a function', function () {
+
+		var original = initDataFrame(
+			[ "Existing" ],
+			[
+				[11],
+				[12],
+			],
+			[5, 6]
+		);		
+
+		var modified = original.setSeries('Generated', 
+				function (row) {
+					return row.Existing * 2;
+				}
+			);
+		expect(original.getColumnNames()).to.eql(["Existing"]);
+		expect(modified.getColumnNames()).to.eql(["Existing", "Generated"]);
+		expect(modified.getSeries("Existing").toValues()).to.eql([11, 12]);
+		expect(modified.getSeries("Generated").toValues()).to.eql([22, 24]);
+	});
+
 	it('can get subset of rows', function () {
 
 		var dataFrame = initDataFrame(

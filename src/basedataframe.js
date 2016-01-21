@@ -710,7 +710,12 @@ BaseDataFrame.prototype.setSeries = function (columnName, data) { //todo: should
 
 	var self = this;
 
-	if (!Object.isArray(data)) {
+	if (Object.isFunction(data)) {
+		data = E.from(self.toObjects())
+			.select(data)
+			.toArray();
+	}
+	else if (!Object.isArray(data)) {
 		assert.isObject(data, "Expected 'data' parameter to 'setSeries' to be either an array or a series object.");
 		assert.isFunction(data.reindex, "Expected 'data' parameter to 'setSeries' to have a 'reindex' function that allows the column to be reindexed.");
 
