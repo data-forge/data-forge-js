@@ -22,5 +22,5 @@ var dataFrame = new dataForge.DataFrame({
 
 console.log(dataFrame.skip(4).take(5).toString());
 
-var column = dataFrame.getColumn("Sin");
-console.log(column.skip(4).take(5).toString());
+var series = dataFrame.getSeries("Sin");
+console.log(series.skip(4).take(5).toString());

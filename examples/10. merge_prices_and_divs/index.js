@@ -3,6 +3,7 @@
 var dataForge = require("../../index.js");
 var glob = require('glob');
 var E = require('linq');
+var fs = require('fs');
 
 //
 // Load as single CSV file containing share prices.

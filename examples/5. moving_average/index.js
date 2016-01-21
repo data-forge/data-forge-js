@@ -9,8 +9,8 @@ var E = require('linq');
 //
 var computeSimpleMovingAverage = function (dataFrame, period) {
 
-	var movingAvgColumn = dataFrame
-		.getColumn('Close')
+	var movingAvg = dataFrame
+		.getSeries('Close')
 		.rollingWindow(period, 
 			function (index, values) {
 				return [index[index.length-1], E.from(values).sum() / values.length];
@@ -18,7 +18,7 @@ var computeSimpleMovingAverage = function (dataFrame, period) {
 		);
 
 	// Create a new data frame with the new column, doesn't modify original data frame.
-	return dataFrame.setColumn('SMA', movingAvgColumn);
+	return dataFrame.setSeries('SMA', movingAvg);
 };
 
 var dataFrame = dataForge
