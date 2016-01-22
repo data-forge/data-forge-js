@@ -1287,4 +1287,26 @@ BaseDataFrame.prototype.count = function () {
 	return self.toValues().length; //todo: will be cheaper to just enumerate.
 };
 
+/**
+ * Transform a column. This is equivalent to extracting a column, calling 'select' on it,
+ * then plugging it back in as the same column.
+ *
+ * @param {string} columnName - Name of the column to transform.
+ * @param {function} selector - Selector function that transforms each row to a different data structure.
+ * 
+ */
+BaseDataFrame.prototype.transformColumn = function (columnName, selector) { //todo: this should support 'column name or index'.
+
+	assert.isString(columnName, "Expected 'columnName' parameter to 'trasnformColumn' to be a string.");
+	assert.isFunction(selector, "Expected 'selector' parameter to 'trasnformColumn' to be a function.");
+
+	var self = this;
+	if (!self.hasSeries(columnName)) {
+		return self;
+	}
+
+	var transformedSeries = self.getSeries(columnName).select(selector);
+	return self.setSeries(columnName, transformedSeries);
+};
+
 module.exports = BaseDataFrame;

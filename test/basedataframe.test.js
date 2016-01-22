@@ -1215,4 +1215,40 @@ describe('BaseDataFrame', function () {
 			);
 		expect(dataFrame.count()).to.eql(2);
 	});
+
+	it('can transform column', function () {
+
+		var dataFrame = initDataFrame(
+				["Column1", "Column2"], 
+				[
+					['A', 1],
+					['B', 2],
+				],
+				[10, 11]
+			);
+		var modified = dataFrame.transformColumn("Column2", function (value) {
+				return value + 100;
+			});
+		expect(dataFrame.getSeries("Column2").toValues()).to.eql([1, 2]);
+		expect(modified.getSeries("Column2").toValues()).to.eql([101, 102]);
+	});
+
+	it('transforming non-existing column has no effect', function () {
+
+		var columnNames = ["Column1", "Column2"];
+		var dataFrame = initDataFrame(
+				columnNames, 
+				[
+					['A', 1],
+					['B', 2],
+				],
+				[10, 11]
+			);
+		var modified = dataFrame.transformColumn("non-existing-column", function (value) {
+				return value + 100;
+			});
+		expect(dataFrame).to.equal(modified);
+		expect(dataFrame.getColumnNames()).to.eql(columnNames);
+	});
+
 });
