@@ -1295,18 +1295,30 @@ BaseDataFrame.prototype.count = function () {
  * @param {function} selector - Selector function that transforms each row to a different data structure.
  * 
  */
-BaseDataFrame.prototype.transformColumn = function (columnName, selector) { //todo: this should support 'column name or index'.
-
-	assert.isString(columnName, "Expected 'columnName' parameter to 'trasnformColumn' to be a string.");
-	assert.isFunction(selector, "Expected 'selector' parameter to 'trasnformColumn' to be a function.");
+BaseDataFrame.prototype.transformColumn = function (columnNameOrColumnNames, selector) { //todo: this should support 'column name or index'.
 
 	var self = this;
-	if (!self.hasSeries(columnName)) {
-		return self;
-	}
 
-	var transformedSeries = self.getSeries(columnName).select(selector);
-	return self.setSeries(columnName, transformedSeries);
+	if (Object.isObject(columnNameOrColumnNames)) {
+		var columnNames = Object.keys(columnNameOrColumnNames)
+		return E.from(columnNames)
+			.aggregate(self, function (prevDataFrame, columnName) {
+				var columnSelector = columnNameOrColumnNames[columnName];
+				return prevDataFrame.transformColumn(columnName, columnSelector);
+			});
+	}
+	else {
+		assert.isString(columnNameOrColumnNames, "Expected 'columnNameOrColumnNames' parameter to 'transformColumn' to be a string or object.");
+		assert.isFunction(selector, "Expected 'selector' parameter to 'transformColumn' to be a function.");
+
+		var columnName = columnNameOrColumnNames;
+		if (!self.hasSeries(columnName)) {
+			return self;
+		}
+
+		var transformedSeries = self.getSeries(columnName).select(selector);
+		return self.setSeries(columnName, transformedSeries);
+	}
 };
 
 module.exports = BaseDataFrame;
