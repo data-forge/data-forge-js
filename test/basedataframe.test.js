@@ -1275,4 +1275,145 @@ describe('BaseDataFrame', function () {
 		expect(dataFrame.getColumnNames()).to.eql(columnNames);
 	});
 
+	//
+	// Generate a data frame for testing.
+	//
+	var genDataFrame = function (numColumns, numRows) {
+
+		var columnNames = E.range(0, numColumns)
+			.select(function (columnIndex) {
+				return columnIndex.toString();
+			})
+			.toArray();
+		var rows = E.range(0, numRows)
+			.select(function (rowIndex) {
+				return E.range(0, numColumns)
+					.select(function (columnIndex) {
+						return (rowIndex+1) * (columnIndex+1);
+					})
+					.toArray();
+			})
+			.toArray();
+		var index = E.range(0, numRows)
+			.toArray();
+
+		return initDataFrame(columnNames, rows, index);
+	};
+
+	it('can compute rolling window - from empty data set', function () {
+
+		var dataFrame = genDataFrame(0, 0);
+		var newDataFrame = dataFrame.rollingWindow(2, function (window, windowIndex) {
+			return [windowIndex, window.toValues()];
+		});
+
+		expect(newDataFrame.toValues().length).to.eql(0);
+	});
+
+	it('rolling window returns 0 values when there are not enough values in the data set', function () {
+
+		var dataFrame = genDataFrame(2, 2);
+		var newDataFrame = dataFrame.rollingWindow(3, function (window, windowIndex) {
+			return [windowIndex, window.toValues()];
+		});
+
+		expect(newDataFrame.toValues().length).to.eql(0);
+	});
+
+	it('can compute rolling window - odd data set with even period', function () {
+
+		var dataFrame = genDataFrame(2, 5);
+		var newDataFrame = dataFrame.rollingWindow(2, function (window, windowIndex) {
+			return [windowIndex, window.toValues()];
+		});
+
+		var index = newDataFrame.getIndex().toValues();
+		expect(index).to.eql([0, 1, 2, 3]);
+
+		var values = newDataFrame.toValues();
+		expect(values.length).to.eql(4);
+		expect(values).to.eql([
+			[[1, 2], [2, 4]],
+			[[2, 4], [3, 6]],
+			[[3, 6], [4, 8]],
+			[[4, 8], [5, 10]],
+		]);
+	});
+
+	it('can compute rolling window - odd data set with odd period', function () {
+
+		var dataFrame = genDataFrame(2, 5);
+		var newDataFrame = dataFrame.rollingWindow(3, function (window, windowIndex) {
+			return [windowIndex, window.toValues()];
+		});
+
+		var index = newDataFrame.getIndex().toValues();
+		expect(index).to.eql([0, 1, 2]);
+
+		var values = newDataFrame.toValues();
+		expect(values.length).to.eql(3);
+		expect(values).to.eql([
+			[[1, 2], [2, 4], [3, 6]],
+			[[2, 4], [3, 6], [4, 8]],
+			[[3, 6], [4, 8], [5, 10]],
+		]);
+	});
+
+	it('can compute rolling window - even data set with even period', function () {
+
+		var dataFrame = genDataFrame(2, 6);
+		var newDataFrame = dataFrame.rollingWindow(2, function (window, windowIndex) {
+			return [windowIndex+10, window.toValues()];
+		});
+
+		var index = newDataFrame.getIndex().toValues();
+		expect(index).to.eql([10, 11, 12, 13, 14]);
+
+		var values = newDataFrame.toValues();
+		expect(values.length).to.eql(5);
+		expect(values).to.eql([
+			[[1, 2], [2, 4]],
+			[[2, 4], [3, 6]],
+			[[3, 6], [4, 8]],
+			[[4, 8], [5, 10]],
+			[[5, 10], [6, 12]],
+		]);
+	});
+
+	it('can compute rolling window - even data set with odd period', function () {
+
+		var dataFrame = genDataFrame(2, 6);
+		var newDataFrame = dataFrame.rollingWindow(3, function (window, windowIndex) {
+			return [windowIndex, window.toValues()];
+		});
+
+		var index = newDataFrame.getIndex().toValues();
+		expect(index).to.eql([0, 1, 2, 3]);
+
+		var values = newDataFrame.toValues();
+		expect(values.length).to.eql(4);
+		expect(values).to.eql([
+			[[1, 2], [2, 4], [3, 6]],
+			[[2, 4], [3, 6], [4, 8]],
+			[[3, 6], [4, 8], [5, 10]],
+			[[4, 8], [5, 10], [6, 12]],
+		]);
+	});
+
+	it('can compute rolling window - can take last index and value from each window', function () {
+
+		var dataFrame = genDataFrame(2, 6);
+		var newDataFrame = dataFrame.rollingWindow(3, function (window, windowIndex) {
+			var index = window.getIndex().toValues();
+			var values = window.toValues();
+			return [index[index.length-1], values[values.length-1]];
+		});
+
+		var index = newDataFrame.getIndex().toValues();
+		expect(index).to.eql([2, 3, 4, 5]);
+
+		var values = newDataFrame.toValues();
+		expect(values).to.eql([[3, 6], [4, 8], [5, 10], [6, 12]]);
+	});
+
 });

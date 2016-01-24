@@ -1321,4 +1321,63 @@ BaseDataFrame.prototype.transformColumn = function (columnNameOrColumnNames, sel
 	}
 };
 
+/** 
+ * Move a rolling window over the data frame, invoke a selector function to build a new data frame.
+ *
+ * @param {integer} period - The number of entries to include in the window.
+ * @param {function} selector - The selector function that builds the output series.
+ *
+ * The selector has the following parameters: 
+ *
+ *		window - Data-frame that represents the rolling window.
+ *		windowIndex - The 0-based index of the window.
+ */
+BaseDataFrame.prototype.rollingWindow = function (period, fn) {
+
+	assert.isNumber(period, "Expected 'period' parameter to 'rollingWindow' to be a number.");
+	assert.isFunction(fn, "Expected 'fn' parameter to 'rollingWindow' to be a function.");
+
+	var self = this;
+
+	//todo: make this properly lazy
+
+	var index = self.getIndex().toValues();
+	var values = self.toObjects();
+
+	var DataFrame = require('./dataframe');
+	if (values.length == 0) {
+		return new DataFrame();
+	}
+
+	var Index = require('./index');
+	var newIndexAndValues = E.range(0, values.length-period+1)
+		.select(function (rowIndex) {
+			var _index = E.from(index).skip(rowIndex).take(period).toArray();
+			var _values = E.from(values).skip(rowIndex).take(period).toArray();
+			var Series = require('./series');
+			var _window = new DataFrame({
+					rows: _values, 
+					index: new Index(_index)
+				});
+			return fn(_window, rowIndex);
+		})
+		.toArray();
+
+	var newIndex = E.from(newIndexAndValues)
+		.select(function (indexAndValue) {
+			return indexAndValue[0];
+		})
+		.toArray();
+	var newValues = E.from(newIndexAndValues)
+		.select(function (indexAndValue) {
+			return indexAndValue[1];
+		})
+		.toArray();
+
+	return new DataFrame({
+			rows: newValues,
+			index: new Index(newIndex)
+		});
+};
+
 module.exports = BaseDataFrame;
