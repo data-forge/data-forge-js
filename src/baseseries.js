@@ -8,6 +8,7 @@ var assert = require('chai').assert;
 var E = require('linq');
 var moment = require('moment');
 var ArrayIterator = require('./iterators/array');
+var Index = require('./index');
 
 //
 // Helper function to validate an iterator.
@@ -429,10 +430,15 @@ BaseSeries.prototype.getRowsSubset = function (startIndex, endIndex) {
 };
 
 /** 
- * Execute code over a moving window to produce a new data frame.
+ * Move a rolling window over the series, invoke a selector function to build a new series.
  *
  * @param {integer} period - The number of entries to include in the window.
- * @param {function} fn - The function to invoke on each window.
+ * @param {function} selector - The selector function that builds the output series.
+ *
+ * The selector has the following parameters: 
+ *
+ *		window - Series that represents the rolling window.
+ *		windowIndex - The 0-based index of the window.
  */
 BaseSeries.prototype.rollingWindow = function (period, fn) {
 
@@ -455,7 +461,9 @@ BaseSeries.prototype.rollingWindow = function (period, fn) {
 		.select(function (rowIndex) {
 			var _index = E.from(index).skip(rowIndex).take(period).toArray();
 			var _values = E.from(values).skip(rowIndex).take(period).toArray();
-			return fn(_index, _values, rowIndex);
+			var Series = require('./series'); //todo: use a lazy series for this.
+			var _window = new Series(_values, new Index(_index));
+			return fn(_window, rowIndex);
 		})
 		.toArray();
 
@@ -571,10 +579,13 @@ BaseSeries.prototype.toString = function () {
 BaseSeries.prototype.percentChange = function () {
 
 	var self = this;
-	return self.rollingWindow(2, function (index, window) {
-		var amountChange = window[1] - window[0]; // Compute amount of change.
-		var pctChange = amountChange / window[0]; // Compute % change.
-		return [index[1], pctChange]; // Return new index and value.
+	return self.rollingWindow(2, function (window) {
+		//todo: var index = window.getIndex().skip(1).first();
+		var index = window.getIndex().skip(1).toValues()[0];
+		var values = window.toValues();
+		var amountChange = values[1] - values[0]; // Compute amount of change.
+		var pctChange = amountChange / values[0]; // Compute % change.
+		return [index, pctChange]; // Return new index and value.
 	});
 };
 

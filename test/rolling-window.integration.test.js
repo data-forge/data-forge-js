@@ -20,7 +20,11 @@ describe('rolling window integration', function () {
 		});
 
 		var newSeries = dataFrame.getSeries('Value')
-			.rollingWindow(5, function (index, values, rowIndex) {
+			.rollingWindow(5, function (window, windowIndex) {
+				//todo: var index = window.getIndex().last();
+				//todo: var value = window.last();
+				var index = window.getIndex().toValues();
+				var values = window.toValues();
 				return [index[index.length-1], values[values.length-1]];
 			});
 

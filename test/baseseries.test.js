@@ -202,8 +202,8 @@ describe('BaseSeries', function () {
 	it('can compute rolling window - from empty data set', function () {
 
 		var series = initSeries([], []);
-		var newSeries = series.rollingWindow(2, function (index, values, rowIndex) {
-			return [rowIndex, values];
+		var newSeries = series.rollingWindow(2, function (window, windowIndex) {
+			return [windowIndex, window.toValues()];
 		});
 
 		expect(newSeries.toValues().length).to.eql(0);
@@ -212,8 +212,8 @@ describe('BaseSeries', function () {
 	it('rolling window returns 0 values when there are not enough values in the data set', function () {
 
 		var series = initSeries([0, 1], [1, 2]);
-		var newSeries = series.rollingWindow(3, function (index, values, rowIndex) {
-			return [rowIndex, values];
+		var newSeries = series.rollingWindow(3, function (window, windowIndex) {
+			return [windowIndex, window.toValues()];
 		});
 
 		expect(newSeries.toValues().length).to.eql(0);
@@ -222,8 +222,8 @@ describe('BaseSeries', function () {
 	it('can compute rolling window - odd data set with even period', function () {
 
 		var series = initSeries(E.range(0, 5).toArray(), E.range(0, 5).toArray());
-		var newSeries = series.rollingWindow(2, function (index, values, rowIndex) {
-			return [rowIndex, values];
+		var newSeries = series.rollingWindow(2, function (window, windowIndex) {
+			return [windowIndex, window.toValues()];
 		});
 
 		var index = newSeries.getIndex().toValues();
@@ -240,8 +240,8 @@ describe('BaseSeries', function () {
 	it('can compute rolling window - odd data set with odd period', function () {
 
 		var series = initSeries(E.range(0, 5).toArray(), E.range(0, 5).toArray());
-		var newSeries = series.rollingWindow(3, function (index, values, rowIndex) {
-			return [rowIndex, values];
+		var newSeries = series.rollingWindow(3, function (window, windowIndex) {
+			return [windowIndex, window.toValues()];
 		});
 
 		var index = newSeries.getIndex().toValues();
@@ -257,8 +257,8 @@ describe('BaseSeries', function () {
 	it('can compute rolling window - even data set with even period', function () {
 
 		var series = initSeries(E.range(0, 6).toArray(), E.range(0, 6).toArray());
-		var newSeries = series.rollingWindow(2, function (index, values, rowIndex) {
-			return [rowIndex+10, values];
+		var newSeries = series.rollingWindow(2, function (window, windowIndex) {
+			return [windowIndex+10, window.toValues()];
 		});
 
 		var index = newSeries.getIndex().toValues();
@@ -276,8 +276,8 @@ describe('BaseSeries', function () {
 	it('can compute rolling window - even data set with odd period', function () {
 
 		var series = initSeries(E.range(0, 6).toArray(), E.range(0, 6).toArray());
-		var newSeries = series.rollingWindow(3, function (index, values, rowIndex) {
-			return [rowIndex, values];
+		var newSeries = series.rollingWindow(3, function (window, windowIndex) {
+			return [windowIndex, window.toValues()];
 		});
 
 		var index = newSeries.getIndex().toValues();
@@ -294,7 +294,9 @@ describe('BaseSeries', function () {
 	it('can compute rolling window - can take last index and value from each window', function () {
 
 		var series = initSeries(E.range(0, 6).toArray(), E.range(0, 6).toArray());
-		var newSeries = series.rollingWindow(3, function (index, values, rowIndex) {
+		var newSeries = series.rollingWindow(3, function (window, windowIndex) {
+			var index = window.getIndex().toValues();
+			var values = window.toValues();
 			return [index[index.length-1], values[values.length-1]];
 		});
 
