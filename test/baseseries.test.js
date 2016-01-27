@@ -571,4 +571,12 @@ describe('BaseSeries', function () {
 		var series = initSeries(indicies, values);		
 		expect(series.count()).to.eql(values.length);
 	})
+
+	it('can get first and last rows', function () {
+
+		var series = initSeries([0, 1, 2], ['A', 'B', 'C']);
+
+		expect(series.first()).to.eql('A');
+		expect(series.last()).to.eql('C');
+	});
 });

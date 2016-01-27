@@ -853,5 +853,33 @@ BaseSeries.prototype.count = function () {
 	return total;
 };
 
+/**
+ * Get the first row of the series.
+ */
+BaseSeries.prototype.first = function () {
+
+	var self = this;
+	var iterator = self.getIterator();
+
+	iterator.moveNext();
+
+	return iterator.getCurrent();	
+};
+
+/**
+ * Get the last row of the series.
+ */
+BaseSeries.prototype.last = function () {
+
+	var self = this;
+	var iterator = self.getIterator();
+	var last;
+
+	while (iterator.moveNext()) {
+		last = iterator.getCurrent();
+	}
+
+	return last;
+};
 
 module.exports = BaseSeries;
