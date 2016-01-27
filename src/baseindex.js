@@ -123,7 +123,14 @@ BaseIndex.prototype.bake = function () {
 BaseIndex.prototype.count = function () {
 
 	var self = this;
-	return self.toValues().length; //todo: will be cheaper to just enumerate.
+	var total = 0;
+	var iterator = self.getIterator();
+
+	while (iterator.moveNext()) {
+		++total;
+	}
+
+	return total;
 };
 
 /**
