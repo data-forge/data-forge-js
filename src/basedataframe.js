@@ -1380,4 +1380,36 @@ BaseDataFrame.prototype.rollingWindow = function (period, fn) {
 		});
 };
 
+/**
+ * Get the first row of the data frame.
+ */
+BaseDataFrame.prototype.first = function () {
+
+	var self = this;
+
+	var iterator = self.getIterator();
+
+	iterator.moveNext();
+
+	return mapRowByColumns(self, iterator.getCurrent());
+};
+
+/**
+ * Get the last row of the data frame.
+ */
+BaseDataFrame.prototype.last = function () {
+
+	var self = this;
+
+	var iterator = self.getIterator();
+
+	var last;
+
+	while (iterator.moveNext()) {
+		last = iterator.getCurrent();
+	}
+
+	return mapRowByColumns(self, last);
+};
+
 module.exports = BaseDataFrame;

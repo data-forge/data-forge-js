@@ -1416,4 +1416,25 @@ describe('BaseDataFrame', function () {
 		expect(values).to.eql([[3, 6], [4, 8], [5, 10], [6, 12]]);
 	});
 
+	it('can get first and last rows in data frame', function () {
+
+		var dataFrame = initDataFrame(
+				["Column1", "Column2"], 
+				[
+					['A', 1],
+					['B', 2],
+					['C', 3],
+				],
+				[10, 11]
+			);
+
+		expect(dataFrame.first()).to.eql({
+			Column1: 'A',
+			Column2: 1,
+		});
+		expect(dataFrame.last()).to.eql({
+			Column1: 'C',
+			Column2: 3,
+		});
+	});
 });
