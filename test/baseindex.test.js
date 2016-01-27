@@ -67,4 +67,12 @@ describe('Index', function () {
 		var index = initIndex(values);
 		expect(index.count()).to.eql(values.length);
 	})
+
+	it('can get first and last rows', function () {
+
+		var index = initIndex([1, 2, 3]);
+
+		expect(index.first()).to.eql(1);
+		expect(index.last()).to.eql(3);
+	});
 });
