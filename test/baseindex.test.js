@@ -66,7 +66,25 @@ describe('Index', function () {
 		var values = [10, 21, 32, 43];
 		var index = initIndex(values);
 		expect(index.count()).to.eql(values.length);
-	})
+	});
+
+	it('getting first row of empty index throws exception', function () {
+
+		var index = initIndex([]);
+
+		expect(function () {
+			index.first();
+		}).to.throw();
+	});
+
+	it('getting last row of empty index throws exception', function () {
+
+		var index = initIndex([]);
+
+		expect(function () {
+			index.last();
+		}).to.throw();
+	});
 
 	it('can get first and last rows', function () {
 

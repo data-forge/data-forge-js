@@ -572,6 +572,24 @@ describe('BaseSeries', function () {
 		expect(series.count()).to.eql(values.length);
 	})
 
+	it('getting first row of empty series throws exception', function () {
+
+		var series = initSeries([], []);
+
+		expect(function () {
+			series.first();
+		}).to.throw();
+	});
+
+	it('getting last row of empty series throws exception', function () {
+
+		var series = initSeries([], []);
+
+		expect(function () {
+			series.last();
+		}).to.throw();
+	});
+
 	it('can get first and last rows', function () {
 
 		var series = initSeries([0, 1, 2], ['A', 'B', 'C']);

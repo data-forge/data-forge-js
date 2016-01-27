@@ -1398,7 +1398,9 @@ BaseDataFrame.prototype.first = function () {
 
 	var iterator = self.getIterator();
 
-	iterator.moveNext();
+	if (!iterator.moveNext()) {
+		throw new Error("No rows in data-frame.");
+	}
 
 	return mapRowByColumns(self, iterator.getCurrent());
 };
@@ -1412,7 +1414,11 @@ BaseDataFrame.prototype.last = function () {
 
 	var iterator = self.getIterator();
 
-	var last;
+	if (!iterator.moveNext()) {
+		throw new Error("No rows in data-frame.");
+	}
+
+	var last = iterator.getCurrent();
 
 	while (iterator.moveNext()) {
 		last = iterator.getCurrent();

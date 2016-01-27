@@ -1416,6 +1416,24 @@ describe('BaseDataFrame', function () {
 		expect(values).to.eql([[3, 6], [4, 8], [5, 10], [6, 12]]);
 	});
 
+	it('getting first row of empty data-frame throws exception', function () {
+
+		var dataFrame = initDataFrame([], [], []);
+
+		expect(function () {
+			dataFrame.first();
+		}).to.throw();
+	});
+
+	it('getting last row of empty data-frame throws exception', function () {
+
+		var dataFrame = initDataFrame([], [], []);
+
+		expect(function () {
+			dataFrame.last();
+		}).to.throw();
+	});
+
 	it('can get first and last rows in data frame', function () {
 
 		var dataFrame = initDataFrame(

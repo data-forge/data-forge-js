@@ -861,7 +861,9 @@ BaseSeries.prototype.first = function () {
 	var self = this;
 	var iterator = self.getIterator();
 
-	iterator.moveNext();
+	if (!iterator.moveNext()) {
+		throw new Error("No rows in series.");
+	}
 
 	return iterator.getCurrent();	
 };
@@ -873,7 +875,12 @@ BaseSeries.prototype.last = function () {
 
 	var self = this;
 	var iterator = self.getIterator();
-	var last;
+
+	if (!iterator.moveNext()) {
+		throw new Error("No rows in series.");
+	}
+
+	var last = iterator.getCurrent();
 
 	while (iterator.moveNext()) {
 		last = iterator.getCurrent();
