@@ -1427,4 +1427,20 @@ BaseDataFrame.prototype.last = function () {
 	return mapRowByColumns(self, last);
 };
 
+/** 
+ * Reverse the data-frame.
+ */
+BaseDataFrame.prototype.reverse = function () {
+
+	var self = this;
+
+	//todo: make this lazy.
+
+	var DataFrame = require('./dataframe');
+	return new DataFrame({
+			rows: E.from(self.toObjects()).reverse().toArray(),
+			index: self.getIndex().reverse()
+		});
+};
+
 module.exports = BaseDataFrame;

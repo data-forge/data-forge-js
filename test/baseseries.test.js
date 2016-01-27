@@ -597,4 +597,14 @@ describe('BaseSeries', function () {
 		expect(series.first()).to.eql('A');
 		expect(series.last()).to.eql('C');
 	});
+
+	it('can reverse', function () {
+
+		var series = initSeries([0, 1, 2], ['A', 'B', 'C']);
+		var reversed = series.reverse();
+		expect(series.toValues()).to.eql(['A', 'B', 'C']);
+		expect(series.getIndex().toValues()).to.eql([0, 1, 2]);
+		expect(reversed.toValues()).to.eql(['C', 'B', 'A']);
+		expect(reversed.getIndex().toValues()).to.eql([2, 1, 0]);
+	});
 });

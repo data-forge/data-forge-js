@@ -1443,7 +1443,7 @@ describe('BaseDataFrame', function () {
 					['B', 2],
 					['C', 3],
 				],
-				[10, 11]
+				[10, 11, 12]
 			);
 
 		expect(dataFrame.first()).to.eql({
@@ -1455,4 +1455,31 @@ describe('BaseDataFrame', function () {
 			Column2: 3,
 		});
 	});
+
+	it('can reverse', function () {
+
+		var dataFrame = initDataFrame(
+				["Column1", "Column2"], 
+				[
+					['A', 1],
+					['B', 2],
+					['C', 3],
+				],
+				[10, 11, 12]
+			);
+
+		var reversed = dataFrame.reverse();
+		expect(dataFrame.toValues()).to.eql([
+			['A', 1],
+			['B', 2],
+			['C', 3],
+		]);
+		expect(dataFrame.getIndex().toValues()).to.eql([10, 11, 12]);
+		expect(reversed.toValues()).to.eql([
+			['C', 3],
+			['B', 2],
+			['A', 1],
+		]);
+		expect(reversed.getIndex().toValues()).to.eql([12, 11, 10]);
+	})
 });

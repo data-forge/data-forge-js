@@ -889,4 +889,21 @@ BaseSeries.prototype.last = function () {
 	return last;
 };
 
+/** 
+ * Reverse the series.
+ */
+BaseSeries.prototype.reverse = function () {
+
+	var self = this;
+
+	//todo: make this lazy.
+
+	var Series = require('./series');
+	return new Series(
+			E.from(self.toValues()).reverse().toArray(),
+			self.getIndex().reverse()
+		);
+};
+
+
 module.exports = BaseSeries;

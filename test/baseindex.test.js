@@ -93,4 +93,12 @@ describe('Index', function () {
 		expect(index.first()).to.eql(1);
 		expect(index.last()).to.eql(3);
 	});
+
+	it('can reverse', function () {
+
+		var index = initIndex([1, 2, 3]);
+		var reversed = index.reverse();
+		expect(index.toValues()).to.eql([1, 2, 3]);
+		expect(reversed.toValues()).to.eql([3, 2, 1]);
+	});
 });
