@@ -63,10 +63,10 @@ var dataForge = {
 	//
 	// Deserialize a data from a CSV text string.
 	//
-	fromCSV: function (csvTextString) {
+	fromCSV: function (csvTextString, config) {
 		assert.isString(csvTextString, "Expected 'csvTextString' parameter to 'dataForge.fromCSV' to be a string containing data encoded in the CSV format.");
 
-		var parsed = BabyParse.parse(csvTextString);
+		var parsed = BabyParse.parse(csvTextString, config);
 		var rows = parsed.data;
 		
 		/* Old csv parsing.
