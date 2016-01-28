@@ -905,5 +905,32 @@ BaseSeries.prototype.reverse = function () {
 		);
 };
 
+/** 
+ * Inflate a series to a data-frame.
+ *
+ * @param {function} selector - Selector function that transforms each value in the series to a row in the new data-frame.
+ */
+BaseSeries.prototype.inflate = function (selector) {
+
+	assert.isFunction(selector, "Expected 'selector' parameter to 'inflate' function to be a function.");
+
+	var self = this;
+
+	//todo: make this lazy.
+	//todo: need a better implementation.
+
+	var DataFrame = require('./dataframe');
+	return new DataFrame({
+			columnNames: ["__gen__"],
+			rows: E.from(self.toValues())
+				.select(function (value) {
+					return [value];
+				})
+				.toArray(),
+		})
+		.select(function (row) {
+			return selector(row.__gen__);
+		});
+};
 
 module.exports = BaseSeries;

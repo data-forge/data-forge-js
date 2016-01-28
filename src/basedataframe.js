@@ -1450,6 +1450,8 @@ BaseDataFrame.prototype.reverse = function () {
  */
 BaseDataFrame.prototype.generateColumns = function (selector) {
 
+	assert.isFunction(selector, "Expected 'selector' parameter to 'generateColumns' function to be a function.");
+
 	var self = this;
 
 	//todo: make this lazy.

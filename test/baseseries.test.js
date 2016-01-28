@@ -607,4 +607,23 @@ describe('BaseSeries', function () {
 		expect(reversed.toValues()).to.eql(['C', 'B', 'A']);
 		expect(reversed.getIndex().toValues()).to.eql([2, 1, 0]);
 	});
+
+	it('can inflate series to data frame', function () {
+
+		var series = initSeries([0, 1, 2], ['A', 'B', 'C']);
+		var dataFrame = series.inflate(function (value) {
+				return {
+					Col1: value,
+					Col2: value + value,
+				};
+			});
+
+		expect(dataFrame.getColumnNames()).to.eql(["Col1", "Col2"]);
+		expect(dataFrame.toValues()).to.eql([
+			['A', 'AA'],
+			['B', 'BB'],
+			['C', 'CC'],
+		]);
+
+	});
 });
