@@ -1464,4 +1464,25 @@ BaseDataFrame.prototype.generateColumns = function (selector) {
 		});
 };
 
+/** 
+ * Deflate a data-frame to a series.
+ *
+ * @param {function} selector - Selector function that transforms each row to a new sequence of values.
+ */
+BaseDataFrame.prototype.deflate = function (selector) {
+
+	assert.isFunction(selector, "Expected 'selector' parameter to 'generateColumns' function to be a function.");
+
+	var self = this;
+
+	//todo: make this lazy.
+	
+	var newValues = E.from(self.toObjects())
+		.select(selector)
+		.toArray();
+
+	var Series = require('./series');
+	return new Series(newValues, self.getIndex());
+};
+
 module.exports = BaseDataFrame;

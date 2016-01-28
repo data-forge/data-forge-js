@@ -927,6 +927,7 @@ BaseSeries.prototype.inflate = function (selector) {
 					return [value];
 				})
 				.toArray(),
+			index: self.getIndex(),
 		})
 		.select(function (row) {
 			return selector(row.__gen__);

@@ -1509,4 +1509,23 @@ describe('BaseDataFrame', function () {
 		expect(modified.getColumnNames()).to.eql(newColumnNames);
 		expect(modified.getSeries(newColumnName).toValues()).to.eql([11, 22, 33]);
 	});
+
+	it('can deflate dataframe to series', function () {
+
+		var dataFrame = initDataFrame(
+				["Column1", "Column2"], 
+				[
+					[1, 10],
+					[2, 20],
+					[3, 30],
+				],
+				[10, 11, 12]
+			);
+
+		var series = dataFrame.deflate(function (row) {
+				return row.Column1 + row.Column2;
+			});
+
+		expect(series.toValues()).to.eql([11, 22, 33]);
+	});
 });
