@@ -1495,9 +1495,6 @@ BaseDataFrame.prototype.head = function (numRows) {
 	assert.isNumber(numRows, "Expected 'numRows' parameter to 'head' function to be a function.");
 
 	var self = this;
-
-	//todo: make this lazy.
-
 	return self.take(numRows);
 };
 
@@ -1511,9 +1508,6 @@ BaseDataFrame.prototype.tail = function (numRows) {
 	assert.isNumber(numRows, "Expected 'numRows' parameter to 'tail' function to be a function.");
 
 	var self = this;
-
-	//todo: make this lazy.
-
 	return self.skip(self.count() - numRows);
 };
 

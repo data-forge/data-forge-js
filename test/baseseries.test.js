@@ -626,4 +626,18 @@ describe('BaseSeries', function () {
 		]);
 
 	});
+
+	it('can get head of series', function () {
+
+		var series = initSeries([0, 1, 2], ['A', 'B', 'C']);
+		var head = series.head(2);
+		expect(head.toValues()).to.eql(['A', 'B']);
+	});
+
+	it('can get tail of series', function () {
+
+		var series = initSeries([0, 1, 2], ['A', 'B', 'C']);
+		var head = series.tail(2);
+		expect(head.toValues()).to.eql(['B', 'C']);
+	});
 });
