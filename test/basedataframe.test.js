@@ -1482,4 +1482,31 @@ describe('BaseDataFrame', function () {
 		]);
 		expect(reversed.getIndex().toValues()).to.eql([12, 11, 10]);
 	})
+
+	it('can generate column', function () {
+
+		var initialColumns = ["Column1", "Column2"];
+		var dataFrame = initDataFrame(
+				initialColumns, 
+				[
+					[1, 10],
+					[2, 20],
+					[3, 30],
+				],
+				[10, 11, 12]
+			);
+
+		var modified = dataFrame.generateColumns(function (row) {
+				return {
+					NewColumn: row.Column1 + row.Column2,
+				};
+			});
+
+		var newColumnName = "NewColumn";
+		var newColumnNames = initialColumns.concat([newColumnName]);
+
+		expect(dataFrame.getColumnNames()).to.eql(initialColumns);
+		expect(modified.getColumnNames()).to.eql(newColumnNames);
+		expect(modified.getSeries(newColumnName).toValues()).to.eql([11, 22, 33]);
+	});
 });

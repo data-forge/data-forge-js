@@ -1443,4 +1443,23 @@ BaseDataFrame.prototype.reverse = function () {
 		});
 };
 
+/** 
+ * Generate new columns based on existing rows.
+ *
+ * @param {function} selector - Selector function that transforms each row to a new set of columns.
+ */
+BaseDataFrame.prototype.generateColumns = function (selector) {
+
+	var self = this;
+
+	//todo: make this lazy.
+	//todo: this should merge on index.
+
+	var newColumns = self.select(selector);
+	return E.from(newColumns.getColumnNames())
+		.aggregate(self, function (prevDataFrame, newColumnName) {
+			return prevDataFrame.setSeries(newColumnName, newColumns.getSeries(newColumnName));
+		});
+};
+
 module.exports = BaseDataFrame;
