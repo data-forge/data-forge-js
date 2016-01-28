@@ -1528,4 +1528,42 @@ describe('BaseDataFrame', function () {
 
 		expect(series.toValues()).to.eql([11, 22, 33]);
 	});
+
+	it('can get head of data frame', function () {
+
+		var dataFrame = initDataFrame(
+				["Column1", "Column2"], 
+				[
+					[1, 10],
+					[2, 20],
+					[3, 30],
+				],
+				[10, 11, 12]
+			);
+
+		var head = dataFrame.head(2);
+		expect(head.toValues()).to.eql([
+			[1, 10],
+			[2, 20],
+		]);
+	});
+
+	it('can get tail of data frame', function () {
+
+		var dataFrame = initDataFrame(
+				["Column1", "Column2"], 
+				[
+					[1, 10],
+					[2, 20],
+					[3, 30],
+				],
+				[10, 11, 12]
+			);
+
+		var head = dataFrame.tail(2);
+		expect(head.toValues()).to.eql([
+					[2, 20],
+					[3, 30],
+		]);
+	});
 });

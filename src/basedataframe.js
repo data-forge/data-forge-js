@@ -1471,7 +1471,7 @@ BaseDataFrame.prototype.generateColumns = function (selector) {
  */
 BaseDataFrame.prototype.deflate = function (selector) {
 
-	assert.isFunction(selector, "Expected 'selector' parameter to 'generateColumns' function to be a function.");
+	assert.isFunction(selector, "Expected 'selector' parameter to 'deflate' function to be a function.");
 
 	var self = this;
 
@@ -1483,6 +1483,38 @@ BaseDataFrame.prototype.deflate = function (selector) {
 
 	var Series = require('./series');
 	return new Series(newValues, self.getIndex());
+};
+
+/** 
+ * Get X rows from the head of the data frame.
+ *
+ * @param {int} numRows - Number of rows to take.
+ */
+BaseDataFrame.prototype.head = function (numRows) {
+
+	assert.isNumber(numRows, "Expected 'numRows' parameter to 'head' function to be a function.");
+
+	var self = this;
+
+	//todo: make this lazy.
+
+	return self.take(numRows);
+};
+
+/** 
+ * Get X rows from the tail of the data frame.
+ *
+ * @param {int} numRows - Number of rows to take.
+ */
+BaseDataFrame.prototype.tail = function (numRows) {
+
+	assert.isNumber(numRows, "Expected 'numRows' parameter to 'tail' function to be a function.");
+
+	var self = this;
+
+	//todo: make this lazy.
+
+	return self.skip(self.count() - numRows);
 };
 
 module.exports = BaseDataFrame;
