@@ -101,4 +101,18 @@ describe('Index', function () {
 		expect(index.toValues()).to.eql([1, 2, 3]);
 		expect(reversed.toValues()).to.eql([3, 2, 1]);
 	});
+
+	it('can get head of index', function () {
+
+		var index = initIndex([1, 2, 3]);
+		var head = index.head(2);
+		expect(head.toValues()).to.eql([1, 2]);
+	});
+
+	it('can get tail of index', function () {
+
+		var index = initIndex([1, 2, 3]);
+		var head = index.tail(2);
+		expect(head.toValues()).to.eql([2, 3]);
+	});
 });

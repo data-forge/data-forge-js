@@ -182,5 +182,30 @@ BaseIndex.prototype.reverse = function () {
 	return new Index(E.from(self.toValues()).reverse().toArray());
 };
 
+/** 
+ * Get X values from the head of the index.
+ *
+ * @param {int} values - Number of values to take.
+ */
+BaseIndex.prototype.head = function (values) {
+
+	assert.isNumber(values, "Expected 'values' parameter to 'head' function to be a function.");
+
+	var self = this;
+	return self.take(values);
+};
+
+/** 
+ * Get X values from the tail of the index.
+ *
+ * @param {int} values - Number of values to take.
+ */
+BaseIndex.prototype.tail = function (values) {
+
+	assert.isNumber(values, "Expected 'values' parameter to 'tail' function to be a function.");
+
+	var self = this;
+	return self.skip(self.count() - values);
+};
 
 module.exports = BaseIndex;
