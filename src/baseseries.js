@@ -139,6 +139,29 @@ BaseSeries.prototype.skipUntil = function (predicate) {
 };
 
 /**
+ * Take a number of rows in the series.
+ *
+ * @param {int} numRows - Number of rows to take.
+ */
+BaseSeries.prototype.take = function (numRows) {
+	assert.isNumber(numRows, "Expected 'numRows' parameter to 'take' function to be a number.");
+
+	var LazySeries = require('./lazyseries'); // Require here to prevent circular ref.
+	
+	var self = this;
+	return new LazySeries(
+		function () {
+			return new ArrayIterator(E
+				.from(self.toValues())
+				.take(numRows)
+				.toArray()
+			);
+		},
+		self.getIndex().take(numRows)
+	); 	
+};
+
+/**
  * Take values in the series while a condition is met.
  *
  * @param {function} predicate - Return true to indicate the condition met.
@@ -214,29 +237,6 @@ BaseSeries.prototype.takeUntil = function (predicate) {
 
 	var self = this;
 	return self.takeWhile(function (value) { return !predicate(value); });
-};
-
-/**
- * Take a number of rows in the series.
- *
- * @param {int} numRows - Number of rows to take.
- */
-BaseSeries.prototype.take = function (numRows) {
-	assert.isNumber(numRows, "Expected 'numRows' parameter to 'take' function to be a number.");
-
-	var LazySeries = require('./lazyseries'); // Require here to prevent circular ref.
-	
-	var self = this;
-	return new LazySeries(
-		function () {
-			return new ArrayIterator(E
-				.from(self.toValues())
-				.take(numRows)
-				.toArray()
-			);
-		},
-		self.getIndex().take(numRows)
-	); 	
 };
 
 /**
