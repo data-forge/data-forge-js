@@ -132,6 +132,97 @@ BaseDataFrame.prototype.skip = function (numRows) {
 };
 
 /**
+ * Skips rows in the data-frame while a condition is met.
+ *
+ * @param {function} predicate - Return true to indicate the condition met.
+ */
+BaseDataFrame.prototype.skipWhile = function (predicate) {
+	assert.isFunction(predicate, "Expected 'predicate' parameter to 'skipWhile' function to be a predicate function that returns true/false.");
+
+	var LazyDataFrame = require('./lazydataframe'); // Require here to prevent circular ref.	
+	var LazyIndex = require('./lazyindex'); // Require here to prevent circular ref.	
+	var self = this;
+	return new LazyDataFrame(
+		function () {
+			return self.getColumnNames();
+		},
+		function () {
+			var valueIterator = self.getIterator();
+			var skipped = false;
+			return {
+				moveNext: function () {
+					for (;;) {
+						if (!valueIterator.moveNext()) {
+							return false;
+						}
+
+						if (skipped) {
+							// Already skipped.
+							return true;
+						}
+
+						// Skipping until predict returns false.
+						if (!predicate(mapRowByColumns(self, valueIterator.getCurrent()))) {
+							skipped = true;
+							return true;
+						}
+					}
+				},
+
+				getCurrent: function () {
+					return valueIterator.getCurrent();
+				},
+			};
+		},
+		function () {
+			return new LazyIndex(
+				function () { //too: can use an iterator here that moves multiple iterators in tandem.
+					var indexIterator = self.getIndex().getIterator();
+					var valueIterator = self.getIterator();
+					var skipped = false;
+					return {
+						moveNext: function () {
+							for (;;) {
+								if (!valueIterator.moveNext() || !indexIterator.moveNext()) {
+									return false;
+								}
+
+								if (skipped) {
+									// Already skipped.
+									return true;
+								}
+
+								// Skipping until predict returns false.
+								if (!predicate(mapRowByColumns(self, valueIterator.getCurrent()))) {
+									skipped = true;
+									return true;
+								}
+							}
+						},
+
+						getCurrent: function () {
+							return indexIterator.getCurrent();
+						},
+					};				
+				}
+			)
+		}
+	); 	
+};
+
+/**
+ * Skips rows in the data-frame until a condition is met.
+ *
+ * @param {function} predicate - Return true to indicate the condition met.
+ */
+BaseDataFrame.prototype.skipUntil = function (predicate) {
+	assert.isFunction(predicate, "Expected 'predicate' parameter to 'skipUntil' function to be a predicate function that returns true/false.");
+
+	var self = this;
+	return self.skipWhile(function (value) { return !predicate(value); });
+};
+
+/**
  * Take a number of rows in the data frame.
  *
  * @param {int} numRows - Number of rows to take.
@@ -166,6 +257,89 @@ BaseDataFrame.prototype.take = function (numRows) {
 			return self.getIndex().take(numRows);
 		}
 	); 	
+};
+
+/**
+ * Take rows from the data-frame while a condition is met.
+ *
+ * @param {function} predicate - Return true to indicate the condition met.
+ */
+BaseDataFrame.prototype.takeWhile = function (predicate) {
+	assert.isFunction(predicate, "Expected 'predicate' parameter to 'takeWhile' function to be a predicate function that returns true/false.");
+
+	var LazyDataFrame = require('./lazydataframe'); // Require here to prevent circular ref.	
+	var LazyIndex = require('./lazyindex'); // Require here to prevent circular ref.	
+	var self = this;
+	return new LazyDataFrame(
+		function () {
+			return self.getColumnNames();
+		},
+		function () {
+			var valueIterator = self.getIterator();
+			var taking = true;
+			return {
+				moveNext: function () {
+					if (!taking) {
+						return false;
+					}
+
+					if (!valueIterator.moveNext()) {
+						return false;
+					}
+
+					if (!predicate(mapRowByColumns(self, valueIterator.getCurrent()))) {
+						taking = false;
+						return false;
+					}
+
+					return true;
+				},
+
+				getCurrent: function () {
+					return valueIterator.getCurrent();
+				},
+			};
+		},
+		function () {
+			return new LazyIndex(
+				function () { //too: can use an iterator here that moves multiple iterators in tandem.
+					var indexIterator = self.getIndex().getIterator();
+					var valueIterator = self.getIterator();
+					var taking = true;
+					return {
+						moveNext: function () {
+							if (!valueIterator.moveNext() || !indexIterator.moveNext()) {
+								return false;
+							}
+
+							if (!predicate(mapRowByColumns(self, valueIterator.getCurrent()))) {
+								taking = false;
+								return false;
+							}
+
+							return true;
+						},
+
+						getCurrent: function () {
+							return indexIterator.getCurrent();
+						},
+					};				
+				}
+			)
+		}
+	); 	
+};
+
+/**
+ * Take rows from the data-frame until a condition is met.
+ *
+ * @param {function} predicate - Return true to indicate the condition met.
+ */
+BaseDataFrame.prototype.takeUntil = function (predicate) {
+	assert.isFunction(predicate, "Expected 'predicate' parameter to 'takeUntil' function to be a predicate function that returns true/false.");
+
+	var self = this;
+	return self.takeWhile(function (value) { return !predicate(value); });
 };
 
 /**

@@ -1566,4 +1566,80 @@ describe('BaseDataFrame', function () {
 					[3, 30],
 		]);
 	});
+
+	it('can skip while', function () {
+
+		var dataFrame = initDataFrame(
+				["Column1"], 
+				[
+					[true],
+					[true],
+					[false],
+					[true],
+				],
+				[0, 1, 2, 3]
+			);
+		var skipped = dataFrame.skipWhile(function (row) { return row.Column1; });
+		expect(skipped.toPairs()).to.eql([
+			[2, { Column1: false }],
+			[3, { Column1: true }],
+		]);
+	});
+
+	it('can skip until', function () {
+
+		var dataFrame = initDataFrame(
+				["Column1"], 
+				[
+					[false],
+					[false],
+					[true],
+					[false],
+				],
+				[0, 1, 2, 3]
+			);
+		var skipped = dataFrame.skipUntil(function (row) { return row.Column1; });
+		expect(skipped.toPairs()).to.eql([
+			[2, { Column1: true }],
+			[3, { Column1: false }]
+		]);
+	});
+
+	it('can take while', function () {
+
+		var dataFrame = initDataFrame(
+				["Column1"], 
+				[
+					[true],
+					[true],
+					[false],
+					[true],
+				],
+				[0, 1, 2, 3]
+			);
+		var skipped = dataFrame.takeWhile(function (row) { return row.Column1; });
+		expect(skipped.toPairs()).to.eql([
+			[0, { Column1: true }],
+			[1, { Column1: true }],
+		]);
+	});
+
+	it('can take until', function () {
+
+		var dataFrame = initDataFrame(
+				["Column1"], 
+				[
+					[false],
+					[false],
+					[true],
+					[false],
+				],
+				[0, 1, 2, 3]
+			);
+		var skipped = dataFrame.takeUntil(function (row) { return row.Column1; });
+		expect(skipped.toPairs()).to.eql([
+			[0, { Column1: false }],
+			[1, { Column1: false }],
+		]);
+	});
 });

@@ -162,7 +162,7 @@ BaseSeries.prototype.take = function (numRows) {
 };
 
 /**
- * Take values in the series while a condition is met.
+ * Take values from the series while a condition is met.
  *
  * @param {function} predicate - Return true to indicate the condition met.
  */
@@ -228,7 +228,7 @@ BaseSeries.prototype.takeWhile = function (predicate) {
 };
 
 /**
- * Take values in the series until a condition is met.
+ * Take values from the series until a condition is met.
  *
  * @param {function} predicate - Return true to indicate the condition met.
  */
