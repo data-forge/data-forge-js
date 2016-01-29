@@ -5,14 +5,7 @@ var ArrayIterator = require('./iterators/array');
 var assert = require('chai').assert;
 var E = require('linq');
 
-//
-// Helper function to validate an iterator.
-//
-var validateEnumerator = function (iterator) {
-	assert.isObject(iterator, "Expected an 'iterator' object.");
-	assert.isFunction(iterator.moveNext, "Expected iterator to have function 'moveNext'.");
-	assert.isFunction(iterator.getCurrent, "Expected iterator to have function 'getCurrent'.");
-};
+var validateIterator = require('./iterators/validate');
 
 /**
  * Base class for indexes.
@@ -95,7 +88,7 @@ BaseIndex.prototype.toValues = function () {
 
 	var self = this;
 	var iterator = self.getIterator();
-	validateEnumerator(iterator);
+	validateIterator(iterator);
 
 	var values = [];
 

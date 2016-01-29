@@ -17,7 +17,12 @@ var ArrayIterator = function (arr) {
 	};
 
 	self.getCurrent = function () {
-		return arr[rowIndex];
+		if (rowIndex >= 0 && rowIndex < arr.length) {
+			return arr[rowIndex];
+		}
+		else {
+			return undefined;
+		}		
 	};
 };
 

@@ -10,14 +10,7 @@ var moment = require('moment');
 var ArrayIterator = require('./iterators/array');
 var Index = require('./index');
 
-//
-// Helper function to validate an iterator.
-//
-var validateIterator = function (iterator) {
-	assert.isObject(iterator, "Expected an 'iterator' object.");
-	assert.isFunction(iterator.moveNext, "Expected iterator to have function 'moveNext'.");
-	assert.isFunction(iterator.getCurrent, "Expected iterator to have function 'getCurrent'.");
-};
+var validateIterator = require('./iterators/validate');
 
 /**
  * Base class for series.

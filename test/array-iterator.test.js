@@ -1,9 +1,15 @@
 'use strict';
 
-describe('array enumerator', function () {
+describe('array iterator', function () {
 
 	var ArrayIterator = require('../src/iterators/array');
 	var expect = require('chai').expect;
+
+	it('result is undefined before moving to first element', function () {
+
+		var testObject = new ArrayIterator([1]);
+		expect(testObject.getCurrent()).to.be.undefined;
+	});
 
 	it('cannot move next for empty enumerator', function () {
 
