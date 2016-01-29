@@ -640,4 +640,44 @@ describe('BaseSeries', function () {
 		var head = series.tail(2);
 		expect(head.toValues()).to.eql(['B', 'C']);
 	});
+
+	it('can skip while', function () {
+
+		var series = initSeries([0, 1, 2, 3], [true, true, false, true]);
+		var skipped = series.skipWhile(function (value) { return value; });
+		expect(skipped.toPairs()).to.eql([
+			[2, false],
+			[3, true],
+		]);
+	});
+
+	it('can skip until', function () {
+
+		var series = initSeries([0, 1, 2, 3], [false, false, true, false]);
+		var skipped = series.skipUntil(function (value) { return value; });
+		expect(skipped.toPairs()).to.eql([
+			[2, true],
+			[3, false],
+		]);
+	});
+
+	it('can take while', function () {
+
+		var series = initSeries([0, 1, 2, 3], [true, true, false, true]);
+		var skipped = series.takeWhile(function (value) { return value; });
+		expect(skipped.toPairs()).to.eql([
+			[0, true],
+			[1, true],
+		]);
+	});
+
+	it('can take until', function () {
+
+		var series = initSeries([0, 1, 2, 3], [false, false, true, false]);		
+		var skipped = series.takeUntil(function (value) { return value; });
+		expect(skipped.toPairs()).to.eql([
+			[0, false],
+			[1, false],
+		]);
+	});
 });
