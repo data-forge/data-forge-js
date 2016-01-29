@@ -8,6 +8,7 @@ var Column = require('./column');
 var LazySeries = require('./lazyseries');
 var LazyIndex = require('./lazyindex');
 var ArrayIterator = require('./iterators/array');
+var MultiIterator = require('./iterators/multi');
 var BabyParse = require('babyparse');
 
 var assert = require('chai').assert; 
@@ -169,14 +170,13 @@ BaseDataFrame.prototype.skipWhile = function (predicate) {
 		},
 		function () {
 			return new LazyIndex(
-				function () { //too: can use an iterator here that moves multiple iterators in tandem.
-					var indexIterator = self.getIndex().getIterator();
-					var valueIterator = self.getIterator();
+				function () {
+					var multiIterator = new MultiIterator([self.getIndex(), self]);
 					var skipped = false;
 					return {
 						moveNext: function () {
 							for (;;) {
-								if (!valueIterator.moveNext() || !indexIterator.moveNext()) {
+								if (!multiIterator.moveNext()) {
 									return false;
 								}
 
@@ -186,7 +186,8 @@ BaseDataFrame.prototype.skipWhile = function (predicate) {
 								}
 
 								// Skipping until predict returns false.
-								if (!predicate(mapRowByColumns(self, valueIterator.getCurrent()))) {
+								var currentValue = multiIterator.getCurrent();
+								if (!predicate(mapRowByColumns(self, currentValue[1]))) {
 									skipped = true;
 									return true;
 								}
@@ -194,7 +195,8 @@ BaseDataFrame.prototype.skipWhile = function (predicate) {
 						},
 
 						getCurrent: function () {
-							return indexIterator.getCurrent();
+							var currentValue = multiIterator.getCurrent();
+							return currentValue[0]; // Return the value of the index.
 						},
 					};				
 				}
@@ -295,17 +297,17 @@ BaseDataFrame.prototype.takeWhile = function (predicate) {
 		},
 		function () {
 			return new LazyIndex(
-				function () { //too: can use an iterator here that moves multiple iterators in tandem.
-					var indexIterator = self.getIndex().getIterator();
-					var valueIterator = self.getIterator();
+				function () {
+					var multiIterator = new MultiIterator([self.getIndex(), self]);
 					var taking = true;
 					return {
 						moveNext: function () {
-							if (!valueIterator.moveNext() || !indexIterator.moveNext()) {
+							if (!multiIterator.moveNext()) {
 								return false;
 							}
 
-							if (!predicate(mapRowByColumns(self, valueIterator.getCurrent()))) {
+							var currentValue = multiIterator.getCurrent();
+							if (!predicate(mapRowByColumns(self, currentValue[1]))) {
 								taking = false;
 								return false;
 							}
@@ -314,7 +316,8 @@ BaseDataFrame.prototype.takeWhile = function (predicate) {
 						},
 
 						getCurrent: function () {
-							return indexIterator.getCurrent();
+							var currentValue = multiIterator.getCurrent();
+							return currentValue[0]; // Return just the index.
 						},
 					};				
 				}
