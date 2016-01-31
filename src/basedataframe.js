@@ -1282,7 +1282,7 @@ BaseDataFrame.prototype.remapColumns = function (columnNames) {
 /**
  * Create a new data frame with different column names.
  *
- * @param {string array} newColumnNames - Array of strings, with an element for each existing column that specifies the new name of that column.
+ * @param {array} newColumnNames - Array of strings, with an element for each existing column that specifies the new name of that column.
  */
 BaseDataFrame.prototype.renameColumns = function (newColumnNames) {
 

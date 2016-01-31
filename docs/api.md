@@ -1,4 +1,5 @@
 ## Members
+
 <dl>
 <dt><a href="#dataForge">dataForge</a></dt>
 <dd><p>Main namespace for Data-Forge.</p>
@@ -12,46 +13,47 @@
     &lt;script language=&quot;javascript&quot; type=&quot;text/javascript&quot; src=&quot;bower_components/data-forge/data-forge.js&quot;&gt;&lt;/script&gt;
 </code></pre></dd>
 </dl>
+
 ## Functions
+
 <dl>
-<dt><a href="#as">as()</a></dt>
-<dd><p>Convert DataFrame from a particular data format using a plugable format.</p>
-</dd>
-<dt><a href="#as">as()</a></dt>
-<dd><p>Convert DataFrame from a particular data format using a plugable format.</p>
-</dd>
-<dt><a href="#BaseColumn">BaseColumn()</a></dt>
-<dd><p>Base class for columns.</p>
-<p>getName - Get the name of the column.
-getValues - Get the values for each entry in the series.
-getIndex - Get the index for the column.</p>
-</dd>
 <dt><a href="#BaseDataFrame">BaseDataFrame()</a></dt>
 <dd><p>Base class for data frames.</p>
 <p>Derived classes must implement:</p>
 <p>getIndex - Get the index for the data frame.
 getColumnNames - Get the columns for the data frame.
-getValues - Get the values for the data frame.</p>
+getIterator - Get a row iterator for the data frame.</p>
 </dd>
 <dt><a href="#BaseIndex">BaseIndex()</a></dt>
 <dd><p>Base class for indexes.</p>
 <p>Derives classes must implement:</p>
-<pre><code>    getName - Get the name of theindex.
-    getValues - Get the array of values from the index.
+<pre><code>    getIterator - Get an iterator for iterating the values of the index.
 </code></pre></dd>
+<dt><a href="#BaseSeries">BaseSeries()</a></dt>
+<dd><p>Base class for series.</p>
+<p>getIterator - Get the iterator for the series.
+getIndex - Get the index for the series.</p>
+</dd>
 <dt><a href="#Column">Column()</a></dt>
 <dd><p>Represents a column in a data frame.</p>
+</dd>
+<dt><a href="#DataFrame">DataFrame(config)</a></dt>
+<dd><p>Constructor for DataFrame.</p>
 </dd>
 <dt><a href="#Index">Index()</a></dt>
 <dd><p>Implements an index for a data frame or column.</p>
 </dd>
-<dt><a href="#LazyColumn">LazyColumn()</a></dt>
-<dd><p>Represents a lazy-evaluated column in a data frame.</p>
-</dd>
 <dt><a href="#LazyIndex">LazyIndex()</a></dt>
 <dd><p>Implements an lazy-evaluated index for a data frame or column.</p>
 </dd>
+<dt><a href="#LazySeries">LazySeries()</a></dt>
+<dd><p>Represents a lazy-evaluated time-series.</p>
+</dd>
+<dt><a href="#Series">Series()</a></dt>
+<dd><p>Represents a time series.</p>
+</dd>
 </dl>
+
 <a name="dataForge"></a>
 ## dataForge
 Main namespace for Data-Forge.Nodejs:		npm install --save data-forge				var dataForge = require('data-forge');Browser:		bower install --save data-forge		<script language="javascript" type="text/javascript" src="bower_components/data-forge/data-forge.js"></script>
@@ -59,19 +61,19 @@ Main namespace for Data-Forge.Nodejs:		npm install --save data-forge				va
 **Kind**: global variable  
 
 * [dataForge](#dataForge)
-  * [.from()](#dataForge.from)
-  * [.fromSync()](#dataForge.fromSync)
-  * [.merge(leftDataFrame, rightDataFrame, [columnName])](#dataForge.merge)
-  * [.concat(dataFrames)](#dataForge.concat)
+    * [.use()](#dataForge.use)
+    * [.fromJSON()](#dataForge.fromJSON)
+    * [.merge(leftDataFrame, rightDataFrame, [columnName])](#dataForge.merge)
+    * [.concat(dataFrames)](#dataForge.concat)
 
-<a name="dataForge.from"></a>
-### dataForge.from()
-Read a DataFrame asynchronously from a plugable data source.
+<a name="dataForge.use"></a>
+### dataForge.use()
+Install a plugin in the dataForge namespace.
 
 **Kind**: static method of <code>[dataForge](#dataForge)</code>  
-<a name="dataForge.fromSync"></a>
-### dataForge.fromSync()
-Read a DataFrame synchronously from a plugable data source.
+<a name="dataForge.fromJSON"></a>
+### dataForge.fromJSON()
+Deserialize a data frame from a JSON text string.
 
 **Kind**: static method of <code>[dataForge](#dataForge)</code>  
 <a name="dataForge.merge"></a>
@@ -82,8 +84,8 @@ Merge data frames by index or a particular column.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| leftDataFrame | <code>DataFrame</code> | One data frame to merge. |
-| rightDataFrame | <code>DataFrame</code> | The other data frame to merge. |
+| leftDataFrame | <code>[DataFrame](#DataFrame)</code> | One data frame to merge. |
+| rightDataFrame | <code>[DataFrame](#DataFrame)</code> | The other data frame to merge. |
 | [columnName] | <code>string</code> | The name of the column to merge on. Optional, when not specified merge is based on the index. |
 
 <a name="dataForge.concat"></a>
@@ -96,229 +98,60 @@ Concatenate multiple data frames into a single.
 | --- | --- | --- |
 | dataFrames | <code>array</code> | Array of data frames to concatenate. |
 
-<a name="as"></a>
-## as()
-Convert DataFrame from a particular data format using a plugable format.
-
-**Kind**: global function  
-<a name="as"></a>
-## as()
-Convert DataFrame from a particular data format using a plugable format.
-
-**Kind**: global function  
-<a name="BaseColumn"></a>
-## BaseColumn()
-Base class for columns.getName - Get the name of the column.getValues - Get the values for each entry in the series.getIndex - Get the index for the column.
-
-**Kind**: global function  
-
-* [BaseColumn()](#BaseColumn)
-  * [.skip(numRows)](#BaseColumn+skip)
-  * [.take(numRows)](#BaseColumn+take)
-  * [.where(filterSelectorPredicate)](#BaseColumn+where)
-  * [.select(selector)](#BaseColumn+select)
-  * [.selectMany(selector)](#BaseColumn+selectMany)
-  * [.order()](#BaseColumn+order)
-  * [.orderDescending()](#BaseColumn+orderDescending)
-  * [.orderBy(sortSelector)](#BaseColumn+orderBy)
-  * [.orderByDescending(sortSelector)](#BaseColumn+orderByDescending)
-  * [.getRowsSubset(index, count)](#BaseColumn+getRowsSubset)
-  * [.rollingWindow(period, fn)](#BaseColumn+rollingWindow)
-  * [.reindex(newIndex)](#BaseColumn+reindex)
-  * [.toString()](#BaseColumn+toString)
-  * [.percentChange()](#BaseColumn+percentChange)
-  * [.parseInts()](#BaseColumn+parseInts)
-  * [.parseFloats()](#BaseColumn+parseFloats)
-  * [.parseDates()](#BaseColumn+parseDates)
-  * [.toStrings()](#BaseColumn+toStrings)
-  * [.detectTypes()](#BaseColumn+detectTypes)
-  * [.truncateStrings(maxLength)](#BaseColumn+truncateStrings)
-
-<a name="BaseColumn+skip"></a>
-### baseColumn.skip(numRows)
-Skip a number of rows in the column.
-
-**Kind**: instance method of <code>[BaseColumn](#BaseColumn)</code>  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| numRows | <code>int</code> | Number of rows to skip. |
-
-<a name="BaseColumn+take"></a>
-### baseColumn.take(numRows)
-Take a number of rows in the column.
-
-**Kind**: instance method of <code>[BaseColumn](#BaseColumn)</code>  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| numRows | <code>int</code> | Number of rows to take. |
-
-<a name="BaseColumn+where"></a>
-### baseColumn.where(filterSelectorPredicate)
-Filter a column by a predicate selector.
-
-**Kind**: instance method of <code>[BaseColumn](#BaseColumn)</code>  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| filterSelectorPredicate | <code>function</code> | Predicte function to filter rows of the column. |
-
-<a name="BaseColumn+select"></a>
-### baseColumn.select(selector)
-Generate a new column based on the results of the selector function.
-
-**Kind**: instance method of <code>[BaseColumn](#BaseColumn)</code>  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| selector | <code>function</code> | Selector function that transforms each value to a different data structure. |
-
-<a name="BaseColumn+selectMany"></a>
-### baseColumn.selectMany(selector)
-Generate a new column based on the results of the selector function.
-
-**Kind**: instance method of <code>[BaseColumn](#BaseColumn)</code>  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| selector | <code>function</code> | Selector function that transforms each value to a different data structure. |
-
-<a name="BaseColumn+order"></a>
-### baseColumn.order()
-Sorts the column by value (ascending).
-
-**Kind**: instance method of <code>[BaseColumn](#BaseColumn)</code>  
-<a name="BaseColumn+orderDescending"></a>
-### baseColumn.orderDescending()
-Sorts the column by value (descending).
-
-**Kind**: instance method of <code>[BaseColumn](#BaseColumn)</code>  
-<a name="BaseColumn+orderBy"></a>
-### baseColumn.orderBy(sortSelector)
-Sorts the column by sort selector (ascending).
-
-**Kind**: instance method of <code>[BaseColumn](#BaseColumn)</code>  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| sortSelector | <code>function</code> | An function to select a value to sort by. |
-
-<a name="BaseColumn+orderByDescending"></a>
-### baseColumn.orderByDescending(sortSelector)
-Sorts the column by sort selector (descending).
-
-**Kind**: instance method of <code>[BaseColumn](#BaseColumn)</code>  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| sortSelector | <code>function</code> | An function to select a value to sort by. |
-
-<a name="BaseColumn+getRowsSubset"></a>
-### baseColumn.getRowsSubset(index, count)
-Get a subset of rows from the column.
-
-**Kind**: instance method of <code>[BaseColumn](#BaseColumn)</code>  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| index | <code>int</code> | Index where the subset starts. |
-| count | <code>int</code> | Number of rows to include in the subset. |
-
-<a name="BaseColumn+rollingWindow"></a>
-### baseColumn.rollingWindow(period, fn)
-Execute code over a moving window to produce a new data frame.
-
-**Kind**: instance method of <code>[BaseColumn](#BaseColumn)</code>  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| period | <code>integer</code> | The number of entries to include in the window. |
-| fn | <code>function</code> | The function to invoke on each window. |
-
-<a name="BaseColumn+reindex"></a>
-### baseColumn.reindex(newIndex)
-Create a new column, reindexed from this column.
-
-**Kind**: instance method of <code>[BaseColumn](#BaseColumn)</code>  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| newIndex | <code>index</code> | The index used to generate the new column. |
-
-<a name="BaseColumn+toString"></a>
-### baseColumn.toString()
-Format the data frame for display as a string.
-
-**Kind**: instance method of <code>[BaseColumn](#BaseColumn)</code>  
-<a name="BaseColumn+percentChange"></a>
-### baseColumn.percentChange()
-Compute the percent change for each row after the first.Percentages are expressed as 0-1 values.
-
-**Kind**: instance method of <code>[BaseColumn](#BaseColumn)</code>  
-<a name="BaseColumn+parseInts"></a>
-### baseColumn.parseInts()
-Parse a column with string values to a column with int values.
-
-**Kind**: instance method of <code>[BaseColumn](#BaseColumn)</code>  
-<a name="BaseColumn+parseFloats"></a>
-### baseColumn.parseFloats()
-Parse a column with string values to a column with float values.
-
-**Kind**: instance method of <code>[BaseColumn](#BaseColumn)</code>  
-<a name="BaseColumn+parseDates"></a>
-### baseColumn.parseDates()
-Parse a column with string values to a column with date values.
-
-**Kind**: instance method of <code>[BaseColumn](#BaseColumn)</code>  
-<a name="BaseColumn+toStrings"></a>
-### baseColumn.toStrings()
-Convert a column of values of different types to a column of string values.
-
-**Kind**: instance method of <code>[BaseColumn](#BaseColumn)</code>  
-<a name="BaseColumn+detectTypes"></a>
-### baseColumn.detectTypes()
-Detect the actual types of the values that comprised the column and their frequency.Returns a new column containing the type information.
-
-**Kind**: instance method of <code>[BaseColumn](#BaseColumn)</code>  
-<a name="BaseColumn+truncateStrings"></a>
-### baseColumn.truncateStrings(maxLength)
-Produces a new column with all string values truncated to the requested maximum length.
-
-**Kind**: instance method of <code>[BaseColumn](#BaseColumn)</code>  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| maxLength | <code>int</code> | The maximum length of the string values after truncation. |
-
 <a name="BaseDataFrame"></a>
 ## BaseDataFrame()
-Base class for data frames.Derived classes must implement:getIndex - Get the index for the data frame.getColumnNames - Get the columns for the data frame.getValues - Get the values for the data frame.
+Base class for data frames.Derived classes must implement:getIndex - Get the index for the data frame.getColumnNames - Get the columns for the data frame.getIterator - Get a row iterator for the data frame.
 
 **Kind**: global function  
 
 * [BaseDataFrame()](#BaseDataFrame)
-  * [.getColumnIndex(columnName)](#BaseDataFrame+getColumnIndex) ⇒ <code>Number</code>
-  * [.skip(numRows)](#BaseDataFrame+skip)
-  * [.take(numRows)](#BaseDataFrame+take)
-  * [.where(filterSelectorPredicate)](#BaseDataFrame+where)
-  * [.select(selector)](#BaseDataFrame+select)
-  * [.selectMany(selector)](#BaseDataFrame+selectMany)
-  * [.getColumns()](#BaseDataFrame+getColumns)
-  * [.orderBy(columnNameOrIndexOrSelector)](#BaseDataFrame+orderBy)
-  * [.orderByDescending(columnNameOrIndexOrSelector)](#BaseDataFrame+orderByDescending)
-  * [.dropColumn(columnOrColumns)](#BaseDataFrame+dropColumn)
-  * [.setColumn(columnName, data)](#BaseDataFrame+setColumn)
-  * [.getRowsSubset(index, count)](#BaseDataFrame+getRowsSubset)
-  * [.setIndex(columnNameOrIndex)](#BaseDataFrame+setIndex)
-  * [.resetIndex()](#BaseDataFrame+resetIndex)
-  * [.toString()](#BaseDataFrame+toString)
-  * [.parseInts()](#BaseDataFrame+parseInts)
-  * [.parseFloats()](#BaseDataFrame+parseFloats)
-  * [.parseDates()](#BaseDataFrame+parseDates)
-  * [.toStrings()](#BaseDataFrame+toStrings)
-  * [.detectTypes()](#BaseDataFrame+detectTypes)
-  * [.truncateStrings(maxLength)](#BaseDataFrame+truncateStrings)
+    * [.getColumnIndex(columnName)](#BaseDataFrame+getColumnIndex) ⇒ <code>Number</code>
+    * [.skip(numRows)](#BaseDataFrame+skip)
+    * [.skipWhile(predicate)](#BaseDataFrame+skipWhile)
+    * [.skipUntil(predicate)](#BaseDataFrame+skipUntil)
+    * [.take(numRows)](#BaseDataFrame+take)
+    * [.takeWhile(predicate)](#BaseDataFrame+takeWhile)
+    * [.takeUntil(predicate)](#BaseDataFrame+takeUntil)
+    * [.where(filterSelectorPredicate)](#BaseDataFrame+where)
+    * [.select(selector)](#BaseDataFrame+select)
+    * [.selectMany(selector)](#BaseDataFrame+selectMany)
+    * [.getSeries(columnNameOrIndex)](#BaseDataFrame+getSeries)
+    * [.hasSeries(columnName)](#BaseDataFrame+hasSeries)
+    * [.expectSeries(columnNameOrIndex)](#BaseDataFrame+expectSeries)
+    * [.getColumns()](#BaseDataFrame+getColumns)
+    * [.orderBy(columnNameOrIndexOrSelector)](#BaseDataFrame+orderBy)
+    * [.orderByDescending(columnNameOrIndexOrSelector)](#BaseDataFrame+orderByDescending)
+    * [.dropColumn(columnOrColumns)](#BaseDataFrame+dropColumn)
+    * [.setSeries(columnName, data)](#BaseDataFrame+setSeries)
+    * [.getRowsSubset(startIndex, endIndex)](#BaseDataFrame+getRowsSubset)
+    * [.setIndex(columnNameOrIndex)](#BaseDataFrame+setIndex)
+    * [.resetIndex()](#BaseDataFrame+resetIndex)
+    * [.toString()](#BaseDataFrame+toString)
+    * [.parseInts(columnNameOrIndex)](#BaseDataFrame+parseInts)
+    * [.parseFloats(columnNameOrIndex)](#BaseDataFrame+parseFloats)
+    * [.parseDates(columnNameOrIndex)](#BaseDataFrame+parseDates)
+    * [.toStrings()](#BaseDataFrame+toStrings)
+    * [.detectTypes()](#BaseDataFrame+detectTypes)
+    * [.detectValues()](#BaseDataFrame+detectValues)
+    * [.truncateStrings(maxLength)](#BaseDataFrame+truncateStrings)
+    * [.remapColumns(columnNames)](#BaseDataFrame+remapColumns)
+    * [.renameColumns(newColumnNames)](#BaseDataFrame+renameColumns)
+    * [.toValues()](#BaseDataFrame+toValues)
+    * [.toObjects()](#BaseDataFrame+toObjects)
+    * [.toJSON()](#BaseDataFrame+toJSON)
+    * [.toCSV()](#BaseDataFrame+toCSV)
+    * [.toPairs()](#BaseDataFrame+toPairs)
+    * [.bake()](#BaseDataFrame+bake)
+    * [.count()](#BaseDataFrame+count)
+    * [.transformColumn(columnName, selector)](#BaseDataFrame+transformColumn)
+    * [.rollingWindow(period, selector)](#BaseDataFrame+rollingWindow)
+    * [.first()](#BaseDataFrame+first)
+    * [.last()](#BaseDataFrame+last)
+    * [.reverse()](#BaseDataFrame+reverse)
+    * [.generateColumns(selector)](#BaseDataFrame+generateColumns)
+    * [.deflate(selector)](#BaseDataFrame+deflate)
+    * [.head(numRows)](#BaseDataFrame+head)
+    * [.tail(numRows)](#BaseDataFrame+tail)
 
 <a name="BaseDataFrame+getColumnIndex"></a>
 ### baseDataFrame.getColumnIndex(columnName) ⇒ <code>Number</code>
@@ -341,6 +174,26 @@ Skip a number of rows in the data frame.
 | --- | --- | --- |
 | numRows | <code>int</code> | Number of rows to skip. |
 
+<a name="BaseDataFrame+skipWhile"></a>
+### baseDataFrame.skipWhile(predicate)
+Skips rows in the data-frame while a condition is met.
+
+**Kind**: instance method of <code>[BaseDataFrame](#BaseDataFrame)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| predicate | <code>function</code> | Return true to indicate the condition met. |
+
+<a name="BaseDataFrame+skipUntil"></a>
+### baseDataFrame.skipUntil(predicate)
+Skips rows in the data-frame until a condition is met.
+
+**Kind**: instance method of <code>[BaseDataFrame](#BaseDataFrame)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| predicate | <code>function</code> | Return true to indicate the condition met. |
+
 <a name="BaseDataFrame+take"></a>
 ### baseDataFrame.take(numRows)
 Take a number of rows in the data frame.
@@ -350,6 +203,26 @@ Take a number of rows in the data frame.
 | Param | Type | Description |
 | --- | --- | --- |
 | numRows | <code>int</code> | Number of rows to take. |
+
+<a name="BaseDataFrame+takeWhile"></a>
+### baseDataFrame.takeWhile(predicate)
+Take rows from the data-frame while a condition is met.
+
+**Kind**: instance method of <code>[BaseDataFrame](#BaseDataFrame)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| predicate | <code>function</code> | Return true to indicate the condition met. |
+
+<a name="BaseDataFrame+takeUntil"></a>
+### baseDataFrame.takeUntil(predicate)
+Take rows from the data-frame until a condition is met.
+
+**Kind**: instance method of <code>[BaseDataFrame](#BaseDataFrame)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| predicate | <code>function</code> | Return true to indicate the condition met. |
 
 <a name="BaseDataFrame+where"></a>
 ### baseDataFrame.where(filterSelectorPredicate)
@@ -380,6 +253,36 @@ Generate a new data frame based on the results of the selector function.
 | Param | Type | Description |
 | --- | --- | --- |
 | selector | <code>function</code> | Selector function that transforms each row to a different data structure. |
+
+<a name="BaseDataFrame+getSeries"></a>
+### baseDataFrame.getSeries(columnNameOrIndex)
+Retreive a time-series from a column of the data-frame.
+
+**Kind**: instance method of <code>[BaseDataFrame](#BaseDataFrame)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| columnNameOrIndex | <code>string</code> &#124; <code>int</code> | Name or index of the column to retreive. |
+
+<a name="BaseDataFrame+hasSeries"></a>
+### baseDataFrame.hasSeries(columnName)
+Returns true if the column with the requested name exists in the data frame.
+
+**Kind**: instance method of <code>[BaseDataFrame](#BaseDataFrame)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| columnName | <code>string</code> | Name of the column to check. |
+
+<a name="BaseDataFrame+expectSeries"></a>
+### baseDataFrame.expectSeries(columnNameOrIndex)
+Verify the existance of a column and return it.Throws an exception if the column doesn't exist.
+
+**Kind**: instance method of <code>[BaseDataFrame](#BaseDataFrame)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| columnNameOrIndex | <code>string</code> &#124; <code>int</code> | Name or index of the column to retreive. |
 
 <a name="BaseDataFrame+getColumns"></a>
 ### baseDataFrame.getColumns()
@@ -416,9 +319,9 @@ Create a new data frame with the requested column or columns dropped.
 | --- | --- | --- |
 | columnOrColumns | <code>string</code> &#124; <code>array</code> | Specifies the column name (a string) or columns (array of column names) to drop. |
 
-<a name="BaseDataFrame+setColumn"></a>
-### baseDataFrame.setColumn(columnName, data)
-Create a new data frame with and additional or replaced column.
+<a name="BaseDataFrame+setSeries"></a>
+### baseDataFrame.setSeries(columnName, data)
+Create a new data frame with an additional column specified by the passed-in series.
 
 **Kind**: instance method of <code>[BaseDataFrame](#BaseDataFrame)</code>  
 
@@ -428,15 +331,15 @@ Create a new data frame with and additional or replaced column.
 | data | <code>array</code> &#124; <code>column</code> | Array of data or column that contains data. |
 
 <a name="BaseDataFrame+getRowsSubset"></a>
-### baseDataFrame.getRowsSubset(index, count)
+### baseDataFrame.getRowsSubset(startIndex, endIndex)
 Get a subset of rows from the data frame.
 
 **Kind**: instance method of <code>[BaseDataFrame](#BaseDataFrame)</code>  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| index | <code>int</code> | Index where the subset starts. |
-| count | <code>int</code> | Number of rows to include in the subset. |
+| startIndex | <code>int</code> | Index where the subset starts. |
+| endIndex | <code>int</code> | Marks the end of the subset, one row past the last row to include. |
 
 <a name="BaseDataFrame+setIndex"></a>
 ### baseDataFrame.setIndex(columnNameOrIndex)
@@ -459,28 +362,48 @@ Format the data frame for display as a string.
 
 **Kind**: instance method of <code>[BaseDataFrame](#BaseDataFrame)</code>  
 <a name="BaseDataFrame+parseInts"></a>
-### baseDataFrame.parseInts()
+### baseDataFrame.parseInts(columnNameOrIndex)
 Parse a column with string values to a column with int values.
 
 **Kind**: instance method of <code>[BaseDataFrame](#BaseDataFrame)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| columnNameOrIndex | <code>string</code> &#124; <code>int</code> | Specifies the column to parse. |
+
 <a name="BaseDataFrame+parseFloats"></a>
-### baseDataFrame.parseFloats()
+### baseDataFrame.parseFloats(columnNameOrIndex)
 Parse a column with string values to a column with float values.
 
 **Kind**: instance method of <code>[BaseDataFrame](#BaseDataFrame)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| columnNameOrIndex | <code>string</code> &#124; <code>int</code> | Specifies the column to parse. |
+
 <a name="BaseDataFrame+parseDates"></a>
-### baseDataFrame.parseDates()
+### baseDataFrame.parseDates(columnNameOrIndex)
 Parse a column with string values to a column with date values.
 
 **Kind**: instance method of <code>[BaseDataFrame](#BaseDataFrame)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| columnNameOrIndex | <code>string</code> &#124; <code>int</code> | Specifies the column to parse. |
+
 <a name="BaseDataFrame+toStrings"></a>
 ### baseDataFrame.toStrings()
-Convert a column of values of different types to a column of string values.
+Convert a column of values of different types to a column of string values.* @param {string|int} columnNameOrIndex - Specifies the column to convert.
 
 **Kind**: instance method of <code>[BaseDataFrame](#BaseDataFrame)</code>  
 <a name="BaseDataFrame+detectTypes"></a>
 ### baseDataFrame.detectTypes()
 Detect actual types and their frequencies contained within columns in the data frame.
+
+**Kind**: instance method of <code>[BaseDataFrame](#BaseDataFrame)</code>  
+<a name="BaseDataFrame+detectValues"></a>
+### baseDataFrame.detectValues()
+Detect values and their frequencies contained within columns in the data frame.
 
 **Kind**: instance method of <code>[BaseDataFrame](#BaseDataFrame)</code>  
 <a name="BaseDataFrame+truncateStrings"></a>
@@ -493,16 +416,154 @@ Produces a new data frame with all string values truncated to the requested maxi
 | --- | --- | --- |
 | maxLength | <code>int</code> | The maximum length of the string values after truncation. |
 
+<a name="BaseDataFrame+remapColumns"></a>
+### baseDataFrame.remapColumns(columnNames)
+Create a new data frame with columns reordered.New column names create new columns (with undefined values), omitting existing column names causes those columns to be dropped.
+
+**Kind**: instance method of <code>[BaseDataFrame](#BaseDataFrame)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| columnNames | <code>array</code> | The new order for columns. |
+
+<a name="BaseDataFrame+renameColumns"></a>
+### baseDataFrame.renameColumns(newColumnNames)
+Create a new data frame with different column names.
+
+**Kind**: instance method of <code>[BaseDataFrame](#BaseDataFrame)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| newColumnNames | <code>array</code> | Array of strings, with an element for each existing column that specifies the new name of that column. |
+
+<a name="BaseDataFrame+toValues"></a>
+### baseDataFrame.toValues()
+Bake the data frame to an array of rows.
+
+**Kind**: instance method of <code>[BaseDataFrame](#BaseDataFrame)</code>  
+<a name="BaseDataFrame+toObjects"></a>
+### baseDataFrame.toObjects()
+Bake the data frame to an array of JavaScript objects.
+
+**Kind**: instance method of <code>[BaseDataFrame](#BaseDataFrame)</code>  
+<a name="BaseDataFrame+toJSON"></a>
+### baseDataFrame.toJSON()
+Serialize the data frame to JSON.
+
+**Kind**: instance method of <code>[BaseDataFrame](#BaseDataFrame)</code>  
+<a name="BaseDataFrame+toCSV"></a>
+### baseDataFrame.toCSV()
+Serialize the data frame to CSV.
+
+**Kind**: instance method of <code>[BaseDataFrame](#BaseDataFrame)</code>  
+<a name="BaseDataFrame+toPairs"></a>
+### baseDataFrame.toPairs()
+Retreive the data as pairs of [index, objects].
+
+**Kind**: instance method of <code>[BaseDataFrame](#BaseDataFrame)</code>  
+<a name="BaseDataFrame+bake"></a>
+### baseDataFrame.bake()
+Forces lazy evaluation to complete and 'bakes' the data frame into memory.
+
+**Kind**: instance method of <code>[BaseDataFrame](#BaseDataFrame)</code>  
+<a name="BaseDataFrame+count"></a>
+### baseDataFrame.count()
+Count the number of rows in the data frame.
+
+**Kind**: instance method of <code>[BaseDataFrame](#BaseDataFrame)</code>  
+<a name="BaseDataFrame+transformColumn"></a>
+### baseDataFrame.transformColumn(columnName, selector)
+Transform a column. This is equivalent to extracting a column, calling 'select' on it,then plugging it back in as the same column.
+
+**Kind**: instance method of <code>[BaseDataFrame](#BaseDataFrame)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| columnName | <code>string</code> | Name of the column to transform. |
+| selector | <code>function</code> | Selector function that transforms each row to a different data structure. |
+
+<a name="BaseDataFrame+rollingWindow"></a>
+### baseDataFrame.rollingWindow(period, selector)
+Move a rolling window over the data frame, invoke a selector function to build a new data frame.
+
+**Kind**: instance method of <code>[BaseDataFrame](#BaseDataFrame)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| period | <code>integer</code> | The number of entries to include in the window. |
+| selector | <code>function</code> | The selector function that builds the output series. The selector has the following parameters:  		window - Data-frame that represents the rolling window. 		windowIndex - The 0-based index of the window. |
+
+<a name="BaseDataFrame+first"></a>
+### baseDataFrame.first()
+Get the first row of the data frame.
+
+**Kind**: instance method of <code>[BaseDataFrame](#BaseDataFrame)</code>  
+<a name="BaseDataFrame+last"></a>
+### baseDataFrame.last()
+Get the last row of the data frame.
+
+**Kind**: instance method of <code>[BaseDataFrame](#BaseDataFrame)</code>  
+<a name="BaseDataFrame+reverse"></a>
+### baseDataFrame.reverse()
+Reverse the data-frame.
+
+**Kind**: instance method of <code>[BaseDataFrame](#BaseDataFrame)</code>  
+<a name="BaseDataFrame+generateColumns"></a>
+### baseDataFrame.generateColumns(selector)
+Generate new columns based on existing rows.
+
+**Kind**: instance method of <code>[BaseDataFrame](#BaseDataFrame)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| selector | <code>function</code> | Selector function that transforms each row to a new set of columns. |
+
+<a name="BaseDataFrame+deflate"></a>
+### baseDataFrame.deflate(selector)
+Deflate a data-frame to a series.
+
+**Kind**: instance method of <code>[BaseDataFrame](#BaseDataFrame)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| selector | <code>function</code> | Selector function that transforms each row to a new sequence of values. |
+
+<a name="BaseDataFrame+head"></a>
+### baseDataFrame.head(numRows)
+Get X rows from the head of the data frame.
+
+**Kind**: instance method of <code>[BaseDataFrame](#BaseDataFrame)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| numRows | <code>int</code> | Number of rows to take. |
+
+<a name="BaseDataFrame+tail"></a>
+### baseDataFrame.tail(numRows)
+Get X rows from the tail of the data frame.
+
+**Kind**: instance method of <code>[BaseDataFrame](#BaseDataFrame)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| numRows | <code>int</code> | Number of rows to take. |
+
 <a name="BaseIndex"></a>
 ## BaseIndex()
-Base class for indexes.Derives classes must implement:		getName - Get the name of theindex.		getValues - Get the array of values from the index.
+Base class for indexes.Derives classes must implement:		getIterator - Get an iterator for iterating the values of the index.
 
 **Kind**: global function  
 
 * [BaseIndex()](#BaseIndex)
-  * [.skip(numRows)](#BaseIndex+skip)
-  * [.take(numRows)](#BaseIndex+take)
-  * [.getRowsSubset(index, count)](#BaseIndex+getRowsSubset)
+    * [.skip(numRows)](#BaseIndex+skip)
+    * [.take(numRows)](#BaseIndex+take)
+    * [.getRowsSubset(startIndex, endIndex)](#BaseIndex+getRowsSubset)
+    * [.count()](#BaseIndex+count)
+    * [.first()](#BaseIndex+first)
+    * [.last()](#BaseIndex+last)
+    * [.reverse()](#BaseIndex+reverse)
+    * [.head(values)](#BaseIndex+head)
+    * [.tail(values)](#BaseIndex+tail)
 
 <a name="BaseIndex+skip"></a>
 ### baseIndex.skip(numRows)
@@ -525,15 +586,359 @@ Take a number of rows from the index.
 | numRows | <code>int</code> | Number of rows to take. |
 
 <a name="BaseIndex+getRowsSubset"></a>
-### baseIndex.getRowsSubset(index, count)
+### baseIndex.getRowsSubset(startIndex, endIndex)
 Get a subset of rows from the index.
 
 **Kind**: instance method of <code>[BaseIndex](#BaseIndex)</code>  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| index | <code>int</code> | Index where the subset starts. |
-| count | <code>int</code> | Number of rows to include in the subset. |
+| startIndex | <code>int</code> | Index where the subset starts. |
+| endIndex | <code>int</code> | Marks the end of the subset, one row past the last row to include. |
+
+<a name="BaseIndex+count"></a>
+### baseIndex.count()
+Count the number of rows in the index.
+
+**Kind**: instance method of <code>[BaseIndex](#BaseIndex)</code>  
+<a name="BaseIndex+first"></a>
+### baseIndex.first()
+Get the first row of the index.
+
+**Kind**: instance method of <code>[BaseIndex](#BaseIndex)</code>  
+<a name="BaseIndex+last"></a>
+### baseIndex.last()
+Get the last row of the index.
+
+**Kind**: instance method of <code>[BaseIndex](#BaseIndex)</code>  
+<a name="BaseIndex+reverse"></a>
+### baseIndex.reverse()
+Reverse the index.
+
+**Kind**: instance method of <code>[BaseIndex](#BaseIndex)</code>  
+<a name="BaseIndex+head"></a>
+### baseIndex.head(values)
+Get X values from the head of the index.
+
+**Kind**: instance method of <code>[BaseIndex](#BaseIndex)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| values | <code>int</code> | Number of values to take. |
+
+<a name="BaseIndex+tail"></a>
+### baseIndex.tail(values)
+Get X values from the tail of the index.
+
+**Kind**: instance method of <code>[BaseIndex](#BaseIndex)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| values | <code>int</code> | Number of values to take. |
+
+<a name="BaseSeries"></a>
+## BaseSeries()
+Base class for series.getIterator - Get the iterator for the series.getIndex - Get the index for the series.
+
+**Kind**: global function  
+
+* [BaseSeries()](#BaseSeries)
+    * [.skip(numRows)](#BaseSeries+skip)
+    * [.skipWhile(predicate)](#BaseSeries+skipWhile)
+    * [.skipUntil(predicate)](#BaseSeries+skipUntil)
+    * [.take(numRows)](#BaseSeries+take)
+    * [.takeWhile(predicate)](#BaseSeries+takeWhile)
+    * [.takeUntil(predicate)](#BaseSeries+takeUntil)
+    * [.where(filterSelectorPredicate)](#BaseSeries+where)
+    * [.select(selector)](#BaseSeries+select)
+    * [.selectMany(selector)](#BaseSeries+selectMany)
+    * [.order()](#BaseSeries+order)
+    * [.orderDescending()](#BaseSeries+orderDescending)
+    * [.orderBy(sortSelector)](#BaseSeries+orderBy)
+    * [.orderByDescending(sortSelector)](#BaseSeries+orderByDescending)
+    * [.getRowsSubset(startIndex, endIndex)](#BaseSeries+getRowsSubset)
+    * [.rollingWindow(period, selector)](#BaseSeries+rollingWindow)
+    * [.reindex(newIndex)](#BaseSeries+reindex)
+    * [.toString()](#BaseSeries+toString)
+    * [.percentChange()](#BaseSeries+percentChange)
+    * [.parseInts()](#BaseSeries+parseInts)
+    * [.parseFloats()](#BaseSeries+parseFloats)
+    * [.parseDates()](#BaseSeries+parseDates)
+    * [.toStrings()](#BaseSeries+toStrings)
+    * [.detectTypes()](#BaseSeries+detectTypes)
+    * [.detectValues()](#BaseSeries+detectValues)
+    * [.truncateStrings(maxLength)](#BaseSeries+truncateStrings)
+    * [.bake()](#BaseSeries+bake)
+    * [.toPairs()](#BaseSeries+toPairs)
+    * [.count()](#BaseSeries+count)
+    * [.first()](#BaseSeries+first)
+    * [.last()](#BaseSeries+last)
+    * [.reverse()](#BaseSeries+reverse)
+    * [.inflate(selector)](#BaseSeries+inflate)
+    * [.head(values)](#BaseSeries+head)
+    * [.tail(values)](#BaseSeries+tail)
+
+<a name="BaseSeries+skip"></a>
+### baseSeries.skip(numRows)
+Skip a number of rows in the series.
+
+**Kind**: instance method of <code>[BaseSeries](#BaseSeries)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| numRows | <code>int</code> | Number of rows to skip. |
+
+<a name="BaseSeries+skipWhile"></a>
+### baseSeries.skipWhile(predicate)
+Skips values in the series while a condition is met.
+
+**Kind**: instance method of <code>[BaseSeries](#BaseSeries)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| predicate | <code>function</code> | Return true to indicate the condition met. |
+
+<a name="BaseSeries+skipUntil"></a>
+### baseSeries.skipUntil(predicate)
+Skips values in the series until a condition is met.
+
+**Kind**: instance method of <code>[BaseSeries](#BaseSeries)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| predicate | <code>function</code> | Return true to indicate the condition met. |
+
+<a name="BaseSeries+take"></a>
+### baseSeries.take(numRows)
+Take a number of rows in the series.
+
+**Kind**: instance method of <code>[BaseSeries](#BaseSeries)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| numRows | <code>int</code> | Number of rows to take. |
+
+<a name="BaseSeries+takeWhile"></a>
+### baseSeries.takeWhile(predicate)
+Take values from the series while a condition is met.
+
+**Kind**: instance method of <code>[BaseSeries](#BaseSeries)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| predicate | <code>function</code> | Return true to indicate the condition met. |
+
+<a name="BaseSeries+takeUntil"></a>
+### baseSeries.takeUntil(predicate)
+Take values from the series until a condition is met.
+
+**Kind**: instance method of <code>[BaseSeries](#BaseSeries)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| predicate | <code>function</code> | Return true to indicate the condition met. |
+
+<a name="BaseSeries+where"></a>
+### baseSeries.where(filterSelectorPredicate)
+Filter a series by a predicate selector.
+
+**Kind**: instance method of <code>[BaseSeries](#BaseSeries)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| filterSelectorPredicate | <code>function</code> | Predicte function to filter rows of the series. |
+
+<a name="BaseSeries+select"></a>
+### baseSeries.select(selector)
+Generate a new series based on the results of the selector function.
+
+**Kind**: instance method of <code>[BaseSeries](#BaseSeries)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| selector | <code>function</code> | Selector function that transforms each value to a different data structure. |
+
+<a name="BaseSeries+selectMany"></a>
+### baseSeries.selectMany(selector)
+Generate a new series based on the results of the selector function.
+
+**Kind**: instance method of <code>[BaseSeries](#BaseSeries)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| selector | <code>function</code> | Selector function that transforms each value to a different data structure. |
+
+<a name="BaseSeries+order"></a>
+### baseSeries.order()
+Sorts the series by value (ascending).
+
+**Kind**: instance method of <code>[BaseSeries](#BaseSeries)</code>  
+<a name="BaseSeries+orderDescending"></a>
+### baseSeries.orderDescending()
+Sorts the series by value (descending).
+
+**Kind**: instance method of <code>[BaseSeries](#BaseSeries)</code>  
+<a name="BaseSeries+orderBy"></a>
+### baseSeries.orderBy(sortSelector)
+Sorts the series by sort selector (ascending).
+
+**Kind**: instance method of <code>[BaseSeries](#BaseSeries)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| sortSelector | <code>function</code> | An function to select a value to sort by. |
+
+<a name="BaseSeries+orderByDescending"></a>
+### baseSeries.orderByDescending(sortSelector)
+Sorts the series by sort selector (descending).
+
+**Kind**: instance method of <code>[BaseSeries](#BaseSeries)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| sortSelector | <code>function</code> | An function to select a value to sort by. |
+
+<a name="BaseSeries+getRowsSubset"></a>
+### baseSeries.getRowsSubset(startIndex, endIndex)
+Get a subset of rows from the series.
+
+**Kind**: instance method of <code>[BaseSeries](#BaseSeries)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| startIndex | <code>int</code> | Index where the subset starts. |
+| endIndex | <code>int</code> | Marks the end of the subset, one row past the last row to include. |
+
+<a name="BaseSeries+rollingWindow"></a>
+### baseSeries.rollingWindow(period, selector)
+Move a rolling window over the series, invoke a selector function to build a new series.
+
+**Kind**: instance method of <code>[BaseSeries](#BaseSeries)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| period | <code>integer</code> | The number of entries to include in the window. |
+| selector | <code>function</code> | The selector function that builds the output series. The selector has the following parameters:  		window - Series that represents the rolling window. 		windowIndex - The 0-based index of the window. |
+
+<a name="BaseSeries+reindex"></a>
+### baseSeries.reindex(newIndex)
+Create a new series, reindexed from this series.
+
+**Kind**: instance method of <code>[BaseSeries](#BaseSeries)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| newIndex | <code>index</code> | The index used to generate the new series. |
+
+<a name="BaseSeries+toString"></a>
+### baseSeries.toString()
+Format the data frame for display as a string.
+
+**Kind**: instance method of <code>[BaseSeries](#BaseSeries)</code>  
+<a name="BaseSeries+percentChange"></a>
+### baseSeries.percentChange()
+Compute the percent change for each row after the first.Percentages are expressed as 0-1 values.
+
+**Kind**: instance method of <code>[BaseSeries](#BaseSeries)</code>  
+<a name="BaseSeries+parseInts"></a>
+### baseSeries.parseInts()
+Parse a series with string values to a series with int values.
+
+**Kind**: instance method of <code>[BaseSeries](#BaseSeries)</code>  
+<a name="BaseSeries+parseFloats"></a>
+### baseSeries.parseFloats()
+Parse a series with string values to a series with float values.
+
+**Kind**: instance method of <code>[BaseSeries](#BaseSeries)</code>  
+<a name="BaseSeries+parseDates"></a>
+### baseSeries.parseDates()
+Parse a series with string values to a series with date values.
+
+**Kind**: instance method of <code>[BaseSeries](#BaseSeries)</code>  
+<a name="BaseSeries+toStrings"></a>
+### baseSeries.toStrings()
+Convert a series of values of different types to a series of string values.
+
+**Kind**: instance method of <code>[BaseSeries](#BaseSeries)</code>  
+<a name="BaseSeries+detectTypes"></a>
+### baseSeries.detectTypes()
+Detect the actual types of the values that comprised the series and their frequency.Returns a new series containing the type information.
+
+**Kind**: instance method of <code>[BaseSeries](#BaseSeries)</code>  
+<a name="BaseSeries+detectValues"></a>
+### baseSeries.detectValues()
+Detect the frequency of values in the series.Returns a new series containing the information.
+
+**Kind**: instance method of <code>[BaseSeries](#BaseSeries)</code>  
+<a name="BaseSeries+truncateStrings"></a>
+### baseSeries.truncateStrings(maxLength)
+Produces a new series with all string values truncated to the requested maximum length.
+
+**Kind**: instance method of <code>[BaseSeries](#BaseSeries)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| maxLength | <code>int</code> | The maximum length of the string values after truncation. |
+
+<a name="BaseSeries+bake"></a>
+### baseSeries.bake()
+Forces lazy evaluation to complete and 'bakes' the series into memory.
+
+**Kind**: instance method of <code>[BaseSeries](#BaseSeries)</code>  
+<a name="BaseSeries+toPairs"></a>
+### baseSeries.toPairs()
+Retreive the data as pairs of [index, value].
+
+**Kind**: instance method of <code>[BaseSeries](#BaseSeries)</code>  
+<a name="BaseSeries+count"></a>
+### baseSeries.count()
+Count the number of rows in the series.
+
+**Kind**: instance method of <code>[BaseSeries](#BaseSeries)</code>  
+<a name="BaseSeries+first"></a>
+### baseSeries.first()
+Get the first row of the series.
+
+**Kind**: instance method of <code>[BaseSeries](#BaseSeries)</code>  
+<a name="BaseSeries+last"></a>
+### baseSeries.last()
+Get the last row of the series.
+
+**Kind**: instance method of <code>[BaseSeries](#BaseSeries)</code>  
+<a name="BaseSeries+reverse"></a>
+### baseSeries.reverse()
+Reverse the series.
+
+**Kind**: instance method of <code>[BaseSeries](#BaseSeries)</code>  
+<a name="BaseSeries+inflate"></a>
+### baseSeries.inflate(selector)
+Inflate a series to a data-frame.
+
+**Kind**: instance method of <code>[BaseSeries](#BaseSeries)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| selector | <code>function</code> | Selector function that transforms each value in the series to a row in the new data-frame. |
+
+<a name="BaseSeries+head"></a>
+### baseSeries.head(values)
+Get X values from the head of the series.
+
+**Kind**: instance method of <code>[BaseSeries](#BaseSeries)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| values | <code>int</code> | Number of values to take. |
+
+<a name="BaseSeries+tail"></a>
+### baseSeries.tail(values)
+Get X values from the tail of the series.
+
+**Kind**: instance method of <code>[BaseSeries](#BaseSeries)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| values | <code>int</code> | Number of values to take. |
 
 <a name="Column"></a>
 ## Column()
@@ -542,82 +947,103 @@ Represents a column in a data frame.
 **Kind**: global function  
 
 * [Column()](#Column)
-  * [.getName()](#Column+getName)
-  * [.getValues()](#Column+getValues)
-  * [.getIndex()](#Column+getIndex)
+    * [.getName()](#Column+getName)
+    * [.getSeries()](#Column+getSeries)
+    * [.toString()](#Column+toString)
 
 <a name="Column+getName"></a>
 ### column.getName()
 Retreive the name of the column.
 
 **Kind**: instance method of <code>[Column](#Column)</code>  
-<a name="Column+getValues"></a>
-### column.getValues()
-Retreive the values of the column.
+<a name="Column+getSeries"></a>
+### column.getSeries()
+Retreive the time-series for the column.
 
 **Kind**: instance method of <code>[Column](#Column)</code>  
-<a name="Column+getIndex"></a>
-### column.getIndex()
-Retreive the index of the column.
+<a name="Column+toString"></a>
+### column.toString()
+Format the column for display as a string.
 
 **Kind**: instance method of <code>[Column](#Column)</code>  
+<a name="DataFrame"></a>
+## DataFrame(config)
+Constructor for DataFrame.
+
+**Kind**: global function  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| config | <code>object</code> | Specifies content and configuration for the data frame. |
+
+
+* [DataFrame(config)](#DataFrame)
+    * [.getIndex()](#DataFrame+getIndex)
+    * [.getColumnNames()](#DataFrame+getColumnNames)
+    * [.getIterator()](#DataFrame+getIterator)
+
+<a name="DataFrame+getIndex"></a>
+### dataFrame.getIndex()
+Get the index of the data frame.
+
+**Kind**: instance method of <code>[DataFrame](#DataFrame)</code>  
+<a name="DataFrame+getColumnNames"></a>
+### dataFrame.getColumnNames()
+Get the names of the columns in the data frame.
+
+**Kind**: instance method of <code>[DataFrame](#DataFrame)</code>  
+<a name="DataFrame+getIterator"></a>
+### dataFrame.getIterator()
+Get an iterator to enumerate the rows of the DataFrame.
+
+**Kind**: instance method of <code>[DataFrame](#DataFrame)</code>  
 <a name="Index"></a>
 ## Index()
 Implements an index for a data frame or column.
 
 **Kind**: global function  
-
-* [Index()](#Index)
-  * [.getName()](#Index+getName)
-  * [.getValues()](#Index+getValues)
-
-<a name="Index+getName"></a>
-### index.getName()
-Get the name of the index.
+<a name="Index+getIterator"></a>
+### index.getIterator()
+Get an iterator to iterate the values of the index.
 
 **Kind**: instance method of <code>[Index](#Index)</code>  
-<a name="Index+getValues"></a>
-### index.getValues()
-Get the array of values from the index.
-
-**Kind**: instance method of <code>[Index](#Index)</code>  
-<a name="LazyColumn"></a>
-## LazyColumn()
-Represents a lazy-evaluated column in a data frame.
-
-**Kind**: global function  
-
-* [LazyColumn()](#LazyColumn)
-  * [.getName()](#LazyColumn+getName)
-  * [.getValues()](#LazyColumn+getValues)
-
-<a name="LazyColumn+getName"></a>
-### lazyColumn.getName()
-Retreive the name of the column.
-
-**Kind**: instance method of <code>[LazyColumn](#LazyColumn)</code>  
-<a name="LazyColumn+getValues"></a>
-### lazyColumn.getValues()
-Retreive the values of the column.
-
-**Kind**: instance method of <code>[LazyColumn](#LazyColumn)</code>  
 <a name="LazyIndex"></a>
 ## LazyIndex()
 Implements an lazy-evaluated index for a data frame or column.
 
 **Kind**: global function  
-
-* [LazyIndex()](#LazyIndex)
-  * [.getName()](#LazyIndex+getName)
-  * [.getValues()](#LazyIndex+getValues)
-
-<a name="LazyIndex+getName"></a>
-### lazyIndex.getName()
-Get the name of the index.
+<a name="LazyIndex+getIterator"></a>
+### lazyIndex.getIterator()
+Get an iterator to iterate the values of the index.
 
 **Kind**: instance method of <code>[LazyIndex](#LazyIndex)</code>  
-<a name="LazyIndex+getValues"></a>
-### lazyIndex.getValues()
-Get the array of values from the index.
+<a name="LazySeries"></a>
+## LazySeries()
+Represents a lazy-evaluated time-series.
 
-**Kind**: instance method of <code>[LazyIndex](#LazyIndex)</code>  
+**Kind**: global function  
+<a name="LazySeries+getIterator"></a>
+### lazySeries.getIterator()
+Get an iterator for the iterating the values of the series.
+
+**Kind**: instance method of <code>[LazySeries](#LazySeries)</code>  
+<a name="Series"></a>
+## Series()
+Represents a time series.
+
+**Kind**: global function  
+
+* [Series()](#Series)
+    * [.getIterator()](#Series+getIterator)
+    * [.getIndex()](#Series+getIndex)
+
+<a name="Series+getIterator"></a>
+### series.getIterator()
+Get an iterator for the iterating the values of the series.
+
+**Kind**: instance method of <code>[Series](#Series)</code>  
+<a name="Series+getIndex"></a>
+### series.getIndex()
+Retreive the index of the series.
+
+**Kind**: instance method of <code>[Series](#Series)</code>  
