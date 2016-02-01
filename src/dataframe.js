@@ -90,15 +90,20 @@ var DataFrame = function (config) {
 		}
 	}
 
+	rows = rows || [];
+
 	var self = this;
 	self._columnNames = columnNames || [];
-	self._values = rows || [];
 	self._index = (config && config.index) || 
 		new LazyIndex(
 			function () {
-				return new ArrayIterator(E.range(0, self._values.length).toArray());
+				return new ArrayIterator(E.range(0, rows.length).toArray()); //todo: this should be a broad cast index.
 			}
 		);
+
+	self.getIterator = function () {
+		return new ArrayIterator(rows);
+	};
 };
 
 var parent = inherit(DataFrame, BaseDataFrame);
@@ -118,15 +123,5 @@ DataFrame.prototype.getColumnNames = function () {
 	var self = this;
 	return self._columnNames;
 };
-
-/**
- * Get an iterator to enumerate the rows of the DataFrame.
- */
-DataFrame.prototype.getIterator = function () {
-	var self = this;
-	return new ArrayIterator(self._values);
-};
-
-//todo: could override the get values fn... here just return the already baked values.
 
 module.exports = DataFrame;
