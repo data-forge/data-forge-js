@@ -738,7 +738,7 @@ describe('BaseDataFrame', function () {
 		
 		var newColumnName = "new column";
 		var newIndex = new dataForge.Index([0, 5, 2, 7]);
-		var newSeries = new dataForge.Series([4, 3, 2, 1], newIndex);
+		var newSeries = new dataForge.Series({ values: [4, 3, 2, 1], index: newIndex });
 		var modified = dataFrame.setSeries(newColumnName, newSeries);
 		var mergedSeries = modified.getSeries(newColumnName);
 

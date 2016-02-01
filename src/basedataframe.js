@@ -1156,13 +1156,13 @@ BaseDataFrame.prototype.detectTypes = function () {
 			var numValues = series.toValues().length;
 			var Series = require('./series');
 			//todo: broad-cast column
-			var newSeries = new Series(
-				E.range(0, numValues)
+			var newSeries = new Series({
+				values: E.range(0, numValues)
 					.select(function () { 
 						return column.getName(); 
 					})
 					.toArray()
-			);
+			});
 			return column.getSeries()
 				.detectTypes()
 				.setSeries('Column', newSeries);
@@ -1186,13 +1186,13 @@ BaseDataFrame.prototype.detectValues = function () {
 			var numValues = column.getSeries().toValues().length;
 			var Series = require('./series');
 			//todo: broad-cast column
-			var newSeries = new Series(
-				E.range(0, numValues)
+			var newSeries = new Series({
+				values: E.range(0, numValues)
 					.select(function () { 
 						return column.getName(); 
 					})
 					.toArray()
-			);
+			});
 			return column.getSeries().detectValues().setSeries('Column', newSeries);
 		})
 		.toArray();
@@ -1652,7 +1652,7 @@ BaseDataFrame.prototype.deflate = function (selector) {
 		.toArray();
 
 	var Series = require('./series');
-	return new Series(newValues, self.getIndex());
+	return new Series({ values: newValues, index: self.getIndex() });
 };
 
 /** 

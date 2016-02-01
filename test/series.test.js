@@ -9,7 +9,7 @@ describe('Series', function () {
 	
 	it('default index is generated', function () {
 		
-		var column = new dataForge.Series([100, 200]);
+		var column = new dataForge.Series({ values: [100, 200] });
 		expect(column.getIndex().toValues()).to.eql([			
 			0,
 			1			
@@ -18,8 +18,8 @@ describe('Series', function () {
 
 	it('can get index', function () {
 		
-		var column = new dataForge.Series([100, 200], new dataForge.Index([5, 6]));
-		expect(column.getIndex().toValues()).to.eql([			
+		var column = new dataForge.Series({ values: [100, 200], index: new dataForge.Index([5, 6]) });
+		expect(column.getIndex().toValues()).to.eql([
 			5,
 			6
 		]);		
@@ -27,7 +27,7 @@ describe('Series', function () {
 	
 	it('can get column values', function () {
 		
-		var column = new dataForge.Series([100, 200]);
+		var column = new dataForge.Series({ values: [100, 200] });
 		expect(column.toValues()).to.eql([			
 			100,
 			200			

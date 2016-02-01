@@ -611,7 +611,7 @@ BaseSeries.prototype.rollingWindow = function (period, fn) {
 
 	if (values.length == 0) {
 		var Series = require('./series');
-		return new Series([]);
+		return new Series();
 	}
 
 	var newIndexAndValues = E.range(0, values.length-period+1)
@@ -619,7 +619,7 @@ BaseSeries.prototype.rollingWindow = function (period, fn) {
 			var _index = E.from(index).skip(rowIndex).take(period).toArray();
 			var _values = E.from(values).skip(rowIndex).take(period).toArray();
 			var Series = require('./series'); //todo: use a lazy series for this.
-			var _window = new Series(_values, new Index(_index));
+			var _window = new Series({ values: _values, index: new Index(_index) });
 			return fn(_window, rowIndex);
 		})
 		.toArray();
@@ -978,7 +978,7 @@ BaseSeries.prototype.bake = function () {
 	var self = this;
 
 	var Series = require('./series');
-	return new Series(self.toValues(), self.getIndex().bake());
+	return new Series({ values: self.toValues(), index: self.getIndex().bake() });
 };
 
 /**
@@ -1056,10 +1056,10 @@ BaseSeries.prototype.reverse = function () {
 	//todo: make this lazy.
 
 	var Series = require('./series');
-	return new Series(
-			E.from(self.toValues()).reverse().toArray(),
-			self.getIndex().reverse()
-		);
+	return new Series({
+			values: E.from(self.toValues()).reverse().toArray(),
+			index: self.getIndex().reverse(),
+		});
 };
 
 /** 

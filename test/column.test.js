@@ -8,7 +8,7 @@ describe('Column', function () {
 	var expect = require('chai').expect; 
 	
 	var initExampleColumn = function (index) {
-		var series = new dataForge.Series([100, 200], index);
+		var series = new dataForge.Series({ values: [100, 200], index: index });
 		return new dataForge.Column('some-column', series);
 	};
 

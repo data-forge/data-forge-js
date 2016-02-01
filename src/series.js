@@ -6,6 +6,7 @@
 
 var BaseSeries = require('./baseseries');
 var LazyIndex = require('./lazyindex');
+var Index = require('./index');
 var ArrayIterator = require('./iterators/array');
 
 var assert = require('chai').assert;
@@ -15,21 +16,33 @@ var inherit = require('./inherit');
 /**
  * Represents a time series.
  */
-var Series = function (values, index) {
-	assert.isArray(values, "Expected 'values' parameter to Series constructor be an array.");
-
-	if (index) {
-		assert.isObject(index, "Expected 'index' parameter to Series constructor to be an object.");
-	}
+var Series = function (config) {
 
 	var self = this;
-	self._values = values;	
-	self._index = index || 
-		new LazyIndex(
-			function () {
-				return new ArrayIterator(E.range(0, values.length).toArray());
-			}
-		);
+
+	if (config) {
+		assert.isArray(config.values, "Expected 'values' field of 'config' parameter to Series constructor be an array.");
+
+		self._values = config.values;
+
+		if (config.index) {
+			assert.isObject(config.index, "Expected 'index' parameter to Series constructor to be an object.");
+
+			self._index = config.index;
+		}
+		else {
+			// Generate the index.
+			self._index = new LazyIndex(
+					function () {
+						return new ArrayIterator(E.range(0, config.values.length).toArray());
+					}
+				);
+		}
+	}
+	else {
+		self._values = [];
+		self._index = new Index([]);
+	}
 };
 
 var parent = inherit(Series, BaseSeries);
