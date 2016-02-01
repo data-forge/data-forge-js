@@ -4,11 +4,13 @@ JavaScript data transformation and analysis toolkit inspired by Pandas and LINQ.
 
 Works in both NodeJS and the browser. 
 
-[Also available for C#](https://github.com/Real-Serious-Games/data-forge-cs).
+[Also available for C#](https://github.com/data-forge/data-forge-cs).
 
 ----------
 
 This project is a work in progress, please don't use unless you want to be an early adopter. Please expect API changes. Please contribute and help guide the direction of *data-forge*.
+
+Note that some features described in this README are not yet implemented, although that list grows smaller every day.
 
 # Generated API docs
 
@@ -20,14 +22,16 @@ See here for [generated API docs](./docs/api.md) that are taking shape.
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
-- [Project Aims](#project-aims)
-- [Driving Principles](#driving-principles)
-- [Implementation](#implementation)
+- [Project Overview](#project-overview)
+  - [Project Aims](#project-aims)
+  - [Driving Principles](#driving-principles)
+  - [Implementation](#implementation)
 - [Installation](#installation)
   - [NodeJS installation and setup](#nodejs-installation-and-setup)
     - [Data-Forge plugins under Node.js](#data-forge-plugins-under-nodejs)
   - [Browser installation and setup](#browser-installation-and-setup)
     - [Data-Forge plugins under the browser](#data-forge-plugins-under-the-browser)
+  - [Meteor installation and setup](#meteor-installation-and-setup)
   - [Getting the code](#getting-the-code)
 - [Key Concepts](#key-concepts)
   - [Data Frame](#data-frame)
@@ -79,32 +83,37 @@ See here for [generated API docs](./docs/api.md) that are taking shape.
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# Project Aims
+# Project Overview
+
+A short overview of the aims, principles and implementation methods for this project.
+
+## Project Aims
 
 The aims of this project:
 
-- To combine the best aspects of [Pandas](https://en.wikipedia.org/wiki/Pandas_(software)) and [LINQ](https://en.wikipedia.org/wiki/Language_Integrated_Query) and make them available in JavaScript and C#.
-- To be able to load data, transform and save data.
+- To combine the best aspects of [Pandas](https://en.wikipedia.org/wiki/Pandas_(software)) and [LINQ](https://en.wikipedia.org/wiki/Language_Integrated_Query) and make them available in JavaScript.
+- To be able to load, transform and save data.
 - To be able to prepare data for visualization. 
 - Be able to load massive data files.
 
-# Driving Principles 
+## Driving Principles 
 
 The principles that drive decision making and tradeoffs:
 
-- Simple, easy to learn, easy to use.
+- The API should be simple, easy to learn and easy to use.
 - Minimize the magic, everything should be understandable, the API should be orthogonal.
-- High performance.
-- Be able to use the same (or very similar) API in both Javascript and C#.
-- The code you build during interactive data exploration should be transplantable to an app or microservice.
+- The library should have high performance.
+- Be able to use a similar API in both Javascript and C#.
+- The code you build during interactive data exploration should be transplantable to an webapp, server or microservice.
 
-# Implementation
+## Implementation
 
 General implementation goals:
 
-- Immutable, every operation generates a new immutable data set.
+- Immutable: every operation generates a new immutable data set.
 - Lazy evaluation, to make the performance of immutability acceptable.
-- Extensible via plugins for data sources and formats.
+- Should be easily extensible.
+- All the core code is created through test driven development.
 
 
 ----------
@@ -131,7 +140,7 @@ Install via NPM:
 
 	npm install --save data-forge-from-yahoo
 
-Required and *use*:
+Import the module and *use* it:
 
 	var dataForge = require('data-forge');
 	dataForge.use(require('data-forge-from-yahoo'));
@@ -175,11 +184,15 @@ Use functions defined by the plugin, eg:
 			// ... use the data returned from Yahoo ...
 		}); 
 
+## Meteor installation and setup
+
+Coming in the future. Can anyone help with that?
+
 ## Getting the code
 
 Install via NPM and Bower as described in previous sections or clone, fork or download the code from GitHub:
 
-[https://github.com/Real-Serious-Games/data-forge-js](https://github.com/Real-Serious-Games/data-forge-js)
+[https://github.com/data-forge/data-forge-js](https://github.com/data-forge/data-forge-js)
 
 
 # Key Concepts
@@ -188,39 +201,47 @@ This section explains the key concepts of *Data-Forge*.
 
 ## Data Frame
 
-This is the *main* concept. A matrix of data structured as rows and columns. Can be considered a sequence of rows. Has an implicit or explicit index. Think of it as a spreadsheet in memory. 
+This is the *main* concept. A matrix of data structured as rows and columns. Can be considered a sequence of rows. Has an implicit or explicit index. Think of it as a spreadsheet in memory.
+
+A *data-frame* internal representation depends on how the data-frame was constructed. It can be stored as a collection of columns (when constructed manually) or a collection of rows (as is the case when constructed from a CSV file).
+
+A *data-frame* can be easily constructed from various formats and it can be exported to various formats. 
 
 ## Row
 
-A single row of data in a *data frame*. Contains a slice of data across columns. Has an implicit or explicit index. An JavaScript object or an array of values is associated with each row.
+A single row of data in a *data-frame*. Contains a slice of data across columns. Has an implicit or explicit index. A row is most commonly represented as a JavaScript object (with column names as fields). A row can also be represented as an array of values.
 
 ## Series
 
-A sequence of indexed values. These are often time-series, where the values are indexed by date/time.
+A sequence of indexed values. These are often, but not always, time-series, where the values are indexed by date/time.
 
 All values in a series are generally expected to have the same type, although this is not a requirement of *data-forge-js*.
 
 ## Column
 
-A single *named* series of data in a *data frame*. Each column is simple a series with a name, the values of the series are the values of the column. A column is a slice of data through all rows. 
+A single *named* series of data in a data-frame. Each column is simply a series with a name, the values of the series are the values of the column. A column is a slice of data through all rows. 
 
 ## Index 
 
-Used to index a data frame for operations such as *merge*. If not specified an integer index (starting at 0) is generated based on row position. An index can be explicitly set by promoting a column to an index.
+A sequence of values that is used to index a data-frame or series. When the data is a *time-series* the index is expected to contain *Date* values.
+ 
+Used for operations that search and merge data-farmes and series. 
+
+If not specified an integer index (starting at 0) is generated based on row position. An index can be explicitly by specifying a column by name.
 
 ## Lazy Evaluation
 
-Data frames, series and index are only fully evaluated when necessary. Operations are queued up and only fully evaluated as needed and when required, for example when serializing to csv or json (`toCSV` or `toJSON`) or when baking to values (`toValues` or `toObjects`). 
+Data-frames, series and index are only fully evaluated when necessary. Operations are queued up and only fully evaluated as needed and when required, for example when serializing to csv or json (`toCSV` or `toJSON`) or when baking to values (`toValues` or `toObjects`). 
 
-A data frame, series or index can be forcibly evaluated by calling the `bake` function. 
+A data-frame, series or index can be forcibly evaluated by calling the `bake` function. 
 
 ## Iterator
 
-An object that iterates the rows of a data frame, series or index. Iterators allow lazy evaluation (row by row evaluation) of data frames, series and index. This is the same concept as an [iterator in JavaScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Iterators_and_Generators) or an [enumerator in C#](https://msdn.microsoft.com/en-us/library/system.collections.ienumerator(v=vs.110).aspx).
+Iterates the rows of a data-frame, series or index. Iterators allow lazy evaluation (row by row evaluation) of data frames, series and index. This is the same concept as an [iterator in JavaScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Iterators_and_Generators) or an [enumerator in C#](https://msdn.microsoft.com/en-us/library/system.collections.ienumerator(v=vs.110).aspx).
 
 # Basic Usage 
 
-## Creating a Data Frame
+## Getting data in
 
 The DataFrame constructor is passed a *config* object that specifies the initial contents of the data frame. 
 
@@ -257,11 +278,27 @@ A data frame can also be created from an array of JavaScript objects:
 			]
 		});
 
+
+## Getting data out
+
+To get back the names of columns:
+
+	var columnNames = dataFrame.getColumnNames();
+
+To get back an array of rows:
+
+	var rows = dataFrame.toValues();
+
+To get back an array of objects (whith column names as field names):
+
+	var objects = dataFrame.toObjects();
+
+
 ## Setting an index
 
-The previous examples each generated an index with the values *0, 1, 2*.
+In the previous examples of creating a data-frame, an index was generated with values starting at zero.
 
-An index can explicitly be provided when creating a data frame:
+An index can also be set explicitly when creating a data frame:
 
 	var dataFrame = new dataForge.DataFrame({
 			columnNames: <column-names>,
@@ -313,17 +350,19 @@ The *from* / *to* functions can be used in combination with Node.js `fs` functio
 
 	var fs = require('fs');
 
-	var dataFrame = dataForge.fromCSV(fs.readFileSync('some-csv-file.csv', 'utf8'));
+	var inputCsvData = fs.readFileSync('some-csv-file.csv', 'utf8');
+	var dataFrame = dataForge.fromCSV(inputCsvData );
 
-	fs.writeFileSync('some-other-csv-file.csv', dataFrame.toCSV());
+	var outputCsvData = dataFrame.toCSV();
+	fs.writeFileSync('some-other-csv-file.csv', outputCsvData);
 
-See the [examples section](#examples) for examples of loading various data sources and formats.
+See the [examples section](#examples) for more examples of loading various data sources and formats.
 
 ## Extracting rows from a data frame
 
-Rows can be extracted from a data frame in several ways.
+Rows can be extracted from a data-frame in several ways.
 
-First we can lazily iterate using an iterator. This is the lowest-level method of accessing the rows of a data frame. Using iterators allows data frames and series to be lazily evaluated (same as with LINQ in C#).
+First we can lazily iterate using an iterator. This is the lowest-level method of accessing the rows of a data frame. Iterators allow lazy evaluation (like LINQ in C#).
 
 	var iterator = dataFrame.getIterator();
 	while (iterator.moveNext()) {
@@ -339,11 +378,11 @@ and
 
 	var arrayOfObjects = dataFrame.toObjects();
 
-Create a new data frame from a subset of rows:
+A new data-frame can be created from a *slice* of rows:
 
 	var startIndex = ... // Starting row index to include in subset. 
 	var endIndex = ... // Ending row index to include in subset.
-	var rowSubset = dataFrame.getRowsSubset(startIndex, endIndex);
+	var rowSubset = dataFrame.slice(startIndex, endIndex);
 
 ## Extracting columns and series from a data frame
 
@@ -355,9 +394,11 @@ Get an array of all columns:
 
 	var arrayOfColumns = dataFrame.getColumns();
 
-Get a series from a column:
-
-	var series = column.getSeries();
+	for (var column in columns) {
+		var name = column.name;
+		var series = column.series;
+		// ... so something with the column ...
+	}
 
 Get the series for a column by name:
 
@@ -367,13 +408,13 @@ Get the series for a column by index:
 
 	var series = dataFrame.getSeries(5); 
 
-Create a new data frame from a sub-set of columns:
+Create a new dataframe from a sub-set of columns:
 
-	var columnSubset = df.getColumnsSubset(["Some-Column", "Some-Other-Column"]);
+	var columnSubset = df.subset(["Some-Column", "Some-Other-Column"]);
 
 ## Enumerating a series
 
-Use an iterator to lazily iterate a series:
+Use an iterator to lazily enumerate a series:
 
 	var iterator = someSeries.getIterator();
 	while (iterator.moveNext()) {
@@ -382,14 +423,14 @@ Use an iterator to lazily iterate a series:
 	}
 
 
-Extract out an array of values from a series. Note that this could be an expensive operation. 
-Lazy evaluation of the entire data frame may be forced to complete.  
+Extract the values from the series as an array. Note that this could be an expensive operation. 
+Lazy evaluation of the entire-data frame may be forced to complete.  
 
 	var arrayOfValues = someSeries.toValues();
 
 ## Enumerating an index
 
-Getting the index from a data frame:
+Getting the index from a data-frame:
 
 	var index = dataFrame.getIndex();
 
@@ -397,7 +438,7 @@ Getting the index from a series:
 
 	var index = someSeries.getIndex();
 
-The index can also be lazily iterated:
+The index can be enumerated lazily:
 
 	var iterator = dataFrame.getIndex().getIterator();
 	while (iterator.moveNext()) {
@@ -405,23 +446,33 @@ The index can also be lazily iterated:
 		// do something with the row.
 	}
 
-Retrieve an array of an index's values:
+Retrieve value from the index as an array:
 
 	var arrayOfValues = index.toValues();
 
 ## Adding a column
 
-New columns can be added to a data frame. This doesn't change the original data frame, it generates a new data frame that contains the additional column.
+New columns can be added to a data-frame. This doesn't change the original data-frame, it generates a new data-frame that contains the additional column.
 
 	var newDf = df.setSeries("Some-New-Column", someNewSeries); 
 
 ## Replacing a column
 
-`setColumn` can also replace an existing column:
+`setSeries` can also replace an existing column:
 
 	var newDf = df.setSeries("Some-Existing-Column", someNewSeries);
 
 Again note that it is only the new data frame that includes the modified column.
+
+## Generating a column
+
+`setSeries` can be passed a function that is used to generate a new column from the existing contents of the date-frame:
+
+	var newDf = df.setSeries("Generated-Column", function (row) {
+			var someValue = ... 
+			// ... generate values for the new column from the contents of the data-frame ...
+			return someValue;
+		});
 
 ## Removing a column
 
@@ -429,12 +480,15 @@ A column can easily be removed:
 
 	var newDf = df.dropColumn('Column-to-be-dropped');
 
+Also works for multiple columns:
+
+	var newDf = df.dropColumn(['col1', 'col2']);
 
 # Immutability and Chained Functions
 
 You may have noticed in previous examples that multiple functions have been chained.
 
-*data-forge* supports only [immutable](https://en.wikipedia.org/wiki/Immutable_object) operations. Each operation returns a new immutable data frame or column. No *in place* operations are supported (one of the things I found confusing about *Pandas*). 
+Data-Forge supports only [immutable](https://en.wikipedia.org/wiki/Immutable_object) operations. Each operation returns a new immutable data frame or column. No *in place* operations are supported (one of the things I found confusing about *Pandas*). 
 
 This is why, in the following example, the final data frame is captured after all operations are applied:
 
@@ -446,15 +500,45 @@ Consider an alternate structure:
 	var df2 = df1.setIndex("Col3");
 	var df3 = df2.dropColumn("Col3");
 
-Here *df1*, *df2* and *df3* are separate data frames with the results of the previous operations applied. These data frames are all immutable and cannot be changed. Any function that transforms a data frame returns a new and independent data frame. This is great, but may require some getting used to!
+Here *df1*, *df2* and *df3* are separate data-frames with the results of the previous operations applied. These data-frames are all immutable and cannot be changed. Any function that transforms a data-frame returns a new and independent data frame. If you are not used to this sort of thing, it may require some getting used to!
+
+# Lazy Evaluation
+
+todo:
+Lazy evaluation in Data-Forge is implemented through *iterators*.
+
+todo: move the examples of manually iteration here.
+todo: how do we get an iterator.
+todo: there are constraints on what the iterators can return.
+
+A data-frame can be created from an iterable:
+
+	var df = new dataForge.DataFrame({ rows: someIterable});
+
+The optional index, can also be an iterable: 
+
+	var df = new dataForge.DataFrame({ 
+		rows: someIterable, 
+		index: someOtherIterable
+	});
+
+A series can also be created from iterables:
+
+	var series = new dataForge.Series({ 
+		rows: someIterable,
+		index: someOtherIterable
+	});
+
+todo: show how lazy evaluation makes it possible to work with very large files.
+
   
 # Data exploration and visualization
 
-In order to understand the data we are working with we must explore it, understand the data types involved and composition of the values.
+In order to understand the data we are working with we must explore it, understand the data types involved and the composition of the values.
 
 ## Console output
 
-Data frame, index and series all provide a `toString` function that can be used to dump data to the console in a readable format.
+Data-frame, index and series all provide a `toString` function that can be used to dump data to the console in a readable format.
 
 Use the LINQ functions `skip` and `take` to preview a subset of the data (more on LINQ functions soon):
 
@@ -464,7 +548,7 @@ Use the LINQ functions `skip` and `take` to preview a subset of the data (more o
 Or more conveniently: 
 
 	// Get a range of rows starting at row index 10 and ending at (but not including) row index 20.
-	console.log(df.getRowsSubset(10, 20).toString()); 
+	console.log(df.slice(10, 20).toString()); 
 
 As you explore a data set you may want to understand what data types you are working with. You can use the `detectTypes` function to produce a new data frame with information on the data types in the data frame you are exploring:
 
@@ -492,7 +576,7 @@ You also probably want to understand the composition of values in the data frame
 
 ## Visual output
 
-The [Github repo](https://github.com/Real-Serious-Games/data-forge-js) has [examples](https://github.com/Real-Serious-Games/data-forge-js/tree/master/examples) showing how to use *data-forge* with [Flot](http://www.flotcharts.org/).
+The [Github repo](https://github.com/data-forge/data-forge-js) has [examples](https://github.com/data-forge/data-forge-js/tree/master/examples) showing how to use *data-forge* with [Flot](http://www.flotcharts.org/).
 
 There is a [Code Project article](http://www.codeproject.com/Articles/1069489/Highstock-plus-Data-Forge-plus-Yahoo) on using Highstock with Data-Forge to chart Yahoo financial data.
 
@@ -500,9 +584,9 @@ There is a [Code Project article](http://www.codeproject.com/Articles/1069489/Hi
 
 ## Data frame transformation
 
-An entire data frame can be transformed using the [LINQ](https://en.wikipedia.org/wiki/Language_Integrated_Query)-style [`select`](http://www.dotnetperls.com/select) function:
+An data-frame can be transformed using the [LINQ](https://en.wikipedia.org/wiki/Language_Integrated_Query)-style [`select`](http://www.dotnetperls.com/select) function:
 
-	var transformedDataFrame = df
+	var transformedDataFrame = sourceDataFrame
 		.select(function (row) {
 			return {
 				NewColumn: row.OldColumn * 2,	// <-- Transform existing column to create a new column.
@@ -510,11 +594,13 @@ An entire data frame can be transformed using the [LINQ](https://en.wikipedia.or
 			};
 		});
 
-The source index is preserved to the transformed data frame.
+This produces an entirely new data-frame. However the new data-frame has the same index as the source data-frame, so both can be merged back together, if required: 
+
+	var mergedDataFrame = dataForge.merge(sourceDataFrame, transformedDataFrame);
 
 The more advanced [`selectMany`](http://www.dotnetperls.com/selectmany) function is also available.
 
-Note: Data frames are immutable, the original data frame remains unmodified.
+Note: Data-frames are immutable, the source data-frame remains unmodified.
 
 ## Series transformation
 
@@ -530,9 +616,9 @@ The source index is preserved to the transformed series.
 
 Note: Series are immutable, the original series is unmodified.
 
-## Data frame and series filtering
+## Data-frame and series filtering
 
-Data frames and series can be filtered using the [LINQ](https://en.wikipedia.org/wiki/Language_Integrated_Query)-style [`where`](http://www.dotnetperls.com/where) function:
+Data-frames and series can be filtered using the [LINQ](https://en.wikipedia.org/wiki/Language_Integrated_Query)-style [`where`](http://www.dotnetperls.com/where) function:
 
 	var newDf = df
 		.where(function (row) {
@@ -545,13 +631,49 @@ Most of the other [LINQ functions](https://code.msdn.microsoft.com/101-LINQ-Samp
 
 More documentation will be here soon on supported LINQ functions.
 
-## Aggregation
+## Summarization and Aggregation
 
-todo: Coming soon
+## Aggregate
+
+todo
+
+### Merge
+
+todo
+
+### Window 
+
+The `window` function allows you to produce a new series for a data-frame or series by considering only a window of rows at a time. The *window* passes over the data-frame or series *batch-by-batch*, taking the first N rows for the first window, then the second N rows for the next window and so on.
+
+	var windowSize = 5; // Looking at 5 rows at a times.
+	var newSeries = sourceSeriesOrDataFrame.window(windowSize,
+			function (window) {
+				var index = ... compute index for row ...
+				var value = ... compute value for row ...
+				return [index, value]; // Generate a row in the new series.			
+			}
+		);
+
+Each invocation of the selector function is passed a data-frame or series that represents the window of time requested. The return value of the selector produces a row in the new series: an array is returned that contains a pair of values. The pair specifies the index and value for the row.
+	   
+The window function can be used for summarization and aggregation of data.
+
+As an example consider computing the weekly totals for daily sales data:
+
+	var salesData = ... series containing amount sold on each day ...
+
+	var weeklySales = salesData.window(7, 
+			function (window) {
+				return [
+					window.getIndex().last(), // Week ending.
+					window.sum(),			  // Total the amount sold during the week.
+				]; 
+			},
+		);
 
 ## Rolling window
 
-The rolling window function allows you to consider only a window of rows at a time. The window rolls across a series and, based on the results of your function, produces a new series with summarized or aggregated data. 
+Like the window function, `rollingWindow` considers a window of rows at a time. This function however *rolls* across the data-frame or series *row-by-row* rather than batch-by-batch. The selector function produces a new series with summarized or aggregated data. 
 
 The `percentChange` function that is included is probably the simplest example use of `rollingWindow`. It computes a new series with the percentage increase of each value in the source series.
 
@@ -574,12 +696,12 @@ Now consider an example that requires a variable window size. Here is some code 
 
 	var smaPeriod = ... variable window size ...
  	var smSeries = sourceSeries.rollingWindow(smaPeriod, 
-			function (indices, values) {
-	    		return [indices[indices.length-1], Enumerable.from(values).sum() / period];
+			function (window) {
+	    		return [
+					window.getIndex().last(),
+					window.sum() / period,
 	    	}
 		);	
-
-Note that [linqjs](https://www.npmjs.com/package/linq) is used to sum the values of the window (however many there might be).
 
 # Node.js examples
 
