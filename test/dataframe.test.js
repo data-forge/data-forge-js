@@ -4,9 +4,10 @@
 describe('DataFrame', function () {
 	
 	var dataForge = require('../index');	
+	var ArrayIterable = require('../src/iterables/array');
 	
 	var expect = require('chai').expect;
-	
+
 	it('can get columns', function () {
 
 		var columns = ["Date", "Value1", "Value2","Value3" ];	
@@ -22,6 +23,18 @@ describe('DataFrame', function () {
 			[new Date(2015, 24, 2), 200, 'bar', 22],
 		];
 		var dataFrame = new dataForge.DataFrame({ columnNames: columns, rows: rows });
+		expect(dataFrame.toValues()).to.eql(rows);
+	});
+
+	it('can specify rows as an iterable', function () {
+
+		var columns = ["Date", "Value1", "Value2","Value3" ];	
+		var rows = [
+			[new Date(1975, 24, 2), 100, 'foo', 11],
+			[new Date(2015, 24, 2), 200, 'bar', 22],
+		];
+		var iterable = new ArrayIterable(rows);
+		var dataFrame = new dataForge.DataFrame({ columnNames: columns, rows: iterable });
 		expect(dataFrame.toValues()).to.eql(rows);
 	});
 

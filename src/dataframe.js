@@ -8,6 +8,9 @@ var BaseDataFrame = require('./basedataframe');
 var LazyIndex = require('./lazyindex');
 
 var ArrayIterator = require('./iterators/array');
+var checkIterable = require('./iterables/check');
+var validateIterable = require('./iterables/validate');
+var ArrayIterable = require('./iterables/array')
 var assert = require('chai').assert;
 var E = require('linq');
 var fs = require('fs');
@@ -32,18 +35,29 @@ var DataFrame = function (config) {
 
 		if (config.columnNames) {
 			assert.isArray(config.columnNames, "Expected 'columnNames' member of 'config' parameter to DataFrame constructor to be an array of strings.");
-			assert.isArray(config.rows, "Expected 'rows' member of 'config' parameter to DataFrame constructor to be an array of rows.");
 
 			config.columnNames.forEach(function (columnName) {
 				assert.isString(columnName, "Expected 'columnNames' member of 'config' parameter to DataFrame constructor to be an array of strings.");
 			});
 
-			config.rows.forEach(function (row) {
-				assert.isArray(row, "Expect 'rows' member of 'config' parameter to DataFrame constructor to be an array of arrays or an array of objects.");
-			});				
+			if (!config.rows) {
+				throw new Error("Expected to find a 'rows' member of 'config' parameter to DataFrame constructor.");
+			}
 
 			columnNames = config.columnNames;
-			rows = config.rows;
+
+		 	if (checkIterable(config.rows)) {
+				rows = config.rows;
+			}
+			else {
+				assert.isArray(config.rows, "Expected 'rows' member of 'config' parameter to DataFrame constructor to be an array of rows.");
+
+				config.rows.forEach(function (row) {
+					assert.isArray(row, "Expected 'rows' member of 'config' parameter to DataFrame constructor to be an array of arrays, an array of objects or an iterator.");
+				});
+
+		 		rows = new ArrayIterable(config.rows);
+			}
 		}
 		else if (config.rows) {
 			assert.isArray(config.rows, "Expected 'rows' member of 'config' parameter to DataFrame constructor to be an array of rows.");
@@ -62,15 +76,17 @@ var DataFrame = function (config) {
 						.distinct()
 						.toArray();
 
-					rows = E.from(config.rows)
-						.select(function (row) {
-							return E.from(columnNames)
-								.select(function (columnName) {
-									return row[columnName];
-								})
-								.toArray();
-						})
-						.toArray();
+					rows = new ArrayIterable(
+						E.from(config.rows) //todo: should have an iterable that converts these one at a time.
+							.select(function (row) {
+								return E.from(columnNames)
+									.select(function (columnName) {
+										return row[columnName];
+									})
+									.toArray();
+							})
+							.toArray()
+					);
 				}
 				else {
 					config.rows.forEach(function (row) {
@@ -84,26 +100,40 @@ var DataFrame = function (config) {
 						})
 						.toArray();
 
-					rows = config.rows;
+					rows = new ArrayIterable(config.rows);
 				}
 			}
+			else {
+				columnNames = [];
+				rows = new ArrayIterable([]);
+			}
+		}
+		else {
+			columnNames = [];
+			rows = new ArrayIterable([]);			
 		}
 	}
+	else {
+		columnNames = [];
+		rows = new ArrayIterable([]);
+	}
 
-	rows = rows || [];
+	validateIterable(rows);
 
 	var self = this;
 	self._columnNames = columnNames || [];
+	self._iterable = rows;
 	self._index = (config && config.index) || 
 		new LazyIndex(
 			function () {
-				return new ArrayIterator(E.range(0, rows.length).toArray()); //todo: this should be a broad cast index.
+				var length = 0;
+				var iterator = rows.getIterator()
+				while (iterator.moveNext()) {
+					++length;
+				}
+				return new ArrayIterator(E.range(0, length).toArray()); //todo: this should be a broad cast index.
 			}
 		);
-
-	self.getIterator = function () {
-		return new ArrayIterator(rows);
-	};
 };
 
 var parent = inherit(DataFrame, BaseDataFrame);
@@ -122,6 +152,14 @@ DataFrame.prototype.getIndex = function () {
 DataFrame.prototype.getColumnNames = function () {
 	var self = this;
 	return self._columnNames;
+};
+
+/**
+ * Get an iterator for the data-frame.
+ */
+DataFrame.prototype.getIterator = function () {
+	var self = this;
+	return self._iterable.getIterator();
 };
 
 module.exports = DataFrame;
