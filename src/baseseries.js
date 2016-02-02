@@ -744,8 +744,7 @@ BaseSeries.prototype.percentChange = function () {
 
 	var self = this;
 	return self.rollingWindow(2, function (window) {
-		//todo: var index = window.getIndex().skip(1).first();
-		var index = window.getIndex().skip(1).toValues()[0];
+		var index = window.getIndex().skip(1).first();
 		var values = window.toValues();
 		var amountChange = values[1] - values[0]; // Compute amount of change.
 		var pctChange = amountChange / values[0]; // Compute % change.
