@@ -479,76 +479,66 @@ BaseDataFrame.prototype.selectMany = function (selector) {
 	var newValues = null;
 	var newRows = null;
 
-	var lazyEvaluate = function () {
+	//todo: this needs to peek at the first row, to determine the new column names.
 
-		if (newValues) {
-			return;
-		}
+	newValues = E.from(self.getIndex().toValues())
+		.zip(self.toValues(), function (index, row) {
+			return [index, selector(mapRowByColumns(self, row))];
+		})
+		.toArray();
 
-		newValues = E.from(self.getIndex().toValues())
-			.zip(self.toValues(), function (index, row) {
-				return [index, selector(mapRowByColumns(self, row))];
-			})
-			.toArray();
+	newColumnNames = E.from(newValues)
+		.selectMany(function (data) {
+			var values = data[1];
+			return E.from(values)
+				.selectMany(function (value) {
+					return Object.keys(value);
+				})
+				.toArray();
+		})
+		.distinct()
+		.toArray();
 
-		newColumnNames = E.from(newValues)
-			.selectMany(function (data) {
-				var values = data[1];
-				return E.from(values)
-					.selectMany(function (value) {
-						return Object.keys(value);
-					})
-					.toArray();
-			})
-			.distinct()
-			.toArray();
+	newRows = E.from(newValues)
+		.selectMany(function (data) {
+			var values = data[1];
+			return E.from(values)
+				.select(function (value) {
+					return E.from(newColumnNames)
+						.select(function (columnName) {
+							return value[columnName];
+						})
+						.toArray();
+				})
+				.toArray();
+		})
+		.toArray();
 
-		newRows = E.from(newValues)
-			.selectMany(function (data) {
-				var values = data[1];
-				return E.from(values)
-					.select(function (value) {
-						return E.from(newColumnNames)
-							.select(function (columnName) {
-								return value[columnName];
+	var DataFrame = require('./dataframe');
+	return new DataFrame({
+		columnNames: newColumnNames,
+		rows: {
+			getIterator: function () {
+				return new ArrayIterator(newRows);
+			},
+		},
+		index: new Index({
+			getIterator: function () {
+				var indexValues = E.from(newValues)
+					.selectMany(function (data) {
+						var index = data[0];
+						var values = data[1];
+						return E.range(0, values.length)
+							.select(function (_) {
+								return index;
 							})
 							.toArray();
 					})
 					.toArray();
-			})
-			.toArray();
-	};
-
-	var LazyDataFrame = require('./lazydataframe');
-	return new LazyDataFrame(
-		function () {
-			lazyEvaluate();
-			return newColumnNames;
-		},
-		function () {
-			lazyEvaluate();
-			return new ArrayIterator(newRows);
-		},
-		function () {
-			return new LazyIndex(
-				function () {
-					lazyEvaluate();
-					var indexValues = E.from(newValues)
-						.selectMany(function (data) {
-							var index = data[0];
-							var values = data[1];
-							return E.range(0, values.length)
-								.select(function (_) {
-									return index;
-								})
-								.toArray();
-						})
-						.toArray();
-					return new ArrayIterator(indexValues);
-				}
-			);
-		}
-	); 	
+				return new ArrayIterator(indexValues);
+			},
+		}),
+	}); 	
 };
 
 /**
