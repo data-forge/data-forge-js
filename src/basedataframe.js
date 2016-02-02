@@ -1303,20 +1303,15 @@ BaseDataFrame.prototype.renameColumn = function (columnNameOrIndex, newColumnNam
 
 	assert.isString(newColumnName, "Expected 'newColumnName' parameter to 'renameColumn' to be a string.");
 
-	var LazyDataFrame = require('./lazydataframe');
-	return new LazyDataFrame(
-		function () {
-			var newColumnNames = self.getColumnNames().slice(0); // Clone array.
-			newColumnNames[columnIndex] = newColumnName;
-			return newColumnNames;
-		},
-		function () {
-			return self.getIterator();
-		},
-		function () {
-			return self.getIndex();
-		}
-	);
+	var newColumnNames = self.getColumnNames().slice(0); // Clone array.
+	newColumnNames[columnIndex] = newColumnName;
+
+	var DataFrame = require('./dataframe');
+	return new DataFrame({
+		columnNames: newColumnNames,
+		rows: self,
+		index: self.getIndex(),
+	});
 };
 
 /**
