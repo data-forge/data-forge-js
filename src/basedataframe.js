@@ -613,43 +613,43 @@ BaseDataFrame.prototype.getColumns = function () {
 		.toArray();
 };
 
-//
-// Retreive a subset of the data frame's columns as a new data frame.
-//
+/**
+ * Create a new data-frame from a subset of columns.
+ *
+ * @param {array} columnNames - Array of column names to include in the new data-frame.
+ */
 BaseDataFrame.prototype.subset = function (columnNames) {
-	var LazyDataFrame = require('./lazydataframe'); // Local require to prevent circular ref.
+	var DataFrame = require('./dataframe'); // Local require to prevent circular ref.
 
 	var self = this;
 	
-	assert.isArray(columnNames, "Expected 'columnName' parameter to 'subset' to be an array.");	
+	assert.isArray(columnNames, "Expected 'columnNames' parameter to 'subset' to be an array.");	
 	
-	return new LazyDataFrame(
-		function () {
-			return columnNames; 
-		},
-		function () {
-			var columnIndices = E.from(columnNames)
-				.select(function (columnName) {
-					return self.getColumnIndex(columnName);
-				})
-				.toArray();
-			
-			return new ArrayIterator(
-				E.from(self.toValues())
-					.select(function (entry) {
-						return E.from(columnIndices)
-							.select(function (columnIndex) {
-								return entry[columnIndex];					
-							})
-							.toArray();
+	return new DataFrame({
+		columnNames: columnNames,
+		rows: {
+			getIterator: function () {
+				var columnIndices = E.from(columnNames)
+					.select(function (columnName) {
+						return self.getColumnIndex(columnName);
 					})
-					.toArray()
-			);
+					.toArray();
+				
+				return new ArrayIterator(
+					E.from(self.toValues())
+						.select(function (entry) {
+							return E.from(columnIndices)
+								.select(function (columnIndex) {
+									return entry[columnIndex];					
+								})
+								.toArray();
+						})
+						.toArray()
+				);
+			},
 		},
-		function () {
-			return self.getIndex();
-		}
-	);	 
+		index: self.getIndex(),
+	});	 
 };
 
 //
