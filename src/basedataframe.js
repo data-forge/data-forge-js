@@ -634,18 +634,23 @@ BaseDataFrame.prototype.subset = function (columnNames) {
 						return self.getColumnIndex(columnName);
 					})
 					.toArray();
-				
-				return new ArrayIterator(
-					E.from(self.toValues())
-						.select(function (entry) {
-							return E.from(columnIndices)
-								.select(function (columnIndex) {
-									return entry[columnIndex];					
-								})
-								.toArray();
-						})
-						.toArray()
-				);
+
+				var iterator = self.getIterator();
+
+				return {
+					moveNext: function () {
+						return iterator.moveNext();
+					},
+
+					getCurrent: function () {
+						var currentValue = iterator.getCurrent();
+						return E.from(columnIndices)
+							.select(function (columnIndex) {
+								return currentValue[columnIndex];					
+							})
+							.toArray();
+					},
+				};
 			},
 		},
 		index: self.getIndex(),
