@@ -366,23 +366,50 @@ BaseDataFrame.prototype.where = function (filterSelectorPredicate) {
 		columnNames: self.getColumnNames(),
 		rows: {
 			getIterator: function () {
-				return new ArrayIterator(
-					E.from(executeLazyWhere())
-						.select(function (data) {
-							return data[1]; // Row
-						})
-						.toArray()
-				);
+				var iterator = self.getIterator();
+
+				return {
+					moveNext: function () {
+						for (;;) {
+							if (!iterator.moveNext()) {
+								return false;
+							}
+
+							var row = iterator.getCurrent();
+							if (filterSelectorPredicate(mapRowByColumns(self, row))) {
+								return true;
+							}
+						}
+					},
+
+					getCurrent: function () {
+						return iterator.getCurrent();
+					},
+				};
 			},
 		},
 		index: new Index({
 			getIterator: function () {
-				return new ArrayIterator(E.from(executeLazyWhere())
-					.select(function (data) {
-						return data[0]; // Index
-					})
-					.toArray()
-				);
+				var multiIterator = new MultiIterator([self.getIndex(), self]);
+
+				return {
+					moveNext: function () {
+						for (;;) {
+							if (!multiIterator.moveNext()) {
+								return false;
+							}
+
+							var row = multiIterator.getCurrent()[1];
+							if (filterSelectorPredicate(mapRowByColumns(self, row))) {
+								return true;
+							}
+						}
+					},
+
+					getCurrent: function () {
+						return multiIterator.getCurrent()[0];
+					},
+				};
 			},
 		}),
 	}); 	
