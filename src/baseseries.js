@@ -167,38 +167,39 @@ BaseSeries.prototype.take = function (numRows) {
 BaseSeries.prototype.takeWhile = function (predicate) {
 	assert.isFunction(predicate, "Expected 'predicate' parameter to 'takeWhile' function to be a predicate function that returns true/false.");
 
-	var LazySeries = require('./lazyseries'); // Require here to prevent circular ref.	
-	var LazyIndex = require('./lazyindex'); // Require here to prevent circular ref.	
+	var Series = require('./series'); // Require here to prevent circular ref.	
 	var self = this;
-	return new LazySeries(
-		function () {
-			var valueIterator = self.getIterator();
-			var taking = true;
-			return {
-				moveNext: function () {
-					if (!taking) {
-						return false;
-					}
+	return new Series({
+		values: {
+			getIterator: function () {
+				var valueIterator = self.getIterator();
+				var taking = true;
+				return {
+					moveNext: function () {
+						if (!taking) {
+							return false;
+						}
 
-					if (!valueIterator.moveNext()) {
-						return false;
-					}
+						if (!valueIterator.moveNext()) {
+							return false;
+						}
 
-					if (!predicate(valueIterator.getCurrent())) {
-						taking = false;
-						return false;
-					}
+						if (!predicate(valueIterator.getCurrent())) {
+							taking = false;
+							return false;
+						}
 
-					return true;
-				},
+						return true;
+					},
 
-				getCurrent: function () {
-					return valueIterator.getCurrent();
-				},
-			};
+					getCurrent: function () {
+						return valueIterator.getCurrent();
+					},
+				};
+			},
 		},
-		new LazyIndex(
-			function () { //too: can use an iterator here that moves multiple iterators in tandem.
+		index: new Index({
+			getIterator: function () { //too: can use an iterator here that moves multiple iterators in tandem.
 				var indexIterator = self.getIndex().getIterator();
 				var valueIterator = self.getIterator();
 				var taking = true;
@@ -220,9 +221,9 @@ BaseSeries.prototype.takeWhile = function (predicate) {
 						return indexIterator.getCurrent();
 					},
 				};				
-			}
-		)
-	); 	
+			},
+		}),
+	}); 	
 };
 
 /**
