@@ -97,33 +97,30 @@ BaseDataFrame.prototype.getColumnIndex = function (columnName) {
 BaseDataFrame.prototype.skip = function (numRows) {
 	assert.isNumber(numRows, "Expected 'numRows' parameter to 'skip' function to be a number.");
 
-	var LazyDataFrame = require('./lazydataframe'); // Require here to prevent circular ref.
+	var DataFrame = require('./dataframe'); // Require here to prevent circular ref.
 	
 	var self = this;
-	return new LazyDataFrame(
-		function () {
-			return self.getColumnNames();
-		},
-		function () {
-			var iterator = self.getIterator();
+	return new DataFrame({
+		columnNames: self.getColumnNames(),
+		rows: {
+			getIterator: function () {
+				var iterator = self.getIterator();
+				return {
+					moveNext: function () {
+						while (--numRows >= 0 && iterator.moveNext()) {
+							// Skip first rows.
+						}
+						return iterator.moveNext();
+					},
 
-			return {
-				moveNext: function () {
-					while (--numRows >= 0 && iterator.moveNext()) {
-						// Skip first rows.
-					}
-					return iterator.moveNext();
-				},
-
-				getCurrent: function () {
-					return iterator.getCurrent();
-				},
-			};
+					getCurrent: function () {
+						return iterator.getCurrent();
+					},
+				};
+			},
 		},
-		function () {
-			return self.getIndex().skip(numRows);
-		}
-	); 	
+		index: self.getIndex().skip(numRows),
+	}); 	
 };
 
 /**
