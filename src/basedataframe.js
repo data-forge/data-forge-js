@@ -7,6 +7,7 @@
 var Column = require('./column');
 var LazySeries = require('./lazyseries');
 var LazyIndex = require('./lazyindex');
+var Index = require('./index');
 var ArrayIterator = require('./iterators/array');
 var MultiIterator = require('./iterators/multi');
 var BabyParse = require('babyparse');
@@ -133,76 +134,73 @@ BaseDataFrame.prototype.skip = function (numRows) {
 BaseDataFrame.prototype.skipWhile = function (predicate) {
 	assert.isFunction(predicate, "Expected 'predicate' parameter to 'skipWhile' function to be a predicate function that returns true/false.");
 
-	var LazyDataFrame = require('./lazydataframe'); // Require here to prevent circular ref.	
-	var LazyIndex = require('./lazyindex'); // Require here to prevent circular ref.	
+	var DataFrame = require('./dataframe'); // Require here to prevent circular ref.	
 	var self = this;
-	return new LazyDataFrame(
-		function () {
-			return self.getColumnNames();
-		},
-		function () {
-			var valueIterator = self.getIterator();
-			var skipped = false;
-			return {
-				moveNext: function () {
-					for (;;) {
-						if (!valueIterator.moveNext()) {
-							return false;
-						}
-
-						if (skipped) {
-							// Already skipped.
-							return true;
-						}
-
-						// Skipping until predict returns false.
-						if (!predicate(mapRowByColumns(self, valueIterator.getCurrent()))) {
-							skipped = true;
-							return true;
-						}
-					}
-				},
-
-				getCurrent: function () {
-					return valueIterator.getCurrent();
-				},
-			};
-		},
-		function () {
-			return new LazyIndex(
-				function () {
-					var multiIterator = new MultiIterator([self.getIndex(), self]);
-					var skipped = false;
-					return {
-						moveNext: function () {
-							for (;;) {
-								if (!multiIterator.moveNext()) {
-									return false;
-								}
-
-								if (skipped) {
-									// Already skipped.
-									return true;
-								}
-
-								// Skipping until predict returns false.
-								var currentValue = multiIterator.getCurrent();
-								if (!predicate(mapRowByColumns(self, currentValue[1]))) {
-									skipped = true;
-									return true;
-								}
+	return new DataFrame({
+		columnNames: self.getColumnNames(),
+		rows: {
+			getIterator: function () {
+				var valueIterator = self.getIterator();
+				var skipped = false;
+				return {
+					moveNext: function () {
+						for (;;) {
+							if (!valueIterator.moveNext()) {
+								return false;
 							}
-						},
 
-						getCurrent: function () {
+							if (skipped) {
+								// Already skipped.
+								return true;
+							}
+
+							// Skipping until predict returns false.
+							if (!predicate(mapRowByColumns(self, valueIterator.getCurrent()))) {
+								skipped = true;
+								return true;
+							}
+						}
+					},
+
+					getCurrent: function () {
+						return valueIterator.getCurrent();
+					},
+				};
+			},
+		},
+		index: new Index({
+			getIterator: function () {
+				var multiIterator = new MultiIterator([self.getIndex(), self]);
+				var skipped = false;
+				return {
+					moveNext: function () {
+						for (;;) {
+							if (!multiIterator.moveNext()) {
+								return false;
+							}
+
+							if (skipped) {
+								// Already skipped.
+								return true;
+							}
+
+							// Skipping until predict returns false.
 							var currentValue = multiIterator.getCurrent();
-							return currentValue[0]; // Return the value of the index.
-						},
-					};				
-				}
-			)
-		}
-	); 	
+							if (!predicate(mapRowByColumns(self, currentValue[1]))) {
+								skipped = true;
+								return true;
+							}
+						}
+					},
+
+					getCurrent: function () {
+						var currentValue = multiIterator.getCurrent();
+						return currentValue[0]; // Return the value of the index.
+					},
+				};				
+			},
+		}),
+	}); 	
 };
 
 /**
