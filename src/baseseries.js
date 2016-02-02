@@ -665,47 +665,48 @@ BaseSeries.prototype.reindex = function (newIndex) {
 
 	var self = this;
 
-	var LazySeries = require('./lazyseries');
+	var Series = require('./series');
+	return new Series({
+		values: {
+			getIterator: function () {
+				//
+				// Generate a map to relate an index value to a series value.
+				//
+				var indexMap = {};
+				var indexExists = {};
 
-	return new LazySeries(
-		function () {
-			//
-			// Generate a map to relate an index value to a series value.
-			//
-			var indexMap = {};
-			var indexExists = {};
+				E.from(self.getIndex().toValues())
+					.zip(self.toValues(), 
+						function (indexValue, seriesValue) {
+							return [indexValue, seriesValue];
+						}
+					)
+					.toArray()
+					.forEach(function (pair) {
+						var index = pair[0];
+						var value = pair[1];
 
-			E.from(self.getIndex().toValues())
-				.zip(self.toValues(), 
-					function (indexValue, seriesValue) {
-						return [indexValue, seriesValue];
-					}
-				)
-				.toArray()
-				.forEach(function (pair) {
-					var index = pair[0];
-					var value = pair[1];
+						if (indexExists[index]) {
+							throw new Error("Duplicate index detected, failed to 'reindex'");
+						}
 
-					if (indexExists[index]) {
-						throw new Error("Duplicate index detected, failed to 'reindex'");
-					}
+						indexMap[index] = value;
+						indexExists[index] = true;
+					});
 
-					indexMap[index] = value;
-					indexExists[index] = true;
-				});
-
-			//
-			// Return the series values in the order specified by the new index.
-			//
-			return new ArrayIterator(E.from(newIndex.toValues())
-				.select(function (newIndexValue) {
-					return indexMap[newIndexValue];
-				})
-				.toArray()
-			);
-		},
-		newIndex
-	);
+				//
+				// Return the series values in the order specified by the new index.
+				//
+				return new ArrayIterator(E.from(newIndex.toValues())
+					.select(function (newIndexValue) {
+						return indexMap[newIndexValue];
+					})
+					.toArray()
+				);
+			},
+		},		
+		index: newIndex,
+	});
 };
 
 /** 
