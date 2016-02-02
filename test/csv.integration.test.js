@@ -52,7 +52,7 @@ describe('csv.integration', function () {
 			['2015-10-23', '300', "bar", '23'],
 		]);
 		
-		var dataFrame2 = dataFrame.getColumnsSubset(['Value1', 'Value3']); 
+		var dataFrame2 = dataFrame.subset(['Value1', 'Value3']); 
 		
 		expect(dataFrame2.getColumnNames()).to.eql([
 			'Value1',

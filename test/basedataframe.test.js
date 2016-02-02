@@ -323,7 +323,7 @@ describe('BaseDataFrame', function () {
 			],
 			[5, 6]
 		);
-		var subset = dataFrame.getColumnsSubset(['Value3', 'Value1']);
+		var subset = dataFrame.subset(['Value3', 'Value1']);
 		expect(dataFrame).not.to.equal(subset); 
 		expect(subset.getIndex().toValues()).to.eql([5, 6]);
 		expect(subset.toValues()).to.eql([

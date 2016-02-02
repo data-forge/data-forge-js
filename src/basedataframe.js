@@ -616,12 +616,12 @@ BaseDataFrame.prototype.getColumns = function () {
 //
 // Retreive a subset of the data frame's columns as a new data frame.
 //
-BaseDataFrame.prototype.getColumnsSubset = function (columnNames) {
+BaseDataFrame.prototype.subset = function (columnNames) {
 	var LazyDataFrame = require('./lazydataframe'); // Local require to prevent circular ref.
 
 	var self = this;
 	
-	assert.isArray(columnNames, "Expected 'columnName' parameter to 'getColumnsSubset' to be an array.");	
+	assert.isArray(columnNames, "Expected 'columnName' parameter to 'subset' to be an array.");	
 	
 	return new LazyDataFrame(
 		function () {
