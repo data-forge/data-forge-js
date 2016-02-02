@@ -168,8 +168,6 @@ BaseIndex.prototype.reverse = function () {
 
 	var self = this;
 
-	//todo: make this lazy.
-
 	var Index = require('./index');
 	return new Index(E.from(self.toValues()).reverse().toArray());
 };

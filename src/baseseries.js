@@ -30,19 +30,21 @@ var BaseSeries = function () {
 BaseSeries.prototype.skip = function (numRows) {
 	assert.isNumber(numRows, "Expected 'numRows' parameter to 'skip' function to be a number.");
 
-	var LazySeries = require('./lazyseries'); // Require here to prevent circular ref.
+	var Series = require('./series'); // Require here to prevent circular ref.
 	
 	var self = this;
-	return new LazySeries(
-		function () {
-			return new ArrayIterator(E
-				.from(self.toValues())
-				.skip(numRows)
-				.toArray()
-			);
-		},
-		self.getIndex().skip(numRows)
-	); 	
+	return new Series({
+		values: {
+			getIterator: function () {
+				return new ArrayIterator(E
+					.from(self.toValues())
+					.skip(numRows)
+					.toArray()
+				);
+			},
+		},		
+		index: self.getIndex().skip(numRows),
+	}); 	
 };
 
 /**
