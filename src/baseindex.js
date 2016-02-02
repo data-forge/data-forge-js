@@ -26,14 +26,14 @@ var BaseIndex = function () {
 BaseIndex.prototype.skip = function (numRows) {
 	assert.isNumber(numRows, "Expected 'numRows' parameter to 'skip' function to be a number.");	
 
-	var LazyIndex = require('./lazyindex');
+	var Index = require('./index');
 
 	var self = this;
-	return new LazyIndex(
-		function () {
+	return new Index({
+		getIterator: function () { //todo: make lazy.
 			return new ArrayIterator(E.from(self.toValues()).skip(numRows).toArray());
-		}
-	);
+		},
+	});
 };
 
 /**
@@ -44,14 +44,14 @@ BaseIndex.prototype.skip = function (numRows) {
 BaseIndex.prototype.take = function (numRows) {
 	assert.isNumber(numRows, "Expected 'numRows' parameter to 'take' function to be a number.");	
 
-	var LazyIndex = require('./lazyindex');
+	var Index = require('./index');
 
 	var self = this;
-	return new LazyIndex(
-		function () {
+	return new Index({
+		getIterator: function () { //todo: make lazy.
 			return new ArrayIterator(E.from(self.toValues()).take(numRows).toArray());
-		}
-	);
+		},
+	});
 };
 
 /**

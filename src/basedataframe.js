@@ -1340,7 +1340,7 @@ BaseDataFrame.prototype.toObjects = function () {
 
 	var self = this;
 	var columnNames = self.getColumnNames();
-	return E.from(self.toValues()) //todo: should this rely on get iterator?
+	return E.from(self.toValues())
 		.select(function (row) {
 			return E.from(columnNames)
 				.zip(row, function (columnName, columnValue) {
@@ -1577,8 +1577,6 @@ BaseDataFrame.prototype.last = function () {
 BaseDataFrame.prototype.reverse = function () {
 
 	var self = this;
-
-	//todo: make this lazy.
 
 	var DataFrame = require('./dataframe');
 	return new DataFrame({
