@@ -1059,8 +1059,6 @@ BaseSeries.prototype.reverse = function () {
 
 	var self = this;
 
-	//todo: make this lazy.
-
 	var Series = require('./series');
 	return new Series({
 			values: E.from(self.toValues()).reverse().toArray(),
