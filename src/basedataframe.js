@@ -1282,18 +1282,12 @@ BaseDataFrame.prototype.renameColumns = function (newColumnNames) {
 		assert.isString(newColumnName, "Expected new column name to be a string, intead got " + typeof(newColumnName));
 	});
 
- 	var LazyDataFrame = require('./lazydataframe');
-	return new LazyDataFrame(
-		function () {
-			return newColumnNames;
-		},
-		function () {
-			return self.getIterator();
-		},
-		function () {
-			return self.getIndex();
-		}
-	);
+ 	var DataFrame = require('./dataframe');
+	return new DataFrame({
+		columnNames: newColumnNames,
+		rows: self,
+		index: self.getIndex(),
+	});
 };
 
 /*
