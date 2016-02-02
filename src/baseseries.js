@@ -898,43 +898,43 @@ BaseSeries.prototype.detectValues = function () {
 
 	var self = this;
 
-	var LazyDataFrame = require('./lazydataframe');
-	return new LazyDataFrame(
-		function () {
-			return ["Value", "Frequency"];
-		},
-		function () {
-			var values = self.toValues();
-			var totalValues = values.length;
+	var DataFrame = require('./dataframe');
+	return new DataFrame({
+		columnNames: ["Value", "Frequency"],
+		rows: {
+			getIterator: function () {
+				var values = self.toValues();
+				var totalValues = values.length;
 
-			var valueFrequencies = E.from(values)
-				.aggregate({}, function (accumulated, value) {
-					var valueKey = value.toString() + "-" + typeof(value);
-					var valueInfo = accumulated[valueKey];
-					if (!valueInfo) {
-						valueInfo = {
-							count: 0,
-							value: value,
-						};
-						accumulated[valueKey] = valueInfo;
-					}
-					++valueInfo.count;
-					return accumulated;
-				});
+				var valueFrequencies = E.from(values)
+					.aggregate({}, function (accumulated, value) {
+						var valueKey = value.toString() + "-" + typeof(value);
+						var valueInfo = accumulated[valueKey];
+						if (!valueInfo) {
+							valueInfo = {
+								count: 0,
+								value: value,
+							};
+							accumulated[valueKey] = valueInfo;
+						}
+						++valueInfo.count;
+						return accumulated;
+					});
 
-			return new ArrayIterator(
-				E.from(Object.keys(valueFrequencies))
-					.select(function (valueKey) {
-						var valueInfo = valueFrequencies[valueKey];
-						return [
-							valueInfo.value,
-							(valueInfo.count / totalValues) * 100
-						];
-					})
-					.toArray()
-			);
-		}
-	);
+				return new ArrayIterator(
+					E.from(Object.keys(valueFrequencies))
+						.select(function (valueKey) {
+							var valueInfo = valueFrequencies[valueKey];
+							return [
+								valueInfo.value,
+								(valueInfo.count / totalValues) * 100
+							];
+						})
+						.toArray()
+				);
+			},
+		},		
+	});
 };
 
 /**
