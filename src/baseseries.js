@@ -55,40 +55,41 @@ BaseSeries.prototype.skip = function (numRows) {
 BaseSeries.prototype.skipWhile = function (predicate) {
 	assert.isFunction(predicate, "Expected 'predicate' parameter to 'skipWhile' function to be a predicate function that returns true/false.");
 
-	var LazySeries = require('./lazyseries'); // Require here to prevent circular ref.	
-	var LazyIndex = require('./lazyindex'); // Require here to prevent circular ref.	
+	var Series = require('./series'); // Require here to prevent circular ref.	
 	var self = this;
-	return new LazySeries(
-		function () {
-			var valueIterator = self.getIterator();
-			var skipped = false;
-			return {
-				moveNext: function () {
-					for (;;) {
-						if (!valueIterator.moveNext()) {
-							return false;
-						}
+	return new Series({
+		values: {
+			getIterator: function () {
+				var valueIterator = self.getIterator();
+				var skipped = false;
+				return {
+					moveNext: function () {
+						for (;;) {
+							if (!valueIterator.moveNext()) {
+								return false;
+							}
 
-						if (skipped) {
-							// Already skipped.
-							return true;
-						}
+							if (skipped) {
+								// Already skipped.
+								return true;
+							}
 
-						// Skipping until predict returns false.
-						if (!predicate(valueIterator.getCurrent())) {
-							skipped = true;
-							return true;
+							// Skipping until predict returns false.
+							if (!predicate(valueIterator.getCurrent())) {
+								skipped = true;
+								return true;
+							}
 						}
-					}
-				},
+					},
 
-				getCurrent: function () {
-					return valueIterator.getCurrent();
-				},
-			};
+					getCurrent: function () {
+						return valueIterator.getCurrent();
+					},
+				};
+			},
 		},
-		new LazyIndex(
-			function () { //too: can use an iterator here that moves multiple iterators in tandem.
+		index: new Index({
+			getIterator: function () { //too: can use an iterator here that moves multiple iterators in tandem.
 				var indexIterator = self.getIndex().getIterator();
 				var valueIterator = self.getIterator();
 				var skipped = false;
@@ -116,9 +117,9 @@ BaseSeries.prototype.skipWhile = function (predicate) {
 						return indexIterator.getCurrent();
 					},
 				};				
-			}
-		)
-	); 	
+			},
+		}),
+	}); 	
 };
 
 /**
