@@ -6,6 +6,7 @@
 
 var Column = require('./column');
 var LazySeries = require('./lazyseries');
+var Series = require('./series');
 var LazyIndex = require('./lazyindex');
 var Index = require('./index');
 var ArrayIterator = require('./iterators/array');
@@ -551,17 +552,19 @@ BaseDataFrame.prototype.getSeries = function (columnNameOrIndex) {
 
 	var columnIndex = parseColumnNameOrIndex(self, columnNameOrIndex, true);
 
-	return new LazySeries(
-		function () {
-			return new ArrayIterator(E.from(self.toValues())
-				.select(function (entry) {
-					return entry[columnIndex];
-				})
-				.toArray()
-			);					
+	return new Series({
+		values: {
+			getIterator: function () {
+				return new ArrayIterator(E.from(self.toValues())
+					.select(function (entry) {
+						return entry[columnIndex];
+					})
+					.toArray()
+				);					
+			},
 		},
-		self.getIndex()
-	);
+		index: self.getIndex(),
+	});
 };
 
 /**
