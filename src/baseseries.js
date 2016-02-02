@@ -443,35 +443,31 @@ var executeOrderBy = function (self, batch) {
 		return cachedSorted;
 	};
 
-	var LazyDataFrame = require('./lazydataframe');
+	var Series = require('./series');
 
-	return new LazyDataFrame(
-		function () {
-			return self.getseriesNames();
-		},
-		function () {
-			return new ArrayIterator(
-				E.from(executeLazySort())
-					.select(function (row) {
-						return row[1]; // Extract the value (minus the index) from the sorted data.					
-					})
-					.toArray()
-				);
-		},
-		function () {
-			var LazyIndex = require('./lazyindex');
-			return new LazyIndex(
-				function () {
-					return new ArrayIterator(E.from(executeLazySort())
+	return new Series({
+		values: {
+			getIterator: function () {
+				return new ArrayIterator(
+					E.from(executeLazySort())
 						.select(function (row) {
-							return row[0]; // Extract the index from the sorted data.
+							return row[1]; // Extract the value (minus the index) from the sorted data.					
 						})
 						.toArray()
 					);
-				}
-			);
-		}
-	);
+			},
+		},
+		index: new Index({
+			getIterator: function () {
+				return new ArrayIterator(E.from(executeLazySort())
+					.select(function (row) {
+						return row[0]; // Extract the index from the sorted data.
+					})
+					.toArray()
+				);
+			},
+		}),
+	});
 };
 
 //
