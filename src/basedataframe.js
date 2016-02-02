@@ -682,6 +682,8 @@ var executeOrderBy = function (self, batch) {
 
 	var cachedSorted = null;
 
+	//todo: reconsider how this works wih lazy iterators.
+
 	//
 	// Don't invoke the sort until we really know what we need.
 	//
@@ -872,33 +874,35 @@ BaseDataFrame.prototype.dropColumn = function (columnOrColumns) {
 		})
 		.toArray();
 
-	var LazyDataFrame = require('./lazydataframe');
+	var DataFrame = require('./dataframe');
 
-	return new LazyDataFrame(
-		function () {
-			return E.from(self.getColumnNames())
-				.where(function (columnName, columnIndex) {
-					return columnIndices.indexOf(columnIndex) < 0;
-				})
-				.toArray();
-		},
-		function () {
-			return new ArrayIterator(
-				E.from(self.toValues())
-					.select(function (row) {
-						return E.from(row)
+	return new DataFrame({
+		columnNames: E.from(self.getColumnNames())
+			.where(function (columnName, columnIndex) {
+				return columnIndices.indexOf(columnIndex) < 0;
+			})
+			.toArray(),
+		rows: {
+			getIterator: function () {
+				var iterator = self.getIterator();
+				return {
+					moveNext: function () {
+						return iterator.moveNext();
+					},
+
+					getCurrent: function () {
+						var currentValue = iterator.getCurrent();
+						return E.from(currentValue)
 							.where(function (column, columnIndex) {
 								return columnIndices.indexOf(columnIndex) < 0;
 							})
 							.toArray();
-					})
-					.toArray()
-			);
+					},
+				};
+			},
 		},
-		function () {
-			return self.getIndex();
-		}
-	);
+		index: self.getIndex(),
+	});
 };
 
 /**
@@ -924,68 +928,64 @@ BaseDataFrame.prototype.setSeries = function (columnName, data) { //todo: should
 		data = data.reindex(self.getIndex()).toValues();
 	}
 
-	var LazyDataFrame = require('./lazydataframe');
+	//todo: overview and improve the way this works.
+
+	var DataFrame = require('./dataframe');
 
 	var columnIndex = self.getColumnIndex(columnName);
-	if (columnIndex < 0) {
-		
+	if (columnIndex < 0) {		
 		// Add new column.
-		return new LazyDataFrame(
-			function () {
-				return self.getColumnNames().concat([columnName]);
+		return new DataFrame({
+			columnNames: self.getColumnNames().concat([columnName]),
+			rows: {
+				getIterator: function () {
+					return new ArrayIterator(
+						E.from(self.toValues())
+							.select(function (row, rowIndex) {
+								return row.concat([data[rowIndex]]);
+							})
+							.toArray()
+					);
+				},
 			},
-			function () {
-				return new ArrayIterator(
-					E.from(self.toValues())
-						.select(function (row, rowIndex) {
-							return row.concat([data[rowIndex]]);
-						})
-						.toArray()
-				);
-			},
-			function () {
-				return self.getIndex();
-			}
-		);
+			index: self.getIndex(),
+		});
 	}
 	else {
-
 		// Replace existing column.
-		return new LazyDataFrame(
-			function () {
-				return E.from(self.getColumnNames())
-					.select(function (thisColumnName, thisColumnIndex) {
-						if (thisColumnIndex === columnIndex) {
-							return columnName;
-						}
-						else { 
-							return thisColumnName;
-						}
-					})
-					.toArray();
+		return new DataFrame({
+			columnNames: E.from(self.getColumnNames())
+				.select(function (thisColumnName, thisColumnIndex) {
+					if (thisColumnIndex === columnIndex) {
+						return columnName;
+					}
+					else { 
+						return thisColumnName;
+					}
+				})
+				.toArray(),
+			rows: {
+				getIterator: function () {
+					return new ArrayIterator(
+						E.from(self.toValues())
+							.select(function (row, rowIndex) {
+								return E.from(row)
+									.select(function (column, thisColumnIndex) {
+										if (thisColumnIndex === columnIndex) {
+											return data[rowIndex];
+										}
+										else {
+											return column;
+										}
+									})
+									.toArray();
+							})
+							.toArray()
+					);
+				},
 			},
-			function () {
-				return new ArrayIterator(
-					E.from(self.toValues())
-						.select(function (row, rowIndex) {
-							return E.from(row)
-								.select(function (column, thisColumnIndex) {
-									if (thisColumnIndex === columnIndex) {
-										return data[rowIndex];
-									}
-									else {
-										return column;
-									}
-								})
-								.toArray();
-						})
-						.toArray()
-				);
-			},
-			function () {
-				return self.getIndex();
-			}
-		);
+			index: self.getIndex(),
+		});
 	}
 };
 
