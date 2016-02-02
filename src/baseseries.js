@@ -357,16 +357,17 @@ BaseSeries.prototype.selectMany = function (selector) {
 			.toArray();
 	};
 
-	var LazySeries = require('./lazyseries');
-	var LazyIndex = require('./lazyindex');
+	var Series = require('./series');
 
-	return new LazySeries(
-		function () {
-			lazyEvaluate();
-			return new ArrayIterator(newValues);
+	return new Series({
+		values: {
+			getIterator: function () {
+				lazyEvaluate();
+				return new ArrayIterator(newValues);
+			}
 		},
-		new LazyIndex(
-			function () {
+		index: new Index({
+			getIterator: function () {
 				lazyEvaluate();
 				var indexValues = E.from(newIndexAndNewValues)
 					.selectMany(function (data) {
@@ -380,9 +381,9 @@ BaseSeries.prototype.selectMany = function (selector) {
 					})
 					.toArray();
 				return new ArrayIterator(indexValues);
-			}
-		)
-	); 	
+			},
+		}),
+	}); 	
 };
 
 //
