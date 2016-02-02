@@ -714,35 +714,32 @@ var executeOrderBy = function (self, batch) {
 		return cachedSorted;
 	};
 
-	var LazyDataFrame = require('./lazydataframe');
+	var DataFrame = require('./dataframe');
 
-	return new LazyDataFrame(
-		function () {
-			return self.getColumnNames();
-		},
-		function () {
-			return new ArrayIterator(
-				E.from(executeLazySort())
-					.select(function (row) {
-						return E.from(row).skip(1).toArray(); // Extract the values (minus the index) from the sorted data.					
-					})
-					.toArray()
-			);
-		},
-		function () {
-			var LazyIndex = require('./lazyindex');
-			return new LazyIndex(
-				function () {
-					return new ArrayIterator(E.from(executeLazySort())
+	return new DataFrame({
+		columnNames: self.getColumnNames(),
+		rows: {
+			getIterator: function () {
+				return new ArrayIterator(
+					E.from(executeLazySort())
 						.select(function (row) {
-							return row[0]; // Extract the index from the sorted data.
+							return E.from(row).skip(1).toArray(); // Extract the values (minus the index) from the sorted data.					
 						})
 						.toArray()
-					);
-				}
-			);
-		}
-	);
+				);
+			},
+		},
+		index: new Index({
+			getIterator: function () {
+				return new ArrayIterator(E.from(executeLazySort())
+					.select(function (row) {
+						return row[0]; // Extract the index from the sorted data.
+					})
+					.toArray()
+				);
+			},
+		}),
+	});
 };
 
 //
