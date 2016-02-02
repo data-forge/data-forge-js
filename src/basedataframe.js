@@ -1002,24 +1002,22 @@ BaseDataFrame.prototype.slice = function (startIndex, endIndex) {
 
 	var self = this;
 
-	var LazyDataFrame = require('./lazydataframe'); // Require here to prevent circular ref.
+	var DataFrame = require('./dataframe'); // Require here to prevent circular ref.
 
-	return new LazyDataFrame(
-		function () {
-			return self.columnNames();
+	return new DataFrame({
+		columnNames: self.getColumnNames(),
+		rows: {
+			getIterator: function () { //todo: revise this code for better laziness.
+				return new ArrayIterator(
+					E.from(self.toValues())
+						.skip(startIndex)
+						.take(endIndex - startIndex)
+						.toArray()
+				);
+			},
 		},
-		function () {
-			return new ArrayIterator(
-				E.from(self.toValues())
-					.skip(startIndex)
-					.take(endIndex - startIndex)
-					.toArray()
-			);
-		},
-		function () {
-			return self.getIndex().getRowsSubset(startIndex, endIndex);
-		}
-	);
+		index: self.getIndex().getRowsSubset(startIndex, endIndex),
+	});
 };
 
 /**
@@ -1031,24 +1029,14 @@ BaseDataFrame.prototype.setIndex = function (columnNameOrIndex) {
 
 	var self = this;
 
-	var LazyDataFrame = require('./lazydataframe'); // Require here to prevent circular ref.
+	var DataFrame = require('./dataframe'); // Require here to prevent circular ref.
 
-	return new LazyDataFrame(
-		function () {
-			return self.getColumnNames();
-		},
-		function () {
-			return new ArrayIterator(self.toValues());
-		},
-		function () {
-			return new LazyIndex(
-				function () {
-					return new ArrayIterator(self.getSeries(columnNameOrIndex).toValues());
-				}
-			);
-		}		
-	);
-}
+	return new DataFrame({
+		columnNames: self.getColumnNames(),
+		rows: self, 
+		index: new Index(self.getSeries(columnNameOrIndex)),
+	});
+};
 
 /**
  * Reset the index of the data frame back to the default sequential integer index.
