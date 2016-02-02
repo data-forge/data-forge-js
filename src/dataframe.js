@@ -5,8 +5,7 @@
 //
 
 var BaseDataFrame = require('./basedataframe');
-var LazyIndex = require('./lazyindex');
-
+var Index = require('./index');
 var ArrayIterator = require('./iterators/array');
 var checkIterable = require('./iterables/check');
 var validateIterable = require('./iterables/validate');
@@ -124,16 +123,16 @@ var DataFrame = function (config) {
 	self._columnNames = columnNames || [];
 	self._iterable = rows;
 	self._index = (config && config.index) || 
-		new LazyIndex(
-			function () {
+		new Index({
+			getIterator: function () {
 				var length = 0;
 				var iterator = rows.getIterator()
 				while (iterator.moveNext()) {
 					++length;
 				}
 				return new ArrayIterator(E.range(0, length).toArray()); //todo: this should be a broad cast index.
-			}
-		);
+			},
+		});
 };
 
 var parent = inherit(DataFrame, BaseDataFrame);

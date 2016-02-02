@@ -5,7 +5,6 @@
 //
 
 var BaseSeries = require('./baseseries');
-var LazyIndex = require('./lazyindex');
 var Index = require('./index');
 var ArrayIterator = require('./iterators/array');
 var ArrayIterable = require('./iterables/array');
@@ -45,16 +44,16 @@ var Series = function (config) {
 		}
 		else {
 			// Generate the index.
-			self._index = new LazyIndex(
-					function () {
+			self._index = new Index({
+					getIterator: function () {
 						var iterator = self._iterable.getIterator();
 						var length = 0;
 						while (iterator.moveNext()) {
 							++length;
 						}
 						return new ArrayIterator(E.range(0, length).toArray());
-					}
-				);
+					},
+				});
 		}
 	}
 	else {

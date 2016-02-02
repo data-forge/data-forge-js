@@ -5,7 +5,7 @@
 //
 
 var BaseDataFrame = require('./basedataframe');
-var LazyIndex = require('./lazyindex');
+var Index = require('./index');
 var ArrayIterator = require('./iterators/array');
 
 var assert = require('chai').assert;
@@ -20,18 +20,17 @@ var LazyDataFrame = function (columnNamesFn, enumeratorFn, indexFn) {
 		assert.isFunction(indexFn, "Expected 'indexFn' parameter to LazyDataFrame constructor to be a function.");
 	}
 
-
 	var self = this;
 	self._columnNamesFn = columnNamesFn;
 	self._enumeratorFn = enumeratorFn;	
 	self._indexFn = indexFn || 
 		// Default to generated index range.
 		function () {
-			return new LazyIndex(
-				function () {
+			return new Index({
+				getIterator: function () {
 					return new ArrayIterator(E.range(0, self.toValues().length).toArray());
-				}
-			);
+				},
+			});
 		};
 };
 

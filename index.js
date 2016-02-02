@@ -34,7 +34,6 @@ var dataForge = {
 	LazySeries: require('./src/lazyseries'),
 	BaseSeries: require('./src/baseseries'),
 	Index: require('./src/index'),
-	LazyIndex: require('./src/lazyindex'),
 	BaseIndex: require('./src/baseindex'),
 
 	/**
@@ -215,17 +214,17 @@ var dataForge = {
 				);
 			},
 			function () {
-				var LazyIndex = require('./src/lazyindex');
-				return new LazyIndex(
-					function () {
+				var Index = require('./src/index');
+				return new Index({
+					getIterator: function () {
 						return new ArrayEnumerator(E.from(dataFrames)
 							.selectMany(function (dataFrame) {
 								return dataFrame.getIndex().toValues();
 							})
 							.toArray()
 						);
-					}
-				)
+					},
+				})
 			}
 		);
 	},

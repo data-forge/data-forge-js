@@ -5,7 +5,7 @@
 //
 
 var BaseSeries = require('./baseseries');
-var LazyIndex = require('./lazyindex');
+var Index = require('./index');
 var ArrayIterator = require('./iterators/array');
 
 var assert = require('chai').assert;
@@ -26,11 +26,11 @@ var LazySeries = function (enumeratorFn, index) {
 	self._enumeratorFn = enumeratorFn;	
 	self._index = index || 
 		// Default to generated index range.
-		new LazyIndex(
-			function () {
+		new Index({
+			getIterator: function () {
 				return new ArrayIterator(E.range(0, self.toValues().length).toArray()); //todo: index should use the enumerator.
-			}
-		);
+			},
+		});
 };
 
 var parent = inherit(LazySeries, BaseSeries);

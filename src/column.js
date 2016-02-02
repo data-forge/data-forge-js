@@ -4,7 +4,6 @@
 // Implements a time series data structure.
 //
 
-var LazyIndex = require('./lazyindex');
 var ArrayIterator = require('./iterators/array');
 
 var assert = require('chai').assert;
