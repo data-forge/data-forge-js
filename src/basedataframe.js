@@ -254,68 +254,65 @@ BaseDataFrame.prototype.take = function (numRows) {
 BaseDataFrame.prototype.takeWhile = function (predicate) {
 	assert.isFunction(predicate, "Expected 'predicate' parameter to 'takeWhile' function to be a predicate function that returns true/false.");
 
-	var LazyDataFrame = require('./lazydataframe'); // Require here to prevent circular ref.	
-	var LazyIndex = require('./lazyindex'); // Require here to prevent circular ref.	
+	var DataFrame = require('./dataframe'); // Require here to prevent circular ref.	
 	var self = this;
-	return new LazyDataFrame(
-		function () {
-			return self.getColumnNames();
+	return new DataFrame({
+		columnNames: self.getColumnNames(),
+		rows: {
+			getIterator: function () {
+				var valueIterator = self.getIterator();
+				var taking = true;
+				return {
+					moveNext: function () {
+						if (!taking) {
+							return false;
+						}
+
+						if (!valueIterator.moveNext()) {
+							return false;
+						}
+
+						if (!predicate(mapRowByColumns(self, valueIterator.getCurrent()))) {
+							taking = false;
+							return false;
+						}
+
+						return true;
+					},
+
+					getCurrent: function () {
+						return valueIterator.getCurrent();
+					},
+				};
+			},
 		},
-		function () {
-			var valueIterator = self.getIterator();
-			var taking = true;
-			return {
-				moveNext: function () {
-					if (!taking) {
-						return false;
-					}
+		index: new Index({
+			getIterator: function () {
+				var multiIterator = new MultiIterator([self.getIndex(), self]);
+				var taking = true;
+				return {
+					moveNext: function () {
+						if (!multiIterator.moveNext()) {
+							return false;
+						}
 
-					if (!valueIterator.moveNext()) {
-						return false;
-					}
+						var currentValue = multiIterator.getCurrent();
+						if (!predicate(mapRowByColumns(self, currentValue[1]))) {
+							taking = false;
+							return false;
+						}
 
-					if (!predicate(mapRowByColumns(self, valueIterator.getCurrent()))) {
-						taking = false;
-						return false;
-					}
+						return true;
+					},
 
-					return true;
-				},
-
-				getCurrent: function () {
-					return valueIterator.getCurrent();
-				},
-			};
-		},
-		function () {
-			return new LazyIndex(
-				function () {
-					var multiIterator = new MultiIterator([self.getIndex(), self]);
-					var taking = true;
-					return {
-						moveNext: function () {
-							if (!multiIterator.moveNext()) {
-								return false;
-							}
-
-							var currentValue = multiIterator.getCurrent();
-							if (!predicate(mapRowByColumns(self, currentValue[1]))) {
-								taking = false;
-								return false;
-							}
-
-							return true;
-						},
-
-						getCurrent: function () {
-							var currentValue = multiIterator.getCurrent();
-							return currentValue[0]; // Return just the index.
-						},
-					};				
-				}
-			)
-		}
-	); 	
+					getCurrent: function () {
+						var currentValue = multiIterator.getCurrent();
+						return currentValue[0]; // Return just the index.
+					},
+				};				
+			},
+		}),
+	}); 	
 };
 
 /**
