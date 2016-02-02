@@ -630,29 +630,29 @@ BaseSeries.prototype.rollingWindow = function (period, fn) {
 		})
 		.toArray();
 
-	var LazySeries = require('./lazyseries');
-	var LazyIndex = require('./lazyindex');
-
-	return new LazySeries(
-		function () {
-			return new ArrayIterator(E.from(newIndexAndValues)
-				.select(function (indexAndValue) {
-					return indexAndValue[1];
-				})
-				.toArray()
-			);
+	var Series = require('./series');
+	return new Series({
+		values: {
+			getIterator: function () {
+				return new ArrayIterator(E.from(newIndexAndValues)
+					.select(function (indexAndValue) {
+						return indexAndValue[1];
+					})
+					.toArray()
+				);
+			},
 		},
-		new LazyIndex(
-			function () {
+		index: new Index({
+			getIterator: function () {
 				return new ArrayIterator(E.from(newIndexAndValues)
 					.select(function (indexAndValue) {
 						return indexAndValue[0];
 					})
 					.toArray()
 				);
-			}
-		)
-	);
+			},
+		}),
+	});
 };
 
 /**
