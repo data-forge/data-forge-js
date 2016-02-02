@@ -361,33 +361,31 @@ BaseDataFrame.prototype.where = function (filterSelectorPredicate) {
 		return cachedFilteredIndexAndValues;
 	}
 
-	var LazyDataFrame = require('./lazydataframe');
-	return new LazyDataFrame(
-		function () {
-			return self.getColumnNames();
-		},
-		function () {
-			return new ArrayIterator(
-				E.from(executeLazyWhere())
-					.select(function (data) {
-						return data[1]; // Row
-					})
-					.toArray()
-			);
-		},
-		function () {
-			return new LazyIndex(
-				function () {
-					return new ArrayIterator(E.from(executeLazyWhere())
+	var DataFrame = require('./dataframe');
+	return new DataFrame({
+		columnNames: self.getColumnNames(),
+		rows: {
+			getIterator: function () {
+				return new ArrayIterator(
+					E.from(executeLazyWhere())
 						.select(function (data) {
-							return data[0]; // Index
+							return data[1]; // Row
 						})
 						.toArray()
-					);
-				}
-			);
-		}
-	); 	
+				);
+			},
+		},
+		index: new Index({
+			getIterator: function () {
+				return new ArrayIterator(E.from(executeLazyWhere())
+					.select(function (data) {
+						return data[0]; // Index
+					})
+					.toArray()
+				);
+			},
+		}),
+	}); 	
 };
 
 /**
