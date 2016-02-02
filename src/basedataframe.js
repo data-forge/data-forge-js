@@ -1044,23 +1044,17 @@ BaseDataFrame.prototype.setIndex = function (columnNameOrIndex) {
 BaseDataFrame.prototype.resetIndex = function () {
 
 	var self = this;
-	var LazyDataFrame = require('./lazydataframe'); // Require here to prevent circular ref.
+	var DataFrame = require('./dataframe'); // Require here to prevent circular ref.
 
-	return new LazyDataFrame(
-		function () {
-			return self.getColumnNames();
-		},
-		function () {
-			return self.getIterator();
-		},
-		function () {
-			return new LazyIndex( //todo: broad-cast index
-				function () {
-					return new ArrayIterator(E.range(0, self.toValues().length).toArray());
-				}
-			);
-		}		
-	);
+	return new DataFrame({
+		columnNames: self.getColumnNames(),
+		rows: self,
+		index: new Index({
+			getIterator: function () { //todo: broad-cast index
+				return new ArrayIterator(E.range(0, self.toValues().length).toArray());
+			},
+		}),
+	});
 };
 
 /** 
