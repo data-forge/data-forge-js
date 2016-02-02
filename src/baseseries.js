@@ -845,49 +845,49 @@ BaseSeries.prototype.detectTypes = function () {
 
 	var self = this;
 
-	var LazyDataFrame = require('./lazydataframe');
-	return new LazyDataFrame(
-		function () {
-			return ["Type", "Frequency"];
-		},
-		function () {
-			var values = self.toValues();
-			var totalValues = values.length;
+	var DataFrame = require('./dataframe');
+	return new DataFrame({
+		columnNames: ["Type", "Frequency"],
+		rows: {
+			getIterator: function () { //todo: make this properly lazy.
+				var values = self.toValues();
+				var totalValues = values.length;
 
-			var typeFrequencies = E.from(values)
-				.select(function (value) {
-					var valueType = typeof(value);
-					if (valueType === 'object') {
-						if (Object.isDate(value)) {
-							valueType = 'date';
+				var typeFrequencies = E.from(values)
+					.select(function (value) {
+						var valueType = typeof(value);
+						if (valueType === 'object') {
+							if (Object.isDate(value)) {
+								valueType = 'date';
+							}
 						}
-					}
-					return valueType;
-				})
-				.aggregate({}, function (accumulated, valueType) {
-					var typeInfo = accumulated[valueType];
-					if (!typeInfo) {
-						typeInfo = {
-							count: 0
-						};
-						accumulated[valueType] = typeInfo;
-					}
-					++typeInfo.count;
-					return accumulated;
-				});
-
-			return new ArrayIterator(
-				E.from(Object.keys(typeFrequencies))
-					.select(function (valueType) {
-						return [
-							valueType,
-							(typeFrequencies[valueType].count / totalValues) * 100
-						];
+						return valueType;
 					})
-					.toArray()
-			);
-		}
-	);
+					.aggregate({}, function (accumulated, valueType) {
+						var typeInfo = accumulated[valueType];
+						if (!typeInfo) {
+							typeInfo = {
+								count: 0
+							};
+							accumulated[valueType] = typeInfo;
+						}
+						++typeInfo.count;
+						return accumulated;
+					});
+
+				return new ArrayIterator(
+					E.from(Object.keys(typeFrequencies))
+						.select(function (valueType) {
+							return [
+								valueType,
+								(typeFrequencies[valueType].count / totalValues) * 100
+							];
+						})
+						.toArray()
+				);
+			}
+		},		
+	});
 };
 
 /** 
