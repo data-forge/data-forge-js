@@ -783,7 +783,7 @@ describe('BaseDataFrame', function () {
 		expect(modified.getSeries("Generated").toValues()).to.eql([22, 24]);
 	});
 
-	it('can get subset of rows', function () {
+	it('can get slice of rows', function () {
 
 		var dataFrame = initDataFrame(
 			[ "Date", "Value1", "Value2", "Value3" ],
@@ -795,7 +795,7 @@ describe('BaseDataFrame', function () {
 			],
 			[5, 6, 7, 8]
 		);
-		var subset = dataFrame.getRowsSubset(1, 3);
+		var subset = dataFrame.slice(1, 3);
 		expect(subset.getIndex().toValues()).to.eql([6, 7]);
 		expect(subset.toValues()).to.eql([
 			[new Date(1975, 24, 2), 200, 'b', 1],

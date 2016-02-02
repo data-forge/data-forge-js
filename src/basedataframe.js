@@ -990,12 +990,12 @@ BaseDataFrame.prototype.setSeries = function (columnName, data) { //todo: should
 };
 
 /**
- * Get a subset of rows from the data frame.
+ * Create a new data-frame from a slice of rows.
  *
- * @param {int} startIndex - Index where the subset starts.
- * @param {int} endIndex - Marks the end of the subset, one row past the last row to include.
+ * @param {int} startIndex - Index where the slice starts.
+ * @param {int} endIndex - Marks the end of the slice, one row past the last row to include.
  */
-BaseDataFrame.prototype.getRowsSubset = function (startIndex, endIndex) {
+BaseDataFrame.prototype.slice = function (startIndex, endIndex) {
 	assert.isNumber(startIndex, "Expected 'startIndex' parameter to getRowsSubset to be an integer.");
 	assert.isNumber(endIndex, "Expected 'endIndex' parameter to getRowsSubset to be an integer.");
 	assert(endIndex >= startIndex, "Expected 'endIndex' parameter to getRowsSubset to be greater than or equal to 'startIndex' parameter.");
