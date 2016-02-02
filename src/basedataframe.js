@@ -555,12 +555,17 @@ BaseDataFrame.prototype.getSeries = function (columnNameOrIndex) {
 	return new Series({
 		values: {
 			getIterator: function () {
-				return new ArrayIterator(E.from(self.toValues())
-					.select(function (entry) {
-						return entry[columnIndex];
-					})
-					.toArray()
-				);					
+				var iterator = self.getIterator();
+
+				return {
+					moveNext: function () {
+						return iterator.moveNext();
+					},
+
+					getCurrent: function () {
+						return iterator.getCurrent()[columnIndex];
+					},
+				};
 			},
 		},
 		index: self.getIndex(),
