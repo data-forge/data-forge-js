@@ -1068,10 +1068,10 @@ BaseDataFrame.prototype.toString = function () {
 	var index = self.getIndex().toValues();
 	var header = ["__index__"].concat(self.getColumnNames());
 	var rows = E.from(self.toValues())
-			.select(function (row, rowIndex) { 
-				return [index[rowIndex]].concat(row);
-			})
-			.toArray()
+		.select(function (row, rowIndex) { 
+			return [index[rowIndex]].concat(row);
+		})
+		.toArray()
 
 	var t = new Table();
 	rows.forEach(function (row, rowIndex) {
@@ -1195,7 +1195,7 @@ BaseDataFrame.prototype.truncateStrings = function (maxLength) {
 	assert.isNumber(maxLength, "Expected 'maxLength' parameter to 'truncateStrings' to be an integer.");
 
 	var self = this;
-	var truncatedValues = E.from(self.toValues())
+	var truncatedValues = E.from(self.toValues()) //todo: make this function lazy.
 		.select(function (row) {
 			return E.from(row)
 				.select(function (value) {
@@ -1235,35 +1235,33 @@ BaseDataFrame.prototype.remapColumns = function (columnNames) {
 
 	var self = this;
 
- 	var LazyDataFrame = require('./lazydataframe');
-	return new LazyDataFrame(
-		function () {
-			return columnNames;
+ 	var DataFrame = require('./dataframe');
+	return new DataFrame({
+		columnNames: columnNames,
+		rows: {
+			getIterator: function () { //todo: make this properly lazy.
+				return new ArrayIterator(
+					E.from(self.toValues())
+						.select(function (row) {
+							return E.from(columnNames)
+								.select(function (columnName) {
+									var columnIndex = self.getColumnIndex(columnName);
+									if (columnIndex >= 0) {
+										return row[columnIndex];
+									}
+									else { 
+										// Column doesn't exist.
+										return undefined;
+									}
+								})
+								.toArray();
+						})
+						.toArray()
+				);
+			},
 		},
-		function () {
-			return new ArrayIterator(
-				E.from(self.toValues())
-					.select(function (row) {
-						return E.from(columnNames)
-							.select(function (columnName) {
-								var columnIndex = self.getColumnIndex(columnName);
-								if (columnIndex >= 0) {
-									return row[columnIndex];
-								}
-								else { 
-									// Column doesn't exist.
-									return undefined;
-								}
-							})
-							.toArray();
-					})
-					.toArray()
-			);
-		},
-		function () {
-			return self.getIndex();
-		}		
-	);
+		index: self.getIndex(),
+	});
 };
 
 /**
