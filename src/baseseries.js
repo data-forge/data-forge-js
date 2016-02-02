@@ -308,19 +308,21 @@ BaseSeries.prototype.select = function (selector) {
 
 	var self = this;
 
-	var LazySeries = require('./lazyseries');
-	return new LazySeries(
-		function () {
-			return new ArrayIterator(
-				E.from(self.toValues())
-					.select(function (value) {
-						return selector(value);
-					})
-					.toArray()
-			);
-		},
-		self.getIndex()
-	); 	
+	var Series = require('./series');
+	return new Series({
+		values: {
+			getIterator: function () {
+				return new ArrayIterator(
+					E.from(self.toValues())
+						.select(function (value) {
+							return selector(value);
+						})
+						.toArray()
+				);
+			},
+		},		
+		index: self.getIndex(),
+	}); 	
 };
 
 /**
