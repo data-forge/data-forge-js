@@ -253,7 +253,7 @@ BaseSeries.prototype.where = function (filterSelectorPredicate) {
 	//
 	// Lazy  execute the filtering.
 	//
-	var executeLazyWhere = function () {
+	var executeLazyWhere = function () { //todo: make this properly lazy.
 
 		if (cachedFilteredIndexAndValues) {
 			return cachedFilteredIndexAndValues;
@@ -270,23 +270,23 @@ BaseSeries.prototype.where = function (filterSelectorPredicate) {
 			})
 			.toArray();
 		return cachedFilteredIndexAndValues;
-	}
+	};
 
+	var Series = require('./series');
 
-	var LazySeries = require('./lazyseries');
-	var LazyIndex = require('./lazyindex');
-
-	return new LazySeries(
-		function () {
-			return new ArrayIterator(E.from(executeLazyWhere())
-				.select(function (data) {
-					return data[1]; // Value
-				})
-				.toArray()
-			);
+	return new Series({
+		values: {
+			getIterator: function () {
+				return new ArrayIterator(E.from(executeLazyWhere())
+					.select(function (data) {
+						return data[1]; // Value
+					})
+					.toArray()
+				);
+			},
 		},
-		new LazyIndex(
-			function () {
+		index: new Index({
+			getIterator: function () {
 				return new ArrayIterator(E.from(executeLazyWhere())
 					.select(function (data) {
 						return data[0]; // Index
@@ -294,8 +294,8 @@ BaseSeries.prototype.where = function (filterSelectorPredicate) {
 					.toArray()
 				);
 			}
-		)
-	); 	
+		}),
+	}); 	
 };
 
 /**
