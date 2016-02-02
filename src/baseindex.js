@@ -67,18 +67,17 @@ BaseIndex.prototype.slice = function (startIndex, endIndex) {
 
 	var self = this;
 
-	var LazyIndex = require('./lazyindex');
-
-	return new LazyIndex(
-		function () {
+	var Index = require('./index');
+	return new Index({
+		getIterator: function () { //todo: make lazy.
 			return new ArrayIterator(
 				E.from(self.toValues())
 					.skip(startIndex)
 					.take(endIndex - startIndex)
 					.toArray()
 			);
-		}
-	);
+		},
+	});
 };
 
 /*
