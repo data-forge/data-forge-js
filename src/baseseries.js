@@ -576,19 +576,20 @@ BaseSeries.prototype.slice = function (startIndex, endIndex) {
 
 	var self = this;
 
-	var LazySeries = require('./lazyseries'); // Require here to prevent circular ref.
-
-	return new LazySeries(
-		function () {
-			return new ArrayIterator(
-				E.from(self.toValues())
-					.skip(startIndex)
-					.take(endIndex - startIndex)
-					.toArray()
-			);
-		},
-		self.getIndex().slice(startIndex, endIndex)
-	);
+	var Series = require('./series'); // Require here to prevent circular ref.
+	return new Series({
+		values: {
+			getIterator: function () {
+				return new ArrayIterator( //todo: make this lazy.
+					E.from(self.toValues())
+						.skip(startIndex)
+						.take(endIndex - startIndex)
+						.toArray()
+				);
+			},
+		},		
+		index: self.getIndex().slice(startIndex, endIndex),
+	});
 };
 
 /** 
