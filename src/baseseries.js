@@ -142,19 +142,21 @@ BaseSeries.prototype.skipUntil = function (predicate) {
 BaseSeries.prototype.take = function (numRows) {
 	assert.isNumber(numRows, "Expected 'numRows' parameter to 'take' function to be a number.");
 
-	var LazySeries = require('./lazyseries'); // Require here to prevent circular ref.
+	var Series = require('./series'); // Require here to prevent circular ref.
 	
 	var self = this;
-	return new LazySeries(
-		function () {
-			return new ArrayIterator(E
-				.from(self.toValues())
-				.take(numRows)
-				.toArray()
-			);
+	return new Series({
+		values: {
+			getIterator: function () {
+				return new ArrayIterator(E
+					.from(self.toValues())
+					.take(numRows)
+					.toArray()
+				);
+			},
 		},
-		self.getIndex().take(numRows)
-	); 	
+		index: self.getIndex().take(numRows),
+	});
 };
 
 /**
