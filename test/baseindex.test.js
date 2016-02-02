@@ -43,11 +43,11 @@ describe('Index', function () {
 		expect(index.take(2).toValues()).to.eql([0, 1]);
 	});
 
-	it('can get subset of rows', function () {
+	it('can get slice of rows', function () {
 
 		var index = initIndex([0, 1, 2, 3]);
-		var subset = index.getRowsSubset(1, 3);
-		expect(subset.toValues()).to.eql([1, 2]);
+		var slice = index.slice(1, 3);
+		expect(slice.toValues()).to.eql([1, 2]);
 	});
 
 	it('can bake index', function () {

@@ -559,15 +559,15 @@ BaseSeries.prototype.orderByDescending = function (sortSelector) {
 };
 
 /**
- * Get a subset of rows from the series.
+ * Create a new series from a slice of rows.
  *
- * @param {int} startIndex - Index where the subset starts.
- * @param {int} endIndex - Marks the end of the subset, one row past the last row to include.
+ * @param {int} startIndex - Index where the slice starts.
+ * @param {int} endIndex - Marks the end of the slice, one row past the last row to include.
  */
-BaseSeries.prototype.getRowsSubset = function (startIndex, endIndex) {
-	assert.isNumber(startIndex, "Expected 'startIndex' parameter to getRowsSubset to be an integer.");
-	assert.isNumber(endIndex, "Expected 'endIndex' parameter to getRowsSubset to be an integer.");
-	assert(endIndex >= startIndex, "Expected 'endIndex' parameter to getRowsSubset to be greater than or equal to 'startIndex' parameter.");
+BaseSeries.prototype.slice = function (startIndex, endIndex) {
+	assert.isNumber(startIndex, "Expected 'startIndex' parameter to slice to be an integer.");
+	assert.isNumber(endIndex, "Expected 'endIndex' parameter to slice to be an integer.");
+	assert(endIndex >= startIndex, "Expected 'endIndex' parameter to slice to be greater than or equal to 'startIndex' parameter.");
 
 	var self = this;
 
@@ -582,7 +582,7 @@ BaseSeries.prototype.getRowsSubset = function (startIndex, endIndex) {
 					.toArray()
 			);
 		},
-		self.getIndex().getRowsSubset(startIndex, endIndex)
+		self.getIndex().slice(startIndex, endIndex)
 	);
 };
 

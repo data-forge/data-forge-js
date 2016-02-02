@@ -1016,7 +1016,7 @@ BaseDataFrame.prototype.slice = function (startIndex, endIndex) {
 				);
 			},
 		},
-		index: self.getIndex().getRowsSubset(startIndex, endIndex),
+		index: self.getIndex().slice(startIndex, endIndex),
 	});
 };
 

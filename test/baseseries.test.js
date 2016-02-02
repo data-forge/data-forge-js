@@ -191,12 +191,12 @@ describe('BaseSeries', function () {
 	});
 
 
-	it('can get subset of rows', function () {
+	it('can get slice of rows', function () {
 
 		var series = initSeries([0, 1, 2, 3], [100, 300, 200, 5]);
-		var subset = series.getRowsSubset(1, 3);
-		expect(subset.getIndex().toValues()).to.eql([1, 2]);
-		expect(subset.toValues()).to.eql([300, 200]);
+		var slice = series.slice(1, 3);
+		expect(slice.getIndex().toValues()).to.eql([1, 2]);
+		expect(slice.toValues()).to.eql([300, 200]);
 	});
 
 	it('can compute rolling window - from empty data set', function () {
