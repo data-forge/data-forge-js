@@ -1127,7 +1127,12 @@ BaseSeries.prototype.tail = function (values) {
 BaseSeries.prototype.sum = function () {
 
 	var self = this;
-	return E.from(self.toValues()).sum(); //todo: use aggregate function to do this.
+	var self = this;
+	return self.skip(1).aggregate(self.first(), 
+		function (prev, value) {
+			return prev + value;
+		}
+	);
 };
 
 /**
@@ -1136,7 +1141,7 @@ BaseSeries.prototype.sum = function () {
 BaseSeries.prototype.average = function () {
 
 	var self = this;
-	return E.from(self.toValues()).average(); //todo: use aggregate function to do this.
+	return self.sum() / self.count();
 };
 
 /**
@@ -1145,7 +1150,11 @@ BaseSeries.prototype.average = function () {
 BaseSeries.prototype.min = function () {
 
 	var self = this;
-	return E.from(self.toValues()).min(); //todo: use aggregate function to do this.
+	return self.skip(1).aggregate(self.first(), 
+		function (prev, value) {
+			return Math.min(prev, value);
+		}
+	);
 };
 
 /**
@@ -1154,13 +1163,21 @@ BaseSeries.prototype.min = function () {
 BaseSeries.prototype.max = function () {
 
 	var self = this;
-	return E.from(self.toValues()).max(); //todo: use aggregate function to do this.
+	return self.skip(1).aggregate(self.first(), 
+		function (prev, value) {
+			return Math.max(prev, value);
+		}
+	);
 };
 
 /**
  * Aggregate the values in the series.
+ *
+ * @param {object} seed - The seed value for producing the aggregation.
+ * @param {function} selector - Function that takes the seed and then each value in the series and produces the aggregate value.
  */
 BaseSeries.prototype.aggregate = function (seed, selector) {
+
 	assert.isFunction(selector, "Expected 'selector' parameter to aggregate to be a function.");
 
 	var self = this;
