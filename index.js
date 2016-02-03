@@ -150,17 +150,39 @@ var dataForge = {
 			.concat(dropElement(leftDataFrame.getColumnNames(), leftColumnIndex))
 			.concat(dropElement(rightDataFrame.getColumnNames(), rightColumnIndex));
 
+		var rightMap = E.from(rightRows)
+			.groupBy(function (rightRow) {
+				return rightRow[rightColumnIndex];
+			})
+			.toObject(
+				function (group) {
+					return group.key();
+				},
+				function (group) {
+					return group.getSource();
+				}
+			);
+
 		var mergedValues = E.from(leftRows) // Merge values, drop index.
 			.selectMany(function (leftRow) {
-				return E
-					.from(rightRows)
-					.where(function (rightRow) {
-						return leftRow[leftColumnIndex] === rightRow[rightColumnIndex];
-					})
+				var rightRows = rightMap[leftRow[leftColumnIndex]] || [];
+				return E.from(rightRows)
 					.select(function (rightRow) {
-						var left = dropElement(leftRow, leftColumnIndex);
-						var right = dropElement(rightRow, rightColumnIndex);
-						return [leftRow[leftColumnIndex]].concat(left).concat(right);
+						var combined = [leftRow[leftColumnIndex]];
+						
+						for (var i = 0; i < leftRow.length; ++i) {
+							if (i !== leftColumnIndex) {
+								combined.push(leftRow[i]);
+							}
+						}
+
+						for (var i = 0; i < rightRow.length; ++i) {
+							if (i !== rightColumnIndex) {
+								combined.push(rightRow[i]);
+							}
+						}
+
+						return combined;
 					});
 			})
 			.toArray();
