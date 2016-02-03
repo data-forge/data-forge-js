@@ -1157,4 +1157,15 @@ BaseSeries.prototype.max = function () {
 	return E.from(self.toValues()).max(); //todo: use aggregate function to do this.
 };
 
+/**
+ * Aggregate the values in the series.
+ */
+BaseSeries.prototype.aggregate = function (seed, selector) {
+	assert.isFunction(selector, "Expected 'selector' parameter to aggregate to be a function.");
+
+	var self = this;
+	return E.from(self.toValues()).aggregate(seed, selector);
+};
+
+
 module.exports = BaseSeries;

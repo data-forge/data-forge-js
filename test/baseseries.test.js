@@ -704,4 +704,15 @@ describe('BaseSeries', function () {
 		var series = initSeries([0, 1, 2], [5, 6, 3]);		
 		expect(series.max()).to.eql(6);
 	});
+
+	it('can aggregate series', function () {
+
+		var series = initSeries([0, 1, 2], [4, 8, 16]);
+
+		var agg = series.aggregate(2, function (prevValue, value) {
+				return prevValue + value;
+			});
+
+		expect(agg).to.eql(30);
+	});
 });
