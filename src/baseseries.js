@@ -1130,5 +1130,13 @@ BaseSeries.prototype.sum = function () {
 	return E.from(self.toValues()).sum(); //todo: use aggregate function to do this.
 };
 
+/**
+ * Average the values in a series.
+ */
+BaseSeries.prototype.average = function () {
+
+	var self = this;
+	return E.from(self.toValues()).average(); //todo: use aggregate function to do this.
+};
 
 module.exports = BaseSeries;

@@ -686,4 +686,10 @@ describe('BaseSeries', function () {
 		var series = initSeries([0, 1, 2], [1, 2, 3]);		
 		expect(series.sum()).to.eql(6);
 	});
+
+	it('can average series', function () {
+
+		var series = initSeries([0, 1, 2], [1, 2, 3]);		
+		expect(series.average()).to.eql(2);
+	});
 });
