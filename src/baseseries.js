@@ -1139,4 +1139,22 @@ BaseSeries.prototype.average = function () {
 	return E.from(self.toValues()).average(); //todo: use aggregate function to do this.
 };
 
+/**
+ * Get the min value in the series.
+ */
+BaseSeries.prototype.min = function () {
+
+	var self = this;
+	return E.from(self.toValues()).min(); //todo: use aggregate function to do this.
+};
+
+/**
+ * Get the max value in the series.
+ */
+BaseSeries.prototype.max = function () {
+
+	var self = this;
+	return E.from(self.toValues()).max(); //todo: use aggregate function to do this.
+};
+
 module.exports = BaseSeries;

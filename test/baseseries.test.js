@@ -692,4 +692,16 @@ describe('BaseSeries', function () {
 		var series = initSeries([0, 1, 2], [1, 2, 3]);		
 		expect(series.average()).to.eql(2);
 	});
+
+	it('can get series minimum', function () {
+
+		var series = initSeries([0, 1, 2], [5, 2.5, 3]);		
+		expect(series.min()).to.eql(2.5);
+	});
+
+	it('can get series maximum', function () {
+
+		var series = initSeries([0, 1, 2], [5, 6, 3]);		
+		expect(series.max()).to.eql(6);
+	});
 });
