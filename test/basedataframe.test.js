@@ -1642,4 +1642,27 @@ describe('BaseDataFrame', function () {
 			[1, { Column1: false }],
 		]);
 	});
+
+	it('can aggregate dataframe', function () {
+
+		var dataFrame = initDataFrame(
+				["Column1", "Column2"], 
+				[
+					[1, 10],
+					[2, 20],
+					[3, 30],
+				],
+				[10, 11, 12]
+			);
+
+		var agg = dataFrame.aggregate({ Column1: 0, Column2: 1 }, function (prev, value) {
+				return {
+					Column1: prev.Column1 + value.Column1,
+					Column2: prev.Column2 * value.Column2,
+				};
+			});
+
+		expect(agg.Column1).to.eql(6);
+		expect(agg.Column2).to.eql(6000);
+	});
 });

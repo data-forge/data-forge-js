@@ -1653,4 +1653,16 @@ BaseDataFrame.prototype.tail = function (numRows) {
 	return self.skip(self.count() - numRows);
 };
 
+/**
+ * Aggregate the rows of the data-frame.
+ *
+ * @param {object} seed - The seed value for producing the aggregation.
+ * @param {function} selector - Function that takes the seed and then each row in the data-frame and produces the aggregate value.
+ */
+BaseDataFrame.prototype.aggregate = function (seed, selector) {
+
+	var self = this;
+	return E.from(self.toObjects()).aggregate(seed, selector);
+};
+
 module.exports = BaseDataFrame;
