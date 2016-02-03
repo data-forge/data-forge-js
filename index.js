@@ -119,7 +119,7 @@ var dataForge = {
 	},
 
 	/**
-	 * Merge data frames by index or a particular column.
+	 * Merge data-frames by index or a particular column.
 	 * 
 	 * @param {DataFrame} leftDataFrame - One data frame to merge.
 	 * @param {DataFrame} rightDataFrame - The other data frame to merge.
