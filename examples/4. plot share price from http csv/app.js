@@ -61,7 +61,7 @@ $(function() {
 			//
 			// Plot the data frame.
 			//
-			var subsetToPlot = dataFrame.getColumnsSubset(['Date', 'Close']);
+			var subsetToPlot = dataFrame.subset(['Date', 'Close']);
 			plot('#placeholder', subsetToPlot);
 		})
 		.catch(function (err) {

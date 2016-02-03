@@ -11,9 +11,9 @@ $(function() {
 
 		var flotSeries = E.from(remainingColumns)
 			.select(function (column) {
-				var name = column.getName();
+				var name = column.name;
 				var data = E.from(index)
-					.zip(column.getSeries().toValues(), function (index, value) {
+					.zip(column.series.toValues(), function (index, value) {
 						return [index, value];
 					})
 					.toArray();
