@@ -16,31 +16,11 @@ describe('DataFrame', function () {
 		assert.isArray(values);
 		assert.isArray(index);
 
-		var dataFrame = new DataFrame();
-
-		dataFrame.getColumnNames = function () {
-			return columns; 
-		};
-
-		dataFrame.getIterator = function () {
-			var valueIndex = -1;
-
-			return {
-				moveNext: function () {
-					return ++valueIndex < values.length;
-				},
-
-				getCurrent: function () {
-					return values[valueIndex];
-				},
-			}
-		};
-		
-		dataFrame.getIndex = function () {
-			return new dataForge.Index(index);
-		};
-		
-		return dataFrame;
+		return new DataFrame({
+			columnNames: columns,
+			rows: new ArrayIterable(values),
+			index: new dataForge.Index(index),
+		});
 	};
 
 	it('can get column index from name', function () {

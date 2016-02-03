@@ -16,14 +16,10 @@ describe('Series', function () {
 		assert.isArray(index);
 		assert.isArray(values);
 
-		var series = new Series();
-		series.getIterator = function () {
-			return new ArrayIterator(values);
-		};
-		series.getIndex = function () {
-			return new dataForge.Index(index);
-		};
-		return series;		
+		return new Series({
+				values: new ArrayIterable(values),
+				index: new dataForge.Index(index),
+			});
 	};
 
 	it('default index is generated', function () {
