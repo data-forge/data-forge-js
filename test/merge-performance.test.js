@@ -36,6 +36,6 @@ describe('merge-performance', function () {
 
 		stopwatch.stop();
 		var time = stopwatch.read();
-		expect(time).to.be.at.most(1000);
+		expect(time).to.be.at.most(250);
 	});
 });
