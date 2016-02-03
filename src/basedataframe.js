@@ -1656,13 +1656,38 @@ BaseDataFrame.prototype.tail = function (numRows) {
 /**
  * Aggregate the rows of the data-frame.
  *
- * @param {object} seed - The seed value for producing the aggregation.
+ * @param {object} [seed] - The seed value for producing the aggregation.
  * @param {function} selector - Function that takes the seed and then each row in the data-frame and produces the aggregate value.
  */
-BaseDataFrame.prototype.aggregate = function (seed, selector) {
+BaseDataFrame.prototype.aggregate = function (seedOrSelector, selector) {
 
 	var self = this;
-	return E.from(self.toObjects()).aggregate(seed, selector);
+
+	if (Object.isFunction(seedOrSelector) && !selector) {
+		return E.from(self.toObjects()).aggregate(seedOrSelector);		
+	}
+	else if (selector) {
+		assert.isFunction(selector, "Expected 'selector' parameter to aggregate to be a function.");
+		return E.from(self.toObjects()).aggregate(seedOrSelector, selector);
+	}
+	else {
+		assert.isObject(seedOrSelector, "Expected 'seed' parameter to aggregate to be an object.");
+
+		return E.from(Object.keys(seedOrSelector))
+			.select(function (columnName) {
+				var columnSelector = seedOrSelector[columnName];
+				assert.isFunction(columnSelector, "Expected column/selector pairs in 'seed' parameter to aggregate.");
+				return [columnName, self.getSeries(columnName).aggregate(columnSelector)];
+			})
+			.toObject(
+				function (pair) {
+					return pair[0];
+				},
+				function (pair) {
+					return pair[1];					
+				}
+			);
+	}
 };
 
 module.exports = BaseDataFrame;

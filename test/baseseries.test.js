@@ -705,7 +705,18 @@ describe('BaseSeries', function () {
 		expect(series.max()).to.eql(6);
 	});
 
-	it('can aggregate series', function () {
+	it('can aggregate series with no seed', function () {
+
+		var series = initSeries([0, 1, 2], [4, 8, 16]);
+
+		var agg = series.aggregate(function (prevValue, value) {
+				return prevValue + value;
+			});
+
+		expect(agg).to.eql(28);
+	});
+
+	it('can aggregate series with seed', function () {
 
 		var series = initSeries([0, 1, 2], [4, 8, 16]);
 
@@ -715,4 +726,22 @@ describe('BaseSeries', function () {
 
 		expect(agg).to.eql(30);
 	});
+
+	it('can aggregate series with a function as the seed', function () {
+
+		var series = initSeries([0, 1, 2], [4, 8, 16]);
+
+		var agg = series.aggregate(
+			function () {
+				return 2;
+			},
+			function (prevValue, value) {
+				return function () {
+					return prevValue() + value;
+				};
+			});
+
+		expect(agg()).to.eql(30);
+	});
+
 });

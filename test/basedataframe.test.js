@@ -1665,4 +1665,105 @@ describe('BaseDataFrame', function () {
 		expect(agg.Column1).to.eql(6);
 		expect(agg.Column2).to.eql(6000);
 	});
+
+	it('can aggregate dataframe with no seed', function () {
+
+		var dataFrame = initDataFrame(
+				["Column1", "Column2"], 
+				[
+					[1, 10],
+					[2, 20],
+					[3, 30],
+				],
+				[10, 11, 12]
+			);
+
+		var agg = dataFrame.aggregate(function (prev, value) {
+				return {
+					Column1: prev.Column1 + value.Column1,
+					Column2: prev.Column2 * value.Column2,
+				};
+			});
+
+		expect(agg.Column1).to.eql(6);
+		expect(agg.Column2).to.eql(6000);
+	});
+
+	it('can aggregate dataframe with seed', function () {
+
+		var dataFrame = initDataFrame(
+				["Column1", "Column2"], 
+				[
+					[1, 10],
+					[2, 20],
+					[3, 30],
+				],
+				[10, 11, 12]
+			);
+
+		var agg = dataFrame.aggregate({ Column1: 0, Column2: 1 }, function (prev, value) {
+				return {
+					Column1: prev.Column1 + value.Column1,
+					Column2: prev.Column2 * value.Column2,
+				};
+			});
+
+		expect(agg.Column1).to.eql(6);
+		expect(agg.Column2).to.eql(6000);
+	});
+
+	it('can aggregate dataframe with function as seed', function () {
+
+		var dataFrame = initDataFrame(
+				["Column1", "Column2"], 
+				[
+					[1, 10],
+					[2, 20],
+					[3, 30],
+				],
+				[10, 11, 12]
+			);
+
+		var agg = dataFrame.aggregate(
+			function () {
+				return { Column1: 0, Column2: 1 };
+			},			
+			function (prev, value) {
+				return function () {
+					return {
+						Column1: prev().Column1 + value.Column1,
+						Column2: prev().Column2 * value.Column2,
+					};
+				};
+			}
+		);
+
+		expect(agg().Column1).to.eql(6);
+		expect(agg().Column2).to.eql(6000);
+	});
+
+	it('can aggregate dataframe with separate functions per column', function () {
+
+		var dataFrame = initDataFrame(
+				["Column1", "Column2"], 
+				[
+					[1, 10],
+					[2, 20],
+					[3, 30],
+				],
+				[10, 11, 12]
+			);
+
+		var agg = dataFrame.aggregate({ 
+				Column1: function (prev, value)  {
+					return prev + value;
+				},
+				Column2: function (prev, value) {
+					return prev * value;
+				},
+			});
+
+		expect(agg.Column1).to.eql(6);
+		expect(agg.Column2).to.eql(6000);
+	});
 });

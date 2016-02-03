@@ -1128,7 +1128,7 @@ BaseSeries.prototype.sum = function () {
 
 	var self = this;
 	var self = this;
-	return self.skip(1).aggregate(self.first(), 
+	return self.aggregate(
 		function (prev, value) {
 			return prev + value;
 		}
@@ -1150,7 +1150,7 @@ BaseSeries.prototype.average = function () {
 BaseSeries.prototype.min = function () {
 
 	var self = this;
-	return self.skip(1).aggregate(self.first(), 
+	return self.aggregate(
 		function (prev, value) {
 			return Math.min(prev, value);
 		}
@@ -1163,7 +1163,7 @@ BaseSeries.prototype.min = function () {
 BaseSeries.prototype.max = function () {
 
 	var self = this;
-	return self.skip(1).aggregate(self.first(), 
+	return self.aggregate(
 		function (prev, value) {
 			return Math.max(prev, value);
 		}
@@ -1173,15 +1173,22 @@ BaseSeries.prototype.max = function () {
 /**
  * Aggregate the values in the series.
  *
- * @param {object} seed - The seed value for producing the aggregation.
+ * @param {object} [seed] - The seed value for producing the aggregation.
  * @param {function} selector - Function that takes the seed and then each value in the series and produces the aggregate value.
  */
-BaseSeries.prototype.aggregate = function (seed, selector) {
-
-	assert.isFunction(selector, "Expected 'selector' parameter to aggregate to be a function.");
+BaseSeries.prototype.aggregate = function (seedOrSelector, selector) {
 
 	var self = this;
-	return E.from(self.toValues()).aggregate(seed, selector);
+
+	if (Object.isFunction(seedOrSelector) && !selector) {
+
+		return E.from(self.skip(1).toValues()).aggregate(self.first(), seedOrSelector);
+	}
+	else {
+		assert.isFunction(selector, "Expected 'selector' parameter to aggregate to be a function.");
+
+		return E.from(self.toValues()).aggregate(seedOrSelector, selector);
+	}
 };
 
 
