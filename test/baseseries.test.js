@@ -680,4 +680,10 @@ describe('BaseSeries', function () {
 			[1, false],
 		]);
 	});
+
+	it('can sum series', function () {
+
+		var series = initSeries([0, 1, 2], [1, 2, 3]);		
+		expect(series.sum()).to.eql(6);
+	});
 });

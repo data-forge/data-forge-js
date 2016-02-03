@@ -1121,6 +1121,14 @@ BaseSeries.prototype.tail = function (values) {
 	return self.skip(self.count() - values);
 };
 
+/**
+ * Sum the values in a series.
+ */
+BaseSeries.prototype.sum = function () {
+
+	var self = this;
+	return E.from(self.toValues()).sum(); //todo: use aggregate function to do this.
+};
 
 
 module.exports = BaseSeries;
