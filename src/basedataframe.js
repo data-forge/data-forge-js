@@ -4,7 +4,6 @@
 // Base class for data frame classes.
 //
 
-var Column = require('./column');
 var Series = require('./series');
 var Index = require('./index');
 var ArrayIterator = require('./iterators/array');
@@ -606,7 +605,10 @@ BaseDataFrame.prototype.getColumns = function () {
 
 	return E.from(self.getColumnNames())
 		.select(function (columnName) {
-			return new Column(columnName, self.getSeries(columnName));
+			return {
+				name: columnName,
+				series: self.getSeries(columnName),
+			};
 		})
 		.toArray();
 };
@@ -1137,18 +1139,18 @@ BaseDataFrame.prototype.detectTypes = function () {
 
 	var dataFrames = E.from(self.getColumns())
 		.select(function (column) {
-			var series = column.getSeries();
+			var series = column.series;
 			var numValues = series.toValues().length;
 			var Series = require('./series');
 			//todo: broad-cast column
 			var newSeries = new Series({
 				values: E.range(0, numValues)
 					.select(function () { 
-						return column.getName(); 
+						return column.name; 
 					})
 					.toArray()
 			});
-			return column.getSeries()
+			return column.series
 				.detectTypes()
 				.setSeries('Column', newSeries);
 		})
@@ -1168,17 +1170,17 @@ BaseDataFrame.prototype.detectValues = function () {
 
 	var dataFrames = E.from(self.getColumns())
 		.select(function (column) {
-			var numValues = column.getSeries().toValues().length;
+			var numValues = column.series.toValues().length;
 			var Series = require('./series');
 			//todo: broad-cast column
 			var newSeries = new Series({
 				values: E.range(0, numValues)
 					.select(function () { 
-						return column.getName(); 
+						return column.name 
 					})
 					.toArray()
 			});
-			return column.getSeries().detectValues().setSeries('Column', newSeries);
+			return column.series.detectValues().setSeries('Column', newSeries);
 		})
 		.toArray();
 	var dataForge = require('../index');

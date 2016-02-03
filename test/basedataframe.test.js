@@ -306,11 +306,11 @@ describe('BaseDataFrame', function () {
 		var columns = dataFrame.getColumns();
 		expect(columns.length).to.eql(4);
 
-		expect(columns[0].getName()).to.eql('Date');
-		expect(columns[0].getSeries().toValues()).to.eql([new Date(1975, 24, 2), new Date(2015, 24, 2)]);
+		expect(columns[0].name).to.eql('Date');
+		expect(columns[0].series.toValues()).to.eql([new Date(1975, 24, 2), new Date(2015, 24, 2)]);
 
-		expect(columns[2].getName()).to.eql('Value2');
-		expect(columns[2].getSeries().toValues()).to.eql(['foo', 'bar']);
+		expect(columns[2].name).to.eql('Value2');
+		expect(columns[2].series.toValues()).to.eql(['foo', 'bar']);
 	});
 	
 	it('can retreive column subset as new dataframe', function () 
@@ -1008,9 +1008,9 @@ describe('BaseDataFrame', function () {
 		expect(renamed.getColumnNames()).to.eql(newColumnNames);
 		var columns = renamed.getColumns();
 		expect(columns.length).to.eql(3);
-		expect(columns[0].getSeries().toValues()).to.eql([300, 200]);
-		expect(columns[1].getSeries().toValues()).to.eql(['c', 'b']);
-		expect(columns[2].getSeries().toValues()).to.eql([3, 1]);
+		expect(columns[0].series.toValues()).to.eql([300, 200]);
+		expect(columns[1].series.toValues()).to.eql(['c', 'b']);
+		expect(columns[2].series.toValues()).to.eql([3, 1]);
 	});
 
 	it('can extract values as array objects', function () {
