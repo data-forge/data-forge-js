@@ -29,7 +29,6 @@ var dataForge = {
 	
 	DataFrame: DataFrame,
 	Series: require('./src/series'),
-	BaseSeries: require('./src/baseseries'),
 	Index: Index,
 	BaseIndex: require('./src/baseindex'),
 
