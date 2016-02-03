@@ -5,7 +5,6 @@
 //
 
 var Column = require('./column');
-var LazySeries = require('./lazyseries');
 var Series = require('./series');
 var Index = require('./index');
 var ArrayIterator = require('./iterators/array');
