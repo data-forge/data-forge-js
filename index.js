@@ -28,7 +28,6 @@ var Index = require('./src/index');
 var dataForge = {
 	
 	DataFrame: DataFrame,
-	BaseDataFrame: require('./src/basedataframe'),
 	Series: require('./src/series'),
 	BaseSeries: require('./src/baseseries'),
 	Index: Index,
