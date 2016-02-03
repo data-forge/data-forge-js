@@ -30,7 +30,6 @@ var dataForge = {
 	DataFrame: DataFrame,
 	Series: require('./src/series'),
 	Index: Index,
-	BaseIndex: require('./src/baseindex'),
 
 	/**
 	 * Install a plugin in the dataForge namespace.
