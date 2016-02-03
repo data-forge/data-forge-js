@@ -8,6 +8,7 @@ require('sugar');
 var BabyParse = require('babyparse');
 
 var DataFrame = require('./src/dataframe');
+var Index = require('./src/index');
 
 /**
  * Main namespace for Data-Forge.
@@ -27,12 +28,11 @@ var DataFrame = require('./src/dataframe');
 var dataForge = {
 	
 	DataFrame: DataFrame,
-	LazyDataFrame: require('./src/lazydataframe'),
 	BaseDataFrame: require('./src/basedataframe'),
 	Column: require('./src/column'),
 	Series: require('./src/series'),
 	BaseSeries: require('./src/baseseries'),
-	Index: require('./src/index'),
+	Index: Index,
 	BaseIndex: require('./src/baseindex'),
 
 	/**
@@ -127,8 +127,6 @@ var dataForge = {
 	 * @param {string} [columnName] - The name of the column to merge on. Optional, when not specified merge is based on the index.
 	 */
 	merge: function (leftDataFrame, rightDataFrame, columnName) {
-		var LazyDataFrame = require('./src/lazydataframe'); //todo: don't included this way.
-
 		assert.isObject(leftDataFrame, "Expected 'leftDataFrame' parameter to 'merge' to be an object.");
 		assert.isObject(rightDataFrame, "Expected 'rightDataFrame' parameter to 'merge' to be an object.");
 
@@ -168,14 +166,14 @@ var dataForge = {
 			})
 			.toArray();
 
-		return new LazyDataFrame(
-			function () {
-				return mergedColumnNames;
+		return new DataFrame({
+			columnNames: mergedColumnNames,
+			rows: {
+				getIterator: function () {
+					return new ArrayEnumerator(mergedValues);
+				},
 			},
-			function () {
-				return new ArrayEnumerator(mergedValues);
-			}
-		);
+		});
 	},
 
 	/**
@@ -195,37 +193,33 @@ var dataForge = {
 				.toArray();
 		};
 
-		var LazyDataFrame = require('./src/lazydataframe');
-		return new LazyDataFrame(
-			function () {
-				return concatenateColumns();
-			},
-			function () {
-				var concatenatedColumns = concatenateColumns();
-				return new ArrayEnumerator(
-					E.from(dataFrames)
-						.selectMany(function (dataFrame) {
-							return dataFrame
-								.remapColumns(concatenatedColumns)
-								.toValues();
-						})
-						.toArray()
-				);
-			},
-			function () {
-				var Index = require('./src/index');
-				return new Index({
-					getIterator: function () {
-						return new ArrayEnumerator(E.from(dataFrames)
+		return new DataFrame({
+			columnNames: concatenateColumns(),
+			rows: {
+				getIterator: function () {
+					var concatenatedColumns = concatenateColumns();
+					return new ArrayEnumerator(
+						E.from(dataFrames)
 							.selectMany(function (dataFrame) {
-								return dataFrame.getIndex().toValues();
+								return dataFrame
+									.remapColumns(concatenatedColumns)
+									.toValues();
 							})
 							.toArray()
-						);
-					},
-				})
-			}
-		);
+					);
+				},
+			},
+			index: new Index({
+				getIterator: function () {
+					return new ArrayEnumerator(E.from(dataFrames)
+						.selectMany(function (dataFrame) {
+							return dataFrame.getIndex().toValues();
+						})
+						.toArray()
+					);
+				},
+			}),
+		});
 	},
 };
 

@@ -13,14 +13,14 @@ describe('data-forge', function () {
 		assert.isArray(columns);
 		assert.isArray(values);
 
-		return new dataForge.LazyDataFrame(
-			function () {
-				return columns;
+		return new dataForge.DataFrame({
+			columnNames: columns,
+			rows: {
+				getIterator: function () {
+					return new ArrayIterator(values);
+				},
 			},
-			function () {
-				return new ArrayIterator(values);
-			}
-		);
+		});
 	};
 
 	it('can merge on column', function () {
