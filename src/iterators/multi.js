@@ -9,28 +9,14 @@ var validateIterator = require('./validate');
 //
 // An iterator that can step multiple other iterators at once.
 //
-var MultiIterator = function (iterables) {
-	assert.isArray(iterables);
+var MultiIterator = function (iterators) {
+	assert.isArray(iterators);
 
-	iterables.forEach(function (iterable) {
-		assert.isObject(iterable);
-		assert.isFunction(iterable.getIterator);
-	});
+	iterators.forEach(function (iterator) {
+			validateIterator(iterator);
+		});
 
 	var self = this;
-	var iterators = null;
-
-	var lazyInit = function () {
-		if (!iterators) {
-			iterators = E.from(iterables)
-				.select(function (iterable) {
-					var iterator = iterable.getIterator();
-					validateIterator(iterator);
-					return iterator;
-				})
-				.toArray();
-		}
-	}
 
 	var ok = false;
 
@@ -40,7 +26,6 @@ var MultiIterator = function (iterables) {
 	// Completes when first iterator completes.
 	//	
 	self.moveNext = function () {				
-		lazyInit();
 
 		if (iterators.length > 0) {
 			ok = E.from(iterators)

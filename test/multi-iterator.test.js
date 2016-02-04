@@ -20,107 +20,74 @@ describe('multi iterator', function () {
 
 	it('can move multiple iterators forward when not at end', function () {
 
-		var mockIterable = {
-			getIterator: function () {
-				return {
-					moveNext: function () {
-						return true;
-					},
+		var mockIterator = {
+			moveNext: function () {
+				return true;
+			},
 
-					getCurrent: function () {
-						return null;
-					},
-				};
+			getCurrent: function () {
+				return null;
 			},
 		};
 
-		var multi = new MultiIterator([mockIterable, mockIterable]);
+		var multi = new MultiIterator([mockIterator, mockIterator]);
 		expect(multi.moveNext()).to.eql(true);
 	});
 
 	it('completes when first child iterator completes', function () {
 
-		var mockIterable1 = {
-			getIterator: function () {
-				return {
-					moveNext: function () {
-						return false;
-					},
+		var mockIterator1 = {
+			moveNext: function () {
+				return false;
+			},
 
-					getCurrent: function () {
-						return null;
-					},
-				};
+			getCurrent: function () {
+				return null;
 			},
 		};
 
-		var mockIterable2 = {
-			getIterator: function () {
-				return {
-					moveNext: function () {
-						return true;
-					},
+		var mockIterator2 = {
+			moveNext: function () {
+				return true;
+			},
 
-					getCurrent: function () {
-						return null;
-					},
-				};
+			getCurrent: function () {
+				return null;
 			},
 		};
 
-		var multi = new MultiIterator([mockIterable1, mockIterable2]);
+		var multi = new MultiIterator([mockIterator1, mockIterator2]);
 		expect(multi.moveNext()).to.eql(false);
 	});
 
 	it('completes when second child iterator completes', function () {
-		var mockIterable1 = {
-			getIterator: function () {
-				return {
-					moveNext: function () {
-						return true;
-					},
+		var mockIterator1 = {
+			moveNext: function () {
+				return true;
+			},
 
-					getCurrent: function () {
-						return null;
-					},
-				};
+			getCurrent: function () {
+				return null;
 			},
 		};
 
-		var mockIterable2 = {
-			getIterator: function () {
-				return {
-					moveNext: function () {
-						return false;
-					},
+		var mockIterator2 = {
+			moveNext: function () {
+				return false;
+			},
 
-					getCurrent: function () {
-						return null;
-					},
-				};
+			getCurrent: function () {
+				return null;
 			},
 		};
 
-		var multi = new MultiIterator([mockIterable1, mockIterable2]);
+		var multi = new MultiIterator([mockIterator1, mockIterator2]);
 		expect(multi.moveNext()).to.eql(false);
 	});
 
 	it('can extract current value', function () {
 
-		var mockIterable1 = {
-			getIterator: function () {
-				return new ArrayIterator([1, 2]);
-			},
-		};
-
-		var mockIterable2 = {
-			getIterator: function () {
-				return new ArrayIterator([10, 20]);
-			},
-		};
-
-		var multi = new MultiIterator([mockIterable1, mockIterable2]);
-
+		var multi = new MultiIterator([new ArrayIterator([1, 2]), new ArrayIterator([10, 20])]);
 		expect(multi.moveNext()).to.eql(true);
 		expect(multi.getCurrent()).to.eql([1, 10]);
 		expect(multi.moveNext()).to.eql(true);

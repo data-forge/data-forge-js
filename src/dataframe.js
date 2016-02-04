@@ -300,7 +300,7 @@ DataFrame.prototype.skipWhile = function (predicate) {
 		},
 		index: new Index({
 			getIterator: function () {
-				var multiIterator = new MultiIterator([self.getIndex(), self]);
+				var multiIterator = new MultiIterator([self.getIndex().getIterator(), self.getIterator()]);
 				var skipped = false;
 				return {
 					moveNext: function () {
@@ -421,7 +421,7 @@ DataFrame.prototype.takeWhile = function (predicate) {
 		},
 		index: new Index({
 			getIterator: function () {
-				var multiIterator = new MultiIterator([self.getIndex(), self]);
+				var multiIterator = new MultiIterator([self.getIndex().getIterator(), self.getIterator()]);
 				var taking = true;
 				return {
 					moveNext: function () {
@@ -523,7 +523,7 @@ DataFrame.prototype.where = function (filterSelectorPredicate) {
 		},
 		index: new Index({
 			getIterator: function () {
-				var multiIterator = new MultiIterator([self.getIndex(), self]);
+				var multiIterator = new MultiIterator([self.getIndex().getIterator(), self.getIterator()]);
 
 				return {
 					moveNext: function () {
