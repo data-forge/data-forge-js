@@ -4,6 +4,7 @@ var assert = require('chai').assert;
 var E = require('linq');
 var dropElement = require('./src/utils').dropElement;
 var ArrayEnumerator = require('./src/iterators/array');
+var ConcatIterator = require('./src/iterators/concat');
 require('sugar');
 var BabyParse = require('babyparse');
 
@@ -229,12 +230,12 @@ var dataForge = {
 			},
 			index: new Index({
 				getIterator: function () {
-					return new ArrayEnumerator(E.from(dataFrames)
-						.selectMany(function (dataFrame) {
-							return dataFrame.getIndex().toValues();
+					var indexes = E.from(dataFrames)
+						.select(function (dataFrame) {
+							return dataFrame.getIndex();
 						})
-						.toArray()
-					);
+						.toArray();
+					return new ConcatIterator(indexes);
 				},
 			}),
 		});
