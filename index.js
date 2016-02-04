@@ -3,7 +3,7 @@
 var assert = require('chai').assert;
 var E = require('linq');
 var dropElement = require('./src/utils').dropElement;
-var ArrayEnumerator = require('./src/iterators/array');
+var ArrayIterator = require('./src/iterators/array');
 var ConcatIterator = require('./src/iterators/concat');
 require('sugar');
 var BabyParse = require('babyparse');
@@ -189,7 +189,7 @@ var dataForge = {
 			columnNames: mergedColumnNames,
 			rows: {
 				getIterator: function () {
-					return new ArrayEnumerator(mergedValues);
+					return new ArrayIterator(mergedValues);
 				},
 			},
 		});
@@ -217,7 +217,7 @@ var dataForge = {
 			rows: {
 				getIterator: function () {
 					var concatenatedColumns = concatenateColumns();
-					return new ArrayEnumerator(
+					return new ArrayIterator(
 						E.from(dataFrames)
 							.selectMany(function (dataFrame) {
 								return dataFrame
