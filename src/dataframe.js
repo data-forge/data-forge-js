@@ -12,6 +12,7 @@ var BabyParse = require('babyparse');
 var ArrayIterable = require('../src/iterables/array');
 var checkIterable = require('../src/iterables/check');
 var validateIterable = require('../src/iterables/validate');
+var SelectIterator = require('../src/iterators/select');
 
 var assert = require('chai').assert; 
 var E = require('linq');
@@ -563,40 +564,30 @@ DataFrame.prototype.select = function (selector) {
 
 	var self = this;
 
-	var newValues = null;
-	var newColumnNames = null;
-
-	//todo: this needs to peek at the first row, to determine the new column names.
-	newValues = E
-		.from(self.toValues())
-		.select(function (row) {
-			return selector(mapRowByColumns(self, row));
-		})
-		.toArray();
-
-	newColumnNames = E.from(newValues)
-		.selectMany(function (value) {
-			return Object.keys(value);
-		})
-		.distinct()
-		.toArray();
+	var determineColumnNames = function () {
+		// Peek at the first row to get the column names.
+		var iterator = self.getIterator();
+		if (!iterator.moveNext()) {
+			return []; // No contents, no columns.
+		}
+		return Object.keys(selector(mapRowByColumns(self, iterator.getCurrent())));
+	};
 
 	var DataFrame = require('./dataframe');
 	return new DataFrame({
-		columnNames: newColumnNames,
+		columnNames: determineColumnNames,
 		rows: {
 			getIterator: function () {
-				return new ArrayIterator(
-					E.from(newValues)
-						.select(function (value) {
-							return E.from(newColumnNames)
-								.select(function (columnName) {
-									return value[columnName];
-								})
-								.toArray();
-						})
-						.toArray()
-				);
+				var columnNames = determineColumnNames();
+
+				return new SelectIterator(self.getIterator(), function (row) {
+						var newValue = selector(mapRowByColumns(self, row));
+						return E.from(columnNames)
+							.select(function (columnName) {
+								return newValue[columnName];
+							})
+							.toArray();
+					});
 			},
 		},
 		index: self.getIndex(),
