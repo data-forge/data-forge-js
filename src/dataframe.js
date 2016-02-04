@@ -55,11 +55,13 @@ var DataFrame = function (config) {
 		}
 
 		if (config.columnNames) {
-			assert.isArray(config.columnNames, "Expected 'columnNames' member of 'config' parameter to DataFrame constructor to be an array of strings.");
+			if (!Object.isFunction(config.columnNames)) {
+				assert.isArray(config.columnNames, "Expected 'columnNames' member of 'config' parameter to DataFrame constructor to be an array of strings or a function that produces an array of strings.");
 
-			config.columnNames.forEach(function (columnName) {
-				assert.isString(columnName, "Expected 'columnNames' member of 'config' parameter to DataFrame constructor to be an array of strings.");
-			});
+				config.columnNames.forEach(function (columnName) {
+					assert.isString(columnName, "Expected 'columnNames' member of 'config' parameter to DataFrame constructor to be an array of strings or a function that produces an array of strings.");
+				});
+			}
 
 			if (!config.rows) {
 				throw new Error("Expected to find a 'rows' member of 'config' parameter to DataFrame constructor.");
@@ -170,6 +172,9 @@ DataFrame.prototype.getIndex = function () {
  */
 DataFrame.prototype.getColumnNames = function () {
 	var self = this;
+	if (Object.isFunction(self._columnNames)) {
+		self._columnNames = self._columnNames(); // Lazy evaluate column names.
+	}
 	return self._columnNames;
 };
 

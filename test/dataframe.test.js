@@ -36,6 +36,28 @@ describe('DataFrame', function () {
 		expect(dataFrame.getColumnIndex("Value3")).to.eql(3);
 	});
 
+	it('can specify columns by function', function ()  {
+
+		var columnNames = ["Column1", "Column2"];
+		var dataFrame = new DataFrame({
+				columnNames: function () {
+					return columnNames;
+				},
+				rows: new ArrayIterable([
+					[1],
+					[2]
+				]),
+				index: new dataForge.Index([1, 2]),
+			});
+
+		expect(dataFrame.getColumnNames()).to.eql(columnNames);
+
+		var columns = dataFrame.getColumns();
+		expect(columns.length).to.eql(2);
+		expect(columns[0].name).to.eql(columnNames[0]);
+		expect(columns[1].name).to.eql(columnNames[1]);
+	});
+
 	it('can bake values from enumerator', function () {
 
 		var dataFrame = initDataFrame(
