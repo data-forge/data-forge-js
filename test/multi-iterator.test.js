@@ -96,4 +96,10 @@ describe('multi iterator', function () {
 		expect(multi.getCurrent()).to.be.undefined;
 	});
 
+	it('can realise', function () {
+
+		var multi = new MultiIterator([new ArrayIterator([1, 2]), new ArrayIterator([10, 20])]);
+		expect(multi.realize()).to.eql([[1, 10], [2, 20]]);
+	});
+
 });

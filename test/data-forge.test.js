@@ -164,14 +164,13 @@ describe('data-forge', function () {
 	 	var result = dataForge.concat([df1, df2, df3]);
 
 	 	expect(result.getColumnNames()).to.eql(["1", "2"]);
-	 	expect(result.getIndex().toValues()).to.eql([0, 1, 0, 1, 0, 1]);
-	 	expect(result.toValues()).to.eql([
- 			[1, 2],
- 			[3, 4],
- 			[5, 6],
- 			[7, 8],
- 			[9, 10],
- 			[11, 12]
+	 	expect(result.toPairs()).to.eql([
+ 			[0, { "1": 1, "2": 2 }],
+ 			[1, { "1": 3, "2": 4 }],
+ 			[0, { "1": 5, "2": 6 }],
+ 			[1, { "1": 7, "2": 8 }],
+ 			[0, { "1": 9, "2": 10 }],
+ 			[1, { "1": 11, "2": 12 }],
  		]);
 	});
 

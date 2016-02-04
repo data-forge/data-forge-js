@@ -1531,11 +1531,16 @@ DataFrame.prototype.toCSV = function () {
 DataFrame.prototype.toPairs = function () {
 
 	var self = this;
-	return E.from(self.getIndex().toValues())
-		.zip(self.toObjects(), function (index, row) {
-			return [index, row];
-		})
-		.toArray();
+	return new SelectIterator(
+			new MultiIterator([self.getIndex().getIterator(), self.getIterator()]),
+			function (pair) {
+				return [
+					pair[0],
+					mapRowByColumns(self, pair[1])
+				];
+			}
+		)
+		.realize();
 };
 
 /**

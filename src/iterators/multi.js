@@ -50,6 +50,20 @@ var MultiIterator = function (iterators) {
 			return undefined;
 		}
 	};
+
+	//
+	// Bake the iterator into an array.
+	//
+	self.realize = function () {
+
+		var output = [];
+
+		while (self.moveNext()) {
+			output.push(self.getCurrent());
+		}
+
+		return output;
+	};
 };
 
 module.exports = MultiIterator;

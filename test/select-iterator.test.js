@@ -95,5 +95,15 @@ describe('select iterator', function () {
 		expect(select.getCurrent()).to.equal(transformed);
 	});
 
+	it('can realize', function () {
+
+		var select = new SelectIterator(new ArrayIterator([1, 2]), 
+				function (value) {
+					return value + 1;
+				}
+			);
+		expect(select.realize()).to.eql([2, 3]);
+	});
+
 
 });

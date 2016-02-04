@@ -22,6 +22,20 @@ var SelectIterator = function (iterator, selector) {
 	self.getCurrent = function () {
 		return selector(iterator.getCurrent());
 	};
+
+	//
+	// Bake the iterator into an array.
+	//
+	self.realize = function () {
+
+		var output = [];
+
+		while (self.moveNext()) {
+			output.push(self.getCurrent());
+		}
+
+		return output;
+	};
 };
 
 module.exports = SelectIterator;
