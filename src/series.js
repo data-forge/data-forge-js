@@ -1248,5 +1248,20 @@ Series.prototype.aggregate = function (seedOrSelector, selector) {
 	}
 };
 
+/**
+ * Convert the series to a JavaScript object.
+ *
+ * @param {function} keySelector - Function that selects keys for the resulting object.
+ * @param {valueSelector} keySelector - Function that selects values for the resulting object.
+ */
+Series.prototype.toObject = function (keySelector, valueSelector) {
+
+	var self = this;
+
+	assert.isFunction(keySelector, "Expected 'keySelector' parameter to toObject to be a function.");
+	assert.isFunction(valueSelector, "Expected 'valueSelector' parameter to toObject to be a function.");
+
+	return E.from(self.toValues()).toObject(keySelector, valueSelector);
+};
 
 module.exports = Series;

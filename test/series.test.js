@@ -778,4 +778,62 @@ describe('Series', function () {
 		expect(agg()).to.eql(30);
 	});
 
+	it('can convert to javascript object', function () {
+
+		var series = initSeries([0, 1], [
+			{
+				Key: 'A',
+				Value: 100,
+			},
+			{
+				Key: 'B',
+				Value: 200,
+			},
+		]);
+
+		var obj = series.toObject(
+			function (row) {
+				return row.Key;
+			},
+			function (row) {
+				return row.Value;
+			}
+		);
+		expect(obj).to.eql({
+			A: 100,
+			B: 200,
+		});
+	});
+
+	it('can convert to javascript object - with duplicate keys', function () {
+
+		var series = initSeries([0, 1], [
+			{
+				Key: 'A',
+				Value: 100,
+			},
+			{
+				Key: 'B',
+				Value: 200,
+			},
+			{
+				Key: 'A',
+				Value: 3,
+			},
+		]);
+
+		var obj = series.toObject(
+			function (row) {
+				return row.Key;
+			},
+			function (row) {
+				return row.Value;
+			}
+		);
+		expect(obj).to.eql({
+			A: 3,
+			B: 200,
+		});
+	});
+
 });
