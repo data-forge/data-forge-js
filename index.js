@@ -217,22 +217,28 @@ var dataForge = {
 			rows: {
 				getIterator: function () {
 					var concatenatedColumns = concatenateColumns();
-					var remappedDataFrames = E.from(dataFrames)
+					var iterators = E.from(dataFrames)
 						.select(function (dataFrame) {
 							return dataFrame.remapColumns(concatenatedColumns);
 						})
+						.select(function (dataFrame) {
+							return dataFrame.getIterator();
+						})						
 						.toArray()
-					return new ConcatIterator(remappedDataFrames);
+					return new ConcatIterator(iterators);
 				},
 			},
 			index: new Index({
 				getIterator: function () {
-					var indexes = E.from(dataFrames)
+					var indexIterators = E.from(dataFrames)
 						.select(function (dataFrame) {
 							return dataFrame.getIndex();
 						})
+						.select(function (index) {
+							return index.getIterator();
+						})
 						.toArray();
-					return new ConcatIterator(indexes);
+					return new ConcatIterator(indexIterators);
 				},
 			}),
 		});

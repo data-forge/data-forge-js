@@ -9,42 +9,42 @@ var validateIterator = require('./validate');
 //
 // An iterator that can step multiple other iterators at once.
 //
-var MultiIterator = function (iterables) {
-	assert.isArray(iterables);
+var MultiIterator = function (iterators) {
+	assert.isArray(iterators);
+
+	iterators.forEach(function (iterator) {
+			validateIterator(iterator);
+		});
 
 	var self = this;
 
-	var curIterable = -1;
-	var curIterator = null;
+	var curIterator = -1;
 
 	self.moveNext = function () {				
 		
-		if (iterables.length === 0) {
+		if (iterators.length === 0) {
 			return false;
 		}
-		
-		if (!curIterator) {
-			curIterator = iterables[0].getIterator();
-			curIterable = 0;
-		}
 
+		if (curIterator < 0) {
+			++curIterator;
+		}
+		
 		for (;;) {
-			if (curIterator.moveNext()) {
+			if (iterators[curIterator].moveNext()) {
 				return true;
 			}
 
-			++curIterable;
-			if (curIterable >= iterables.length) {
+			++curIterator;
+			if (curIterator >= iterators.length) {
 				return false;
 			}
-
-			curIterator = iterables[curIterable].getIterator();
 		}
 	};
 
 	self.getCurrent = function () {
-		if (curIterator) {
-			return curIterator.getCurrent();
+		if (curIterator >= 0) {
+			return iterators[curIterator].getCurrent();
 		}
 		else {
 			return undefined;

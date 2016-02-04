@@ -20,53 +20,33 @@ describe('concat iterator', function () {
 
 	it('completes immediately if child iterators are empty', function () {
 
-		var mockIterable1 = {
-			getIterator: function () {
-				return {
-					moveNext: function () {
-						return false;
-					},
+		var mockIterator1 = {
+			moveNext: function () {
+				return false;
+			},
 
-					getCurrent: function () {
-						return null;
-					},
-				};
+			getCurrent: function () {
+				return null;
 			},
 		};
 
-		var mockIterable2 = {
-			getIterator: function () {
-				return {
-					moveNext: function () {
-						return false;
-					},
+		var mockIterator2 = {
+			moveNext: function () {
+				return false;
+			},
 
-					getCurrent: function () {
-						return null;
-					},
-				};
+			getCurrent: function () {
+				return null;
 			},
 		};
 
-		var concat = new ConcatIterator([mockIterable1, mockIterable2]);
+		var concat = new ConcatIterator([mockIterator1, mockIterator2]);
 		expect(concat.moveNext()).to.eql(false);
 	});
 
 	it('completes when all child iterators complete', function () {
 
-		var mockIterable1 = {
-			getIterator: function () {
-				return new ArrayIterator([1, 2]);
-			},
-		};
-
-		var mockIterable2 = {
-			getIterator: function () {
-				return new ArrayIterator([3, 4]);
-			},
-		};
-
-		var concat = new ConcatIterator([mockIterable1, mockIterable2]);
+		var concat = new ConcatIterator([new ArrayIterator([1, 2]), new ArrayIterator([3, 4])]);
 		expect(concat.moveNext()).to.eql(true);
 		expect(concat.getCurrent()).to.eql(1);
 
