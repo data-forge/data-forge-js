@@ -15,6 +15,7 @@ var checkIterable = require('./iterables/check');
 var validateIterable = require('./iterables/validate');
 var SkipIterator = require('./iterators/skip');
 var TakeIterator = require('../src/iterators/take');
+var SelectIterator = require('../src/iterators/select');
 
 /**
  * Represents a time series.
@@ -353,13 +354,7 @@ Series.prototype.select = function (selector) {
 	return new Series({
 		values: {
 			getIterator: function () {
-				return new ArrayIterator(
-					E.from(self.toValues())
-						.select(function (value) {
-							return selector(value);
-						})
-						.toArray()
-				);
+				return new SelectIterator(self.getIterator(), selector);
 			},
 		},		
 		index: self.getIndex(),
