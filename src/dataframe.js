@@ -14,6 +14,7 @@ var ArrayIterable = require('../src/iterables/array');
 var checkIterable = require('../src/iterables/check');
 var validateIterable = require('../src/iterables/validate');
 var SelectIterator = require('../src/iterators/select');
+var TakeIterator = require('../src/iterators/take');
 
 var assert = require('chai').assert; 
 var E = require('linq');
@@ -347,22 +348,10 @@ DataFrame.prototype.take = function (numRows) {
 
 	var self = this;
 	return new DataFrame({
-		columnNames: self.getColumnNames(),
+		columnNames: self.getColumnNames(), //todo: this will bake column names! maybe this should always be a function.
 		rows: {
 			getIterator: function () {
-				var iterator = self.getIterator();
-				return {
-					moveNext: function () {
-						if (--numRows >= 0) {
-							return iterator.moveNext();
-						}
-						return false;
-					},
-
-					getCurrent: function () {
-						return iterator.getCurrent();
-					},
-				};
+				return new TakeIterator(self.getIterator(), numRows);
 			},
 		},
 		index: self.getIndex().take(numRows),
