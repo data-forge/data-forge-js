@@ -1576,13 +1576,20 @@ DataFrame.prototype.rollingWindow = function (period, fn) {
 
 	var newIndexAndValues = E.range(0, values.length-period+1)
 		.select(function (rowIndex) {
-			var _index = E.from(index).skip(rowIndex).take(period).toArray();
-			var _values = E.from(values).skip(rowIndex).take(period).toArray();
 			var _window = new DataFrame({
-					rows: _values, 
-					index: new Index(_index)
+					columnNames: self.getColumnNames(),
+					rows: {
+						getIterator: function () {
+							return new TakeIterator(new SkipIterator(self.getIterator(), rowIndex), period);
+						},
+					},
+					index: new Index({
+						getIterator: function () {
+							return new TakeIterator(new SkipIterator(self.getIndex().getIterator(), rowIndex), period);
+						},
+					}),
 				});
-			return fn(_window, rowIndex);
+			return fn(_window, rowIndex);			
 		})
 		.toArray();
 
