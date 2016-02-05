@@ -64,8 +64,6 @@ Index.prototype.skip = function (numRows) {
 Index.prototype.take = function (numRows) {
 	assert.isNumber(numRows, "Expected 'numRows' parameter to 'take' function to be a number.");	
 
-	var Index = require('./index');
-
 	var self = this;
 	return new Index({
 		getIterator: function () { //todo: make lazy.
@@ -87,7 +85,6 @@ Index.prototype.slice = function (startIndex, endIndex) {
 
 	var self = this;
 
-	var Index = require('./index');
 	return new Index({
 		getIterator: function () { //todo: make lazy.
 			return new ArrayIterator(
@@ -124,8 +121,6 @@ Index.prototype.toValues = function () {
 Index.prototype.bake = function () {
 
 	var self = this;
-
-	var Index = require('./index');
 	return new Index(self.toValues());
 };
 
@@ -187,8 +182,6 @@ Index.prototype.last = function () {
 Index.prototype.reverse = function () {
 
 	var self = this;
-
-	var Index = require('./index');
 	return new Index(E.from(self.toValues()).reverse().toArray());
 };
 

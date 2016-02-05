@@ -88,8 +88,6 @@ Series.prototype.getIndex = function () {
 Series.prototype.skip = function (numRows) {
 	assert.isNumber(numRows, "Expected 'numRows' parameter to 'skip' function to be a number.");
 
-	var Series = require('./series'); // Require here to prevent circular ref.
-	
 	var self = this;
 	return new Series({
 		values: {
@@ -109,7 +107,6 @@ Series.prototype.skip = function (numRows) {
 Series.prototype.skipWhile = function (predicate) {
 	assert.isFunction(predicate, "Expected 'predicate' parameter to 'skipWhile' function to be a predicate function that returns true/false.");
 
-	var Series = require('./series'); // Require here to prevent circular ref.	
 	var self = this;
 	return new Series({
 		values: {
@@ -196,8 +193,6 @@ Series.prototype.skipUntil = function (predicate) {
 Series.prototype.take = function (numRows) {
 	assert.isNumber(numRows, "Expected 'numRows' parameter to 'take' function to be a number.");
 
-	var Series = require('./series'); // Require here to prevent circular ref.
-	
 	var self = this;
 	return new Series({
 		values: {
@@ -221,7 +216,6 @@ Series.prototype.take = function (numRows) {
 Series.prototype.takeWhile = function (predicate) {
 	assert.isFunction(predicate, "Expected 'predicate' parameter to 'takeWhile' function to be a predicate function that returns true/false.");
 
-	var Series = require('./series'); // Require here to prevent circular ref.	
 	var self = this;
 	return new Series({
 		values: {
@@ -326,8 +320,6 @@ Series.prototype.where = function (filterSelectorPredicate) {
 		return cachedFilteredIndexAndValues;
 	};
 
-	var Series = require('./series');
-
 	return new Series({
 		values: {
 			getIterator: function () {
@@ -361,8 +353,6 @@ Series.prototype.select = function (selector) {
 	assert.isFunction(selector, "Expected 'selector' parameter to 'select' function to be a function.");
 
 	var self = this;
-
-	var Series = require('./series');
 	return new Series({
 		values: {
 			getIterator: function () {
@@ -410,8 +400,6 @@ Series.prototype.selectMany = function (selector) {
 			})
 			.toArray();
 	};
-
-	var Series = require('./series');
 
 	return new Series({
 		values: {
@@ -496,8 +484,6 @@ var executeOrderBy = function (self, batch) {
 
 		return cachedSorted;
 	};
-
-	var Series = require('./series');
 
 	return new Series({
 		values: {
@@ -630,7 +616,6 @@ Series.prototype.slice = function (startIndex, endIndex) {
 
 	var self = this;
 
-	var Series = require('./series'); // Require here to prevent circular ref.
 	return new Series({
 		values: {
 			getIterator: function () {
@@ -670,7 +655,6 @@ Series.prototype.rollingWindow = function (period, fn) {
 	var values = self.toValues();
 
 	if (values.length == 0) {
-		var Series = require('./series');
 		return new Series();
 	}
 
@@ -678,13 +662,11 @@ Series.prototype.rollingWindow = function (period, fn) {
 		.select(function (rowIndex) {
 			var _index = E.from(index).skip(rowIndex).take(period).toArray();
 			var _values = E.from(values).skip(rowIndex).take(period).toArray();
-			var Series = require('./series'); //todo: use a lazy series for this.
 			var _window = new Series({ values: _values, index: new Index(_index) });
 			return fn(_window, rowIndex);
 		})
 		.toArray();
 
-	var Series = require('./series');
 	return new Series({
 		values: {
 			getIterator: function () {
@@ -719,7 +701,6 @@ Series.prototype.reindex = function (newIndex) {
 
 	var self = this;
 
-	var Series = require('./series');
 	return new Series({
 		values: {
 			getIterator: function () {
@@ -1037,8 +1018,10 @@ Series.prototype.bake = function () {
 
 	var self = this;
 
-	var Series = require('./series');
-	return new Series({ values: self.toValues(), index: self.getIndex().bake() });
+	return new Series({ 
+		values: self.toValues(), 
+		index: self.getIndex().bake(),
+	});
 };
 
 /**
@@ -1113,7 +1096,6 @@ Series.prototype.reverse = function () {
 
 	var self = this;
 
-	var Series = require('./series');
 	return new Series({
 			values: E.from(self.toValues()).reverse().toArray(),
 			index: self.getIndex().reverse(),

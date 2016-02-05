@@ -237,8 +237,6 @@ DataFrame.prototype.getColumnIndex = function (columnName) {
 DataFrame.prototype.skip = function (numRows) {
 	assert.isNumber(numRows, "Expected 'numRows' parameter to 'skip' function to be a number.");
 
-	var DataFrame = require('./dataframe'); // Require here to prevent circular ref.
-	
 	var self = this;
 	return new DataFrame({
 		columnNames: self.getColumnNames(),
@@ -259,7 +257,6 @@ DataFrame.prototype.skip = function (numRows) {
 DataFrame.prototype.skipWhile = function (predicate) {
 	assert.isFunction(predicate, "Expected 'predicate' parameter to 'skipWhile' function to be a predicate function that returns true/false.");
 
-	var DataFrame = require('./dataframe'); // Require here to prevent circular ref.	
 	var self = this;
 	return new DataFrame({
 		columnNames: self.getColumnNames(),
@@ -348,8 +345,6 @@ DataFrame.prototype.skipUntil = function (predicate) {
 DataFrame.prototype.take = function (numRows) {
 	assert.isNumber(numRows, "Expected 'numRows' parameter to 'take' function to be a number.");
 
-	var DataFrame = require('./dataframe'); // Require here to prevent circular ref.
-	
 	var self = this;
 	return new DataFrame({
 		columnNames: self.getColumnNames(),
@@ -382,7 +377,6 @@ DataFrame.prototype.take = function (numRows) {
 DataFrame.prototype.takeWhile = function (predicate) {
 	assert.isFunction(predicate, "Expected 'predicate' parameter to 'takeWhile' function to be a predicate function that returns true/false.");
 
-	var DataFrame = require('./dataframe'); // Require here to prevent circular ref.	
 	var self = this;
 	return new DataFrame({
 		columnNames: self.getColumnNames(),
@@ -489,7 +483,6 @@ DataFrame.prototype.where = function (filterSelectorPredicate) {
 		return cachedFilteredIndexAndValues;
 	}
 
-	var DataFrame = require('./dataframe');
 	return new DataFrame({
 		columnNames: self.getColumnNames(),
 		rows: {
@@ -562,7 +555,6 @@ DataFrame.prototype.select = function (selector) {
 		return Object.keys(selector(mapRowByColumns(self, iterator.getCurrent())));
 	};
 
-	var DataFrame = require('./dataframe');
 	return new DataFrame({
 		columnNames: determineColumnNames,
 		rows: {
@@ -632,7 +624,6 @@ DataFrame.prototype.selectMany = function (selector) {
 		})
 		.toArray();
 
-	var DataFrame = require('./dataframe');
 	return new DataFrame({
 		columnNames: newColumnNames,
 		rows: {
@@ -739,7 +730,6 @@ DataFrame.prototype.getColumns = function () {
  * @param {array} columnNames - Array of column names to include in the new data-frame.
  */
 DataFrame.prototype.subset = function (columnNames) {
-	var DataFrame = require('./dataframe'); // Local require to prevent circular ref.
 
 	var self = this;
 	
@@ -835,8 +825,6 @@ var executeOrderBy = function (self, batch) {
 
 		return cachedSorted;
 	};
-
-	var DataFrame = require('./dataframe');
 
 	return new DataFrame({
 		columnNames: self.getColumnNames(),
@@ -994,8 +982,6 @@ DataFrame.prototype.dropColumn = function (columnOrColumns) {
 		})
 		.toArray();
 
-	var DataFrame = require('./dataframe');
-
 	return new DataFrame({
 		columnNames: E.from(self.getColumnNames())
 			.where(function (columnName, columnIndex) {
@@ -1049,8 +1035,6 @@ DataFrame.prototype.setSeries = function (columnName, data) { //todo: should all
 	}
 
 	//todo: overview and improve the way this works.
-
-	var DataFrame = require('./dataframe');
 
 	var columnIndex = self.getColumnIndex(columnName);
 	if (columnIndex < 0) {		
@@ -1121,9 +1105,6 @@ DataFrame.prototype.slice = function (startIndex, endIndex) {
 	assert(endIndex >= startIndex, "Expected 'endIndex' parameter to getRowsSubset to be greater than or equal to 'startIndex' parameter.");
 
 	var self = this;
-
-	var DataFrame = require('./dataframe'); // Require here to prevent circular ref.
-
 	return new DataFrame({
 		columnNames: self.getColumnNames(),
 		rows: {
@@ -1148,9 +1129,6 @@ DataFrame.prototype.slice = function (startIndex, endIndex) {
 DataFrame.prototype.setIndex = function (columnNameOrIndex) {
 
 	var self = this;
-
-	var DataFrame = require('./dataframe'); // Require here to prevent circular ref.
-
 	return new DataFrame({
 		columnNames: self.getColumnNames(),
 		rows: self, 
@@ -1164,8 +1142,6 @@ DataFrame.prototype.setIndex = function (columnNameOrIndex) {
 DataFrame.prototype.resetIndex = function () {
 
 	var self = this;
-	var DataFrame = require('./dataframe'); // Require here to prevent circular ref.
-
 	return new DataFrame({
 		columnNames: self.getColumnNames(),
 		rows: self,
@@ -1255,13 +1231,10 @@ DataFrame.prototype.detectTypes = function () {
 
 	var self = this;
 
-	var DataFrame = require('./dataframe');
-
 	var dataFrames = E.from(self.getColumns())
 		.select(function (column) {
 			var series = column.series;
 			var numValues = series.toValues().length;
-			var Series = require('./series');
 			//todo: broad-cast column
 			var newSeries = new Series({
 				values: E.range(0, numValues)
@@ -1286,12 +1259,9 @@ DataFrame.prototype.detectValues = function () {
 
 	var self = this;
 
-	var DataFrame = require('./dataframe');
-
 	var dataFrames = E.from(self.getColumns())
 		.select(function (column) {
 			var numValues = column.series.toValues().length;
-			var Series = require('./series');
 			//todo: broad-cast column
 			var newSeries = new Series({
 				values: E.range(0, numValues)
@@ -1331,7 +1301,6 @@ DataFrame.prototype.truncateStrings = function (maxLength) {
 		})
 		.toArray();
 
-	var DataFrame = require('./dataframe');
 	return new DataFrame({
 			columnNames: self.getColumnNames(),
 			rows: truncatedValues,
@@ -1355,7 +1324,6 @@ DataFrame.prototype.remapColumns = function (columnNames) {
 
 	var self = this;
 
- 	var DataFrame = require('./dataframe');
 	return new DataFrame({
 		columnNames: columnNames,
 		rows: {
@@ -1402,7 +1370,6 @@ DataFrame.prototype.renameColumns = function (newColumnNames) {
 		assert.isString(newColumnName, "Expected new column name to be a string, intead got " + typeof(newColumnName));
 	});
 
- 	var DataFrame = require('./dataframe');
 	return new DataFrame({
 		columnNames: newColumnNames,
 		rows: self,
@@ -1426,7 +1393,6 @@ DataFrame.prototype.renameColumn = function (columnNameOrIndex, newColumnName) {
 	var newColumnNames = self.getColumnNames().slice(0); // Clone array.
 	newColumnNames[columnIndex] = newColumnName;
 
-	var DataFrame = require('./dataframe');
 	return new DataFrame({
 		columnNames: newColumnNames,
 		rows: self,
@@ -1538,8 +1504,6 @@ DataFrame.prototype.toPairs = function () {
 DataFrame.prototype.bake = function () {
 
 	var self = this;
-
-	var DataFrame = require('./dataframe');
 	return new DataFrame({
 			columnNames: self.getColumnNames(),
 			rows: self.toValues(),
@@ -1622,17 +1586,14 @@ DataFrame.prototype.rollingWindow = function (period, fn) {
 	var index = self.getIndex().toValues();
 	var values = self.toObjects();
 
-	var DataFrame = require('./dataframe');
 	if (values.length == 0) {
 		return new DataFrame();
 	}
 
-	var Index = require('./index');
 	var newIndexAndValues = E.range(0, values.length-period+1)
 		.select(function (rowIndex) {
 			var _index = E.from(index).skip(rowIndex).take(period).toArray();
 			var _values = E.from(values).skip(rowIndex).take(period).toArray();
-			var Series = require('./series');
 			var _window = new DataFrame({
 					rows: _values, 
 					index: new Index(_index)
@@ -1703,7 +1664,6 @@ DataFrame.prototype.reverse = function () {
 
 	var self = this;
 
-	var DataFrame = require('./dataframe');
 	return new DataFrame({
 			rows: E.from(self.toObjects()).reverse().toArray(),
 			index: self.getIndex().reverse()
@@ -1748,7 +1708,6 @@ DataFrame.prototype.deflate = function (selector) {
 		.select(selector)
 		.toArray();
 
-	var Series = require('./series');
 	return new Series({ values: newValues, index: self.getIndex() });
 };
 
