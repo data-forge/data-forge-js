@@ -1523,7 +1523,7 @@ DataFrame.prototype.count = function () {
  */
 DataFrame.prototype.transformColumn = function (columnNameOrColumnNames, selector) { //todo: this should support 'column name or index'.
 
-	var self = this;
+	var self = this; //todo: make this lazy.
 
 	if (Object.isObject(columnNameOrColumnNames)) {
 		var columnNames = Object.keys(columnNameOrColumnNames)
