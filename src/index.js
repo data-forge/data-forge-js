@@ -4,6 +4,7 @@ var ArrayIterator = require('./iterators/array');
 var ArrayIterable = require('./iterables/array');
 var checkIterable = require('./iterables/check');
 var validateIterable = require('./iterables/validate');
+var SkipIterator = require('./iterators/skip');
 
 var assert = require('chai').assert;
 var E = require('linq');
@@ -49,8 +50,8 @@ Index.prototype.skip = function (numRows) {
 
 	var self = this;
 	return new Index({
-		getIterator: function () { //todo: make lazy.
-			return new ArrayIterator(E.from(self.toValues()).skip(numRows).toArray());
+		getIterator: function () {
+			return new SkipIterator(self.getIterator(), numRows);
 		},
 	});
 };

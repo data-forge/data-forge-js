@@ -13,6 +13,7 @@ var Index = require('./index');
 var ArrayIterable = require('./iterables/array');
 var checkIterable = require('./iterables/check');
 var validateIterable = require('./iterables/validate');
+var SkipIterator = require('./iterators/skip');
 
 /**
  * Represents a time series.
@@ -93,11 +94,7 @@ Series.prototype.skip = function (numRows) {
 	return new Series({
 		values: {
 			getIterator: function () {
-				return new ArrayIterator(E
-					.from(self.toValues())
-					.skip(numRows)
-					.toArray()
-				);
+				return new SkipIterator(self.getIterator(), numRows);
 			},
 		},		
 		index: self.getIndex().skip(numRows),

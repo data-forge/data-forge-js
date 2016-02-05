@@ -8,6 +8,7 @@ var Series = require('./series');
 var Index = require('./index');
 var ArrayIterator = require('./iterators/array');
 var MultiIterator = require('./iterators/multi');
+var SkipIterator = require('./iterators/skip');
 var BabyParse = require('babyparse');
 var ArrayIterable = require('../src/iterables/array');
 var checkIterable = require('../src/iterables/check');
@@ -243,19 +244,7 @@ DataFrame.prototype.skip = function (numRows) {
 		columnNames: self.getColumnNames(),
 		rows: {
 			getIterator: function () {
-				var iterator = self.getIterator();
-				return {
-					moveNext: function () {
-						while (--numRows >= 0 && iterator.moveNext()) {
-							// Skip first rows.
-						}
-						return iterator.moveNext();
-					},
-
-					getCurrent: function () {
-						return iterator.getCurrent();
-					},
-				};
+				return new SkipIterator(self.getIterator(), numRows);
 			},
 		},
 		index: self.getIndex().skip(numRows),
