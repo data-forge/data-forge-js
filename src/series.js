@@ -616,12 +616,7 @@ Series.prototype.slice = function (startIndex, endIndex) {
 	return new Series({
 		values: {
 			getIterator: function () {
-				return new ArrayIterator( //todo: make this lazy.
-					E.from(self.toValues())
-						.skip(startIndex)
-						.take(endIndex - startIndex)
-						.toArray()
-				);
+				return new TakeIterator(new SkipIterator(self.getIterator(), startIndex), endIndex - startIndex);
 			},
 		},		
 		index: self.getIndex().slice(startIndex, endIndex),

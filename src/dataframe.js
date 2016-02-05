@@ -1088,7 +1088,7 @@ DataFrame.prototype.setSeries = function (columnName, data) { //todo: should all
  * @param {int} startIndex - Index where the slice starts.
  * @param {int} endIndex - Marks the end of the slice, one row past the last row to include.
  */
-DataFrame.prototype.slice = function (startIndex, endIndex) {
+DataFrame.prototype.slice = function (startIndex, endIndex) { //todo: this doesn't work with time serires!
 	assert.isNumber(startIndex, "Expected 'startIndex' parameter to getRowsSubset to be an integer.");
 	assert.isNumber(endIndex, "Expected 'endIndex' parameter to getRowsSubset to be an integer.");
 	assert(endIndex >= startIndex, "Expected 'endIndex' parameter to getRowsSubset to be greater than or equal to 'startIndex' parameter.");
@@ -1097,13 +1097,8 @@ DataFrame.prototype.slice = function (startIndex, endIndex) {
 	return new DataFrame({
 		columnNames: self.getColumnNames(),
 		rows: {
-			getIterator: function () { //todo: revise this code for better laziness.
-				return new ArrayIterator(
-					E.from(self.toValues())
-						.skip(startIndex)
-						.take(endIndex - startIndex)
-						.toArray()
-				);
+			getIterator: function () {
+				return new TakeIterator(new SkipIterator(self.getIterator(), startIndex), endIndex - startIndex);
 			},
 		},
 		index: self.getIndex().slice(startIndex, endIndex),

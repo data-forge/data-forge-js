@@ -87,13 +87,8 @@ Index.prototype.slice = function (startIndex, endIndex) {
 	var self = this;
 
 	return new Index({
-		getIterator: function () { //todo: make lazy.
-			return new ArrayIterator(
-				E.from(self.toValues())
-					.skip(startIndex)
-					.take(endIndex - startIndex)
-					.toArray()
-			);
+		getIterator: function () {
+			return new TakeIterator(new SkipIterator(self.getIterator(), startIndex), endIndex - startIndex);
 		},
 	});
 };
