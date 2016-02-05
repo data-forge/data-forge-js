@@ -1667,6 +1667,7 @@ DataFrame.prototype.generateColumns = function (selector) {
 
 	//todo: make this lazy.
 	//todo: this should merge on index.
+	//todo: need to be able to override columns on 1 data frame with columns from another.
 
 	var newColumns = self.select(selector);
 	return E.from(newColumns.getColumnNames())
