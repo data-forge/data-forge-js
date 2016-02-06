@@ -16,6 +16,7 @@ var validateIterable = require('./iterables/validate');
 var SkipIterator = require('./iterators/skip');
 var SkipWhileIterator = require('./iterators/skip-while');
 var TakeIterator = require('../src/iterators/take');
+var TakeWhileIterator = require('../src/iterators/take-while');
 var SelectIterator = require('../src/iterators/select');
 var MultiIterator = require('../src/iterators/multi');
 
@@ -180,55 +181,23 @@ Series.prototype.takeWhile = function (predicate) {
 	return new Series({
 		values: {
 			getIterator: function () {
-				var valueIterator = self.getIterator();
-				var taking = true;
-				return {
-					moveNext: function () {
-						if (!taking) {
-							return false;
-						}
-
-						if (!valueIterator.moveNext()) {
-							return false;
-						}
-
-						if (!predicate(valueIterator.getCurrent())) {
-							taking = false;
-							return false;
-						}
-
-						return true;
-					},
-
-					getCurrent: function () {
-						return valueIterator.getCurrent();
-					},
-				};
+				return new TakeWhileIterator(self.getIterator(), predicate);
 			},
 		},
 		index: new Index({
-			getIterator: function () { //too: can use an iterator here that moves multiple iterators in tandem.
-				var indexIterator = self.getIndex().getIterator();
-				var valueIterator = self.getIterator();
-				var taking = true;
-				return {
-					moveNext: function () {
-						if (!valueIterator.moveNext() || !indexIterator.moveNext()) {
-							return false;
+			getIterator: function () {
+				var multiIterator = new MultiIterator([self.getIndex().getIterator(), self.getIterator()]);
+				return new SelectIterator(
+						new TakeWhileIterator(
+							multiIterator, 
+							function (pair) {
+								return predicate(pair[1]);
+							}
+						),
+						function (pair) {
+							return pair[0];
 						}
-
-						if (!predicate(valueIterator.getCurrent())) {
-							taking = false;
-							return false;
-						}
-
-						return true;
-					},
-
-					getCurrent: function () {
-						return indexIterator.getCurrent();
-					},
-				};				
+					);
 			},
 		}),
 	}); 	

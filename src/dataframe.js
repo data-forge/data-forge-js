@@ -16,6 +16,7 @@ var checkIterable = require('../src/iterables/check');
 var validateIterable = require('../src/iterables/validate');
 var SelectIterator = require('../src/iterators/select');
 var TakeIterator = require('../src/iterators/take');
+var TakeWhileIterator = require('../src/iterators/take-while');
 
 var assert = require('chai').assert; 
 var E = require('linq');
@@ -333,56 +334,25 @@ DataFrame.prototype.takeWhile = function (predicate) {
 		columnNames: self.getColumnNames(),
 		rows: {
 			getIterator: function () {
-				var valueIterator = self.getIterator();
-				var taking = true;
-				return {
-					moveNext: function () {
-						if (!taking) {
-							return false;
-						}
-
-						if (!valueIterator.moveNext()) {
-							return false;
-						}
-
-						if (!predicate(mapRowByColumns(self, valueIterator.getCurrent()))) {
-							taking = false;
-							return false;
-						}
-
-						return true;
-					},
-
-					getCurrent: function () {
-						return valueIterator.getCurrent();
-					},
-				};
+				return new TakeWhileIterator(self.getIterator(), function (row) {
+						return predicate(mapRowByColumns(self, row));
+					});
 			},
 		},
 		index: new Index({
 			getIterator: function () {
 				var multiIterator = new MultiIterator([self.getIndex().getIterator(), self.getIterator()]);
-				var taking = true;
-				return {
-					moveNext: function () {
-						if (!multiIterator.moveNext()) {
-							return false;
+				return new SelectIterator(
+						new TakeWhileIterator(
+							multiIterator, 
+							function (pair) {
+								return predicate(mapRowByColumns(self, pair[1]));
+							}
+						),
+						function (pair) {
+							return pair[0];
 						}
-
-						var currentValue = multiIterator.getCurrent();
-						if (!predicate(mapRowByColumns(self, currentValue[1]))) {
-							taking = false;
-							return false;
-						}
-
-						return true;
-					},
-
-					getCurrent: function () {
-						var currentValue = multiIterator.getCurrent();
-						return currentValue[0]; // Return just the index.
-					},
-				};				
+					);
 			},
 		}),
 	}); 	
