@@ -481,7 +481,7 @@ DataFrame.prototype.select = function (selector) {
 	var self = this;
 
 	var determineColumnNames = function () {
-		// Peek at the first row to get the column names.
+		// Peek at the first row to ` the column names.
 		var iterator = self.getIterator();
 		if (!iterator.moveNext()) {
 			return []; // No contents, no columns.
@@ -597,17 +597,9 @@ DataFrame.prototype.getSeries = function (columnNameOrIndex) {
 	return new Series({
 		values: {
 			getIterator: function () {
-				var iterator = self.getIterator();
-
-				return {
-					moveNext: function () {
-						return iterator.moveNext();
-					},
-
-					getCurrent: function () {
-						return iterator.getCurrent()[columnIndex];
-					},
-				};
+				return new SelectIterator(self.getIterator(), function (row) {
+						return row[columnIndex];
+					});
 			},
 		},
 		index: self.getIndex(),
