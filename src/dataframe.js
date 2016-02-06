@@ -237,7 +237,7 @@ DataFrame.prototype.getColumnIndex = function (columnName) {
 	var columnNames = self.getColumnNames();
 	
 	for (var i = 0; i < columnNames.length; ++i) {
-		if (columnName == columnNames[i]) {
+		if (columnName === columnNames[i]) {
 			return i;
 		}
 	}	
