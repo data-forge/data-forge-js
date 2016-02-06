@@ -5,7 +5,7 @@ describe('DataFrame', function () {
 	
 	var dataForge = require('../index');	
 	var DataFrame = require('../src/dataframe');
-	var ArrayIterable = require('../src/iterables/array');
+	var ArrayIterator = require('../src/iterators/array');
 	var moment = require('moment');
 		
 	var expect = require('chai').expect;
@@ -19,7 +19,7 @@ describe('DataFrame', function () {
 
 		return new DataFrame({
 			columnNames: columns,
-			rows: new ArrayIterable(values),
+			rows: values,
 			index: new dataForge.Index(index),
 		});
 	};
@@ -44,10 +44,10 @@ describe('DataFrame', function () {
 				columnNames: function () {
 					return columnNames;
 				},
-				rows: new ArrayIterable([
+				rows: [
 					[1],
 					[2]
-				]),
+				],
 				index: new dataForge.Index([1, 2]),
 			});
 
@@ -1844,7 +1844,9 @@ describe('DataFrame', function () {
 			[new Date(1975, 24, 2), 100, 'foo', 11],
 			[new Date(2015, 24, 2), 200, 'bar', 22],
 		];
-		var iterable = new ArrayIterable(rows);
+		var iterable = function ()  {
+			return new ArrayIterator(rows);
+		};
 		var dataFrame = new dataForge.DataFrame({ columnNames: columns, rows: iterable });
 		expect(dataFrame.toValues()).to.eql(rows);
 	});

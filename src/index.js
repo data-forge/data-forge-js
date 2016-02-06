@@ -1,9 +1,6 @@
 'use strict';
 
 var ArrayIterator = require('./iterators/array');
-var ArrayIterable = require('./iterables/array');
-var checkIterable = require('./iterables/check');
-var validateIterable = require('./iterables/validate');
 var SkipIterator = require('./iterators/skip');
 var SkipWhileIterator = require('./iterators/skip-while');
 var TakeIterator = require('../src/iterators/take');
@@ -21,16 +18,18 @@ var Index = function (values) {
 
 	var self = this;
 
-	if (checkIterable(values)) {
+	if (Object.isFunction(values)) {
 		self._iterable = values;
 	}
 	else {
 		assert.isArray(values, "Expected 'values' parameter to Index constructor to be an array or an iterable.");
 
-		self._iterable = new ArrayIterable(values);
+		self._iterable = function () {
+			return new ArrayIterator(values);
+		};
 	}
 
-	validateIterable(self._iterable);
+	assert.isFunction(self._iterable);
 };
 
 /**
@@ -38,7 +37,7 @@ var Index = function (values) {
  */
 Index.prototype.getIterator = function () {
 	var self = this;
-	return self._iterable.getIterator();
+	return self._iterable();
 };
 
 /**
@@ -52,10 +51,8 @@ Index.prototype.skip = function (numRows) {
 	var Index = require('./index');
 
 	var self = this;
-	return new Index({
-		getIterator: function () {
-			return new SkipIterator(self.getIterator(), numRows);
-		},
+	return new Index(function () {
+		return new SkipIterator(self.getIterator(), numRows);
 	});
 };
 
@@ -68,10 +65,8 @@ Index.prototype.take = function (numRows) {
 	assert.isNumber(numRows, "Expected 'numRows' parameter to 'take' function to be a number.");	
 
 	var self = this;
-	return new Index({
-		getIterator: function () {
-			return new TakeIterator(self.getIterator(), numRows);
-		},
+	return new Index(function () {
+		return new TakeIterator(self.getIterator(), numRows);
 	});
 };
 
@@ -115,16 +110,14 @@ Index.prototype.slice = function (startIndexOrStartPredicate, endIndexOrEndPredi
 			};
 	}
 
-	return new Index({
-		getIterator: function () {
-			return new TakeWhileIterator(
-				new SkipWhileIterator(
-					self.getIterator(),
-					startPredicate					
-				),
-				endPredicate
-			)
-		},
+	return new Index(function () {
+		return new TakeWhileIterator(
+			new SkipWhileIterator(
+				self.getIterator(),
+				startPredicate					
+			),
+			endPredicate
+		)
 	});
 };
 

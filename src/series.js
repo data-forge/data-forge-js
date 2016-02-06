@@ -10,9 +10,6 @@ var moment = require('moment');
 var ArrayIterator = require('./iterators/array');
 var validateIterator = require('./iterators/validate');
 var Index = require('./index');
-var ArrayIterable = require('./iterables/array');
-var checkIterable = require('./iterables/check');
-var validateIterable = require('./iterables/validate');
 var SkipIterator = require('./iterators/skip');
 var SkipWhileIterator = require('./iterators/skip-while');
 var TakeIterator = require('../src/iterators/take');
@@ -33,13 +30,15 @@ var Series = function (config) {
 			throw new Error("Expected 'values' field to be set on 'config' parameter to Series constructor.");
 		}
 
-		if (checkIterable(config.values)) {
+		if (Object.isFunction(config.values)) {
 			self._iterable = config.values;
 		}
 		else {
 			assert.isArray(config.values, "Expected 'values' field of 'config' parameter to Series constructor be an array or an iterable.");
 
-			self._iterable = new ArrayIterable(config.values);
+			self._iterable = function () {
+				return new ArrayIterator(config.values);
+			};
 		}		
 
 		if (config.index) {
@@ -49,24 +48,24 @@ var Series = function (config) {
 		}
 		else {
 			// Generate the index.
-			self._index = new Index({
-					getIterator: function () {
-						var iterator = self._iterable.getIterator();
-						var length = 0;
-						while (iterator.moveNext()) {
-							++length;
-						}
-						return new ArrayIterator(E.range(0, length).toArray());
-					},
+			self._index = new Index(function () {
+					var iterator = self._iterable();
+					var length = 0;
+					while (iterator.moveNext()) {
+						++length;
+					}
+					return new ArrayIterator(E.range(0, length).toArray());
 				});
 		}
 	}
 	else {
-		self._iterable = new ArrayIterable([]);
+		self._iterable = function () {
+			return new ArrayIterator([]);
+		};
 		self._index = new Index([]);
 	}
 
-	validateIterable(self._iterable);
+	assert.isFunction(self._iterable);
 };
 
 /**
@@ -74,7 +73,7 @@ var Series = function (config) {
  */
 Series.prototype.getIterator = function () {
 	var self = this;
-	return self._iterable.getIterator();
+	return self._iterable();
 };
 
 /**
@@ -95,10 +94,8 @@ Series.prototype.skip = function (numRows) {
 
 	var self = this;
 	return new Series({
-		values: {
-			getIterator: function () {
-				return new SkipIterator(self.getIterator(), numRows);
-			},
+		values: function () {
+			return new SkipIterator(self.getIterator(), numRows);
 		},		
 		index: self.getIndex().skip(numRows),
 	}); 	
@@ -114,26 +111,22 @@ Series.prototype.skipWhile = function (predicate) {
 
 	var self = this;
 	return new Series({
-		values: {
-			getIterator: function () {
-				return new SkipWhileIterator(self.getIterator(), predicate);
-			},
+		values: function () {
+			return new SkipWhileIterator(self.getIterator(), predicate);
 		},
-		index: new Index({
-			getIterator: function () {
-				var multiIterator = new MultiIterator([self.getIndex().getIterator(), self.getIterator()]);
-				return new SelectIterator(
-						new SkipWhileIterator(
-							multiIterator, 
-							function (pair) {
-								return predicate(pair[1]);
-							}
-						),
+		index: new Index(function () {
+			var multiIterator = new MultiIterator([self.getIndex().getIterator(), self.getIterator()]);
+			return new SelectIterator(
+					new SkipWhileIterator(
+						multiIterator, 
 						function (pair) {
-							return pair[0];
+							return predicate(pair[1]);
 						}
-					);
-			},
+					),
+					function (pair) {
+						return pair[0];
+					}
+				);
 		}),
 	}); 	
 };
@@ -160,10 +153,8 @@ Series.prototype.take = function (numRows) {
 
 	var self = this;
 	return new Series({
-		values: {
-			getIterator: function () {
-				return new TakeIterator(self.getIterator(), numRows);
-			},
+		values: function () {
+			return new TakeIterator(self.getIterator(), numRows);
 		},
 		index: self.getIndex().take(numRows),
 	});
@@ -179,26 +170,22 @@ Series.prototype.takeWhile = function (predicate) {
 
 	var self = this;
 	return new Series({
-		values: {
-			getIterator: function () {
-				return new TakeWhileIterator(self.getIterator(), predicate);
-			},
+		values: function () {
+			return new TakeWhileIterator(self.getIterator(), predicate);
 		},
-		index: new Index({
-			getIterator: function () {
-				var multiIterator = new MultiIterator([self.getIndex().getIterator(), self.getIterator()]);
-				return new SelectIterator(
-						new TakeWhileIterator(
-							multiIterator, 
-							function (pair) {
-								return predicate(pair[1]);
-							}
-						),
+		index: new Index(function () {
+			var multiIterator = new MultiIterator([self.getIndex().getIterator(), self.getIterator()]);
+			return new SelectIterator(
+					new TakeWhileIterator(
+						multiIterator, 
 						function (pair) {
-							return pair[0];
+							return predicate(pair[1]);
 						}
-					);
-			},
+					),
+					function (pair) {
+						return pair[0];
+					}
+				);
 		}),
 	}); 	
 };
@@ -250,25 +237,21 @@ Series.prototype.where = function (filterSelectorPredicate) {
 	};
 
 	return new Series({
-		values: {
-			getIterator: function () {
-				return new ArrayIterator(E.from(executeLazyWhere())
-					.select(function (data) {
-						return data[1]; // Value
-					})
-					.toArray()
-				);
-			},
+		values: function () {
+			return new ArrayIterator(E.from(executeLazyWhere())
+				.select(function (data) {
+					return data[1]; // Value
+				})
+				.toArray()
+			);
 		},
-		index: new Index({
-			getIterator: function () {
-				return new ArrayIterator(E.from(executeLazyWhere())
-					.select(function (data) {
-						return data[0]; // Index
-					})
-					.toArray()
-				);
-			}
+		index: new Index(function () {
+			return new ArrayIterator(E.from(executeLazyWhere())
+				.select(function (data) {
+					return data[0]; // Index
+				})
+				.toArray()
+			);
 		}),
 	}); 	
 };
@@ -283,10 +266,8 @@ Series.prototype.select = function (selector) {
 
 	var self = this;
 	return new Series({
-		values: {
-			getIterator: function () {
-				return new SelectIterator(self.getIterator(), selector);
-			},
+		values: function () {
+			return new SelectIterator(self.getIterator(), selector);
 		},		
 		index: self.getIndex(),
 	}); 	
@@ -325,28 +306,24 @@ Series.prototype.selectMany = function (selector) {
 	};
 
 	return new Series({
-		values: {
-			getIterator: function () {
-				lazyEvaluate();
-				return new ArrayIterator(newValues);
-			}
+		values: function () {
+			lazyEvaluate();
+			return new ArrayIterator(newValues);
 		},
-		index: new Index({
-			getIterator: function () {
-				lazyEvaluate();
-				var indexValues = E.from(newIndexAndNewValues)
-					.selectMany(function (data) {
-						var index = data[0];
-						var values = data[1];
-						return E.range(0, values.length)
-							.select(function (_) {
-								return index;
-							})
-							.toArray();
-					})
-					.toArray();
-				return new ArrayIterator(indexValues);
-			},
+		index: new Index(function () {
+			lazyEvaluate();
+			var indexValues = E.from(newIndexAndNewValues)
+				.selectMany(function (data) {
+					var index = data[0];
+					var values = data[1];
+					return E.range(0, values.length)
+						.select(function (_) {
+							return index;
+						})
+						.toArray();
+				})
+				.toArray();
+			return new ArrayIterator(indexValues);
 		}),
 	}); 	
 };
@@ -409,26 +386,22 @@ var executeOrderBy = function (self, batch) {
 	};
 
 	return new Series({
-		values: {
-			getIterator: function () {
-				return new ArrayIterator(
-					E.from(executeLazySort())
-						.select(function (row) {
-							return row[1]; // Extract the value (minus the index) from the sorted data.					
-						})
-						.toArray()
-					);
-			},
-		},
-		index: new Index({
-			getIterator: function () {
-				return new ArrayIterator(E.from(executeLazySort())
+		values: function () {
+			return new ArrayIterator(
+				E.from(executeLazySort())
 					.select(function (row) {
-						return row[0]; // Extract the index from the sorted data.
+						return row[1]; // Extract the value (minus the index) from the sorted data.					
 					})
 					.toArray()
 				);
-			},
+		},
+		index: new Index(function () {
+			return new ArrayIterator(E.from(executeLazySort())
+				.select(function (row) {
+					return row[0]; // Extract the index from the sorted data.
+				})
+				.toArray()
+			);
 		}),
 	});
 };
@@ -567,25 +540,23 @@ Series.prototype.slice = function (startIndexOrStartPredicate, endIndexOrEndPred
 	}
 
 	return new Series({
-		values: {
-			getIterator: function () {
-				return new SelectIterator(
-					new TakeWhileIterator(
-						new SkipWhileIterator(
-							new MultiIterator([self.getIndex().getIterator(), self.getIterator()]),
-							function (pair) {
-								return startPredicate(pair[0]); // Check index for start condition.
-							}
-						),
+		values: function () {
+			return new SelectIterator(
+				new TakeWhileIterator(
+					new SkipWhileIterator(
+						new MultiIterator([self.getIndex().getIterator(), self.getIterator()]),
 						function (pair) {
-							return endPredicate(pair[0]); // Check index for end condition.
+							return startPredicate(pair[0]); // Check index for start condition.
 						}
 					),
 					function (pair) {
-						return pair[1]; // Value.
+						return endPredicate(pair[0]); // Check index for end condition.
 					}
-				);
-			},
+				),
+				function (pair) {
+					return pair[1]; // Value.
+				}
+			);
 		},		
 		index: self.getIndex().slice(startIndexOrStartPredicate, endIndexOrEndPredicate, predicate),
 	});
@@ -621,15 +592,11 @@ Series.prototype.rollingWindow = function (period, fn) {
 	var newIndexAndValues = E.range(0, values.length-period+1)
 		.select(function (rowIndex) {
 			var _window = new Series({
-					values: {
-						getIterator: function () {
-							return new TakeIterator(new SkipIterator(self.getIterator(), rowIndex), period);
-						},
+					values: function () {
+						return new TakeIterator(new SkipIterator(self.getIterator(), rowIndex), period);
 					},
-					index: new Index({
-						getIterator: function () {
-							return new TakeIterator(new SkipIterator(self.getIndex().getIterator(), rowIndex), period);
-						},
+					index: new Index(function () {
+						return new TakeIterator(new SkipIterator(self.getIndex().getIterator(), rowIndex), period);
 					}),
 				});			
 			return fn(_window, rowIndex);
@@ -637,25 +604,21 @@ Series.prototype.rollingWindow = function (period, fn) {
 		.toArray();
 
 	return new Series({
-		values: {
-			getIterator: function () {
-				return new ArrayIterator(E.from(newIndexAndValues)
-					.select(function (indexAndValue) {
-						return indexAndValue[1];
-					})
-					.toArray()
-				);
-			},
+		values: function () {
+			return new ArrayIterator(E.from(newIndexAndValues)
+				.select(function (indexAndValue) {
+					return indexAndValue[1];
+				})
+				.toArray()
+			);
 		},
-		index: new Index({
-			getIterator: function () {
-				return new ArrayIterator(E.from(newIndexAndValues)
-					.select(function (indexAndValue) {
-						return indexAndValue[0];
-					})
-					.toArray()
-				);
-			},
+		index: new Index(function () {
+			return new ArrayIterator(E.from(newIndexAndValues)
+				.select(function (indexAndValue) {
+					return indexAndValue[0];
+				})
+				.toArray()
+			);
 		}),
 	});
 };
@@ -671,43 +634,41 @@ Series.prototype.reindex = function (newIndex) {
 	var self = this;
 
 	return new Series({
-		values: {
-			getIterator: function () {
-				//
-				// Generate a map to relate an index value to a series value.
-				//
-				var indexMap = {};
-				var indexExists = {};
+		values: function () {
+			//
+			// Generate a map to relate an index value to a series value.
+			//
+			var indexMap = {};
+			var indexExists = {};
 
-				E.from(self.getIndex().toValues())
-					.zip(self.toValues(), 
-						function (indexValue, seriesValue) {
-							return [indexValue, seriesValue];
-						}
-					)
-					.toArray()
-					.forEach(function (pair) {
-						var index = pair[0];
-						var value = pair[1];
+			E.from(self.getIndex().toValues())
+				.zip(self.toValues(), 
+					function (indexValue, seriesValue) {
+						return [indexValue, seriesValue];
+					}
+				)
+				.toArray()
+				.forEach(function (pair) {
+					var index = pair[0];
+					var value = pair[1];
 
-						if (indexExists[index]) {
-							throw new Error("Duplicate index detected, failed to 'reindex'");
-						}
+					if (indexExists[index]) {
+						throw new Error("Duplicate index detected, failed to 'reindex'");
+					}
 
-						indexMap[index] = value;
-						indexExists[index] = true;
-					});
+					indexMap[index] = value;
+					indexExists[index] = true;
+				});
 
-				//
-				// Return the series values in the order specified by the new index.
-				//
-				return new ArrayIterator(E.from(newIndex.toValues())
-					.select(function (newIndexValue) {
-						return indexMap[newIndexValue];
-					})
-					.toArray()
-				);
-			},
+			//
+			// Return the series values in the order specified by the new index.
+			//
+			return new ArrayIterator(E.from(newIndex.toValues())
+				.select(function (newIndexValue) {
+					return indexMap[newIndexValue];
+				})
+				.toArray()
+			);
 		},		
 		index: newIndex,
 	});
@@ -852,44 +813,42 @@ Series.prototype.detectTypes = function () {
 	var DataFrame = require('./dataframe');
 	return new DataFrame({
 		columnNames: ["Type", "Frequency"],
-		rows: {
-			getIterator: function () { //todo: make this properly lazy.
-				var values = self.toValues();
-				var totalValues = values.length;
+		rows: function () { //todo: make this properly lazy.
+			var values = self.toValues();
+			var totalValues = values.length;
 
-				var typeFrequencies = E.from(values)
-					.select(function (value) {
-						var valueType = typeof(value);
-						if (valueType === 'object') {
-							if (Object.isDate(value)) {
-								valueType = 'date';
-							}
+			var typeFrequencies = E.from(values)
+				.select(function (value) {
+					var valueType = typeof(value);
+					if (valueType === 'object') {
+						if (Object.isDate(value)) {
+							valueType = 'date';
 						}
-						return valueType;
+					}
+					return valueType;
+				})
+				.aggregate({}, function (accumulated, valueType) {
+					var typeInfo = accumulated[valueType];
+					if (!typeInfo) {
+						typeInfo = {
+							count: 0
+						};
+						accumulated[valueType] = typeInfo;
+					}
+					++typeInfo.count;
+					return accumulated;
+				});
+
+			return new ArrayIterator(
+				E.from(Object.keys(typeFrequencies))
+					.select(function (valueType) {
+						return [
+							valueType,
+							(typeFrequencies[valueType].count / totalValues) * 100
+						];
 					})
-					.aggregate({}, function (accumulated, valueType) {
-						var typeInfo = accumulated[valueType];
-						if (!typeInfo) {
-							typeInfo = {
-								count: 0
-							};
-							accumulated[valueType] = typeInfo;
-						}
-						++typeInfo.count;
-						return accumulated;
-					});
-
-				return new ArrayIterator(
-					E.from(Object.keys(typeFrequencies))
-						.select(function (valueType) {
-							return [
-								valueType,
-								(typeFrequencies[valueType].count / totalValues) * 100
-							];
-						})
-						.toArray()
-				);
-			}
+					.toArray()
+			);
 		},		
 	});
 };
@@ -905,39 +864,37 @@ Series.prototype.detectValues = function () {
 	var DataFrame = require('./dataframe');
 	return new DataFrame({
 		columnNames: ["Value", "Frequency"],
-		rows: {
-			getIterator: function () {
-				var values = self.toValues();
-				var totalValues = values.length;
+		rows: function () {
+			var values = self.toValues();
+			var totalValues = values.length;
 
-				var valueFrequencies = E.from(values)
-					.aggregate({}, function (accumulated, value) {
-						var valueKey = value.toString() + "-" + typeof(value);
-						var valueInfo = accumulated[valueKey];
-						if (!valueInfo) {
-							valueInfo = {
-								count: 0,
-								value: value,
-							};
-							accumulated[valueKey] = valueInfo;
-						}
-						++valueInfo.count;
-						return accumulated;
-					});
+			var valueFrequencies = E.from(values)
+				.aggregate({}, function (accumulated, value) {
+					var valueKey = value.toString() + "-" + typeof(value);
+					var valueInfo = accumulated[valueKey];
+					if (!valueInfo) {
+						valueInfo = {
+							count: 0,
+							value: value,
+						};
+						accumulated[valueKey] = valueInfo;
+					}
+					++valueInfo.count;
+					return accumulated;
+				});
 
-				return new ArrayIterator(
-					E.from(Object.keys(valueFrequencies))
-						.select(function (valueKey) {
-							var valueInfo = valueFrequencies[valueKey];
-							return [
-								valueInfo.value,
-								(valueInfo.count / totalValues) * 100
-							];
-						})
-						.toArray()
-				);
-			},
-		},		
+			return new ArrayIterator(
+				E.from(Object.keys(valueFrequencies))
+					.select(function (valueKey) {
+						var valueInfo = valueFrequencies[valueKey];
+						return [
+							valueInfo.value,
+							(valueInfo.count / totalValues) * 100
+						];
+					})
+					.toArray()
+			);
+		},
 	});
 };
 

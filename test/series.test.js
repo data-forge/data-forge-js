@@ -6,7 +6,6 @@ describe('Series', function () {
 	var dataForge = require('../index');
 	var Series = require('../src/series');
 	var ArrayIterator = require('../src/iterators/array');
-	var ArrayIterable = require('../src/iterables/array');
 	var moment = require('moment');
 	
 	var expect = require('chai').expect; 
@@ -18,9 +17,9 @@ describe('Series', function () {
 		assert.isArray(values);
 
 		return new Series({
-				values: new ArrayIterable(values),
-				index: new dataForge.Index(index),
-			});
+			values: values,
+			index: new dataForge.Index(index),
+		});
 	};
 
 	it('default index is generated', function () {
@@ -52,7 +51,9 @@ describe('Series', function () {
 
 	it('can specify values as an iterable', function () {
 		
-		var iterable = new ArrayIterable([100, 200]);
+		var iterable = function () {
+			return new ArrayIterator([100, 200]);
+		};
 		var column = new dataForge.Series({ values: iterable });
 		expect(column.toValues()).to.eql([			
 			100,

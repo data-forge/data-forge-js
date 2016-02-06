@@ -187,10 +187,8 @@ var dataForge = {
 
 		return new DataFrame({
 			columnNames: mergedColumnNames,
-			rows: {
-				getIterator: function () {
-					return new ArrayIterator(mergedValues);
-				},
+			rows: function () {
+				return new ArrayIterator(mergedValues);
 			},
 		});
 	},
@@ -214,32 +212,28 @@ var dataForge = {
 
 		return new DataFrame({
 			columnNames: concatenateColumns(),
-			rows: {
-				getIterator: function () {
-					var concatenatedColumns = concatenateColumns();
-					var iterators = E.from(dataFrames)
-						.select(function (dataFrame) {
-							return dataFrame.remapColumns(concatenatedColumns);
-						})
-						.select(function (dataFrame) {
-							return dataFrame.getIterator();
-						})						
-						.toArray()
-					return new ConcatIterator(iterators);
-				},
+			rows: function () {
+				var concatenatedColumns = concatenateColumns();
+				var iterators = E.from(dataFrames)
+					.select(function (dataFrame) {
+						return dataFrame.remapColumns(concatenatedColumns);
+					})
+					.select(function (dataFrame) {
+						return dataFrame.getIterator();
+					})						
+					.toArray()
+				return new ConcatIterator(iterators);
 			},
-			index: new Index({
-				getIterator: function () {
-					var indexIterators = E.from(dataFrames)
-						.select(function (dataFrame) {
-							return dataFrame.getIndex();
-						})
-						.select(function (index) {
-							return index.getIterator();
-						})
-						.toArray();
-					return new ConcatIterator(indexIterators);
-				},
+			index: new Index(function () {
+				var indexIterators = E.from(dataFrames)
+					.select(function (dataFrame) {
+						return dataFrame.getIndex();
+					})
+					.select(function (index) {
+						return index.getIterator();
+					})
+					.toArray();
+				return new ConcatIterator(indexIterators);
 			}),
 		});
 	},

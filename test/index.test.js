@@ -4,7 +4,6 @@ describe('Index', function () {
 
 	var Index = require('../src/index');
 	var ArrayIterator = require('../src/iterators/array');
-	var ArrayIterable = require('../src/iterables/array');
 	var dataForge = require('../index');
 	var moment = require('moment');
 
@@ -14,11 +13,7 @@ describe('Index', function () {
 	var initIndex = function (values) {
 		assert.isArray(values);
 
-		return new Index({
-			getIterator: function () {
-				return new ArrayIterator(values);
-			},
-		});
+		return new Index(values);
 	};
 
 	it('can get values from index', function () {
@@ -29,7 +24,9 @@ describe('Index', function () {
 
 	it('can specify values from iterable', function () {
 
-		var iterable = new ArrayIterable([0, 1, 2, 3]);
+		var iterable = function () {
+			return new ArrayIterator([0, 1, 2, 3]);
+		};
 		var index = new Index(iterable);
 		expect(index.toValues()).to.eql([0, 1, 2, 3]);
 	});

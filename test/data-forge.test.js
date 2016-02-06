@@ -15,10 +15,8 @@ describe('data-forge', function () {
 
 		return new dataForge.DataFrame({
 			columnNames: columns,
-			rows: {
-				getIterator: function () {
-					return new ArrayIterator(values);
-				},
+			rows: function () {
+				return new ArrayIterator(values);
 			},
 		});
 	};

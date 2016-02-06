@@ -11,9 +11,6 @@ var MultiIterator = require('./iterators/multi');
 var SkipIterator = require('./iterators/skip');
 var SkipWhileIterator = require('./iterators/skip-while');
 var BabyParse = require('babyparse');
-var ArrayIterable = require('../src/iterables/array');
-var checkIterable = require('../src/iterables/check');
-var validateIterable = require('../src/iterables/validate');
 var SelectIterator = require('../src/iterators/select');
 var TakeIterator = require('../src/iterators/take');
 var TakeWhileIterator = require('../src/iterators/take-while');
@@ -75,7 +72,7 @@ var DataFrame = function (config) {
 
 			columnNames = config.columnNames;
 
-		 	if (checkIterable(config.rows)) {
+		 	if (Object.isFunction(config.rows)) {
 				rows = config.rows;
 			}
 			else {
@@ -87,7 +84,9 @@ var DataFrame = function (config) {
 					});
 				}
 
-		 		rows = new ArrayIterable(config.rows);
+		 		rows = function () {
+					return new ArrayIterator(config.rows);
+		 		};		 		
 			}
 		}
 		else if (config.rows) {
@@ -112,20 +111,18 @@ var DataFrame = function (config) {
 							.toArray();
 					};
 
-					rows = {
-						getIterator: function () {
-							var columnNames = self.getColumnNames();
-							return new SelectIterator(
-								new ArrayIterator(config.rows),
-								function (row) {
-									return E.from(columnNames)
-										.select(function (columnName) {
-											return row[columnName];
-										})
-										.toArray();
-								}
-							);
-						},
+					rows = function () {
+						var columnNames = self.getColumnNames();
+						return new SelectIterator(
+							new ArrayIterator(config.rows),
+							function (row) {
+								return E.from(columnNames)
+									.select(function (columnName) {
+										return row[columnName];
+									})
+									.toArray();
+							}
+						);
 					};
 				}
 				else {
@@ -142,38 +139,44 @@ var DataFrame = function (config) {
 						})
 						.toArray();
 
-					rows = new ArrayIterable(config.rows);
+					rows = function () {
+						return new ArrayIterator(config.rows);
+					};
 				}
 			}
 			else {
 				columnNames = [];
-				rows = new ArrayIterable([]);
+				rows = function () {
+					return new ArrayIterator([]);
+				};
 			}
 		}
 		else {
 			columnNames = [];
-			rows = new ArrayIterable([]);			
+				rows = function () {
+					return new ArrayIterator([]);
+				};
 		}
 	}
 	else {
 		columnNames = [];
-		rows = new ArrayIterable([]);
+		rows = function () {
+			return new ArrayIterator([]);
+		};
 	}
 
-	validateIterable(rows);
+	assert.isFunction(rows);
 
 	self._columnNames = columnNames || [];
 	self._iterable = rows;
 	self._index = (config && config.index) || 
-		new Index({
-			getIterator: function () {
-				var length = 0;
-				var iterator = rows.getIterator()
-				while (iterator.moveNext()) {
-					++length;
-				}
-				return new ArrayIterator(E.range(0, length).toArray()); //todo: this should be a broad cast index.
-			},
+		new Index(function () {
+			var length = 0;
+			var iterator = rows();
+			while (iterator.moveNext()) {
+				++length;
+			}
+			return new ArrayIterator(E.range(0, length).toArray()); //todo: this should be a broad cast index.
 		});
 };
 
@@ -201,7 +204,7 @@ DataFrame.prototype.getColumnNames = function () {
  */
 DataFrame.prototype.getIterator = function () {
 	var self = this;
-	return self._iterable.getIterator();
+	return self._iterable();
 };
 
 //
@@ -256,10 +259,8 @@ DataFrame.prototype.skip = function (numRows) {
 	var self = this;
 	return new DataFrame({
 		columnNames: self.getColumnNames(),
-		rows: {
-			getIterator: function () {
-				return new SkipIterator(self.getIterator(), numRows);
-			},
+		rows: function () {
+			return new SkipIterator(self.getIterator(), numRows);
 		},
 		index: self.getIndex().skip(numRows),
 	}); 	
@@ -276,28 +277,24 @@ DataFrame.prototype.skipWhile = function (predicate) {
 	var self = this;
 	return new DataFrame({
 		columnNames: self.getColumnNames(),
-		rows: {
-			getIterator: function () {
-				return new SkipWhileIterator(self.getIterator(), function (row) {
-						return predicate(mapRowByColumns(self, row));
-					});
-			},
+		rows: function () {
+			return new SkipWhileIterator(self.getIterator(), function (row) {
+					return predicate(mapRowByColumns(self, row));
+				});
 		},
-		index: new Index({
-			getIterator: function () {
-				var multiIterator = new MultiIterator([self.getIndex().getIterator(), self.getIterator()]);
-				return new SelectIterator(
-						new SkipWhileIterator(
-							multiIterator, 
-							function (pair) {
-								return predicate(mapRowByColumns(self, pair[1]));
-							}
-						),
+		index: new Index(function () {
+			var multiIterator = new MultiIterator([self.getIndex().getIterator(), self.getIterator()]);
+			return new SelectIterator(
+					new SkipWhileIterator(
+						multiIterator, 
 						function (pair) {
-							return pair[0];
+							return predicate(mapRowByColumns(self, pair[1]));
 						}
-					);
-			},
+					),
+					function (pair) {
+						return pair[0];
+					}
+				);
 		}),
 	}); 	
 };
@@ -325,10 +322,8 @@ DataFrame.prototype.take = function (numRows) {
 	var self = this;
 	return new DataFrame({
 		columnNames: self.getColumnNames(), //todo: this will bake column names! maybe this should always be a function.
-		rows: {
-			getIterator: function () {
-				return new TakeIterator(self.getIterator(), numRows);
-			},
+		rows: function () {
+			return new TakeIterator(self.getIterator(), numRows);
 		},
 		index: self.getIndex().take(numRows),
 	}); 	
@@ -345,28 +340,24 @@ DataFrame.prototype.takeWhile = function (predicate) {
 	var self = this;
 	return new DataFrame({
 		columnNames: self.getColumnNames(),
-		rows: {
-			getIterator: function () {
-				return new TakeWhileIterator(self.getIterator(), function (row) {
-						return predicate(mapRowByColumns(self, row));
-					});
-			},
+		rows: function () {
+			return new TakeWhileIterator(self.getIterator(), function (row) {
+					return predicate(mapRowByColumns(self, row));
+				});
 		},
-		index: new Index({
-			getIterator: function () {
-				var multiIterator = new MultiIterator([self.getIndex().getIterator(), self.getIterator()]);
-				return new SelectIterator(
-						new TakeWhileIterator(
-							multiIterator, 
-							function (pair) {
-								return predicate(mapRowByColumns(self, pair[1]));
-							}
-						),
+		index: new Index(function () {
+			var multiIterator = new MultiIterator([self.getIndex().getIterator(), self.getIterator()]);
+			return new SelectIterator(
+					new TakeWhileIterator(
+						multiIterator, 
 						function (pair) {
-							return pair[0];
+							return predicate(mapRowByColumns(self, pair[1]));
 						}
-					);
-			},
+					),
+					function (pair) {
+						return pair[0];
+					}
+				);
 		}),
 	}); 	
 };
@@ -419,53 +410,49 @@ DataFrame.prototype.where = function (filterSelectorPredicate) {
 
 	return new DataFrame({
 		columnNames: self.getColumnNames(),
-		rows: {
-			getIterator: function () {
-				var iterator = self.getIterator();
+		rows: function () {
+			var iterator = self.getIterator();
 
-				return {
-					moveNext: function () {
-						for (;;) {
-							if (!iterator.moveNext()) {
-								return false;
-							}
-
-							var row = iterator.getCurrent();
-							if (filterSelectorPredicate(mapRowByColumns(self, row))) {
-								return true;
-							}
+			return {
+				moveNext: function () {
+					for (;;) {
+						if (!iterator.moveNext()) {
+							return false;
 						}
-					},
 
-					getCurrent: function () {
-						return iterator.getCurrent();
-					},
-				};
-			},
+						var row = iterator.getCurrent();
+						if (filterSelectorPredicate(mapRowByColumns(self, row))) {
+							return true;
+						}
+					}
+				},
+
+				getCurrent: function () {
+					return iterator.getCurrent();
+				},
+			};
 		},
-		index: new Index({
-			getIterator: function () {
-				var multiIterator = new MultiIterator([self.getIndex().getIterator(), self.getIterator()]);
+		index: new Index(function () {
+			var multiIterator = new MultiIterator([self.getIndex().getIterator(), self.getIterator()]);
 
-				return {
-					moveNext: function () {
-						for (;;) {
-							if (!multiIterator.moveNext()) {
-								return false;
-							}
-
-							var row = multiIterator.getCurrent()[1];
-							if (filterSelectorPredicate(mapRowByColumns(self, row))) {
-								return true;
-							}
+			return {
+				moveNext: function () {
+					for (;;) {
+						if (!multiIterator.moveNext()) {
+							return false;
 						}
-					},
 
-					getCurrent: function () {
-						return multiIterator.getCurrent()[0];
-					},
-				};
-			},
+						var row = multiIterator.getCurrent()[1];
+						if (filterSelectorPredicate(mapRowByColumns(self, row))) {
+							return true;
+						}
+					}
+				},
+
+				getCurrent: function () {
+					return multiIterator.getCurrent()[0];
+				},
+			};
 		}),
 	}); 	
 };
@@ -491,19 +478,17 @@ DataFrame.prototype.select = function (selector) {
 
 	return new DataFrame({
 		columnNames: determineColumnNames,
-		rows: {
-			getIterator: function () {
-				var columnNames = determineColumnNames();
+		rows: function () {
+			var columnNames = determineColumnNames();
 
-				return new SelectIterator(self.getIterator(), function (row) {
-						var newValue = selector(mapRowByColumns(self, row));
-						return E.from(columnNames)
-							.select(function (columnName) {
-								return newValue[columnName];
-							})
-							.toArray();
-					});
-			},
+			return new SelectIterator(self.getIterator(), function (row) {
+					var newValue = selector(mapRowByColumns(self, row));
+					return E.from(columnNames)
+						.select(function (columnName) {
+							return newValue[columnName];
+						})
+						.toArray();
+				});
 		},
 		index: self.getIndex(),
 	}); 	
@@ -560,26 +545,22 @@ DataFrame.prototype.selectMany = function (selector) {
 
 	return new DataFrame({
 		columnNames: newColumnNames,
-		rows: {
-			getIterator: function () {
-				return new ArrayIterator(newRows);
-			},
+		rows: function () {
+			return new ArrayIterator(newRows);
 		},
-		index: new Index({
-			getIterator: function () {
-				var indexValues = E.from(newValues)
-					.selectMany(function (data) {
-						var index = data[0];
-						var values = data[1];
-						return E.range(0, values.length)
-							.select(function (_) {
-								return index;
-							})
-							.toArray();
-					})
-					.toArray();
-				return new ArrayIterator(indexValues);
-			},
+		index: new Index(function () {
+			var indexValues = E.from(newValues)
+				.selectMany(function (data) {
+					var index = data[0];
+					var values = data[1];
+					return E.range(0, values.length)
+						.select(function (_) {
+							return index;
+						})
+						.toArray();
+				})
+				.toArray();
+			return new ArrayIterator(indexValues);
 		}),
 	}); 	
 };
@@ -595,12 +576,10 @@ DataFrame.prototype.getSeries = function (columnNameOrIndex) {
 	var columnIndex = parseColumnNameOrIndex(self, columnNameOrIndex, true);
 
 	return new Series({
-		values: {
-			getIterator: function () {
-				return new SelectIterator(self.getIterator(), function (row) {
-						return row[columnIndex];
-					});
-			},
+		values: function () {
+			return new SelectIterator(self.getIterator(), function (row) {
+					return row[columnIndex];
+				});
 		},
 		index: self.getIndex(),
 	});
@@ -663,31 +642,29 @@ DataFrame.prototype.subset = function (columnNames) {
 	
 	return new DataFrame({
 		columnNames: columnNames,
-		rows: {
-			getIterator: function () {
-				var columnIndices = E.from(columnNames)
-					.select(function (columnName) {
-						return self.getColumnIndex(columnName);
-					})
-					.toArray();
+		rows: function () {
+			var columnIndices = E.from(columnNames)
+				.select(function (columnName) {
+					return self.getColumnIndex(columnName);
+				})
+				.toArray();
 
-				var iterator = self.getIterator();
+			var iterator = self.getIterator();
 
-				return {
-					moveNext: function () {
-						return iterator.moveNext();
-					},
+			return {
+				moveNext: function () {
+					return iterator.moveNext();
+				},
 
-					getCurrent: function () {
-						var currentValue = iterator.getCurrent();
-						return E.from(columnIndices)
-							.select(function (columnIndex) {
-								return currentValue[columnIndex];					
-							})
-							.toArray();
-					},
-				};
-			},
+				getCurrent: function () {
+					var currentValue = iterator.getCurrent();
+					return E.from(columnIndices)
+						.select(function (columnIndex) {
+							return currentValue[columnIndex];					
+						})
+						.toArray();
+				},
+			};
 		},
 		index: self.getIndex(),
 	});	 
@@ -754,26 +731,22 @@ var executeOrderBy = function (self, batch) {
 
 	return new DataFrame({
 		columnNames: self.getColumnNames(),
-		rows: {
-			getIterator: function () {
-				return new ArrayIterator(
-					E.from(executeLazySort())
-						.select(function (row) {
-							return E.from(row).skip(1).toArray(); // Extract the values (minus the index) from the sorted data.					
-						})
-						.toArray()
-				);
-			},
-		},
-		index: new Index({
-			getIterator: function () {
-				return new ArrayIterator(E.from(executeLazySort())
+		rows: function () {
+			return new ArrayIterator(
+				E.from(executeLazySort())
 					.select(function (row) {
-						return row[0]; // Extract the index from the sorted data.
+						return E.from(row).skip(1).toArray(); // Extract the values (minus the index) from the sorted data.					
 					})
 					.toArray()
-				);
-			},
+			);
+		},
+		index: new Index(function () {
+			return new ArrayIterator(E.from(executeLazySort())
+				.select(function (row) {
+					return row[0]; // Extract the index from the sorted data.
+				})
+				.toArray()
+			);
 		}),
 	});
 };
@@ -914,24 +887,22 @@ DataFrame.prototype.dropColumn = function (columnOrColumns) {
 				return columnIndices.indexOf(columnIndex) < 0;
 			})
 			.toArray(),
-		rows: {
-			getIterator: function () {
-				var iterator = self.getIterator();
-				return {
-					moveNext: function () {
-						return iterator.moveNext();
-					},
+		rows: function () {
+			var iterator = self.getIterator();
+			return {
+				moveNext: function () {
+					return iterator.moveNext();
+				},
 
-					getCurrent: function () {
-						var currentValue = iterator.getCurrent();
-						return E.from(currentValue)
-							.where(function (column, columnIndex) {
-								return columnIndices.indexOf(columnIndex) < 0;
-							})
-							.toArray();
-					},
-				};
-			},
+				getCurrent: function () {
+					var currentValue = iterator.getCurrent();
+					return E.from(currentValue)
+						.where(function (column, columnIndex) {
+							return columnIndices.indexOf(columnIndex) < 0;
+						})
+						.toArray();
+				},
+			};
 		},
 		index: self.getIndex(),
 	});
@@ -967,16 +938,14 @@ DataFrame.prototype.setSeries = function (columnName, data) { //todo: should all
 		// Add new column.
 		return new DataFrame({
 			columnNames: self.getColumnNames().concat([columnName]),
-			rows: {
-				getIterator: function () {
-					return new ArrayIterator(
-						E.from(self.toValues())
-							.select(function (row, rowIndex) {
-								return row.concat([data[rowIndex]]);
-							})
-							.toArray()
-					);
-				},
+			rows: function () {
+				return new ArrayIterator(
+					E.from(self.toValues())
+						.select(function (row, rowIndex) {
+							return row.concat([data[rowIndex]]);
+						})
+						.toArray()
+				);
 			},
 			index: self.getIndex(),
 		});
@@ -994,25 +963,23 @@ DataFrame.prototype.setSeries = function (columnName, data) { //todo: should all
 					}
 				})
 				.toArray(),
-			rows: {
-				getIterator: function () {
-					return new ArrayIterator(
-						E.from(self.toValues())
-							.select(function (row, rowIndex) {
-								return E.from(row)
-									.select(function (column, thisColumnIndex) {
-										if (thisColumnIndex === columnIndex) {
-											return data[rowIndex];
-										}
-										else {
-											return column;
-										}
-									})
-									.toArray();
-							})
-							.toArray()
-					);
-				},
+			rows: function () {
+				return new ArrayIterator(
+					E.from(self.toValues())
+						.select(function (row, rowIndex) {
+							return E.from(row)
+								.select(function (column, thisColumnIndex) {
+									if (thisColumnIndex === columnIndex) {
+										return data[rowIndex];
+									}
+									else {
+										return column;
+									}
+								})
+								.toArray();
+						})
+						.toArray()
+				);
 			},
 			index: self.getIndex(),
 		});
@@ -1061,25 +1028,23 @@ DataFrame.prototype.slice = function (startIndexOrStartPredicate, endIndexOrEndP
 
 	return new DataFrame({
 		columnNames: self.getColumnNames(),
-		rows: {
-			getIterator: function () {
-				return new SelectIterator(
-					new TakeWhileIterator(
-						new SkipWhileIterator(
-							new MultiIterator([self.getIndex().getIterator(), self.getIterator()]),
-							function (pair) {
-								return startPredicate(pair[0]); // Check index for start condition.
-							}
-						),
+		rows: function () {
+			return new SelectIterator(
+				new TakeWhileIterator(
+					new SkipWhileIterator(
+						new MultiIterator([self.getIndex().getIterator(), self.getIterator()]),
 						function (pair) {
-							return endPredicate(pair[0]); // Check index for end condition.
+							return startPredicate(pair[0]); // Check index for start condition.
 						}
 					),
 					function (pair) {
-						return pair[1]; // Value.
+						return endPredicate(pair[0]); // Check index for end condition.
 					}
-				);
-			},
+				),
+				function (pair) {
+					return pair[1]; // Value.
+				}
+			);
 		},		
 		index: self.getIndex().slice(startIndexOrStartPredicate, endIndexOrEndPredicate, predicate),
 	});
@@ -1096,8 +1061,12 @@ DataFrame.prototype.setIndex = function (columnNameOrIndex) {
 	var self = this;
 	return new DataFrame({
 		columnNames: self.getColumnNames(),
-		rows: self, 
-		index: new Index(self.getSeries(columnNameOrIndex)),
+		rows: function () {
+			return self.getIterator();
+		},
+		index: new Index(function () {
+			return self.getSeries(columnNameOrIndex).getIterator();
+		}),
 	});
 };
 
@@ -1109,11 +1078,11 @@ DataFrame.prototype.resetIndex = function () {
 	var self = this;
 	return new DataFrame({
 		columnNames: self.getColumnNames(),
-		rows: self,
-		index: new Index({
-			getIterator: function () { //todo: broad-cast index
-				return new ArrayIterator(E.range(0, self.toValues().length).toArray());
-			},
+		rows: function () {
+			return self.getIterator();
+		},
+		index: new Index(function () { //todo: broad-cast index
+			return new ArrayIterator(E.range(0, self.toValues().length).toArray());
 		}),
 	});
 };
@@ -1291,27 +1260,25 @@ DataFrame.prototype.remapColumns = function (columnNames) {
 
 	return new DataFrame({
 		columnNames: columnNames,
-		rows: {
-			getIterator: function () { //todo: make this properly lazy.
-				return new ArrayIterator(
-					E.from(self.toValues())
-						.select(function (row) {
-							return E.from(columnNames)
-								.select(function (columnName) {
-									var columnIndex = self.getColumnIndex(columnName);
-									if (columnIndex >= 0) {
-										return row[columnIndex];
-									}
-									else { 
-										// Column doesn't exist.
-										return undefined;
-									}
-								})
-								.toArray();
-						})
-						.toArray()
-				);
-			},
+		rows: function () { //todo: make this properly lazy.
+			return new ArrayIterator(
+				E.from(self.toValues())
+					.select(function (row) {
+						return E.from(columnNames)
+							.select(function (columnName) {
+								var columnIndex = self.getColumnIndex(columnName);
+								if (columnIndex >= 0) {
+									return row[columnIndex];
+								}
+								else { 
+									// Column doesn't exist.
+									return undefined;
+								}
+							})
+							.toArray();
+					})
+					.toArray()
+			);
 		},
 		index: self.getIndex(),
 	});
@@ -1337,7 +1304,9 @@ DataFrame.prototype.renameColumns = function (newColumnNames) {
 
 	return new DataFrame({
 		columnNames: newColumnNames,
-		rows: self,
+		rows: function () {
+			return self.getIterator();
+		},
 		index: self.getIndex(),
 	});
 };
@@ -1360,7 +1329,9 @@ DataFrame.prototype.renameColumn = function (columnNameOrIndex, newColumnName) {
 
 	return new DataFrame({
 		columnNames: newColumnNames,
-		rows: self,
+		rows: function () {
+			return self.getIterator();
+		},
 		index: self.getIndex(),
 	});
 };
@@ -1559,15 +1530,11 @@ DataFrame.prototype.rollingWindow = function (period, fn) {
 		.select(function (rowIndex) {
 			var _window = new DataFrame({
 					columnNames: self.getColumnNames(),
-					rows: {
-						getIterator: function () {
-							return new TakeIterator(new SkipIterator(self.getIterator(), rowIndex), period);
-						},
+					rows: function () {
+						return new TakeIterator(new SkipIterator(self.getIterator(), rowIndex), period);
 					},
-					index: new Index({
-						getIterator: function () {
-							return new TakeIterator(new SkipIterator(self.getIndex().getIterator(), rowIndex), period);
-						},
+					index: new Index(function () {
+						return new TakeIterator(new SkipIterator(self.getIndex().getIterator(), rowIndex), period);
 					}),
 				});
 			return fn(_window, rowIndex);			
