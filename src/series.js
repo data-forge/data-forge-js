@@ -14,8 +14,10 @@ var ArrayIterable = require('./iterables/array');
 var checkIterable = require('./iterables/check');
 var validateIterable = require('./iterables/validate');
 var SkipIterator = require('./iterators/skip');
+var SkipWhileIterator = require('./iterators/skip-while');
 var TakeIterator = require('../src/iterators/take');
 var SelectIterator = require('../src/iterators/select');
+var MultiIterator = require('../src/iterators/multi');
 
 /**
  * Represents a time series.
@@ -113,63 +115,23 @@ Series.prototype.skipWhile = function (predicate) {
 	return new Series({
 		values: {
 			getIterator: function () {
-				var valueIterator = self.getIterator();
-				var skipped = false;
-				return {
-					moveNext: function () {
-						for (;;) {
-							if (!valueIterator.moveNext()) {
-								return false;
-							}
-
-							if (skipped) {
-								// Already skipped.
-								return true;
-							}
-
-							// Skipping until predict returns false.
-							if (!predicate(valueIterator.getCurrent())) {
-								skipped = true;
-								return true;
-							}
-						}
-					},
-
-					getCurrent: function () {
-						return valueIterator.getCurrent();
-					},
-				};
+				return new SkipWhileIterator(self.getIterator(), predicate);
 			},
 		},
 		index: new Index({
-			getIterator: function () { //too: can use an iterator here that moves multiple iterators in tandem.
-				var indexIterator = self.getIndex().getIterator();
-				var valueIterator = self.getIterator();
-				var skipped = false;
-				return {
-					moveNext: function () {
-						for (;;) {
-							if (!valueIterator.moveNext() || !indexIterator.moveNext()) {
-								return false;
+			getIterator: function () {
+				var multiIterator = new MultiIterator([self.getIndex().getIterator(), self.getIterator()]);
+				return new SelectIterator(
+						new SkipWhileIterator(
+							multiIterator, 
+							function (pair) {
+								return predicate(pair[1]);
 							}
-
-							if (skipped) {
-								// Already skipped.
-								return true;
-							}
-
-							// Skipping until predict returns false.
-							if (!predicate(valueIterator.getCurrent())) {
-								skipped = true;
-								return true;
-							}
+						),
+						function (pair) {
+							return pair[0];
 						}
-					},
-
-					getCurrent: function () {
-						return indexIterator.getCurrent();
-					},
-				};				
+					);
 			},
 		}),
 	}); 	

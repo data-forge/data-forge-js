@@ -9,6 +9,7 @@ var Index = require('./index');
 var ArrayIterator = require('./iterators/array');
 var MultiIterator = require('./iterators/multi');
 var SkipIterator = require('./iterators/skip');
+var SkipWhileIterator = require('./iterators/skip-while');
 var BabyParse = require('babyparse');
 var ArrayIterable = require('../src/iterables/array');
 var checkIterable = require('../src/iterables/check');
@@ -263,64 +264,25 @@ DataFrame.prototype.skipWhile = function (predicate) {
 		columnNames: self.getColumnNames(),
 		rows: {
 			getIterator: function () {
-				var valueIterator = self.getIterator();
-				var skipped = false;
-				return {
-					moveNext: function () {
-						for (;;) {
-							if (!valueIterator.moveNext()) {
-								return false;
-							}
-
-							if (skipped) {
-								// Already skipped.
-								return true;
-							}
-
-							// Skipping until predict returns false.
-							if (!predicate(mapRowByColumns(self, valueIterator.getCurrent()))) {
-								skipped = true;
-								return true;
-							}
-						}
-					},
-
-					getCurrent: function () {
-						return valueIterator.getCurrent();
-					},
-				};
+				return new SkipWhileIterator(self.getIterator(), function (row) {
+						return predicate(mapRowByColumns(self, row));
+					});
 			},
 		},
 		index: new Index({
 			getIterator: function () {
 				var multiIterator = new MultiIterator([self.getIndex().getIterator(), self.getIterator()]);
-				var skipped = false;
-				return {
-					moveNext: function () {
-						for (;;) {
-							if (!multiIterator.moveNext()) {
-								return false;
+				return new SelectIterator(
+						new SkipWhileIterator(
+							multiIterator, 
+							function (pair) {
+								return predicate(mapRowByColumns(self, pair[1]));
 							}
-
-							if (skipped) {
-								// Already skipped.
-								return true;
-							}
-
-							// Skipping until predict returns false.
-							var currentValue = multiIterator.getCurrent();
-							if (!predicate(mapRowByColumns(self, currentValue[1]))) {
-								skipped = true;
-								return true;
-							}
+						),
+						function (pair) {
+							return pair[0];
 						}
-					},
-
-					getCurrent: function () {
-						var currentValue = multiIterator.getCurrent();
-						return currentValue[0]; // Return the value of the index.
-					},
-				};				
+					);
 			},
 		}),
 	}); 	
