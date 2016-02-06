@@ -7,6 +7,7 @@ describe('Series', function () {
 	var Series = require('../src/series');
 	var ArrayIterator = require('../src/iterators/array');
 	var ArrayIterable = require('../src/iterables/array');
+	var moment = require('moment');
 	
 	var expect = require('chai').expect; 
 	var assert = require('chai').assert; 
@@ -229,8 +230,42 @@ describe('Series', function () {
 
 		var series = initSeries([0, 1, 2, 3], [100, 300, 200, 5]);
 		var slice = series.slice(1, 3);
-		expect(slice.getIndex().toValues()).to.eql([1, 2]);
-		expect(slice.toValues()).to.eql([300, 200]);
+		expect(slice.toPairs()).to.eql([
+			[1, 300],
+			[2, 200],
+		]);
+	});
+
+	it('can get slice of rows with explict predicates', function () {
+
+		var series = initSeries([0, 1, 2, 3], [100, 300, 200, 5]);
+		var slice = series.slice(
+			function (indexValue) {
+				return indexValue < 1;
+			},
+			function (indexValue) {
+				return indexValue < 3;
+			}
+		);
+
+		expect(slice.toPairs()).to.eql([
+			[1, 300],
+			[2, 200],
+		]);
+	});
+
+	it('can get slice of rows from time series', function () {
+
+		var series = initSeries([new Date(2016, 1, 1), new Date(2016, 1, 3), new Date(2016, 1, 5), new Date(2016, 1, 10)], [0, 1, 2, 3]);
+		var slice = series.slice(new Date(2016, 1, 2), new Date(2016, 1, 8),
+			function (a, b) {
+				return moment(a).isBefore(b);
+			}
+		);
+		expect(slice.toPairs()).to.eql([
+			[new Date(2016, 1, 3), 1],
+			[new Date(2016, 1, 5), 2],
+		]);
 	});
 
 	it('can compute rolling window - from empty data set', function () {

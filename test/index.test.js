@@ -6,6 +6,7 @@ describe('Index', function () {
 	var ArrayIterator = require('../src/iterators/array');
 	var ArrayIterable = require('../src/iterables/array');
 	var dataForge = require('../index');
+	var moment = require('moment');
 
 	var expect = require('chai').expect;
 	var assert = require('chai').assert;
@@ -56,6 +57,31 @@ describe('Index', function () {
 		var index = initIndex([0, 1, 2, 3]);
 		var slice = index.slice(1, 3);
 		expect(slice.toValues()).to.eql([1, 2]);
+	});
+
+	it('can get slice of rows with explicit predicates', function () {
+
+		var index = initIndex([0, 1, 2, 3]);
+		var slice = index.slice(
+			function (value) {
+				return value < 1;
+			},
+			function (value) {
+				return value < 3;
+			}
+		);
+		expect(slice.toValues()).to.eql([1, 2]);
+	});
+
+	it('can get slice of rows from time series', function () {
+
+		var index = initIndex([new Date(2016, 1, 1), new Date(2016, 1, 3), new Date(2016, 1, 5), new Date(2016, 1, 10)]);
+		var slice = index.slice(new Date(2016, 1, 2), new Date(2016, 1, 8),
+			function (a, b) {
+				return moment(a).isBefore(b);
+			}
+		);
+		expect(slice.toValues()).to.eql([new Date(2016, 1, 3), new Date(2016, 1, 5)]);
 	});
 
 	it('can bake index', function () {

@@ -1017,24 +1017,68 @@ DataFrame.prototype.setSeries = function (columnName, data) { //todo: should all
 /**
  * Create a new data-frame from a slice of rows.
  *
- * @param {int} startIndex - Index where the slice starts.
- * @param {int} endIndex - Marks the end of the slice, one row past the last row to include.
+ * @param {int|function} startIndexOrStartPredicate - Index where the slice starts or a predicate function that determines where the slice starts.
+ * @param {int|function} endIndexOrEndPredicate - Marks the end of the slice, one row past the last row to include. Or a predicate function that determines when the slice has ended.
+ * @param {function} [predicate] - Optional predicate to compare index against start/end index. Return true to start or stop the slice.
  */
-DataFrame.prototype.slice = function (startIndex, endIndex) { //todo: this doesn't work with time serires!
-	assert.isNumber(startIndex, "Expected 'startIndex' parameter to getRowsSubset to be an integer.");
-	assert.isNumber(endIndex, "Expected 'endIndex' parameter to getRowsSubset to be an integer.");
-	assert(endIndex >= startIndex, "Expected 'endIndex' parameter to getRowsSubset to be greater than or equal to 'startIndex' parameter.");
+DataFrame.prototype.slice = function (startIndexOrStartPredicate, endIndexOrEndPredicate, predicate) {
 
 	var self = this;
+
+	var startIndex;
+	var endIndex;
+	var startPredicate = null;
+	var endPredicate = null;
+
+	if (predicate) {
+		assert.isFunction(predicate, "Expected 'predicate' parameter to slice function to be function.");
+	}
+
+	if (Object.isFunction(startIndexOrStartPredicate)) {
+		startPredicate = startIndexOrStartPredicate;
+	}
+	else {
+		startIndex = startIndexOrStartPredicate;
+		startPredicate = function (value) {
+				return predicate && predicate(value, startIndex) || value < startIndex;
+			};
+	}
+
+	if (Object.isFunction(endIndexOrEndPredicate)) {
+		endPredicate = endIndexOrEndPredicate;
+	}
+	else {
+		endIndex = endIndexOrEndPredicate;
+		endPredicate = function (value) {
+				return predicate && predicate(value, endIndex) || value < endIndex;
+			};
+	}
+
 	return new DataFrame({
 		columnNames: self.getColumnNames(),
 		rows: {
 			getIterator: function () {
-				return new TakeIterator(new SkipIterator(self.getIterator(), startIndex), endIndex - startIndex);
+				return new SelectIterator(
+					new TakeWhileIterator(
+						new SkipWhileIterator(
+							new MultiIterator([self.getIndex().getIterator(), self.getIterator()]),
+							function (pair) {
+								return startPredicate(pair[0]); // Check index for start condition.
+							}
+						),
+						function (pair) {
+							return endPredicate(pair[0]); // Check index for end condition.
+						}
+					),
+					function (pair) {
+						return pair[1]; // Value.
+					}
+				);
 			},
-		},
-		index: self.getIndex().slice(startIndex, endIndex),
+		},		
+		index: self.getIndex().slice(startIndexOrStartPredicate, endIndexOrEndPredicate, predicate),
 	});
+
 };
 
 /**

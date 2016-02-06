@@ -6,7 +6,8 @@ describe('DataFrame', function () {
 	var dataForge = require('../index');	
 	var DataFrame = require('../src/dataframe');
 	var ArrayIterable = require('../src/iterables/array');
-	
+	var moment = require('moment');
+		
 	var expect = require('chai').expect;
 	var assert = require('chai').assert;
 	var E = require('linq');
@@ -789,20 +790,68 @@ describe('DataFrame', function () {
 	it('can get slice of rows', function () {
 
 		var dataFrame = initDataFrame(
-			[ "Date", "Value1", "Value2", "Value3" ],
+			[ "Value1", "Value2", "Value3" ],
 			[
-				[new Date(2011, 24, 2), 300, 'c', 3],
-				[new Date(1975, 24, 2), 200, 'b', 1],
-				[new Date(2013, 24, 2), 20, 'c', 22],
-				[new Date(2015, 24, 2), 100, 'd', 4],
+				[300, 'c', 3],
+				[200, 'b', 1],
+				[20, 'c', 22],
+				[100, 'd', 4],
 			],
 			[5, 6, 7, 8]
 		);
-		var subset = dataFrame.slice(1, 3);
-		expect(subset.getIndex().toValues()).to.eql([6, 7]);
-		expect(subset.toValues()).to.eql([
-			[new Date(1975, 24, 2), 200, 'b', 1],
-			[new Date(2013, 24, 2), 20, 'c', 22],
+		var slice = dataFrame.slice(6, 8);
+		expect(slice.toPairs()).to.eql([
+			[6, { Value1: 200, Value2: 'b', Value3: 1 }],
+			[7, { Value1: 20, Value2: 'c', Value3: 22 }],
+		]);
+	});
+
+	it('can get slice of rows with explicit predicates', function () {
+
+		var dataFrame = initDataFrame(
+			[ "Value1", "Value2", "Value3" ],
+			[
+				[300, 'c', 3],
+				[200, 'b', 1],
+				[20, 'c', 22],
+				[100, 'd', 4],
+			],
+			[5, 6, 7, 8]
+		);
+		var slice = dataFrame.slice(
+			function (indexValue) {
+				return indexValue < 6;
+			},
+			function (indexValue) {
+				return indexValue < 8;
+			}
+		);
+		expect(slice.toPairs()).to.eql([
+			[6, { Value1: 200, Value2: 'b', Value3: 1 }],
+			[7, { Value1: 20, Value2: 'c', Value3: 22 }],
+		]);
+	});
+
+	it('can get slice of rows from time series', function () {
+
+		var dataFrame = initDataFrame(
+			[ "Value1", "Value2", "Value3" ],
+			[
+				[300, 'c', 3],
+				[200, 'b', 1],
+				[20, 'c', 22],
+				[100, 'd', 4],
+			],
+			[new Date(2016, 1, 1), new Date(2016, 1, 3), new Date(2016, 1, 5), new Date(2016, 1, 10)]
+		);
+		var slice = dataFrame.slice(new Date(2016, 1, 2), new Date(2016, 1, 8),
+			function (a, b) {
+				return moment(a).isBefore(b);
+			}
+		);
+		expect(slice.toPairs()).to.eql([
+			[new Date(2016, 1, 3), { Value1: 200, Value2: 'b', Value3: 1 }],
+			[new Date(2016, 1, 5), { Value1: 20, Value2: 'c', Value3: 22 }],
 		]);
 	});
 

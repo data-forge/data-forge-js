@@ -5,7 +5,9 @@ var ArrayIterable = require('./iterables/array');
 var checkIterable = require('./iterables/check');
 var validateIterable = require('./iterables/validate');
 var SkipIterator = require('./iterators/skip');
+var SkipWhileIterator = require('./iterators/skip-while');
 var TakeIterator = require('../src/iterators/take');
+var TakeWhileIterator = require('../src/iterators/take-while');
 
 var assert = require('chai').assert;
 var E = require('linq');
@@ -76,19 +78,52 @@ Index.prototype.take = function (numRows) {
 /**
  * Create a new index from a slice of rows.
  *
- * @param {int} startIndex - Index where the slice starts.
- * @param {int} endIndex - Marks the end of the slice, one row past the last row to include.
+ * @param {int|function} startIndexOrStartPredicate - Index where the slice starts or a predicate function that determines where the slice starts.
+ * @param {int|function} endIndexOrEndPredicate - Marks the end of the slice, one row past the last row to include. Or a predicate function that determines when the slice has ended.
+ * @param {function} [predicate] - Optional predicate to compare index against start/end index. Return true to start or stop the slice.
  */
-Index.prototype.slice = function (startIndex, endIndex) {
-	assert.isNumber(startIndex, "Expected 'startIndex' parameter to slice to be an integer.");
-	assert.isNumber(endIndex, "Expected 'endIndex' parameter to slice to be an integer.");
-	assert(endIndex >= startIndex, "Expected 'endIndex' parameter to slice to be greater than or equal to 'startIndex' parameter.");
+Index.prototype.slice = function (startIndexOrStartPredicate, endIndexOrEndPredicate, predicate) {
 
 	var self = this;
 
+	var startIndex;
+	var endIndex;
+	var startPredicate = null;
+	var endPredicate = null;
+
+	if (predicate) {
+		assert.isFunction(predicate, "Expected 'predicate' parameter to slice function to be function.");
+	}
+
+	if (Object.isFunction(startIndexOrStartPredicate)) {
+		startPredicate = startIndexOrStartPredicate;
+	}
+	else {
+		startIndex = startIndexOrStartPredicate;
+		startPredicate = function (value) {
+				return predicate && predicate(value, startIndex) || value < startIndex;
+			};
+	}
+
+	if (Object.isFunction(endIndexOrEndPredicate)) {
+		endPredicate = endIndexOrEndPredicate;
+	}
+	else {
+		endIndex = endIndexOrEndPredicate;
+		endPredicate = function (value) {
+				return predicate && predicate(value, endIndex) || value < endIndex;
+			};
+	}
+
 	return new Index({
 		getIterator: function () {
-			return new TakeIterator(new SkipIterator(self.getIterator(), startIndex), endIndex - startIndex);
+			return new TakeWhileIterator(
+				new SkipWhileIterator(
+					self.getIterator(),
+					startPredicate					
+				),
+				endPredicate
+			)
 		},
 	});
 };
