@@ -65,4 +65,121 @@ describe('csv.integration', function () {
 		]);
 	});
 
+	it('can handle CSV with trailing commas', function () {
+		
+		var csv =
+			"c1, c2,\n" +
+			"f, 1,2\n" +
+			"x, 2,2";
+
+		var dataFrame = dataForge.fromCSV(csv);
+		expect(dataFrame.getColumnNames()).to.eql(["c1", "c2", ""]);
+
+		var series1 = dataFrame.getSeries('c1');
+		expect(series1.toValues()).to.eql([
+			'f',
+			'x',
+		]);
+		
+		var series2 = dataFrame.getSeries('c2');
+		expect(series2.toValues()).to.eql([
+			'1',
+			'2',
+		]);
+	});
+
+	it('can handle CSV with quoted fields', function () {
+		
+		var csv =
+			'"c1","c2"\n' +
+			'"a","1"\n' +
+			'"b","2"';
+
+		var dataFrame = dataForge.fromCSV(csv);
+		expect(dataFrame.getColumnNames()).to.eql(["c1", "c2"]);
+
+		var series1 = dataFrame.getSeries('c1');
+		expect(series1.toValues()).to.eql([
+			'a',
+			'b',
+		]);
+		
+		var series2 = dataFrame.getSeries('c2');
+		expect(series2.toValues()).to.eql([
+			'1',
+			'2',
+		]);
+	});	
+
+	it('can handle CSV with unix line endings', function () {
+		
+		var csv =
+			'c1,c2\n' +
+			'a,1\n' +
+			'b,2';
+
+		var dataFrame = dataForge.fromCSV(csv);
+		expect(dataFrame.getColumnNames()).to.eql(["c1", "c2"]);
+
+		var series1 = dataFrame.getSeries('c1');
+		expect(series1.toValues()).to.eql([
+			'a',
+			'b',
+		]);
+		
+		var series2 = dataFrame.getSeries('c2');
+		expect(series2.toValues()).to.eql([
+			'1',
+			'2',
+		]);
+	});	
+
+	it('can handle CSV with windows line endings', function () {
+		
+		var csv =
+			'c1,c2\r\n' +
+			'a,1\r\n' +
+			'b,2';
+
+		var dataFrame = dataForge.fromCSV(csv);
+		expect(dataFrame.getColumnNames()).to.eql(["c1", "c2"]);
+
+		var series1 = dataFrame.getSeries('c1');
+		expect(series1.toValues()).to.eql([
+			'a',
+			'b',
+		]);
+		
+		var series2 = dataFrame.getSeries('c2');
+		expect(series2.toValues()).to.eql([
+			'1',
+			'2',
+		]);
+	});	
+
+	it('can handle ASX share game CSV', function () {
+
+		var csv =
+			'"Company name","Code",\n' +
+			'"AUSTRALIAN AGRICULTURAL COMPANY LIMITED.","AAC",\n' +
+			'"ARDENT LEISURE GROUP","AAD",\n';
+
+		var dataFrame = dataForge.fromCSV(csv);
+		expect(dataFrame.getColumnNames()).to.eql(["Company name", "Code", ""]);
+
+		var series1 = dataFrame.getSeries('Company name');
+		expect(series1.toValues()).to.eql([
+			'AUSTRALIAN AGRICULTURAL COMPANY LIMITED.',
+			'ARDENT LEISURE GROUP',
+			'',
+		]);
+		
+		var series2 = dataFrame.getSeries('Code');
+		expect(series2.toValues()).to.eql([
+			'AAC',
+			'AAD',
+			undefined,
+		]);
+
+	});
 });
