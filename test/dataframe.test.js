@@ -7,6 +7,7 @@ describe('DataFrame', function () {
 	var DataFrame = require('../src/dataframe');
 	var ArrayIterator = require('../src/iterators/array');
 	var moment = require('moment');
+	var extend = require('extend');
 		
 	var expect = require('chai').expect;
 	var assert = require('chai').assert;
@@ -15,13 +16,17 @@ describe('DataFrame', function () {
 	var initDataFrame = function (columns, values, index) {
 		assert.isArray(columns);
 		assert.isArray(values);
-		assert.isArray(index);
-
-		return new DataFrame({
+		
+		var config = {
 			columnNames: columns,
-			rows: values,
-			index: new dataForge.Index(index),
-		});
+			rows: values,			
+		};
+
+		if (index) {
+			config.index = new dataForge.Index(index);
+		}
+
+		return new DataFrame(config);
 	};
 
 	it('can get column index from name', function () {
@@ -2140,4 +2145,38 @@ describe('DataFrame', function () {
 		});
 	});
 
+	it('can zip multiple data-frames', function () {
+
+	 	var df1 = initDataFrame(["a", "b"], [[1, 2], [3, 4]]);
+	 	var df2 = initDataFrame(["c", "d"], [[6, 5], [8, 7]]);
+	 	var df3 = initDataFrame(["e", "f"], [[9, 10], [11, 12]]);
+
+		var zipped = df1.zip(df2, df3, function (row1, row2, row3) {
+				return extend({}, row1, row2, row3);
+			}
+		);
+
+		expect(zipped.toPairs()).to.eql([
+			[0, 
+				{
+					a: 1,
+					b: 2,
+					c: 6,
+					d: 5,
+					e: 9,
+					f: 10,
+				}
+			],			
+			[1, 
+				{
+					a: 3,
+					b: 4,
+					c: 8,
+					d: 7,
+					e: 11,
+					f: 12,
+				}
+			],
+		]);
+	});
 });

@@ -1842,4 +1842,35 @@ DataFrame.prototype.toObject = function (keySelector, valueSelector) {
 	return E.from(self.toObjects()).toObject(keySelector, valueSelector);
 };
 
+/**
+ * Zip together multiple data-frames to produce a new data-frame.
+ *
+ * @param {...object} dataFrames - Each data-frame that is to be zipped.
+ * @param {function} selector - Selector function that produces a new data-frame based on the inputs.
+ */
+DataFrame.prototype.zip = function () {
+
+	var dataFrames = E.from(arguments)
+		.takeWhile(function (arg) {
+			return arg && !Object.isFunction(arg);
+		})
+		.toArray();
+
+	assert(dataFrames.length >= 0, "Expected 1 or more 'data-frame' parameters to the zip function.");
+
+	dataFrames = [this].concat(dataFrames);
+
+	var selector = E.from(arguments)
+		.skipWhile(function (arg) {
+			return arg && !Object.isFunction(arg);
+		})
+		.firstOrDefault();
+
+	assert.isFunction(selector, "Expect 'selector' parameter to zip to be a function.");
+
+	var dataForge = require('../index.js');
+	return dataForge.zipDataFrames(dataFrames, function (rows) {
+			return selector.apply(undefined, rows);
+		});
+};
 module.exports = DataFrame;
