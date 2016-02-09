@@ -277,4 +277,16 @@ describe('data-forge', function () {
 		]);
 	});	
 
+	it('can generate series from range', function () {
+
+		var series = dataForge.range(10, 5);
+		expect(series.toPairs()).to.eql([
+			[0, 10],
+			[1, 11],
+			[2, 12],
+			[3, 13],
+			[4, 14],
+		]);
+
+	});
 });

@@ -9,6 +9,7 @@ require('sugar');
 var BabyParse = require('babyparse');
 
 var DataFrame = require('./src/dataframe');
+var Series = require('./src/series');
 var Index = require('./src/index');
 
 /**
@@ -29,7 +30,7 @@ var Index = require('./src/index');
 var dataForge = {
 	
 	DataFrame: DataFrame,
-	Series: require('./src/series'),
+	Series: Series,
 	Index: Index,
 
 	/**
@@ -237,6 +238,35 @@ var dataForge = {
 			}),
 		});
 	},
+
+	/**
+	 * Generate a series from a range of numbers.
+	 *
+	 * @param {int} start - The value of the first number in the range.
+	 * @param {int} count - The number of sequential values in the range.
+	 */
+	range: function (start, count) {
+
+		assert.isNumber(start, "Expect 'start' parameter to range function to be a number.");
+		assert.isNumber(count, "Expect 'count' parameter to range function to be a number.");
+
+		return new Series({
+				values: function ()  {
+
+					var i = -1;
+
+					return {
+						moveNext: function () {
+							return ++i < count;
+						},
+
+						getCurrent: function () {
+							return start + i;
+						},
+					};
+				},
+			});
+	}
 };
 
 module.exports = dataForge;
