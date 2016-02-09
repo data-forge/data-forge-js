@@ -6,6 +6,7 @@ describe('data-forge', function () {
 	var dataForge = require('../index');	
 	var ArrayIterator = require('../src/iterators/array');	
 	var E = require('linq');
+	var extend = require('extend');
 
 	var expect = require('chai').expect;
 	var assert = require('chai').assert;
@@ -325,6 +326,68 @@ describe('data-forge', function () {
 		expect(zipped.toPairs()).to.eql([
 			[0, 0+10+100],
 			[1, 1+11+101],
+		]);
+	});
+
+	it('can zip multiple data-frames', function () {
+
+	 	var df1 = initDataFrame(["a", "b"], [[1, 2], [3, 4]]);
+	 	var df2 = initDataFrame(["c", "d"], [[6, 5], [8, 7]]);
+	 	var df3 = initDataFrame(["e", "f"], [[9, 10], [11, 12]]);
+
+		var zipped = dataForge.zipDataFrames([df1, df2, df3],
+			function (rows) {
+				return extend({}, rows[0], rows[1], rows[2]);
+			}
+		);
+
+		expect(zipped.toPairs()).to.eql([
+			[0, 
+				{
+					a: 1,
+					b: 2,
+					c: 6,
+					d: 5,
+					e: 9,
+					f: 10,
+				}
+			],			
+			[1, 
+				{
+					a: 3,
+					b: 4,
+					c: 8,
+					d: 7,
+					e: 11,
+					f: 12,
+				}
+			],
+		]);
+	});
+
+	it('can zip multiple data-frames with ragged rows', function () {
+
+	 	var df1 = initDataFrame(["a", "b"], [[1, 2], [3, 4]]);
+	 	var df2 = initDataFrame(["c", "d"], [[6, 5], ]);
+	 	var df3 = initDataFrame(["e", "f"], [[9, 10], [11, 12]]);
+
+		var zipped = dataForge.zipDataFrames([df1, df2, df3],
+			function (rows) {
+				return extend({}, rows[0], rows[1], rows[2]);
+			}
+		);
+
+		expect(zipped.toPairs()).to.eql([
+			[0, 
+				{
+					a: 1,
+					b: 2,
+					c: 6,
+					d: 5,
+					e: 9,
+					f: 10,
+				}
+			],			
 		]);
 	});
 

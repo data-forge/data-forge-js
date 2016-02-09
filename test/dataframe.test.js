@@ -1399,7 +1399,7 @@ describe('DataFrame', function () {
 
 		expect(windowed.toPairs()).to.eql([
 			[0, [[1, 2], [3, 4]]],
-			[1, [[5, 6], [7, 8]]],
+			[1, [[5, 6], [7, 8]]] ,
 			[2, [[9, 10]]],
 		]);
 	});
@@ -1934,7 +1934,7 @@ describe('DataFrame', function () {
 		expect(dataFrame.toValues()).to.eql(rows);
 	});
 
-	it('can specify rows as an iterable', function () {
+	it('can specify rows as an iterable or arrays', function () {
 
 		var columns = ["Date", "Value1", "Value2","Value3" ];	
 		var rows = [
@@ -1946,6 +1946,27 @@ describe('DataFrame', function () {
 		};
 		var dataFrame = new dataForge.DataFrame({ columnNames: columns, rows: iterable });
 		expect(dataFrame.toValues()).to.eql(rows);
+	});
+
+	it('can specify rows as an iterable of objects', function () {
+
+		var rows = [
+			{
+				V1: 1,
+				V2: 10,
+			},
+			{
+				V1: 2,
+				V2: 100,
+			},
+		];
+		var iterable = function ()  {
+			return new ArrayIterator(rows);
+		};
+		var dataFrame = new dataForge.DataFrame({ rows: iterable });
+		expect(dataFrame.getColumnNames()).to.eql(["V1", "V2"]);
+		expect(dataFrame.getSeries("V1").toValues()).to.eql([1, 2]);
+		expect(dataFrame.getSeries("V2").toValues()).to.eql([10, 100]);
 	});
 
 	it('default index is generated', function () {

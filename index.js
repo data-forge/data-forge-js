@@ -297,6 +297,33 @@ var dataForge = {
 			},
 		});
 	},
+
+	/*
+	 * Zip together multiple data-frames to create a new data-frame.
+	 *
+	 * @param {array} dataFrames - Array of data-frames to zip together.
+	 * @param {function} selector - Selector function that produces a new data-frame based on the input data-frames.
+	 */
+	zipDataFrames: function (dataFrames, selector) {
+
+		assert.isArray(dataFrames, "Expected 'dataFrames' parameter to zipDataFrames to be an array of Series objects.");
+		assert.isFunction(selector, "Expected 'selector' parameter to zipDataFrames to be a function.");
+
+		return new DataFrame({
+			rows: function () {
+				var dataFrameIterators = E.from(dataFrames)
+					.select(function (dataFrame) {
+						return dataFrame.getObjectsIterator();
+					})
+					.toArray();
+
+				return new SelectIterator(
+					new MultiIterator(dataFrameIterators),
+					selector
+				);
+			},
+		});
+	},	
 };
 
 module.exports = dataForge;

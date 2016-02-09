@@ -90,66 +90,99 @@ var DataFrame = function (config) {
 			}
 		}
 		else if (config.rows) {
-			assert.isArray(config.rows, "Expected 'rows' member of 'config' parameter to DataFrame constructor to be an array of rows.");
-			
-			if (config.rows.length > 0) {
-				if (Object.isObject(config.rows[0])) {
+			if (Object.isFunction(config.rows)) {
 
-					if (config.debug) {
-						config.rows.forEach(function (row) {
-							assert.isObject(row, "Expect 'rows' member of 'config' parameter to DataFrame constructor to be array of objects or arrays, do not mix and match arrays and objects in 'rows'.");
-						});							
+				var determineColumnNames = function () {
+					var iterator = config.rows();
+					if (!iterator.moveNext()) {
+						return [];
 					}
 
-					// Derive column names from object fields.
-					columnNames = function () {
-						return E.from(config.rows)
-							.selectMany(function (row) {
-								return Object.keys(row);
-							})
-							.distinct()
-							.toArray();
-					};
+					return Object.keys(iterator.getCurrent());
+				};				
 
-					rows = function () {
-						var columnNames = self.getColumnNames();
-						return new SelectIterator(
-							new ArrayIterator(config.rows),
-							function (row) {
-								return E.from(columnNames)
-									.select(function (columnName) {
-										return row[columnName];
-									})
-									.toArray();
-							}
-						);
-					};
-				}
-				else {
-					if (config.debug) {
-						config.rows.forEach(function (row) {
-							assert.isArray(row, "Expect 'rows' member of 'config' parameter to DataFrame constructor to be array of objects or arrays, do not mix and match arrays and objects in 'rows'.");
-						});				
-					}
+				columnNames = determineColumnNames;
 
-					// Default column names.
-					columnNames = E.range(0, config.rows[0].length)
-						.select(function (columnIndex) {
-							return columnIndex.toString();
-						})
-						.toArray();
-
-					rows = function () {
-						return new ArrayIterator(config.rows);
-					};
-				}
-			}
-			else {
-				columnNames = [];
 				rows = function () {
-					return new ArrayIterator([]);
+					var columnNames = determineColumnNames();
+
+					return new SelectIterator(
+						config.rows(),
+						function (row) {
+							return E.from(columnNames)
+								.select(function (columnNames) {
+									return row[columnNames];
+								})
+								.toArray();
+						}
+					);
 				};
 			}
+			else {
+				assert.isArray(config.rows, "Expected 'rows' member of 'config' parameter to DataFrame constructor to be an array of rows.");
+				
+				if (config.rows.length > 0) {
+					if (Object.isObject(config.rows[0])) {
+
+						if (config.debug) {
+							config.rows.forEach(function (row) {
+								assert.isObject(row, "Expect 'rows' member of 'config' parameter to DataFrame constructor to be array of objects or arrays, do not mix and match arrays and objects in 'rows'.");
+							});							
+						}
+
+						// Derive column names from object fields.
+						columnNames = function () {
+							return E.from(config.rows)
+								.selectMany(function (row) {
+									return Object.keys(row);
+								})
+								.distinct()
+								.toArray();
+						};
+
+						rows = function () {
+							var columnNames = self.getColumnNames();
+							return new SelectIterator(
+								new ArrayIterator(config.rows),
+								function (row) {
+									return E.from(columnNames)
+										.select(function (columnName) {
+											return row[columnName];
+										})
+										.toArray();
+								}
+							);
+						};
+					}
+					else {
+						if (config.debug) {
+							config.rows.forEach(function (row) {
+								assert.isArray(row, "Expect 'rows' member of 'config' parameter to DataFrame constructor to be array of objects or arrays, do not mix and match arrays and objects in 'rows'.");
+							});				
+						}
+
+						// Default column names.
+						columnNames = E.range(0, config.rows[0].length)
+							.select(function (columnIndex) {
+								return columnIndex.toString();
+							})
+							.toArray();
+
+						rows = function () {
+							return new ArrayIterator(config.rows);
+						};
+					}
+				}
+				else {
+					columnNames = [];
+					rows = function () {
+						return new ArrayIterator([]);
+					};
+				}
+
+			}
+
+
 		}
 		else {
 			columnNames = [];
@@ -205,6 +238,19 @@ DataFrame.prototype.getColumnNames = function () {
 DataFrame.prototype.getIterator = function () {
 	var self = this;
 	return self._iterable();
+};
+
+/**
+ * Get an object iterator for the data-frame.
+ */
+DataFrame.prototype.getObjectsIterator = function () {
+	var self = this;
+	return new SelectIterator(
+		self._iterable(),
+		function (row) {
+			return mapRowByColumns(self, row);
+		}
+	);
 };
 
 //

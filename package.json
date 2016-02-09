@@ -26,6 +26,7 @@
     "sugar": "^1.4.1"
   },
   "devDependencies": {
+    "extend": "^3.0.0",
     "statman-stopwatch": "^1.0.4"
   }
 }
