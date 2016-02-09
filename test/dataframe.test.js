@@ -1352,6 +1352,103 @@ describe('DataFrame', function () {
 		return initDataFrame(columnNames, rows, index);
 	};
 
+	it('can compute window - creates an empty series from an empty data set', function () {
+
+		var dataFrame = new DataFrame();
+		var windowed = dataFrame.window(2, function (window, windowIndex) {
+			return [windowIndex, window.sum()];
+		});
+
+		expect(windowed.count()).to.eql(0);
+	});
+
+	it('can compute window - with even window size and even number of rows', function () {
+
+		var dataFrame = new DataFrame({ 
+			rows: [
+				[1, 2],
+				[3, 4],
+				[5, 6],
+				[7, 8],
+			],
+		});
+		var windowed = dataFrame.window(2, function (window, windowIndex) {
+			return [windowIndex, window.toValues()];
+		});
+
+		expect(windowed.toPairs()).to.eql([
+			[0, [[1, 2], [3, 4]]],
+			[1, [[5, 6], [7, 8]]],
+		]);
+	});
+
+	it('can compute window - with even window size and odd number of rows', function () {
+
+		var dataFrame = new DataFrame({ 
+			rows: [
+				[1, 2],
+				[3, 4],
+				[5, 6],
+				[7, 8],
+				[9, 10],
+			],
+		});
+		var windowed = dataFrame.window(2, function (window, windowIndex) {
+			return [windowIndex, window.toValues()];
+		});
+
+		expect(windowed.toPairs()).to.eql([
+			[0, [[1, 2], [3, 4]]],
+			[1, [[5, 6], [7, 8]]],
+			[2, [[9, 10]]],
+		]);
+	});
+
+	it('can compute window - with odd window size and odd number of rows', function () {
+
+		var dataFrame = new DataFrame({ 
+			rows: [
+				[1, 2],
+				[3, 4],
+				[5, 6],
+				[7, 8],
+				[9, 10],
+				[11, 12],
+			],
+		});
+		var windowed = dataFrame.window(3, function (window, windowIndex) {
+			return [windowIndex, window.toValues()];
+		});
+
+		expect(windowed.toPairs()).to.eql([
+			[0, [[1, 2], [3, 4], [5, 6]]],
+			[1, [[7, 8], [9, 10], [11, 12]]],
+		]);
+
+	});
+
+	it('can compute window - with odd window size and even number of rows', function () {
+
+		var dataFrame = new DataFrame({ 
+			rows: [
+				[1, 2],
+				[3, 4],
+				[5, 6],
+				[7, 8],
+				[9, 10],
+			],
+		});
+		var windowed = dataFrame.window(3, function (window, windowIndex) {
+			return [windowIndex, window.toValues()];
+		});
+
+		expect(windowed.toPairs()).to.eql([
+			[0, [[1, 2], [3, 4], [5, 6]]],
+			[1, [[7, 8], [9, 10]]],
+		]);
+
+	});
+
 	it('can compute rolling window - from empty data set', function () {
 
 		var dataFrame = genDataFrame(0, 0);

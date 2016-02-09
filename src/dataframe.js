@@ -1499,21 +1499,87 @@ DataFrame.prototype.transformColumn = function (columnNameOrColumnNames, selecto
 	}
 };
 
-/** 
- * Move a rolling window over the data frame, invoke a selector function to build a new data frame.
+/**
+ * Move a window over the data-frame (batch by batch), invoke a selector for each window that builds a new series.
  *
- * @param {integer} period - The number of entries to include in the window.
- * @param {function} selector - The selector function that builds the output series.
+ * @param {integer} period - The number of rows in the window.
+ * @param {function} selector - The selector function invoked per row that builds the output series.
  *
  * The selector has the following parameters: 
  *
  *		window - Data-frame that represents the rolling window.
  *		windowIndex - The 0-based index of the window.
  */
-DataFrame.prototype.rollingWindow = function (period, fn) {
+DataFrame.prototype.window = function (period, selector) {
+
+	assert.isNumber(period, "Expected 'period' parameter to 'window' to be a number.");
+	assert.isFunction(selector, "Expected 'selector' parameter to 'window' to be a function.");
+
+	var self = this;
+
+	//todo: make this properly lazy
+
+	var index = self.getIndex().toValues();
+	var values = self.toValues();
+
+	if (values.length == 0) {
+		return new Series();
+	}
+
+	var numWindows = Math.ceil(values.length/period);
+	if (numWindows == 0) {
+		return new Series();
+	}
+	
+	//todo: make this properly lazy
+
+	var newIndexAndValues = E.range(0, numWindows)
+		.select(function (windowIndex) {
+			var _window = new DataFrame({
+					columnNames: self.getColumnNames(),
+					rows: function () {
+						return new TakeIterator(new SkipIterator(self.getIterator(), windowIndex*period), period);
+					},
+					index: new Index(function () {
+						return new TakeIterator(new SkipIterator(self.getIndex().getIterator(), windowIndex*period), period);
+					}),
+				});
+			return selector(_window, windowIndex);			
+		})
+		.toArray();
+
+	var newIndex = E.from(newIndexAndValues)
+		.select(function (indexAndValue) {
+			return indexAndValue[0];
+		})
+		.toArray();
+	var newValues = E.from(newIndexAndValues)
+		.select(function (indexAndValue) {
+			return indexAndValue[1];
+		})
+		.toArray();
+
+	return new Series({
+			values: newValues,
+			index: new Index(newIndex)
+		});
+};
+
+/** 
+ * Move a window over the data-frame (row by row), invoke a selector for each window that builds a new series.
+ *
+ * @param {integer} period - The number of rows in the window.
+ * @param {function} selector - The selector function invoked per row that builds the output series.
+ *
+ * The selector has the following parameters: 
+ *
+ *		window - Data-frame that represents the rolling window.
+ *		windowIndex - The 0-based index of the window.
+ */
+DataFrame.prototype.rollingWindow = function (period, selector) {
 
 	assert.isNumber(period, "Expected 'period' parameter to 'rollingWindow' to be a number.");
-	assert.isFunction(fn, "Expected 'fn' parameter to 'rollingWindow' to be a function.");
+	assert.isFunction(selector, "Expected 'selector' parameter to 'rollingWindow' to be a function.");
 
 	var self = this;
 
@@ -1527,17 +1593,17 @@ DataFrame.prototype.rollingWindow = function (period, fn) {
 	}
 
 	var newIndexAndValues = E.range(0, values.length-period+1)
-		.select(function (rowIndex) {
+		.select(function (windowIndex) {
 			var _window = new DataFrame({
 					columnNames: self.getColumnNames(),
 					rows: function () {
-						return new TakeIterator(new SkipIterator(self.getIterator(), rowIndex), period);
+						return new TakeIterator(new SkipIterator(self.getIterator(), windowIndex), period);
 					},
 					index: new Index(function () {
-						return new TakeIterator(new SkipIterator(self.getIndex().getIterator(), rowIndex), period);
+						return new TakeIterator(new SkipIterator(self.getIndex().getIterator(), windowIndex), period);
 					}),
 				});
-			return fn(_window, rowIndex);			
+			return selector(_window, windowIndex);			
 		})
 		.toArray();
 

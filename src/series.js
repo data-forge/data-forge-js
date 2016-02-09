@@ -567,6 +567,11 @@ Series.prototype.slice = function (startIndexOrStartPredicate, endIndexOrEndPred
  *
  * @param {integer} period - The number of rows in the window.
  * @param {function} selector - The selector function invoked per row that builds the output series.
+ *
+ * The selector has the following parameters: 
+ *
+ *		window - Data-frame that represents the rolling window.
+ *		windowIndex - The 0-based index of the window.
  */
 Series.prototype.window = function (period, selector) {
 
@@ -590,16 +595,16 @@ Series.prototype.window = function (period, selector) {
 	}
 	
 	var newIndexAndValues = E.range(0, numWindows)
-		.select(function (rowIndex) {
+		.select(function (windowIndex) {
 			var _window = new Series({
 					values: function () {
-						return new TakeIterator(new SkipIterator(self.getIterator(), rowIndex*period), period);
+						return new TakeIterator(new SkipIterator(self.getIterator(), windowIndex*period), period);
 					},
 					index: new Index(function () {
-						return new TakeIterator(new SkipIterator(self.getIndex().getIterator(), rowIndex*period), period);
+						return new TakeIterator(new SkipIterator(self.getIndex().getIterator(), windowIndex*period), period);
 					}),
 				});			
-			return selector(_window, rowIndex);
+			return selector(_window, windowIndex);
 		})
 		.toArray();
 
@@ -651,16 +656,16 @@ Series.prototype.rollingWindow = function (period, selector) {
 	}
 
 	var newIndexAndValues = E.range(0, values.length-period+1)
-		.select(function (rowIndex) {
+		.select(function (windowIndex) {
 			var _window = new Series({
 					values: function () {
-						return new TakeIterator(new SkipIterator(self.getIterator(), rowIndex), period);
+						return new TakeIterator(new SkipIterator(self.getIterator(), windowIndex), period);
 					},
 					index: new Index(function () {
-						return new TakeIterator(new SkipIterator(self.getIndex().getIterator(), rowIndex), period);
+						return new TakeIterator(new SkipIterator(self.getIndex().getIterator(), windowIndex), period);
 					}),
 				});			
-			return selector(_window, rowIndex);
+			return selector(_window, windowIndex);
 		})
 		.toArray();
 
