@@ -5,6 +5,7 @@ describe('data-forge', function () {
 	
 	var dataForge = require('../index');	
 	var ArrayIterator = require('../src/iterators/array');	
+	var E = require('linq');
 
 	var expect = require('chai').expect;
 	var assert = require('chai').assert;
@@ -288,5 +289,42 @@ describe('data-forge', function () {
 			[4, 14],
 		]);
 
+	});
+
+	it('can zip multiple series', function () {
+
+		var series1 = dataForge.range(0, 3);
+		var series2 = dataForge.range(10, 3);
+		var series3 = dataForge.range(100, 3);
+
+		var zipped = dataForge.zipSeries([series1, series2, series3], 
+			function (values) {
+				return E.from(values).sum();
+			}
+		);
+
+		expect(zipped.toPairs()).to.eql([
+			[0, 0+10+100],
+			[1, 1+11+101],
+			[2, 2+12+102],
+		]);
+	});
+
+	it('can zip multiple series with ragged rows', function () {
+
+		var series1 = dataForge.range(0, 3);
+		var series2 = dataForge.range(10, 2);
+		var series3 = dataForge.range(100, 3);
+
+		var zipped = dataForge.zipSeries([series1, series2, series3], 
+			function (values) {
+				return E.from(values).sum();
+			}
+		);
+
+		expect(zipped.toPairs()).to.eql([
+			[0, 0+10+100],
+			[1, 1+11+101],
+		]);
 	});
 });

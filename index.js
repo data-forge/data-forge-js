@@ -5,12 +5,15 @@ var E = require('linq');
 var dropElement = require('./src/utils').dropElement;
 var ArrayIterator = require('./src/iterators/array');
 var ConcatIterator = require('./src/iterators/concat');
+var SelectIterator = require('./src/iterators/select');
+var MultiIterator = require('./src/iterators/multi');
 require('sugar');
 var BabyParse = require('babyparse');
 
 var DataFrame = require('./src/dataframe');
 var Series = require('./src/series');
 var Index = require('./src/index');
+var E = require('linq');
 
 /**
  * Main namespace for Data-Forge.
@@ -266,7 +269,34 @@ var dataForge = {
 					};
 				},
 			});
-	}
+	},
+
+	/*
+	 * Zip together multiple series to create a new series.
+	 *
+	 * @param {array} series - Array of series to zip together.
+	 * @param {function} selector - Selector function that produces a new series based on the input series.
+	 */
+	zipSeries: function (series, selector) {
+
+		assert.isArray(series, "Expected 'series' parameter to zipSeries to be an array of Series objects.");
+		assert.isFunction(selector, "Expected 'selector' parameter to zipSeries to be a function.");
+
+		return new Series({
+			values: function () {
+				return new SelectIterator(
+					new MultiIterator(
+						E.from(series)
+							.select(function (series) {
+								return series.getIterator();
+							})
+							.toArray()
+					),
+					selector
+				);
+			},
+		});
+	},
 };
 
 module.exports = dataForge;
