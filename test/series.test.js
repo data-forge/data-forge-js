@@ -937,5 +937,27 @@ describe('Series', function () {
 		});
 	});
 
+	it('can zip two series', function () {
 
+		var zipped = dataForge.range(0, 3)
+			.zip(dataForge.range(10, 3), function (s1, s2) {
+				return s1 + s2;
+			});
+
+		expect(zipped.toValues()).to.eql([0+10, 1+11, 2+12]);
+	});
+
+	it('can zip multiple series', function () {
+
+		var zipped = dataForge.range(0, 3)
+			.zip(
+				dataForge.range(10, 3), 
+				dataForge.range(100, 3),
+				function (s1, s2, s3) {
+					return s1 + s2 + s3;
+				}
+			);
+
+		expect(zipped.toValues()).to.eql([0+10+100, 1+11+101, 2+12+102]);
+	});
 });

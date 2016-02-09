@@ -1235,5 +1235,36 @@ Series.prototype.toObject = function (keySelector, valueSelector) {
 	return E.from(self.toValues()).toObject(keySelector, valueSelector);
 };
 
+/**
+ * Zip together multiple series to produce a new series.
+ *
+ * @param {...series} series - Each series that is to be zipped.
+ * @param {function} selector - Selector function that produces a new series based on the inputs.
+ */
+Series.prototype.zip = function () {
+
+	var inputSeries = E.from(arguments)
+		.takeWhile(function (arg) {
+			return arg && !Object.isFunction(arg);
+		})
+		.toArray();
+
+	assert(inputSeries.length >= 0, "Expected 1 or more 'series' parameters to the zip function.");
+
+	inputSeries = [this].concat(inputSeries);
+
+	var selector = E.from(arguments)
+		.skipWhile(function (arg) {
+			return arg && !Object.isFunction(arg);
+		})
+		.firstOrDefault();
+
+	assert.isFunction(selector, "Expect 'selector' parameter to zip to be a function.");
+
+	var dataForge = require('../index.js');
+	return dataForge.zipSeries(inputSeries, function (values) {
+			return selector.apply(undefined, values);
+		});
+};
 
 module.exports = Series;
