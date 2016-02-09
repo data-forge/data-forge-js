@@ -562,21 +562,82 @@ Series.prototype.slice = function (startIndexOrStartPredicate, endIndexOrEndPred
 	});
 };
 
-/** 
- * Move a rolling window over the series, invoke a selector function to build a new series.
+/**
+ * Move a window over the series (batch by batch), invoke a selector for each window that builds a new series.
  *
- * @param {integer} period - The number of entries to include in the window.
- * @param {function} selector - The selector function that builds the output series.
+ * @param {integer} period - The number of rows in the window.
+ * @param {function} selector - The selector function invoked per row that builds the output series.
+ */
+Series.prototype.window = function (period, selector) {
+
+	assert.isNumber(period, "Expected 'period' parameter to 'window' to be a number.");
+	assert.isFunction(selector, "Expected 'selector' parameter to 'window' to be a function.");
+
+	var self = this;
+
+	//todo: make this properly lazy
+
+	var index = self.getIndex().toValues();
+	var values = self.toValues();
+
+	if (values.length == 0) {
+		return new Series();
+	}
+
+	var numWindows = Math.ceil(values.length/period);
+	if (numWindows == 0) {
+		return new Series();
+	}
+	
+	var newIndexAndValues = E.range(0, numWindows)
+		.select(function (rowIndex) {
+			var _window = new Series({
+					values: function () {
+						return new TakeIterator(new SkipIterator(self.getIterator(), rowIndex*period), period);
+					},
+					index: new Index(function () {
+						return new TakeIterator(new SkipIterator(self.getIndex().getIterator(), rowIndex*period), period);
+					}),
+				});			
+			return selector(_window, rowIndex);
+		})
+		.toArray();
+
+	return new Series({
+		values: function () {
+			return new ArrayIterator(E.from(newIndexAndValues)
+				.select(function (indexAndValue) {
+					return indexAndValue[1];
+				})
+				.toArray()
+			);
+		},
+		index: new Index(function () {
+			return new ArrayIterator(E.from(newIndexAndValues)
+				.select(function (indexAndValue) {
+					return indexAndValue[0];
+				})
+				.toArray()
+			);
+		}),
+	});	
+};
+
+/** 
+ * Move a rolling window over the series (row by row), invoke a selector for each window that builds a new series.
+ *
+ * @param {integer} period - The number of rows in the window.
+ * @param {function} selector - The selector function invoked per row that builds the output series.
  *
  * The selector has the following parameters: 
  *
  *		window - Series that represents the rolling window.
  *		windowIndex - The 0-based index of the window.
  */
-Series.prototype.rollingWindow = function (period, fn) {
+Series.prototype.rollingWindow = function (period, selector) {
 
 	assert.isNumber(period, "Expected 'period' parameter to 'rollingWindow' to be a number.");
-	assert.isFunction(fn, "Expected 'fn' parameter to 'rollingWindow' to be a function.");
+	assert.isFunction(selector, "Expected 'selector' parameter to 'rollingWindow' to be a function.");
 
 	var self = this;
 
@@ -599,7 +660,7 @@ Series.prototype.rollingWindow = function (period, fn) {
 						return new TakeIterator(new SkipIterator(self.getIndex().getIterator(), rowIndex), period);
 					}),
 				});			
-			return fn(_window, rowIndex);
+			return selector(_window, rowIndex);
 		})
 		.toArray();
 
@@ -1168,5 +1229,6 @@ Series.prototype.toObject = function (keySelector, valueSelector) {
 
 	return E.from(self.toValues()).toObject(keySelector, valueSelector);
 };
+
 
 module.exports = Series;
