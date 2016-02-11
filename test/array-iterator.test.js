@@ -37,4 +37,11 @@ describe('array iterator', function () {
 		testObject.moveNext();
 		expect(testObject.getCurrent()).to.eql(1);
 	});
+
+	it('can realize iterator', function () {
+
+		var values = [1, 2, 3];
+		var testObject = new ArrayIterator(values);
+		expect(testObject.realize()).to.eql(values);
+	})
 });
