@@ -1939,7 +1939,7 @@ describe('DataFrame', function () {
 		expect(dataFrame.toValues()).to.eql(rows);
 	});
 
-	it('can specify rows as an iterable or arrays', function () {
+	it('can specify rows as an iterable of arrays', function () {
 
 		var columns = ["Date", "Value1", "Value2","Value3" ];	
 		var rows = [
@@ -1972,6 +1972,46 @@ describe('DataFrame', function () {
 		expect(dataFrame.getColumnNames()).to.eql(["V1", "V2"]);
 		expect(dataFrame.getSeries("V1").toValues()).to.eql([1, 2]);
 		expect(dataFrame.getSeries("V2").toValues()).to.eql([10, 100]);
+	});
+
+	it('can specify data-frame input as an iterable', function () {
+
+		var columnNames = [ "c1", "c2"];
+
+		var rows = [
+			[1, 2],
+			[3, 4]
+		];
+		var mockRowsIterator = new ArrayIterator(rows);
+
+		var objects = [
+			{ c1: 1, c2: 2 },
+			{ c1: 2, c2: 3 },
+		];
+		var mockObjectsIterator = new ArrayIterator(objects);
+
+		var mockIterable = {
+
+			getColumnNames: function () {
+				return columnNames;
+			},
+
+			getRowsIterator: function () {
+				return mockRowsIterator;
+			},
+
+			getObjectsIterator: function () {
+				return mockObjectsIterator;
+			},
+		};
+
+		var dataFrame = new DataFrame({ iterable: mockIterable });
+
+		expect(dataFrame.getColumnNames()).to.eql(columnNames);
+		expect(dataFrame.getRowsIterator()).to.eql(mockRowsIterator);
+		expect(dataFrame.getObjectsIterator()).to.eql(mockObjectsIterator);
+		expect(dataFrame.toValues()).to.eql(rows);		
+		expect(dataFrame.toObjects()).to.eql(objects);
 	});
 
 	it('default index is generated', function () {

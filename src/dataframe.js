@@ -57,6 +57,11 @@ var DataFrame = function (config) {
 			assert.isObject(config.index, "Expected 'index' member of 'config' parameter to DataFrame constructor to be an object.");
 		}
 
+		if (config.iterable) {
+			assert.isObject(config.iterable, "Expected 'iterable' member of 'config' parameter to DataFrame constructor to be an object.");
+
+			self._newIterable = config.iterable;
+		}
 		if (config.columnNames) {
 			if (!Object.isFunction(config.columnNames)) {
 				assert.isArray(config.columnNames, "Expected 'columnNames' member of 'config' parameter to DataFrame constructor to be an array of strings or a function that produces an array of strings.");
@@ -215,7 +220,10 @@ DataFrame.prototype.getIndex = function () {
  */
 DataFrame.prototype.getColumnNames = function () {
 	var self = this;
-	if (Object.isFunction(self._columnNames)) {
+	if (self._newIterable) {
+		return self._newIterable.getColumnNames();
+	}
+	if (Object.isFunction(self._columnNames)) { //fio:
 		self._columnNames = self._columnNames(); // Lazy evaluate column names.
 	}
 	return self._columnNames;
@@ -224,17 +232,33 @@ DataFrame.prototype.getColumnNames = function () {
 /**
  * Get an iterator for the data-frame.
  */
-DataFrame.prototype.getIterator = function () {
+DataFrame.prototype.getIterator = function () { //fio:
 	var self = this;
 	return self._iterable();
 };
 
 /**
- * Get an object iterator for the data-frame.
+ * Get a rows iterator for the data-frame.
+ */
+DataFrame.prototype.getRowsIterator = function () {
+	var self = this;
+	if (self._newIterable) {
+		return self._newIterable.getRowsIterator();
+	}
+
+	return self.getIterator();
+};
+
+/**
+ * Get an objects iterator for the data-frame.
  */
 DataFrame.prototype.getObjectsIterator = function () {
 	var self = this;
-	return new SelectIterator(
+	if (self._newIterable) {
+		return self._newIterable.getObjectsIterator();
+	}
+
+	return new SelectIterator( //fio:
 		self._iterable(),
 		function (row) {
 			return mapRowByColumns(self, row);
@@ -1378,7 +1402,7 @@ DataFrame.prototype.toValues = function () {
 
 	var self = this;
 
-	var iterator = self.getIterator();
+	var iterator = self.getRowsIterator();
 	validateIterator(iterator);
 
 	var values = [];
@@ -1396,23 +1420,17 @@ DataFrame.prototype.toValues = function () {
 DataFrame.prototype.toObjects = function () {
 
 	var self = this;
-	var columnNames = self.getColumnNames();
-	return E.from(self.toValues())
-		.select(function (row) {
-			return E.from(columnNames)
-				.zip(row, function (columnName, columnValue) {
-					return [columnName, columnValue];
-				})
-				.toObject(
-					function (column) {
-						return column[0]; // Field name.
-					},
-					function (column) {
-						return column[1]; // Field value.
-					}
-				);
-		})
-		.toArray();
+
+	var iterator = self.getObjectsIterator();
+	validateIterator(iterator);
+
+	var objects = [];
+
+	while (iterator.moveNext()) {
+		objects.push(iterator.getCurrent());
+	}
+
+	return objects;
 };
 
 /**
