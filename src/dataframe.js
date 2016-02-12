@@ -173,26 +173,15 @@ var DataFrame = function (config) {
 						};
 					}
 				}
-				else {
-					columnNames = [];
-					rows = function () {
-						return new ArrayIterator([]);
-					};
-				}
-
 			}
-
-
-		}
-		else {
-			columnNames = [];
-				rows = function () {
-					return new ArrayIterator([]);
-				};
 		}
 	}
-	else {
+
+	if (!columnNames) {
 		columnNames = [];
+	}
+
+	if (!rows) {
 		rows = function () {
 			return new ArrayIterator([]);
 		};
