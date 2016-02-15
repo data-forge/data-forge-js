@@ -14,6 +14,7 @@ var BabyParse = require('babyparse');
 var SelectIterator = require('../src/iterators/select');
 var TakeIterator = require('../src/iterators/take');
 var TakeWhileIterator = require('../src/iterators/take-while');
+var utils = require('./utils');
 
 var assert = require('chai').assert; 
 var E = require('linq');
@@ -1880,4 +1881,45 @@ DataFrame.prototype.zip = function () {
 			return selector.apply(undefined, rows);
 		});
 };
+
+/**
+ * Bring the name column to the front, making it the first column in the data-frame.
+ *
+ * @param {string} columnName - The name of the column to bring to the front.
+ */
+DataFrame.prototype.bringToFront = function (columnName) {
+
+	assert.isString(columnName, "Expect 'columnName' parameter to bringToFront function to be a string.");
+
+	var self = this;
+
+	var columnIndex = self.getColumnIndex(columnName);
+	if (columnIndex < 0) {
+		throw new Error("Failed to find column with name '" + columnName + "'.");
+	}
+
+	var reorderedColumnNames = [columnName].concat(utils.dropElement(self.getColumnNames(), columnIndex));
+	return self.remapColumns(reorderedColumnNames);
+};
+
+/**
+ * Bring the name column to the back, making it the last column in the data-frame.
+ *
+ * @param {string} columnName - The name of the column to bring to the back.
+ */
+DataFrame.prototype.bringToBack = function (columnName) {
+
+	assert.isString(columnName, "Expect 'columnName' parameter to bringToBack function to be a string.");
+
+	var self = this;
+
+	var columnIndex = self.getColumnIndex(columnName);
+	if (columnIndex < 0) {
+		throw new Error("Failed to find column with name '" + columnName + "'.");
+	}
+
+	var reorderedColumnNames = utils.dropElement(self.getColumnNames(), columnIndex).concat([columnName]);
+	return self.remapColumns(reorderedColumnNames);
+};
+
 module.exports = DataFrame;

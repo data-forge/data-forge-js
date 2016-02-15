@@ -2219,4 +2219,34 @@ describe('DataFrame', function () {
 			],
 		]);
 	});
+
+	it('can bring column to front', function () {
+
+		var dataFrame = initDataFrame(["a", "b", "c"], [[1, 2, 3], [4, 5, 6]]);
+
+		expect(dataFrame.getColumnNames()).to.eql(["a", "b", "c"]);
+
+		var modified = dataFrame.bringToFront("b");
+
+		expect(modified.getColumnNames()).to.eql(["b", "a", "c"]);
+		expect(modified.toValues()).to.eql([
+			[2, 1, 3],
+			[5, 4, 6],
+		]);
+	})
+
+	it('can bring column to back', function () {
+
+		var dataFrame = initDataFrame(["a", "b", "c"], [[1, 2, 3], [4, 5, 6]]);
+
+		expect(dataFrame.getColumnNames()).to.eql(["a", "b", "c"]);
+
+		var modified = dataFrame.bringToBack("b");
+
+		expect(modified.getColumnNames()).to.eql(["a", "c", "b"]);
+		expect(modified.toValues()).to.eql([
+			[1, 3, 2],
+			[4, 6, 5],
+		]);
+	})
 });
