@@ -1101,9 +1101,16 @@ Series.prototype.reverse = function () {
  */
 Series.prototype.inflate = function (selector) {
 
-	assert.isFunction(selector, "Expected 'selector' parameter to 'inflate' function to be a function.");
-
 	var self = this;
+
+	if (selector) {
+		assert.isFunction(selector, "Expected 'selector' parameter to 'inflate' function to be a function.");
+	}
+	else {
+		selector = function (value) {
+			return value;
+		}
+	}
 
 	//todo: make this lazy.
 	//todo: need a better implementation.

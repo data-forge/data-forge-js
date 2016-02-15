@@ -762,6 +762,28 @@ describe('Series', function () {
 
 	});
 
+	it('inflate has a default selector that expands the columns in an object', function () {
+
+		var series = initSeries([0, 1], [
+			{
+				A: 1,
+				B: 2,
+			},	
+			{
+				A: 3,
+				B: 4,
+			},	
+		]);
+		var dataFrame = series.inflate();
+
+		expect(dataFrame.getColumnNames()).to.eql(["A", "B"]);
+		expect(dataFrame.toValues()).to.eql([
+			[1, 2],
+			[3, 4],
+		]);
+
+	});
+
 	it('can get head of series', function () {
 
 		var series = initSeries([0, 1, 2], ['A', 'B', 'C']);
