@@ -1112,17 +1112,17 @@ Series.prototype.inflate = function (selector) {
 		}
 	}
 
-	//todo: make this lazy.
-	//todo: need a better implementation.
-
 	var DataFrame = require('./dataframe');
 	return new DataFrame({
 			columnNames: ["__gen__"],
-			rows: E.from(self.toValues())
-				.select(function (value) {
-					return [value];
-				})
-				.toArray(),
+			rows: function () {
+				return new SelectIterator(
+					self.getIterator(),
+					function (value) {
+						return [value];
+					}
+				);
+			},
 			index: self.getIndex(),
 		})
 		.select(function (row) {
