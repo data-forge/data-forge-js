@@ -1097,7 +1097,7 @@ Series.prototype.reverse = function () {
 /** 
  * Inflate a series to a data-frame.
  *
- * @param {function} selector - Selector function that transforms each value in the series to a row in the new data-frame.
+ * @param {function} [selector] - Optional selector function that transforms each value in the series to a row in the new data-frame.
  */
 Series.prototype.inflate = function (selector) {
 

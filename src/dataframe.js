@@ -15,6 +15,7 @@ var SelectIterator = require('../src/iterators/select');
 var TakeIterator = require('../src/iterators/take');
 var TakeWhileIterator = require('../src/iterators/take-while');
 var utils = require('./utils');
+var extend = require('extend');
 
 var assert = require('chai').assert; 
 var E = require('linq');
@@ -1769,6 +1770,23 @@ DataFrame.prototype.deflate = function (selector) {
 		.toArray();
 
 	return new Series({ values: newValues, index: self.getIndex() });
+};
+
+/** 
+ * Inflate a named column in the data-frame to 1 or more new columns.
+ *
+ * @param {string|int} columnNameOrIndex - Name or index of the column to retreive.
+ * @param {function} [selector] - Selector function that transforms each value in the column to new columns.
+ */
+DataFrame.prototype.inflateColumn = function (columnNameOrIndex, selector) {
+
+	var self = this;
+	var dataForge = require('../index');
+	return self.zip(self.getSeries(columnNameOrIndex).inflate(selector),
+		function (row1, row2) {
+			return extend({}, row1, row2); //todo: this should zip's default operation.
+		}
+	);
 };
 
 /** 

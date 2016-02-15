@@ -2249,4 +2249,23 @@ describe('DataFrame', function () {
 			[4, 6, 5],
 		]);
 	})
+
+
+	it('can inflate column to new columns', function () {
+
+		var dataFrame = initDataFrame(
+			["a", "b"], 
+			[
+				[1, { X: 2, Y: 3 }], 
+				[4, { X: 5, Y: 6 }],
+			]
+		);
+
+		var inflated = dataFrame.inflateColumn("b");
+		expect(inflated.getColumnNames()).to.eql(["a", "b", "X", "Y"]);
+		expect(inflated.toValues()).to.eql([
+			[1, { X: 2, Y: 3 }, 2, 3],
+			[4, { X: 5, Y: 6 }, 5, 6],
+		]);
+	});
 });
