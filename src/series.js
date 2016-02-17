@@ -15,6 +15,7 @@ var SkipWhileIterator = require('./iterators/skip-while');
 var TakeIterator = require('../src/iterators/take');
 var TakeWhileIterator = require('../src/iterators/take-while');
 var SelectIterator = require('../src/iterators/select');
+var SelectManyIterator = require('../src/iterators/select-many');
 var MultiIterator = require('../src/iterators/multi');
 var WhereIterator = require('../src/iterators/where');
 
@@ -283,23 +284,28 @@ Series.prototype.selectMany = function (selector) {
 
 	return new Series({
 		values: function () {
-			lazyEvaluate();
-			return new ArrayIterator(newValues);
+			return new SelectManyIterator(self.getIterator(), selector);
 		},
 		index: new Index(function () {
-			lazyEvaluate();
-			var indexValues = E.from(newIndexAndNewValues)
-				.selectMany(function (data) {
-					var index = data[0];
-					var values = data[1];
-					return E.range(0, values.length)
-						.select(function (_) {
-							return index;
-						})
-						.toArray();
-				})
-				.toArray();
-			return new ArrayIterator(indexValues);
+			return new SelectIterator(
+					new SelectManyIterator(
+						new MultiIterator([self.getIndex().getIterator(), self.getIterator()]),
+						function (pair) {
+							var newValues = selector(pair[1]);
+							return E.from(newValues)
+								.select(function (value) {
+									return [
+										pair[0], // Index
+										value
+									];
+								})
+								.toArray();
+						}
+					),
+					function (pair) {
+						return pair[0]; // Index.
+					}
+			);
 		}),
 	}); 	
 };

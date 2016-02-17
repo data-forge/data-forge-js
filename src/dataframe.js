@@ -12,6 +12,7 @@ var SkipIterator = require('./iterators/skip');
 var SkipWhileIterator = require('./iterators/skip-while');
 var BabyParse = require('babyparse');
 var SelectIterator = require('../src/iterators/select');
+var SelectManyIterator = require('../src/iterators/select-many');
 var TakeIterator = require('../src/iterators/take');
 var TakeWhileIterator = require('../src/iterators/take-while');
 var WhereIterator = require('../src/iterators/where');
@@ -528,63 +529,32 @@ DataFrame.prototype.selectMany = function (selector) {
 
 	var self = this;
 
-	var newColumnNames = null;
-	var newValues = null;
-	var newRows = null;
-
-	//todo: this needs to peek at the first row, to determine the new column names.
-
-	newValues = E.from(self.getIndex().toValues())
-		.zip(self.toValues(), function (index, row) {
-			return [index, selector(mapRowByColumns(self, row))];
-		})
-		.toArray();
-
-	newColumnNames = E.from(newValues)
-		.selectMany(function (data) {
-			var values = data[1];
-			return E.from(values)
-				.selectMany(function (value) {
-					return Object.keys(value);
-				})
-				.toArray();
-		})
-		.distinct()
-		.toArray();
-
-	newRows = E.from(newValues)
-		.selectMany(function (data) {
-			var values = data[1];
-			return E.from(values)
-				.select(function (value) {
-					return E.from(newColumnNames)
-						.select(function (columnName) {
-							return value[columnName];
-						})
-						.toArray();
-				})
-				.toArray();
-		})
-		.toArray();
-
 	return new DataFrame({
-		columnNames: newColumnNames,
 		rows: function () {
-			return new ArrayIterator(newRows);
+			return new SelectManyIterator(self.getIterator(), function (row) {
+					return selector(mapRowByColumns(self, row));
+				})
 		},
 		index: new Index(function () {
-			var indexValues = E.from(newValues)
-				.selectMany(function (data) {
-					var index = data[0];
-					var values = data[1];
-					return E.range(0, values.length)
-						.select(function (_) {
-							return index;
-						})
-						.toArray();
-				})
-				.toArray();
-			return new ArrayIterator(indexValues);
+			return new SelectIterator(
+					new SelectManyIterator(
+						new MultiIterator([self.getIndex().getIterator(), self.getIterator()]),
+						function (pair) {
+							var newValues = selector(pair[1]);
+							return E.from(newValues)
+								.select(function (value) {
+									return [
+										pair[0], // Index
+										value
+									];
+								})
+								.toArray();
+						}
+					),
+					function (pair) {
+						return pair[0]; // Index.
+					}
+			);
 		}),
 	}); 	
 };
