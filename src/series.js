@@ -16,6 +16,7 @@ var TakeIterator = require('../src/iterators/take');
 var TakeWhileIterator = require('../src/iterators/take-while');
 var SelectIterator = require('../src/iterators/select');
 var MultiIterator = require('../src/iterators/multi');
+var WhereIterator = require('../src/iterators/where');
 
 /**
  * Represents a time series.
@@ -211,46 +212,21 @@ Series.prototype.where = function (filterSelectorPredicate) {
 	assert.isFunction(filterSelectorPredicate, "Expected 'filterSelectorPredicate' parameter to 'where' function to be a function.");
 
 	var self = this;
-
-	var cachedFilteredIndexAndValues = null;
-
-	//
-	// Lazy  execute the filtering.
-	//
-	var executeLazyWhere = function () { //todo: make this properly lazy.
-
-		if (cachedFilteredIndexAndValues) {
-			return cachedFilteredIndexAndValues;
-		}
-
-		cachedFilteredIndexAndValues = E
-			.from(self.getIndex().toValues())
-			.zip(self.toValues(), function (index, value) {
-				return [index, value];
-			})
-			.where(function (data) {
-				var value = data[1];
-				return filterSelectorPredicate(value);
-			})
-			.toArray();
-		return cachedFilteredIndexAndValues;
-	};
-
 	return new Series({
 		values: function () {
-			return new ArrayIterator(E.from(executeLazyWhere())
-				.select(function (data) {
-					return data[1]; // Value
-				})
-				.toArray()
-			);
+			return new WhereIterator(self.getIterator(), filterSelectorPredicate);
 		},
 		index: new Index(function () {
-			return new ArrayIterator(E.from(executeLazyWhere())
-				.select(function (data) {
-					return data[0]; // Index
-				})
-				.toArray()
+			return new SelectIterator(
+				new WhereIterator(
+					new MultiIterator([self.getIndex().getIterator(), self.getIterator()]), 
+					function (pair) {
+						return filterSelectorPredicate(pair[1]);
+					}
+				),
+				function (pair) {
+					return pair[0];
+				}
 			);
 		}),
 	}); 	

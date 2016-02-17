@@ -14,6 +14,7 @@ var BabyParse = require('babyparse');
 var SelectIterator = require('../src/iterators/select');
 var TakeIterator = require('../src/iterators/take');
 var TakeWhileIterator = require('../src/iterators/take-while');
+var WhereIterator = require('../src/iterators/where');
 var utils = require('./utils');
 var extend = require('extend');
 
@@ -444,58 +445,12 @@ DataFrame.prototype.where = function (filterSelectorPredicate) {
 	assert.isFunction(filterSelectorPredicate, "Expected 'filterSelectorPredicate' parameter to 'where' function to be a function.");
 
 	var self = this;
-
-	var cachedFilteredIndexAndValues = null;
-
-	//
-	// Lazy execute the filtering.
-	//
-	var executeLazyWhere = function () {
-
-		if (cachedFilteredIndexAndValues) {
-			return cachedFilteredIndexAndValues;
-		}
-
-		cachedFilteredIndexAndValues = E
-			.from(self.getIndex().toValues())
-			.zip(self.toValues(), function (index, values) {
-				return [index, values];
-			})
-			.where(function (data) {
-				var row = data[1];
-				return filterSelectorPredicate(mapRowByColumns(self, row));
-			})
-			.toArray();
-		return cachedFilteredIndexAndValues;
-	}
-
 	return new DataFrame({
 		columnNames: self.getColumnNames(),
 		rows: function () {
-			var iterator = self.getIterator();
-
-			return {
-				moveNext: function () {
-					for (;;) {
-						if (!iterator.moveNext()) {
-							return false;
-						}
-
-						var row = iterator.getCurrent();
-						if (filterSelectorPredicate(mapRowByColumns(self, row))) {
-							return true;
-						}
-					}
-				},
-
-				getCurrent: function () {
-					return iterator.getCurrent();
-				},
-
-				getCurrentIndex: function () {
-					return iterator.getCurrentIndex();
-				},
-			};
+			return new WhereIterator(self.getIterator(), function (row) {
+					return filterSelectorPredicate(mapRowByColumns(self, row));
+				});
 		},
 		index: new Index(function () {
 			var multiIterator = new MultiIterator([self.getIndex().getIterator(), self.getIterator()]);
