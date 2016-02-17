@@ -23,6 +23,10 @@ var TakeIterator = function (iterator, takeAmount) {
 	self.getCurrent = function () {
 		return iterator.getCurrent();
 	};
+
+	self.getCurrentIndex = function () {
+		return iterator.getCurrentIndex();
+	};
 };
 
 module.exports = TakeIterator;

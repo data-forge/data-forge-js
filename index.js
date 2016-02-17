@@ -258,13 +258,17 @@ var dataForge = {
 
 					var i = -1;
 
-					return {
+					return { //todo: should have a range iterator.
 						moveNext: function () {
 							return ++i < count;
 						},
 
 						getCurrent: function () {
 							return start + i;
+						},
+
+						getCurrentIndex: function () {
+							return i;
 						},
 					};
 				},

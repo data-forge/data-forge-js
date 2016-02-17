@@ -51,6 +51,19 @@ var MultiIterator = function (iterators) {
 		}
 	};
 
+	self.getCurrentIndex = function () {
+		if (ok) {
+			return E.from(iterators)
+				.select(function (iterator) {
+					return iterator.getCurrentIndex();
+				})
+				.toArray();
+		}
+		else {
+			return undefined;
+		}
+	};
+
 	//
 	// Bake the iterator into an array.
 	//

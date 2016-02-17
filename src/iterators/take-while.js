@@ -11,30 +11,33 @@ var TakeWhileIterator = function (iterator, predicate) {
 	validateIterator(iterator);
 	assert.isFunction(predicate);
 
+	var self = this;
 	var taking = true;
-	return {
-		moveNext: function () {
-			if (!taking) {
-				return false;
-			}
 
-			if (!iterator.moveNext()) {
-				return false;
-			}
+	self.moveNext = function () {
+		if (!taking) {
+			return false;
+		}
 
-			if (!predicate(iterator.getCurrent())) {
-				taking = false;
-				return false;
-			}
+		if (!iterator.moveNext()) {
+			return false;
+		}
 
-			return true;
-		},
+		if (!predicate(iterator.getCurrent())) {
+			taking = false;
+			return false;
+		}
 
-		getCurrent: function () {
-			return iterator.getCurrent();
-		},
+		return true;
 	};
 
+	self.getCurrent = function () {
+		return iterator.getCurrent();
+	};
+
+	self.getCurrentIndex = function () {
+		return iterator.getCurrentIndex();
+	};
 };
 
 module.exports = TakeWhileIterator;

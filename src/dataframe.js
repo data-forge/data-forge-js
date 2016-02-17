@@ -491,6 +491,10 @@ DataFrame.prototype.where = function (filterSelectorPredicate) {
 				getCurrent: function () {
 					return iterator.getCurrent();
 				},
+
+				getCurrentIndex: function () {
+					return iterator.getCurrentIndex();
+				},
 			};
 		},
 		index: new Index(function () {
@@ -512,6 +516,10 @@ DataFrame.prototype.where = function (filterSelectorPredicate) {
 
 				getCurrent: function () {
 					return multiIterator.getCurrent()[0];
+				},
+
+				getCurrentIndex: function () {
+					return multiIterator.getCurrentIndex()[0];
 				},
 			};
 		}),
@@ -724,6 +732,10 @@ DataFrame.prototype.subset = function (columnNames) {
 							return currentValue[columnIndex];					
 						})
 						.toArray();
+				},
+
+				getCurrentIndex: function () {
+					return iterator.getCurrentIndex();
 				},
 			};
 		},
@@ -962,6 +974,10 @@ DataFrame.prototype.dropColumn = function (columnOrColumns) {
 							return columnIndices.indexOf(columnIndex) < 0;
 						})
 						.toArray();
+				},
+
+				getCurrentIndex: function () {
+					return iterator.getCurrentIndex();
 				},
 			};
 		},

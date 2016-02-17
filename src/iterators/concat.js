@@ -50,6 +50,15 @@ var MultiIterator = function (iterators) {
 			return undefined;
 		}
 	};
+
+	self.getCurrentIndex = function () {
+		if (curIterator >= 0) {
+			return iterators[curIterator].getCurrentIndex();
+		}
+		else {
+			return undefined;
+		}
+	};
 };
 
 module.exports = MultiIterator;

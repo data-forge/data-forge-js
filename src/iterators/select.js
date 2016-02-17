@@ -23,6 +23,10 @@ var SelectIterator = function (iterator, selector) {
 		return selector(iterator.getCurrent());
 	};
 
+	self.getCurrentIndex = function () {
+		return iterator.getCurrentIndex();
+	};
+
 	//
 	// Bake the iterator into an array.
 	//

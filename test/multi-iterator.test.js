@@ -28,6 +28,10 @@ describe('multi iterator', function () {
 			getCurrent: function () {
 				return null;
 			},
+
+			getCurrentIndex: function () {
+				return 0;
+			},
 		};
 
 		var multi = new MultiIterator([mockIterator, mockIterator]);
@@ -44,6 +48,10 @@ describe('multi iterator', function () {
 			getCurrent: function () {
 				return null;
 			},
+
+			getCurrentIndex: function () {
+				return 0;
+			},
 		};
 
 		var mockIterator2 = {
@@ -53,6 +61,10 @@ describe('multi iterator', function () {
 
 			getCurrent: function () {
 				return null;
+			},
+
+			getCurrentIndex: function () {
+				return 0;
 			},
 		};
 
@@ -69,6 +81,10 @@ describe('multi iterator', function () {
 			getCurrent: function () {
 				return null;
 			},
+
+			getCurrentIndex: function () {
+				return 0;
+			},
 		};
 
 		var mockIterator2 = {
@@ -78,6 +94,10 @@ describe('multi iterator', function () {
 
 			getCurrent: function () {
 				return null;
+			},
+
+			getCurrentIndex: function () {
+				return 0;
 			},
 		};
 

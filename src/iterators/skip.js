@@ -23,6 +23,10 @@ var SkipIterator = function (iterator, skipAmount) {
 	self.getCurrent = function () {
 		return iterator.getCurrent();
 	};
+
+	self.getCurrentIndex = function () {
+		return iterator.getCurrentIndex();
+	};
 };
 
 module.exports = SkipIterator;

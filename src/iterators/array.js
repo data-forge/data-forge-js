@@ -25,6 +25,15 @@ var ArrayIterator = function (arr) {
 		}		
 	};
 
+	self.getCurrentIndex = function () {
+		if (rowIndex >= 0 && rowIndex < arr.length) {
+			return rowIndex;
+		}
+		else {
+			return undefined;
+		}
+	}
+
 	//
 	// Bake the iterator into an array.
 	//
