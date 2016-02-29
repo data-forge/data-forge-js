@@ -974,11 +974,11 @@ DataFrame.prototype.setIndex = function (columnNameOrIndex) {
 	return new DataFrame({
 		columnNames: self.getColumnNames(),
 		rows: function () {
-			return self.getIterator();
+			return new ApplyIndexIterator(
+					self.getIterator(),
+					self.getSeries(columnNameOrIndex).getIterator()
+				);
 		},
-		index: new Index(function () {
-			return self.getSeries(columnNameOrIndex).getIterator();
-		}),
 	});
 };
 
