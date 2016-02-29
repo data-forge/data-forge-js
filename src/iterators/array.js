@@ -5,8 +5,14 @@ var assert = require('chai').assert;
 //
 // Data-forge enumerator for iterating a standard JavaScript array.
 //
-var ArrayIterator = function (arr) {
+var ArrayIterator = function (arr, index) {
 	assert.isArray(arr);
+
+	if (index) {
+		assert.isArray(index);
+
+		assert(arr.length == index.length, "Expect value array and index array to be the same length.");
+	}
 
 	var self = this;
 
@@ -27,7 +33,12 @@ var ArrayIterator = function (arr) {
 
 	self.getCurrentIndex = function () {
 		if (rowIndex >= 0 && rowIndex < arr.length) {
-			return rowIndex;
+			if (index) {
+				return index[rowIndex];
+			}
+			else {
+				return rowIndex;
+			}
 		}
 		else {
 			return undefined;

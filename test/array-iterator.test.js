@@ -75,4 +75,15 @@ describe('array iterator', function () {
 		testObject.moveNext();
 		expect(testObject.getCurrentIndex()).to.be.undefined;
 	});
+
+	it('can specify index', function () {
+
+		var testObject = new ArrayIterator([1, 2, 3], [5, 6, 7]);
+		testObject.moveNext();
+		expect(testObject.getCurrentIndex()).to.eql(5);
+		testObject.moveNext();
+		expect(testObject.getCurrentIndex()).to.eql(6);
+		testObject.moveNext();
+		expect(testObject.getCurrentIndex()).to.eql(7);
+	});
 });
