@@ -17,6 +17,7 @@ var TakeIterator = require('../src/iterators/take');
 var TakeWhileIterator = require('../src/iterators/take-while');
 var WhereIterator = require('../src/iterators/where');
 var ApplyIndexIterator = require('../src/iterators/apply-index');
+var CountIterator = require('../src/iterators/count');
 var utils = require('./utils');
 var extend = require('extend');
 
@@ -991,11 +992,11 @@ DataFrame.prototype.resetIndex = function () {
 	return new DataFrame({
 		columnNames: self.getColumnNames(),
 		rows: function () {
-			return self.getIterator();
+			return new ApplyIndexIterator(
+					self.getIterator(),
+					new CountIterator()
+				)
 		},
-		index: new Index(function () { //todo: broad-cast index
-			return new ArrayIterator(E.range(0, self.toValues().length).toArray());
-		}),
 	});
 };
 
