@@ -319,21 +319,18 @@ var executeOrderBy = function (self, batch) {
 	return new Series({
 		values: function () {
 			return new ArrayIterator(
-				E.from(executeLazySort())
-					.select(function (row) {
-						return row[1]; // Extract the value (minus the index) from the sorted data.					
-					})
-					.toArray()
+					E.from(executeLazySort())
+						.select(function (row) {
+							return row[1]; // Extract the value (minus the index) from the sorted data.					
+						})
+						.toArray(),
+					E.from(executeLazySort())
+						.select(function (row) {
+							return row[0]; // Extract the index from the sorted data.
+						})
+						.toArray()						
 				);
 		},
-		index: new Index(function () {
-			return new ArrayIterator(E.from(executeLazySort())
-				.select(function (row) {
-					return row[0]; // Extract the index from the sorted data.
-				})
-				.toArray()
-			);
-		}),
 	});
 };
 
