@@ -643,22 +643,20 @@ var executeOrderBy = function (self, batch) {
 	return new DataFrame({
 		columnNames: self.getColumnNames(),
 		rows: function () {
+			var sorted = executeLazySort();
 			return new ArrayIterator(
 					E.from(executeLazySort())
 						.select(function (row) {
 							return E.from(row).skip(1).toArray(); // Extract the values (minus the index) from the sorted data.					
 						})
+						.toArray(),
+					E.from(executeLazySort())
+						.select(function (row) {
+							return row[0]; // Extract the index from the sorted data.
+						})
 						.toArray()
-			);
+				);
 		},
-		index: new Index(function () {
-			return new ArrayIterator(E.from(executeLazySort())
-					.select(function (row) {
-						return row[0]; // Extract the index from the sorted data.
-					})
-					.toArray()
-			);
-		}),
 	});
 };
 
