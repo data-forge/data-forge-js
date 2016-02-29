@@ -113,7 +113,6 @@ Series.prototype.skip = function (numRows) {
 		values: function () {
 			return new SkipIterator(self.getIterator(), numRows);
 		},		
-		index: self.getIndex().skip(numRows),
 	}); 	
 };
 
@@ -130,20 +129,6 @@ Series.prototype.skipWhile = function (predicate) {
 		values: function () {
 			return new SkipWhileIterator(self.getIterator(), predicate);
 		},
-		index: new Index(function () {
-			var multiIterator = new MultiIterator([self.getIndex().getIterator(), self.getIterator()]);
-			return new SelectIterator(
-					new SkipWhileIterator(
-						multiIterator, 
-						function (pair) {
-							return predicate(pair[1]);
-						}
-					),
-					function (pair) {
-						return pair[0];
-					}
-				);
-		}),
 	}); 	
 };
 
@@ -172,7 +157,6 @@ Series.prototype.take = function (numRows) {
 		values: function () {
 			return new TakeIterator(self.getIterator(), numRows);
 		},
-		index: self.getIndex().take(numRows),
 	});
 };
 
@@ -189,20 +173,6 @@ Series.prototype.takeWhile = function (predicate) {
 		values: function () {
 			return new TakeWhileIterator(self.getIterator(), predicate);
 		},
-		index: new Index(function () {
-			var multiIterator = new MultiIterator([self.getIndex().getIterator(), self.getIterator()]);
-			return new SelectIterator(
-					new TakeWhileIterator(
-						multiIterator, 
-						function (pair) {
-							return predicate(pair[1]);
-						}
-					),
-					function (pair) {
-						return pair[0];
-					}
-				);
-		}),
 	}); 	
 };
 
@@ -231,19 +201,6 @@ Series.prototype.where = function (filterSelectorPredicate) {
 		values: function () {
 			return new WhereIterator(self.getIterator(), filterSelectorPredicate);
 		},
-		index: new Index(function () {
-			return new SelectIterator(
-				new WhereIterator(
-					new MultiIterator([self.getIndex().getIterator(), self.getIterator()]), 
-					function (pair) {
-						return filterSelectorPredicate(pair[1]);
-					}
-				),
-				function (pair) {
-					return pair[0];
-				}
-			);
-		}),
 	}); 	
 };
 
@@ -260,7 +217,6 @@ Series.prototype.select = function (selector) {
 		values: function () {
 			return new SelectIterator(self.getIterator(), selector);
 		},		
-		index: self.getIndex(),
 	}); 	
 };
 
@@ -300,27 +256,6 @@ Series.prototype.selectMany = function (selector) {
 		values: function () {
 			return new SelectManyIterator(self.getIterator(), selector);
 		},
-		index: new Index(function () {
-			return new SelectIterator(
-					new SelectManyIterator(
-						new MultiIterator([self.getIndex().getIterator(), self.getIterator()]),
-						function (pair) {
-							var newValues = selector(pair[1]);
-							return E.from(newValues)
-								.select(function (value) {
-									return [
-										pair[0], // Index
-										value
-									];
-								})
-								.toArray();
-						}
-					),
-					function (pair) {
-						return pair[0]; // Index.
-					}
-			);
-		}),
 	}); 	
 };
 
@@ -596,9 +531,6 @@ Series.prototype.window = function (period, selector) {
 					values: function () {
 						return new TakeIterator(new SkipIterator(self.getIterator(), windowIndex*period), period);
 					},
-					index: new Index(function () {
-						return new TakeIterator(new SkipIterator(self.getIndex().getIterator(), windowIndex*period), period);
-					}),
 				});			
 			return selector(_window, windowIndex);
 		})
@@ -613,14 +545,6 @@ Series.prototype.window = function (period, selector) {
 				.toArray()
 			);
 		},
-		index: new Index(function () {
-			return new ArrayIterator(E.from(newIndexAndValues)
-				.select(function (indexAndValue) {
-					return indexAndValue[0];
-				})
-				.toArray()
-			);
-		}),
 	});	
 };
 
@@ -657,9 +581,6 @@ Series.prototype.rollingWindow = function (period, selector) {
 					values: function () {
 						return new TakeIterator(new SkipIterator(self.getIterator(), windowIndex), period);
 					},
-					index: new Index(function () {
-						return new TakeIterator(new SkipIterator(self.getIndex().getIterator(), windowIndex), period);
-					}),
 				});			
 			return selector(_window, windowIndex);
 		})
@@ -1124,7 +1045,6 @@ Series.prototype.inflate = function (selector) {
 					}
 				);
 			},
-			index: self.getIndex(),
 		})
 		.select(function (row) {
 			return selector(row.__gen__);
