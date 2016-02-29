@@ -505,7 +505,6 @@ describe('Series', function () {
 		var series = initSeries([10], [5]);
 		var parsed = series.parseInts();
 
-		expect(parsed.getIndex().toValues()).to.eql([10]);
 		expect(function () { 
 			parsed.toValues();
 		}).to.throw();
@@ -543,7 +542,6 @@ describe('Series', function () {
 		var series = initSeries([10], [5]);
 		var parsed = series.parseFloats();
 
-		expect(parsed.getIndex().toValues()).to.eql([10]);
 		expect(function () { 
 			parsed.toValues();
 		}).to.throw();
@@ -581,7 +579,6 @@ describe('Series', function () {
 		var series = initSeries([10], [5]);
 		var parsed = series.parseDates();
 
-		expect(parsed.getIndex().toValues()).to.eql([10]);
 		expect(function () { 
 			parsed.toValues();
 		}).to.throw();
@@ -930,7 +927,7 @@ describe('Series', function () {
 
 	it('can convert to javascript object - with duplicate keys', function () {
 
-		var series = initSeries([0, 1], [
+		var series = initSeries([0, 1, 2], [
 			{
 				Key: 'A',
 				Value: 100,

@@ -317,7 +317,12 @@ var dataForge = {
 			rows: function () {
 				var dataFrameIterators = E.from(dataFrames)
 					.select(function (dataFrame) {
-						return dataFrame.getObjectsIterator();
+						return new SelectIterator(
+								dataFrame.getIterator(),
+								function (row) {
+									return dataFrame._mapRowByColumns(row); //fio:
+								}
+							);
 					})
 					.toArray();
 

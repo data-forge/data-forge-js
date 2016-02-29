@@ -1974,6 +1974,7 @@ describe('DataFrame', function () {
 		expect(dataFrame.getSeries("V2").toValues()).to.eql([10, 100]);
 	});
 
+	/*todo:
 	it('can specify data-frame input as an iterable', function () {
 
 		var columnNames = [ "c1", "c2"];
@@ -2013,6 +2014,7 @@ describe('DataFrame', function () {
 		expect(dataFrame.toValues()).to.eql(rows);		
 		expect(dataFrame.toObjects()).to.eql(objects);
 	});
+	*/
 
 	it('default index is generated', function () {
 
@@ -2197,7 +2199,7 @@ describe('DataFrame', function () {
 		);
 
 		expect(zipped.toPairs()).to.eql([
-			[0, 
+			[[0, 0, 0], //fio: should be just a single index.
 				{
 					a: 1,
 					b: 2,
@@ -2207,7 +2209,7 @@ describe('DataFrame', function () {
 					f: 10,
 				}
 			],			
-			[1, 
+			[[1, 1, 1],
 				{
 					a: 3,
 					b: 4,

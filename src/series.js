@@ -18,6 +18,7 @@ var SelectIterator = require('../src/iterators/select');
 var SelectManyIterator = require('../src/iterators/select-many');
 var MultiIterator = require('../src/iterators/multi');
 var WhereIterator = require('../src/iterators/where');
+var ApplyIndexIterator = require('../src/iterators/apply-index');
 
 /**
  * Represents a time series.
@@ -25,6 +26,7 @@ var WhereIterator = require('../src/iterators/where');
 var Series = function (config) {
 
 	var self = this;
+	var index;
 
 	if (config) {
 
@@ -46,28 +48,23 @@ var Series = function (config) {
 		if (config.index) {
 			assert.isObject(config.index, "Expected 'index' parameter to Series constructor to be an object.");
 
-			self._index = config.index;
-		}
-		else {
-			// Generate the index.
-			self._index = new Index(function () {
-					var iterator = self._iterable();
-					var length = 0;
-					while (iterator.moveNext()) {
-						++length;
-					}
-					return new ArrayIterator(E.range(0, length).toArray());
-				});
+			index = config.index;
 		}
 	}
 	else {
 		self._iterable = function () {
 			return new ArrayIterator([]);
 		};
-		self._index = new Index([]);
 	}
 
 	assert.isFunction(self._iterable);
+
+	if (index) { //todo: phase this out.
+		var oldIterable = self._iterable;
+		self._iterable = function () {
+			return new ApplyIndexIterator(oldIterable(), index.getIterator());
+		}
+	}
 };
 
 /**
@@ -83,7 +80,24 @@ Series.prototype.getIterator = function () {
  */
 Series.prototype.getIndex = function () {
 	var self = this;
-	return self._index;
+	return new Index(function () {		
+		var iterator = self.getIterator();
+		var i = -1;
+		return {
+			moveNext: function () {
+				++i;
+				return iterator.moveNext();
+			},
+
+			getCurrent: function () {
+				return iterator.getCurrentIndex();
+			},
+
+			getCurrentIndex: function () {
+				return i;
+			},
+		};
+	});
 };
 
 /**
@@ -1004,11 +1018,16 @@ Series.prototype.bake = function () {
 Series.prototype.toPairs = function () {
 
 	var self = this;
-	return E.from(self.getIndex().toValues())
-		.zip(self.toValues(), function (index, value) {
-			return [index, value];
-		})
-		.toArray();
+	var iterator = self.getIterator();
+	validateIterator(iterator);
+
+	var pairs = [];
+
+	while (iterator.moveNext()) {
+		pairs.push([iterator.getCurrentIndex(), iterator.getCurrent()]);
+	}
+
+	return pairs;
 };
 
 /**
