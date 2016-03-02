@@ -26,57 +26,68 @@ var CountIterator = require('../src/iterators/count');
 var Series = function (config) {
 
 	var self = this;
-	var index;
 
-	if (config) {
+	if (config && config.iterable) {
+		assert.isFunction(config.iterable);
 
-		if (config.iterable) {
-			assert.isFunction(config.iterable);
+		self._iterable = config.iterable;
+		return;
+	}
 
-			self._iterable = config.iterable;
-			return;
-		}
+	if (!config) {
+		self._iterable = function () {
+			return { //todo: this should empty iterator.
+				moveNext: function () {
+					return false;
+				},
 
-		if (!config.values) {
-			throw new Error("Expected 'values' field to be set on 'config' parameter to Series constructor.");
-		}
-
-		if (Object.isFunction(config.values)) {
-			self._iterable = config.values;
-		}
-		else {
-			assert.isArray(config.values, "Expected 'values' field of 'config' parameter to Series constructor be an array or an iterable.");
-
-			self._iterable = function () {
-				return new ArrayIterator(config.values);
+				getCurrent: function () {
+					return undefined;
+				},
 			};
-		}		
+		};
+		return;
+	}
 
-		if (config.index) {
-			assert.isObject(config.index, "Expected 'index' parameter to Series constructor to be an object.");
+	var index;
+	var values;
 
-			index = config.index;
+	if (!config.values) {
+		throw new Error("Expected 'values' field to be set on 'config' parameter to Series constructor.");
+	}
+
+	if (Object.isFunction(config.values)) {
+		values = config.values;
+	}
+	else {
+		assert.isArray(config.values, "Expected 'values' field of 'config' parameter to Series constructor be an array or an iterable.");
+
+		var valuesArray = config.values;
+
+		values = function () {
+			return new ArrayIterator(valuesArray);
+		};
+	}		
+
+	if (config.index) {
+		assert.isObject(config.index, "Expected 'index' parameter to Series constructor to be an object.");
+
+		index = function () {
+			return config.index.getIterator();
 		}
 	}
 	else {
-		self._iterable = function () {
-			return new ArrayIterator([]);
+		index = function () {
+			return new CountIterator();
 		};
 	}
 
-	assert.isFunction(self._iterable);
+	assert.isFunction(values);
+	assert.isFunction(index);
 
-	var oldIterable = self._iterable;
-	if (index) { //todo: phase this out.
-		self._iterable = function () {
-			return new MultiIterator([index.getIterator(), oldIterable()]);
-		};
-	}
-	else {
-		self._iterable = function () {
-			return new MultiIterator([new CountIterator(), oldIterable()]);
-		};
-	}
+	self._iterable = function () {
+		return new MultiIterator([index(), values()]);
+	};
 };
 
 /**
