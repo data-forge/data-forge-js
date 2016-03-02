@@ -814,14 +814,9 @@ DataFrame.prototype.dropColumn = function (columnOrColumns) {
 			})
 			.toArray(),		
 		iterable: function () {
-			var iterator = self.getIterator();
-			return {
-				moveNext: function () {
-					return iterator.moveNext();
-				},
-
-				getCurrent: function () {
-					var pair = iterator.getCurrent();
+			return new SelectIterator(
+				self.getIterator(),
+				function (pair) {
 					return [
 						pair[0],
 						E.from(pair[1])
@@ -829,9 +824,9 @@ DataFrame.prototype.dropColumn = function (columnOrColumns) {
 								return columnIndices.indexOf(columnIndex) < 0;
 							})
 							.toArray()
-					];
-				},
-			};
+					];					
+				}
+			);
 		},
 	});
 };
