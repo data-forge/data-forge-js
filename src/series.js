@@ -27,13 +27,6 @@ var Series = function (config) {
 
 	var self = this;
 
-	if (config && config.iterable) {
-		assert.isFunction(config.iterable);
-
-		self._iterable = config.iterable;
-		return;
-	}
-
 	if (!config) {
 		self._iterable = function () {
 			return { //todo: this should empty iterator.
@@ -46,6 +39,13 @@ var Series = function (config) {
 				},
 			};
 		};
+		return;
+	}
+
+	if (config && config.iterable) {
+		assert.isFunction(config.iterable);
+
+		self._iterable = config.iterable;
 		return;
 	}
 
