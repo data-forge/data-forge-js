@@ -42,29 +42,7 @@ describe('DataFrame', function () {
 		expect(dataFrame.getColumnIndex("Value3")).to.eql(3);
 	});
 
-	it('can specify columns by function', function ()  {
-
-		var columnNames = ["Column1", "Column2"];
-		var dataFrame = new DataFrame({
-				columnNames: function () {
-					return columnNames;
-				},
-				rows: [
-					[1],
-					[2]
-				],
-				index: new dataForge.Index([1, 2]),
-			});
-
-		expect(dataFrame.getColumnNames()).to.eql(columnNames);
-
-		var columns = dataFrame.getColumns();
-		expect(columns.length).to.eql(2);
-		expect(columns[0].name).to.eql(columnNames[0]);
-		expect(columns[1].name).to.eql(columnNames[1]);
-	});
-
-	it('can bake values from enumerator', function () {
+	it('can extract values', function () {
 
 		var dataFrame = initDataFrame(
 				[ "Date", "Value1", "Value2", "Value3" ],
@@ -1176,8 +1154,6 @@ describe('DataFrame', function () {
 				['A', 1],
 				['B', 2],
 		]);
-
-
 	});
 
 	it('can rename column - specified by name', function () {
@@ -1973,48 +1949,6 @@ describe('DataFrame', function () {
 		expect(dataFrame.getSeries("V1").toValues()).to.eql([1, 2]);
 		expect(dataFrame.getSeries("V2").toValues()).to.eql([10, 100]);
 	});
-
-	/*todo:
-	it('can specify data-frame input as an iterable', function () {
-
-		var columnNames = [ "c1", "c2"];
-
-		var rows = [
-			[1, 2],
-			[3, 4]
-		];
-		var mockRowsIterator = new ArrayIterator(rows);
-
-		var objects = [
-			{ c1: 1, c2: 2 },
-			{ c1: 2, c2: 3 },
-		];
-		var mockObjectsIterator = new ArrayIterator(objects);
-
-		var mockIterable = {
-
-			getColumnNames: function () {
-				return columnNames;
-			},
-
-			getRowsIterator: function () {
-				return mockRowsIterator;
-			},
-
-			getObjectsIterator: function () {
-				return mockObjectsIterator;
-			},
-		};
-
-		var dataFrame = new DataFrame({ iterable: mockIterable });
-
-		expect(dataFrame.getColumnNames()).to.eql(columnNames);
-		expect(dataFrame.getRowsIterator()).to.eql(mockRowsIterator);
-		expect(dataFrame.getObjectsIterator()).to.eql(mockObjectsIterator);
-		expect(dataFrame.toValues()).to.eql(rows);		
-		expect(dataFrame.toObjects()).to.eql(objects);
-	});
-	*/
 
 	it('default index is generated', function () {
 
