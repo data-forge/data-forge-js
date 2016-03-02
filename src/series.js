@@ -33,7 +33,7 @@ var Series = function (config) {
 		if (config.iterable) {
 			assert.isFunction(config.iterable);
 
-			self._iterable = config.iterable; //todo: test me.
+			self._iterable = config.iterable;
 			return;
 		}
 

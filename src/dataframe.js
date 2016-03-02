@@ -56,7 +56,7 @@ var DataFrame = function (config) {
 	var rows;
 	var index;
 
-	if (config && config.iterable) { //todo: test me.
+	if (config && config.iterable) {
 
 		assert.isFunction(config.iterable, "Expected 'iterable' field of 'config' parameter to DataFrame constructor to be a function that returns an index/value pairs iterator.");
 
