@@ -1200,7 +1200,7 @@ describe('DataFrame', function () {
 
 	it('renaming non-existing column has no effect', function () {
 
-		var columnNames = ["Column1", "Column2", "Column3"];
+		var columnNames = ["Column1", "Column2"];
 		var dataFrame = initDataFrame(
 				columnNames, 
 				[

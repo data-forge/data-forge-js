@@ -1003,37 +1003,10 @@ Series.prototype.inflate = function (selector) {
 		}
 	}
 
-	var iterable = function () {
-		return self.select(selector)
-			.getIterator();
-	};
-
-	var determineColumnNames = function () {
-		var iterator = iterable();
-		if (!iterator.moveNext()) {
-			return [];
-		}
-		return Object.keys(iterator.getCurrent()[1]);
-	};
-
 	var DataFrame = require('./dataframe');
 	return new DataFrame({
-		columnNames: determineColumnNames,
 		iterable: function () {
-			var newColumnNames = determineColumnNames();
-			return new SelectIterator(
-				iterable(),
-				function (pair) {
-					return [
-						pair[0],
-						E.from(newColumnNames)
-							.select(function (columnName) {
-								return pair[1][columnName];
-							})
-							.toArray(),
-					];
-				}
-			);
+			return self.select(selector).getIterator();
 		},
 	});
 };
