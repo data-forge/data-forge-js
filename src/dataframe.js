@@ -232,19 +232,12 @@ var DataFrame = function (config) {
 DataFrame.prototype.getIndex = function () {
 	var self = this;
 	return new Index(function () {		
-		var iterator = self.getIterator();
-		var i = -1;
-
-		return { //todo: just use a select iterator.
-			moveNext: function () {
-				++i;
-				return iterator.moveNext();
-			},
-
-			getCurrent: function () {
-				return iterator.getCurrent()[0]; // Extract the index.
-			},
-		};
+		return new SelectIterator(
+			self.getIterator(),
+			function (pair) {
+				return pair[0]; // Extract index.
+			}
+		);
 	});
 };
 
