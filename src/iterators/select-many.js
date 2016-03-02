@@ -55,10 +55,6 @@ var SelectManyIterator = function (iterator, selector) {
 		return childIterator.getCurrent();
 	};
 
-	self.getCurrentIndex = function () {
-		return expandIterator.getCurrentIndex();
-	};
-
 	//
 	// Bake the iterator into an array.
 	//

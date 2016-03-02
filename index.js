@@ -216,7 +216,7 @@ var dataForge = {
 
 		return new DataFrame({
 			columnNames: concatenateColumns(),
-			rows: function () {
+			iterable: function () {
 				var concatenatedColumns = concatenateColumns();
 				var iterators = E.from(dataFrames)
 					.select(function (dataFrame) {
@@ -228,17 +228,6 @@ var dataForge = {
 					.toArray()
 				return new ConcatIterator(iterators);
 			},
-			index: new Index(function () {
-				var indexIterators = E.from(dataFrames)
-					.select(function (dataFrame) {
-						return dataFrame.getIndex();
-					})
-					.select(function (index) {
-						return index.getIterator();
-					})
-					.toArray();
-				return new ConcatIterator(indexIterators);
-			}),
 		});
 	},
 
@@ -267,9 +256,6 @@ var dataForge = {
 							return start + i;
 						},
 
-						getCurrentIndex: function () {
-							return i;
-						},
 					};
 				},
 			});
@@ -286,19 +272,32 @@ var dataForge = {
 		assert.isArray(series, "Expected 'series' parameter to zipSeries to be an array of Series objects.");
 		assert.isFunction(selector, "Expected 'selector' parameter to zipSeries to be a function.");
 
+		//todo: make this lazy.
+
+		var seriesToZip = E.from(series)
+			.select(function (series) {
+				return series.toValues();
+			})
+			.toArray();
+
+		var length = E.from(seriesToZip).select(function (values) { 
+				return values.length; 
+			})
+			.min();
+
+		var output = [];
+
+		for (var i = 0; i < length; ++i) {
+			var curElements = E.from(seriesToZip)
+				.select(function (values) {
+					return values[i];
+				})
+				.toArray();
+			output.push(selector(curElements));
+		}
+
 		return new Series({
-			values: function () {
-				return new SelectIterator(
-					new MultiIterator(
-						E.from(series)
-							.select(function (series) {
-								return series.getIterator();
-							})
-							.toArray()
-					),
-					selector
-				);
-			},
+			values: output,
 		});
 	},
 
@@ -313,24 +312,32 @@ var dataForge = {
 		assert.isArray(dataFrames, "Expected 'dataFrames' parameter to zipDataFrames to be an array of Series objects.");
 		assert.isFunction(selector, "Expected 'selector' parameter to zipDataFrames to be a function.");
 
-		return new DataFrame({
-			rows: function () {
-				var dataFrameIterators = E.from(dataFrames)
-					.select(function (dataFrame) {
-						return new SelectIterator(
-								dataFrame.getIterator(),
-								function (row) {
-									return dataFrame._mapRowByColumns(row); //fio:
-								}
-							);
-					})
-					.toArray();
+		//todo: make this lazy.
 
-				return new SelectIterator(
-					new MultiIterator(dataFrameIterators),
-					selector
-				);
-			},
+		var dataFrameContents = E.from(dataFrames)
+			.select(function (dataFrame) {
+				return dataFrame.toObjects();
+			})
+			.toArray();
+
+		var length = E.from(dataFrameContents).select(function (objects) { 
+				return objects.length; 
+			})
+			.min();
+
+		var output = [];
+
+		for (var i = 0; i < length; ++i) {
+			var curElements = E.from(dataFrameContents)
+				.select(function (objects) {
+					return objects[i];
+				})
+				.toArray();
+			output.push(selector(curElements));
+		}
+
+		return new DataFrame({
+			rows: output,
 		});
 	},	
 };

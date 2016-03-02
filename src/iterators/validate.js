@@ -9,5 +9,4 @@ module.exports = function (iterator) {
 	assert.isObject(iterator, "Expected an 'iterator' object.");
 	assert.isFunction(iterator.moveNext, "Expected iterator to have function 'moveNext'.");
 	assert.isFunction(iterator.getCurrent, "Expected iterator to have function 'getCurrent'.");
-	assert.isFunction(iterator.getCurrentIndex, "Expected iterator to have function 'getCurrentIndex'.");
 };

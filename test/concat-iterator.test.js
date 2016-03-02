@@ -28,10 +28,6 @@ describe('concat iterator', function () {
 			getCurrent: function () {
 				return null;
 			},
-
-			getCurrentIndex: function () {
-				return 0;
-			},
 		};
 
 		var mockIterator2 = {
@@ -42,10 +38,6 @@ describe('concat iterator', function () {
 			getCurrent: function () {
 				return null;
 			},
-	
-			getCurrentIndex: function () {
-				return 0;
-			},	
 		};
 
 		var concat = new ConcatIterator([mockIterator1, mockIterator2]);

@@ -15,16 +15,15 @@ var SelectIterator = function (iterator, selector) {
 	validateIterator(iterator);
 	assert.isFunction(selector);
 
+	var i = -1; //todo: test this.
+
 	self.moveNext = function () {				
+		++i;
 		return iterator.moveNext();
 	};
 
 	self.getCurrent = function () {
-		return selector(iterator.getCurrent());
-	};
-
-	self.getCurrentIndex = function () {
-		return iterator.getCurrentIndex();
+		return selector(iterator.getCurrent(), i);
 	};
 
 	//

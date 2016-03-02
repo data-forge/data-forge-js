@@ -20,15 +20,6 @@ var CountIterator = function () {
 		}
 	};
 
-	self.getCurrentIndex = function () {
-		if (working < 0) {
-			return undefined;
-		}
-		else {
-			return working;
-		}
-	};
-
 };
 
 module.exports = CountIterator;

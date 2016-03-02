@@ -24,9 +24,6 @@ var TakeIterator = function (iterator, takeAmount) {
 		return iterator.getCurrent();
 	};
 
-	self.getCurrentIndex = function () {
-		return iterator.getCurrentIndex();
-	};
 };
 
 module.exports = TakeIterator;

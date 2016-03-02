@@ -16,10 +16,6 @@ describe('select iterator', function () {
 			getCurrent: function () {
 				return null;
 			},
-
-			getCurrentIndex: function () {
-				return 0;
-			},
 		};
 		
 		var select = new SelectIterator(mockIterator, function () {});
@@ -36,10 +32,6 @@ describe('select iterator', function () {
 			getCurrent: function () {
 				return null;
 			},
-
-			getCurrentIndex: function () {
-				return 0;
-			},		
 		};
 		var select = new SelectIterator(mockIterator, function () {});
 		expect(select.moveNext()).to.eql(false);
@@ -54,10 +46,6 @@ describe('select iterator', function () {
 
 			getCurrent: function () {
 				return null;
-			},
-
-			getCurrentIndex: function () {
-				return 0;
 			},
 		};
 
@@ -74,10 +62,6 @@ describe('select iterator', function () {
 
 			getCurrent: function () {
 				return null;
-			},
-
-			getCurrentIndex: function () {
-				return 0;
 			},
 		};
 
@@ -99,10 +83,6 @@ describe('select iterator', function () {
 
 			getCurrent: function () {
 				return original;
-			},
-
-			getCurrentIndex: function () {
-				return 0;
 			},
 		};
 

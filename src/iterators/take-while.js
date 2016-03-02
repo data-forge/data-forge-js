@@ -35,9 +35,6 @@ var TakeWhileIterator = function (iterator, predicate) {
 		return iterator.getCurrent();
 	};
 
-	self.getCurrentIndex = function () {
-		return iterator.getCurrentIndex();
-	};
 };
 
 module.exports = TakeWhileIterator;

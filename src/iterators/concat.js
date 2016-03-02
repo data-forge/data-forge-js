@@ -51,14 +51,6 @@ var MultiIterator = function (iterators) {
 		}
 	};
 
-	self.getCurrentIndex = function () {
-		if (curIterator >= 0) {
-			return iterators[curIterator].getCurrentIndex();
-		}
-		else {
-			return undefined;
-		}
-	};
 };
 
 module.exports = MultiIterator;

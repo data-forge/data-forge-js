@@ -305,13 +305,13 @@ describe('data-forge', function () {
 		);
 
 		expect(zipped.toPairs()).to.eql([
-			[[0, 0, 0],
+			[0,
 				0+10+100
 			],
-			[[1, 1, 1],
+			[1,
 				1+11+101
 			],
-			[[2, 2, 2],
+			[2,
 				2+12+102
 			],
 		]);
@@ -330,10 +330,10 @@ describe('data-forge', function () {
 		);
 
 		expect(zipped.toPairs()).to.eql([
-			[[0, 0, 0],
+			[0,
 				0+10+100
 			],
-			[[1, 1, 1],
+			[1,
 				1+11+101
 			],
 		]);
@@ -352,7 +352,7 @@ describe('data-forge', function () {
 		);
 
 		expect(zipped.toPairs()).to.eql([
-			[[0, 0, 0], //fio: should be just a single index.
+			[0,
 				{
 					a: 1,
 					b: 2,
@@ -362,7 +362,7 @@ describe('data-forge', function () {
 					f: 10,
 				}
 			],			
-			[[1, 1, 1],
+			[1,
 				{
 					a: 3,
 					b: 4,
@@ -388,7 +388,7 @@ describe('data-forge', function () {
 		);
 
 		expect(zipped.toPairs()).to.eql([
-			[[0, 0, 0], //fio: should be just a single index.
+			[0,
 				{
 					a: 1,
 					b: 2,

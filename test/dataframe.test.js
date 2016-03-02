@@ -2199,7 +2199,7 @@ describe('DataFrame', function () {
 		);
 
 		expect(zipped.toPairs()).to.eql([
-			[[0, 0, 0], //fio: should be just a single index.
+			[0,
 				{
 					a: 1,
 					b: 2,
@@ -2209,7 +2209,7 @@ describe('DataFrame', function () {
 					f: 10,
 				}
 			],			
-			[[1, 1, 1],
+			[1,
 				{
 					a: 3,
 					b: 4,

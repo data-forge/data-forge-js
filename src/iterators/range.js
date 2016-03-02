@@ -19,15 +19,6 @@ var RangeIterator = function (startIndex, count) {
 		}
 	};
 
-	self.getCurrentIndex = function () {
-		if (working < startIndex || working >= startIndex+count) {
-			return undefined;
-		}
-		else {
-			return working;
-		}
-	};
-
 };
 
 module.exports = RangeIterator;

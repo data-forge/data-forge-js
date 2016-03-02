@@ -24,9 +24,6 @@ var SkipIterator = function (iterator, skipAmount) {
 		return iterator.getCurrent();
 	};
 
-	self.getCurrentIndex = function () {
-		return iterator.getCurrentIndex();
-	};
 };
 
 module.exports = SkipIterator;
