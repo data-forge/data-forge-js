@@ -603,15 +603,9 @@ DataFrame.prototype.subset = function (columnNames) {
 				})
 				.toArray();
 
-			var iterator = self.getIterator();
-
-			return { //todo: can this be implemented in terms of an existing iterator?
-				moveNext: function () {
-					return iterator.moveNext();
-				},
-
-				getCurrent: function () {
-					var pair = iterator.getCurrent();
+			return new SelectIterator(
+				self.getIterator(),
+				function (pair) {
 					return [
 						pair[0],
 						E.from(columnIndices)
@@ -619,9 +613,9 @@ DataFrame.prototype.subset = function (columnNames) {
 								return pair[1][columnIndex];					
 							})
 							.toArray()
-					];
-				},
-			};
+					];					
+				}
+			);
 		},
 	});	 
 };
