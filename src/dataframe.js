@@ -87,14 +87,23 @@ var DataFrame = function (config) {
 
 		var iterable = config.iterable;
 
-		self._columnNames = function () {
-			var iterator = iterable();
-			if (!iterator.moveNext()) {
-				return [];
-			}
+		if (config.columnNames) {
+			if (!Object.isFunction(config.columnNames)) {
+				assert.isArray(config.columnNames, "Expected 'columnNames' field of 'config' parameter to DataFrame constructor to be an array of column names or function that returns an array of column names.");
+			};
 
-			return Object.keys(iterator.getCurrent()[1]);
-		};
+			self._columnNames = config.columnNames;
+		}
+		else {
+			self._columnNames = function () { //todo: could just make this the default behavior if no columns are specified ?!
+				var iterator = iterable();
+				if (!iterator.moveNext()) {
+					return [];
+				}
+
+				return Object.keys(iterator.getCurrent()[1]);
+			};
+		}
 		self._iterable = iterable;
 		return;
 	}

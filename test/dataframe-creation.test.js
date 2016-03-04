@@ -119,6 +119,48 @@ describe('dataframe creation', function () {
 		]);
 	});
 
+	it('can create from index/value iterable with specified column order', function () {
+		
+		var columnNames = ["c2", "c1"];
+		var dataFrame = new DataFrame({
+			columnNames: columnNames,
+			iterable: function () {
+				return new ArrayIterator([
+					[20, { c1: 1, c2: 2 }],
+					[21, { c1: 3, c2: 4 }],
+				]);
+			},
+		});
+
+		expect(dataFrame.getColumnNames()).to.eql(columnNames);
+		expect(dataFrame.toPairs()).to.eql([
+			[20, { c1: 1, c2: 2 }],
+			[21, { c1: 3, c2: 4 }],
+		]);
+	});
+
+	it('can create from index/value iterable with column order from function', function () {
+		
+		var columnNames = ["c2", "c1"];
+		var dataFrame = new DataFrame({
+			columnNames: function () {
+				return columnNames;
+			},
+			iterable: function () {
+				return new ArrayIterator([
+					[20, { c1: 1, c2: 2 }],
+					[21, { c1: 3, c2: 4 }],
+				]);
+			},
+		});
+
+		expect(dataFrame.getColumnNames()).to.eql(columnNames);
+		expect(dataFrame.toPairs()).to.eql([
+			[20, { c1: 1, c2: 2 }],
+			[21, { c1: 3, c2: 4 }],
+		]);
+	});
+
 	it('can create from rows iterable', function () {
 		
 		var columnNames = ["c1", "c2"];
