@@ -63,8 +63,9 @@ describe('DataFrame', function () {
 	});
 	
 	it('can skip', function () {
+		var columnNames = ["Date", "Value1", "Value2", "Value3"];
 		var dataFrame = initDataFrame(
-			[ "Date", "Value1", "Value2", "Value3" ],
+			columnNames,
 			[
 				[new Date(2011, 24, 2), 300, 'c', 3],
 				[new Date(1975, 24, 2), 200, 'b', 1],
@@ -74,6 +75,7 @@ describe('DataFrame', function () {
 			[5, 6, 7, 8]
 		);
 		var skipped = dataFrame.skip(2);		
+		expect(skipped.getColumnNames()).to.eql(columnNames);
 		expect(skipped.getIndex().toValues()).to.eql([7, 8]);
 		expect(skipped.toValues()).to.eql([
 			[new Date(2013, 24, 2), 20, 'c', 22],
