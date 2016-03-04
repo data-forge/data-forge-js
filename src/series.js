@@ -19,6 +19,7 @@ var SelectManyIterator = require('../src/iterators/select-many');
 var MultiIterator = require('../src/iterators/multi');
 var WhereIterator = require('../src/iterators/where');
 var CountIterator = require('../src/iterators/count');
+var EmptyIterator = require('../src/iterators/empty');
 
 /**
  * Represents a time series.
@@ -29,15 +30,7 @@ var Series = function (config) {
 
 	if (!config) {
 		self._iterable = function () {
-			return { //todo: this should empty iterator.
-				moveNext: function () {
-					return false;
-				},
-
-				getCurrent: function () {
-					return undefined;
-				},
-			};
+			return new EmptyIterator();
 		};
 		return;
 	}

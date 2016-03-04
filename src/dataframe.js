@@ -17,6 +17,7 @@ var TakeIterator = require('../src/iterators/take');
 var TakeWhileIterator = require('../src/iterators/take-while');
 var WhereIterator = require('../src/iterators/where');
 var CountIterator = require('../src/iterators/count');
+var EmptyIterator = require('../src/iterators/empty');
 var utils = require('./utils');
 var extend = require('extend');
 
@@ -26,7 +27,7 @@ var E = require('linq');
 var validateIterator = require('./iterators/validate');
 
 //
-// Help function to grab a column index from a 'column name or index' parameter.
+// Helper function to grab a column index from a 'column name or index' parameter.
 //
 var parseColumnNameOrIndexToIndex = function (dataFrame, columnNameOrIndex, failForNonExistantColumn) {
 
@@ -68,15 +69,7 @@ var DataFrame = function (config) {
 	if (!config) {
 		self._columnNames = [];
 		self._iterable = function () {
-			return { //todo: empty iterator.
-				moveNext: function () {
-					return false;
-				},
-
-				getCurrent: function () {
-					return undefined;
-				},
-			};
+			return new EmptyIterator();
 		};
 		return;
 	}
