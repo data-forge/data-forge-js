@@ -302,6 +302,19 @@ describe('DataFrame', function () {
 		]);
 	});
 
+	it('retreive a non-existing column results in an empty series', function () {
+
+		var dataFrame = new DataFrame({
+			columnNames: ["C1"],
+			rows: [
+				[1]
+			],
+		});
+
+		var series = dataFrame.getSeries("non-existing-column");
+		expect(series.toPairs()).to.eql([]);
+	});
+
 	it('can retreive columns', function () {
 		
 		var dataFrame = initDataFrame(
