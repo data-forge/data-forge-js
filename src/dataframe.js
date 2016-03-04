@@ -1621,8 +1621,13 @@ DataFrame.prototype.reverse = function () {
 		columnNames: function () {
 			return self.getColumnNames();
 		},
-		rows: E.from(self.toValues()).reverse().toArray(),
-		index: self.getIndex().reverse() //todo: should iterable.
+		iterable: function () {
+			return new ArrayIterator(
+				E.from(self.getIterator().realize())
+					.reverse()
+					.toArray()
+			);
+		},
 	});
 };
 
