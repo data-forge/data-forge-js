@@ -584,6 +584,15 @@ describe('Series', function () {
 		}).to.throw();
 	});
 
+	it('can parse string series to date - with format string', function () {
+
+		var series = initSeries([10, 5], ['24-02-75', '24-02-15']);
+		var parsed = series.parseDates('DD-MM-YY');
+
+		expect(parsed.getIndex().toValues()).to.eql([10, 5]);
+		expect(parsed.toValues()).to.eql([new Date(1975, 1, 24), new Date(2015, 1, 24)]); // Note months are 0-based here.
+	});
+
 	it('can parse values to strings', function () {
 
 		var series = initSeries([1, 2, 3, 4, 5, 6], [1, null, undefined, "foo", 5.5, new Date(2015, 1, 1)]);

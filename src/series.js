@@ -728,8 +728,14 @@ Series.prototype.parseFloats = function () {
 
 /**
  * Parse a series with string values to a series with date values.
+ *
+ * @param {string} [formatString] - Optional formatting string for dates.
  */
-Series.prototype.parseDates = function () {
+Series.prototype.parseDates = function (formatString) {
+
+	if (formatString) {
+		assert.isString(formatString, "Expected optional 'formatString' parameter to parseDates to be a string (if specified).");
+	}
 
 	var self = this;
 	return self.select(function (value, valueIndex) {
@@ -743,7 +749,7 @@ Series.prototype.parseDates = function () {
 				return undefined;
 			}
 
-			return moment(value).toDate();
+			return moment(value, formatString).toDate();
 		}
 	});
 };

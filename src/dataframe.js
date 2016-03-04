@@ -1100,11 +1100,16 @@ DataFrame.prototype.parseFloats = function (columnNameOrIndex) {
  * Parse a column with string values to a column with date values.
  *
  * @param {string|int} columnNameOrIndex - Specifies the column to parse.
+ * @param {string} [formatString] - Optional formatting string for dates.
  */
-DataFrame.prototype.parseDates = function (columnNameOrIndex) {
+DataFrame.prototype.parseDates = function (columnNameOrIndex, formatString) {
+
+	if (formatString) {
+		assert.isString(formatString, "Expected optional 'formatString' parameter to parseDates to be a string (if specified).");
+	}
 
 	var self = this;
-	return self.setSeries(columnNameOrIndex, self.getSeries(columnNameOrIndex).parseDates());
+	return self.setSeries(columnNameOrIndex, self.getSeries(columnNameOrIndex).parseDates(formatString));
 };
 
 /**
