@@ -610,6 +610,28 @@ describe('Series', function () {
 
 	});
 
+	it('can specify format string for date series', function () {
+
+		var series = initSeries([1], [new Date(2015, 1, 3)]);
+		var converted = series.toStrings('YYYY-DD-MM');
+
+		expect(converted.getIndex().toValues()).to.eql([1]);
+		expect(converted.toValues()).to.eql([
+			'2015-03-02',
+		]);
+	});
+
+	it('can specify format string for date series - with moment', function () {
+
+		var series = initSeries([1], [moment(new Date(2015, 1, 3))]);
+		var converted = series.toStrings('YYYY-DD-MM');
+
+		expect(converted.getIndex().toValues()).to.eql([1]);
+		expect(converted.toValues()).to.eql([
+			'2015-03-02',
+		]);
+	});
+
 	it('can detect actual series type', function () {
 
 		var series = initSeries([1], [1]);

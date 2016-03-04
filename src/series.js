@@ -756,8 +756,14 @@ Series.prototype.parseDates = function (formatString) {
 
 /**
  * Convert a series of values of different types to a series of string values.
+ *
+ * @param {string} [formatString] - Optional formatting string for dates.
  */
-Series.prototype.toStrings = function () {
+Series.prototype.toStrings = function (formatString) {
+
+	if (formatString) {
+		assert.isString(formatString, "Expected optional 'formatString' parameter to parseDates to be a string (if specified).");
+	}
 
 	var self = this;
 	return self.select(function (value) {
@@ -766,6 +772,12 @@ Series.prototype.toStrings = function () {
 		}
 		else if (value === null) {
 			return null;
+		}
+		else if (formatString && Object.isDate(value)) {
+			return moment(value).format(formatString);
+		}
+		else if (formatString && moment.isMoment(value)) {
+			return value.format(formatString);
 		}
 		else {
 			return value.toString();	

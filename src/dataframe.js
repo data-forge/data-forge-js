@@ -1115,12 +1115,17 @@ DataFrame.prototype.parseDates = function (columnNameOrIndex, formatString) {
 /**
  * Convert a column of values of different types to a column of string values.
  *
- * * @param {string|int} columnNameOrIndex - Specifies the column to convert.
+ * @param {string|int} columnNameOrIndex - Specifies the column to convert.
+ * @param {string} [formatString] - Optional formatting string for dates.
  */
-DataFrame.prototype.toStrings = function (columnNameOrIndex) {
+DataFrame.prototype.toStrings = function (columnNameOrIndex, formatString) {
+
+	if (formatString) {
+		assert.isString(formatString, "Expected optional 'formatString' parameter to parseDates to be a string (if specified).");
+	}
 
 	var self = this;
-	return self.setSeries(columnNameOrIndex, self.getSeries(columnNameOrIndex).toString());
+	return self.setSeries(columnNameOrIndex, self.getSeries(columnNameOrIndex).toStrings(formatString));
 };
 
 /**
