@@ -108,11 +108,20 @@ var DataFrame = function (config) {
 	assert.isObject(config, "Expected 'config' parameter to DataFrame constructor to be an object with options for initialisation.");
 
 	if (config.index) {
-		assert.isObject(config.index, "Expected 'index' member of 'config' parameter to DataFrame constructor to be an object.");
+		var inputIndex = config.index;
 
-		index = function () {
-			return config.index.getIterator();
-		};
+		if (Object.isArray(inputIndex)) {
+			index = function () {
+				return new ArrayIterator(inputIndex);
+			};		
+		}
+		else {
+			assert.isObject(config.index, "Expected 'index' member of 'config' parameter to DataFrame constructor to be an object.");			
+
+			index = function () {
+				return inputIndex.getIterator();
+			};
+		}
 	}
 	else {
 		index = function () {

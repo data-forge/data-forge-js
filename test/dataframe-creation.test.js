@@ -55,7 +55,26 @@ describe('dataframe creation', function () {
 				[1, 2],
 				[3, 4],
 			],
-			index: new Index([10, 11])
+			index: new Index([10, 11]),
+		});
+
+		expect(dataFrame.getColumnNames()).to.eql(columnNames);
+		expect(dataFrame.toPairs()).to.eql([
+			[10, { c1: 1, c2: 2 }],
+			[11, { c1: 3, c2: 4 }],
+		]);
+	});
+
+	it('can create from rows with array index', function () {
+
+		var columnNames = ["c1", "c2"];
+		var dataFrame = new DataFrame({
+			columnNames: columnNames,
+			rows: [
+				[1, 2],
+				[3, 4],
+			],
+			index: [10, 11]
 		});
 
 		expect(dataFrame.getColumnNames()).to.eql(columnNames);
@@ -89,7 +108,25 @@ describe('dataframe creation', function () {
 				{ c1: 1, c2: 2 },
 				{ c1: 3, c2: 4 },
 			],
-			index: new Index([10, 11])
+			index: new Index([10, 11]),
+		});
+
+		var columnNames = ["c1", "c2"];
+		expect(dataFrame.getColumnNames()).to.eql(columnNames);
+		expect(dataFrame.toPairs()).to.eql([
+			[10, { c1: 1, c2: 2 }],
+			[11, { c1: 3, c2: 4 }],
+		]);
+	});
+
+	it('can create from objects with array index', function () {
+		
+		var dataFrame = new DataFrame({
+			rows: [
+				{ c1: 1, c2: 2 },
+				{ c1: 3, c2: 4 },
+			],
+			index: [10, 11],
 		});
 
 		var columnNames = ["c1", "c2"];

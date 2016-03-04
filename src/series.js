@@ -63,11 +63,20 @@ var Series = function (config) {
 	}		
 
 	if (config.index) {
-		assert.isObject(config.index, "Expected 'index' parameter to Series constructor to be an object.");
+		var inputIndex = config.index;
+		if (Object.isArray(inputIndex)) {
 
-		index = function () {
-			return config.index.getIterator();
+			index = function () {
+				return new ArrayIterator(inputIndex);
+			};
 		}
+		else {
+			assert.isObject(inputIndex, "Expected 'index' parameter to Series constructor to be an object.");
+
+			index = function () {
+				return inputIndex.getIterator();
+			};
+		} 
 	}
 	else {
 		index = function () {

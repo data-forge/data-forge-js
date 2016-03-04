@@ -25,7 +25,21 @@ describe('series creation', function () {
 
 		var series = new Series({
 			values: [1, 2, 3],
-			index: new Index([10, 11, 22])
+			index: new Index([10, 11, 22]),
+		});
+
+		expect(series.toPairs()).to.eql([
+			[10, 1],
+			[11, 2],
+			[22, 3],
+		]);
+	});
+
+	it('can create from values with array index', function () {
+
+		var series = new Series({
+			values: [1, 2, 3],
+			index: [10, 11, 22],
 		});
 
 		expect(series.toPairs()).to.eql([
