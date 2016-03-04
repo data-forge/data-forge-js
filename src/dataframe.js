@@ -545,12 +545,17 @@ DataFrame.prototype.getSeries = function (columnNameOrIndex) {
 
 	return new Series({
 		iterable: function () {
-			return new SelectIterator(self.getIterator(), function (pair) {
+			return new WhereIterator(
+				new SelectIterator(self.getIterator(), function (pair) {
 					return [
 						pair[0],
 						pair[1][columnName],
 					];
-				});
+				}),
+				function (pair) {
+					return pair[1] !== undefined;
+				}
+			);
 		},
 	});
 };

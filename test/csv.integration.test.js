@@ -178,7 +178,6 @@ describe('csv.integration', function () {
 		expect(series2.toValues()).to.eql([
 			'AAC',
 			'AAD',
-			undefined,
 		]);
 
 	});

@@ -282,6 +282,26 @@ describe('DataFrame', function () {
 		expect(series3.toValues()).to.eql([11, 22]);
 	});
 
+	it('when a series is extracted from a dataframe, undefined values are stripped out.', function () {
+		
+		var dataFrame = initDataFrame(
+			[ "S" ],
+			[
+				[undefined],
+				[11],
+				[undefined],
+				[12],
+				[undefined],
+			]
+		);
+		
+		var series = dataFrame.getSeries('S');
+		expect(series.toPairs()).to.eql([
+			[1, 11],
+			[3, 12],
+		]);
+	});
+
 	it('can retreive columns', function () {
 		
 		var dataFrame = initDataFrame(
@@ -746,8 +766,8 @@ describe('DataFrame', function () {
 			[new Date(2015, 24, 2), 100, 'd', 4, undefined],
 		]);
 
-		expect(mergedSeries.getIndex().toValues()).to.eql([5, 6, 7, 8]);
-		expect(mergedSeries.toValues()).to.eql([3, undefined, 1, undefined]);
+		expect(mergedSeries.getIndex().toValues()).to.eql([5, 7]);
+		expect(mergedSeries.toValues()).to.eql([3, 1]);
 	});
 
 	it('can set column procedurally from a function', function () {
@@ -2046,16 +2066,16 @@ describe('DataFrame', function () {
 		expect(columns.length).to.eql(4);
 
 		expect(columns[0].name).to.eql("Col1");
-		expect(columns[0].series.toValues()).to.eql([1, undefined]);
+		expect(columns[0].series.toValues()).to.eql([1]);
 
 		expect(columns[1].name).to.eql("Col2");
-		expect(columns[1].series.toValues()).to.eql(["hello", undefined]);
+		expect(columns[1].series.toValues()).to.eql(["hello"]);
 
 		expect(columns[2].name).to.eql("Col3");
-		expect(columns[2].series.toValues()).to.eql([undefined, 10]);
+		expect(columns[2].series.toValues()).to.eql([10]);
 
 		expect(columns[3].name).to.eql("Col4");
-		expect(columns[3].series.toValues()).to.eql([undefined, "computer"]);
+		expect(columns[3].series.toValues()).to.eql(["computer"]);
 	});
 
 	it('can initialize from array of objects with zero fields', function () {
