@@ -181,6 +181,7 @@ describe('DataFrame', function () {
 			],
 			[5, 6, 7, 8]
 		);
+
 		var modified = dataFrame.select(function (row, index) {
 				return {
 					C: index
@@ -229,6 +230,40 @@ describe('DataFrame', function () {
 				[102, 'd'],
 		]);		
 	});
+
+	it('can select many with index', function () {
+		var dataFrame = initDataFrame(
+			[ "V" ],
+			[
+				[1],
+				[2],
+				[3],
+				[4],
+			],
+			[5, 6, 7, 8]
+		);
+
+		var modified = dataFrame.selectMany(function (row, index) {
+				return E.range(0, 2).
+					select(function (i) {
+						return {
+							V: index
+						};					
+					})
+					.toArray();
+			});		
+
+		expect(modified.toPairs()).to.eql([
+			[5, { V: 5 }],
+			[5, { V: 5 }],
+			[6, { V: 6 }],
+			[6, { V: 6 }],
+			[7, { V: 7 }],
+			[7, { V: 7 }],
+			[8, { V: 8 }],
+			[8, { V: 8 }],
+		]);
+	});		
 
 	it('throws exception when pulling a non-existing column name', function () {
 		

@@ -528,7 +528,7 @@ DataFrame.prototype.selectMany = function (selector) {
 	return new DataFrame({
 		iterable: function () {
 			return new SelectManyIterator(self.getIterator(), function (pair) {
-				var newRows = selector(pair[1]);
+				var newRows = selector(pair[1], pair[0]);
 				return E.from(newRows)
 					.select(function (newRow) {
 						return [
