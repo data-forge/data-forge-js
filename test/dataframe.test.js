@@ -2001,6 +2001,27 @@ describe('DataFrame', function () {
 		]);
 	});
 
+	it('can take until - with index', function () {
+
+		var dataFrame = initDataFrame(
+				["Column1"], 
+				[
+					[false],
+					[false],
+					[true],
+					[false],
+				],
+				[false, false, true, false]
+			);
+		var skipped = dataFrame.takeUntil(function (row, index) { 
+			return index; 
+		});
+		expect(skipped.toPairs()).to.eql([
+			[false, { Column1: false }],
+			[false, { Column1: false }],
+		]);
+	});
+
 	it('can aggregate dataframe', function () {
 
 		var dataFrame = initDataFrame(
