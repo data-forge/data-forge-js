@@ -509,7 +509,7 @@ DataFrame.prototype.select = function (selector) {
 			return new SelectIterator(self.getIterator(), function (pair) {
 					return [
 						pair[0],
-						selector(pair[1]),
+						selector(pair[1], pair[0]),
 					];
 				});
 		},
