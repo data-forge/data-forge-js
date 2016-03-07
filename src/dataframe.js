@@ -868,8 +868,10 @@ DataFrame.prototype.setSeries = function (columnName, data) { //todo: should all
 	var self = this;
 
 	if (Object.isFunction(data)) {
-		data = E.from(self.toObjects())
-			.select(data)
+		data = E.from(self.toPairs()) //todo: make this lazy
+			.select(function (pair) {
+				return data(pair[1], pair[0]);
+			})
 			.toArray();
 	}
 	else if (!Object.isArray(data)) {

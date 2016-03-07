@@ -885,6 +885,29 @@ describe('DataFrame', function () {
 		expect(modified.getSeries("Generated").toValues()).to.eql([22, 24]);
 	});
 
+	it('can set column procedurally from a function - with index', function () {
+
+		var original = initDataFrame(
+			[ "Existing" ],
+			[
+				[11],
+				[12],
+			],
+			[5, 6]
+		);		
+
+		var modified = original.setSeries('Generated', 
+				function (row, index) {
+					return index;
+				}
+			);
+
+		expect(modified.toPairs()).to.eql([
+			[5, { Existing: 11, Generated: 5 }],
+			[6, { Existing: 12, Generated: 6 }],
+		]);
+	});
+
 	it('can get slice of rows', function () {
 
 		var dataFrame = initDataFrame(
