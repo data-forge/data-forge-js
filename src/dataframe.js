@@ -1861,13 +1861,19 @@ DataFrame.prototype.bringToFront = function (columnOrColumns) {
 
 	var self = this;
 	var existingColumnNames = self.getColumnNames();
-	var remainingColumnNames = E.from(existingColumnNames)
+	var columnsToMove = E.from(columnOrColumns) // Strip out non-existing columns.
 		.where(function (columnName) {
-			return !E.from(columnOrColumns).contains(columnName);
+			return E.from(existingColumnNames).contains(columnName);
 		})
 		.toArray();
 
-	var reorderedColumnNames = columnOrColumns.concat(remainingColumnNames);
+	var remainingColumnNames = E.from(existingColumnNames)
+		.where(function (columnName) {
+			return !E.from(columnsToMove).contains(columnName);
+		})
+		.toArray();
+
+	var reorderedColumnNames = columnsToMove.concat(remainingColumnNames);
 	return self.remapColumns(reorderedColumnNames);
 };
 
@@ -1891,13 +1897,19 @@ DataFrame.prototype.bringToBack = function (columnOrColumns) {
 
 	var self = this;
 	var existingColumnNames = self.getColumnNames();
-	var remainingColumnNames = E.from(existingColumnNames)
+	var columnsToMove = E.from(columnOrColumns) // Strip out non-existing columns.
 		.where(function (columnName) {
-			return !E.from(columnOrColumns).contains(columnName);
+			return E.from(existingColumnNames).contains(columnName);
 		})
 		.toArray();
 
-	var reorderedColumnNames = remainingColumnNames.concat(columnOrColumns);
+	var remainingColumnNames = E.from(existingColumnNames)
+		.where(function (columnName) {
+			return !E.from(columnsToMove).contains(columnName);
+		})
+		.toArray();
+
+	var reorderedColumnNames = remainingColumnNames.concat(columnsToMove);
 	return self.remapColumns(reorderedColumnNames);
 };
 

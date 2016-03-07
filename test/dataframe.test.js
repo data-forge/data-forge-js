@@ -2435,6 +2435,21 @@ describe('DataFrame', function () {
 		]);
 	});
 
+	it('bringing non-existing column to front has no effect', function () {
+
+		var dataFrame = initDataFrame(["a", "b", "c"], [[1, 2, 3], [4, 5, 6]]);
+
+		expect(dataFrame.getColumnNames()).to.eql(["a", "b", "c"]);
+
+		var modified = dataFrame.bringToFront("non-existing-column");
+
+		expect(modified.getColumnNames()).to.eql(["a", "b", "c"]);
+		expect(modified.toValues()).to.eql([
+			[1, 2, 3],
+			[4, 5, 6],
+		]);
+	});
+
 	it('can bring column to back', function () {
 
 		var dataFrame = initDataFrame(["a", "b", "c"], [[1, 2, 3], [4, 5, 6]]);
@@ -2462,6 +2477,21 @@ describe('DataFrame', function () {
 		expect(modified.toValues()).to.eql([
 			[3, 2, 1],
 			[6, 5, 4],
+		]);
+	});
+
+	it('bringing non-existing-column to back has no effect', function () {
+
+		var dataFrame = initDataFrame(["a", "b", "c"], [[1, 2, 3], [4, 5, 6]]);
+
+		expect(dataFrame.getColumnNames()).to.eql(["a", "b", "c"]);
+
+		var modified = dataFrame.bringToBack("non-existing-column");
+
+		expect(modified.getColumnNames()).to.eql(["a", "b", "c"]);
+		expect(modified.toValues()).to.eql([
+			[1, 2, 3],
+			[4, 5, 6],
 		]);
 	});
 
