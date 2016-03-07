@@ -123,6 +123,26 @@ describe('DataFrame', function () {
 		]);		
 	});
 
+	it('can filter on index', function () {
+		var dataFrame = initDataFrame(
+			[ "V" ],
+			[
+				[1],
+				[2],
+				[3],
+				[4],
+			],
+			[5, 6, 7, 8]
+		);
+		var filtered = dataFrame.where(function (row, index) {
+				return index > 5 && index < 8;
+			});		
+		expect(filtered.toPairs()).to.eql([
+			[6, { V: 2 }],
+			[7, { V: 3 }],
+		]);		
+	});
+
 	it('can select', function () {
 		var dataFrame = initDataFrame(
 			[ "Date", "Value1", "Value2", "Value3" ],
