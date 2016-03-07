@@ -1691,14 +1691,19 @@ DataFrame.prototype.deflate = function (selector) {
 
 	var self = this;
 
-	//todo: make this lazy.
-	
-	var newValues = E.from(self.toObjects())
-		.select(selector)
-		.toArray();
-
 	return new Series({ 
-			values: newValues, 
+			iterable: function () {
+				return new SelectIterator(
+					self.getIterator(),
+					function (pair) {
+						var newValue = selector(pair[1], pair[0]);
+						return [
+							pair[0],
+							newValue
+						];
+					}
+				);
+			},
 		});
 };
 
