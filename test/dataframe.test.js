@@ -1877,6 +1877,27 @@ describe('DataFrame', function () {
 		]);
 	});
 
+	it('can skip while - with index', function () {
+
+		var dataFrame = initDataFrame(
+				["Column1"], 
+				[
+					[true],
+					[true],
+					[false],
+					[true],
+				],
+				[true, true, false, true]
+			);
+		var skipped = dataFrame.skipWhile(function (row, index) { 
+			return index; 
+		});
+		expect(skipped.toPairs()).to.eql([
+			[false, { Column1: false }],
+			[true, { Column1: true }],
+		]);
+	});
+
 	it('can skip until', function () {
 
 		var dataFrame = initDataFrame(
