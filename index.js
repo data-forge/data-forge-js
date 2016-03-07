@@ -14,6 +14,7 @@ var DataFrame = require('./src/dataframe');
 var Series = require('./src/series');
 var Index = require('./src/index');
 var E = require('linq');
+var registeredPlugins = {};
 
 /**
  * Main namespace for Data-Forge.
@@ -42,6 +43,12 @@ var dataForge = {
 	use: function (plugin) {
 
 		assert.isFunction(plugin, "Expected 'plugin' parameter to 'use' to be a function.");
+
+		if (registeredPlugins[plugin] === plugin) {
+			return; // Already registered.
+		}
+
+		registeredPlugins[plugin] = plugin;
 
 		var self = this;
 		plugin(self);

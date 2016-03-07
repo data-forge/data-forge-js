@@ -401,4 +401,34 @@ describe('data-forge', function () {
 		]);
 	});
 
+	it('can register plugin', function () {
+
+		var called = false;
+
+		var plugin = function (passedInDataForge) {
+			expect(passedInDataForge).to.equal(dataForge);
+			called = true;
+		};
+
+		dataForge.use(plugin);
+
+		expect(called).to.equal(true);
+
+	});
+
+	it('registering plugin more than once has no effect', function () {
+
+		var called = 0;
+
+		var plugin = function (passedInDataForge) {
+			expect(passedInDataForge).to.equal(dataForge);
+			++called;
+		};
+
+		dataForge.use(plugin);
+		dataForge.use(plugin);
+
+		expect(called).to.equal(1);
+
+	});
 });
