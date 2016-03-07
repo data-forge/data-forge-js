@@ -2418,7 +2418,22 @@ describe('DataFrame', function () {
 			[2, 1, 3],
 			[5, 4, 6],
 		]);
-	})
+	});
+
+	it('can bring multiple columns to front', function () {
+
+		var dataFrame = initDataFrame(["a", "b", "c"], [[1, 2, 3], [4, 5, 6]]);
+
+		expect(dataFrame.getColumnNames()).to.eql(["a", "b", "c"]);
+
+		var modified = dataFrame.bringToFront(["b", "c"]);
+
+		expect(modified.getColumnNames()).to.eql(["b", "c", "a"]);
+		expect(modified.toValues()).to.eql([
+			[2, 3, 1],
+			[5, 6, 4],
+		]);
+	});
 
 	it('can bring column to back', function () {
 
@@ -2433,8 +2448,22 @@ describe('DataFrame', function () {
 			[1, 3, 2],
 			[4, 6, 5],
 		]);
-	})
+	});
 
+	it('can bring multiple columns to back', function () {
+
+		var dataFrame = initDataFrame(["a", "b", "c"], [[1, 2, 3], [4, 5, 6]]);
+
+		expect(dataFrame.getColumnNames()).to.eql(["a", "b", "c"]);
+
+		var modified = dataFrame.bringToBack(["b", "a"]);
+
+		expect(modified.getColumnNames()).to.eql(["c", "b", "a"]);
+		expect(modified.toValues()).to.eql([
+			[3, 2, 1],
+			[6, 5, 4],
+		]);
+	});
 
 	it('can inflate column to new columns', function () {
 

@@ -1844,40 +1844,60 @@ DataFrame.prototype.zip = function () {
 /**
  * Bring the name column to the front, making it the first column in the data-frame.
  *
- * @param {string} columnName - The name of the column to bring to the front.
+ * @param {string|array} columnOrColumns - Specifies the column or columns to bring to the front.
  */
-DataFrame.prototype.bringToFront = function (columnName) {
+DataFrame.prototype.bringToFront = function (columnOrColumns) {
 
-	assert.isString(columnName, "Expect 'columnName' parameter to bringToFront function to be a string.");
+	if (Object.isArray(columnOrColumns)) {
+		columnOrColumns.forEach(function (columnName) {
+			assert.isString(columnName, "Expect 'columnOrColumns' parameter to bringToFront function to specify a column or columns via a string or an array of strings.");	
+		});
+	}
+	else {
+		assert.isString(columnOrColumns, "Expect 'columnOrColumns' parameter to bringToFront function to specify a column or columns via a string or an array of strings.");
 
-	var self = this;
-
-	var columnIndex = self.getColumnIndex(columnName);
-	if (columnIndex < 0) {
-		throw new Error("Failed to find column with name '" + columnName + "'.");
+		columnOrColumns = [columnOrColumns]; // Convert to array for coding convenience.
 	}
 
-	var reorderedColumnNames = [columnName].concat(utils.dropElement(self.getColumnNames(), columnIndex));
+	var self = this;
+	var existingColumnNames = self.getColumnNames();
+	var remainingColumnNames = E.from(existingColumnNames)
+		.where(function (columnName) {
+			return !E.from(columnOrColumns).contains(columnName);
+		})
+		.toArray();
+
+	var reorderedColumnNames = columnOrColumns.concat(remainingColumnNames);
 	return self.remapColumns(reorderedColumnNames);
 };
 
 /**
  * Bring the name column to the back, making it the last column in the data-frame.
  *
- * @param {string} columnName - The name of the column to bring to the back.
+ * @param {string|array} columnOrColumns - Specifies the column or columns to bring to the back.
  */
-DataFrame.prototype.bringToBack = function (columnName) {
+DataFrame.prototype.bringToBack = function (columnOrColumns) {
 
-	assert.isString(columnName, "Expect 'columnName' parameter to bringToBack function to be a string.");
+	if (Object.isArray(columnOrColumns)) {
+		columnOrColumns.forEach(function (columnName) {
+			assert.isString(columnName, "Expect 'columnOrColumns' parameter to bringToBack function to specify a column or columns via a string or an array of strings.");	
+		});
+	}
+	else {
+		assert.isString(columnOrColumns, "Expect 'columnOrColumns' parameter to bringToBack function to specify a column or columns via a string or an array of strings.");
 
-	var self = this;
-
-	var columnIndex = self.getColumnIndex(columnName);
-	if (columnIndex < 0) {
-		throw new Error("Failed to find column with name '" + columnName + "'.");
+		columnOrColumns = [columnOrColumns]; // Convert to array for coding convenience.
 	}
 
-	var reorderedColumnNames = utils.dropElement(self.getColumnNames(), columnIndex).concat([columnName]);
+	var self = this;
+	var existingColumnNames = self.getColumnNames();
+	var remainingColumnNames = E.from(existingColumnNames)
+		.where(function (columnName) {
+			return !E.from(columnOrColumns).contains(columnName);
+		})
+		.toArray();
+
+	var reorderedColumnNames = remainingColumnNames.concat(columnOrColumns);
 	return self.remapColumns(reorderedColumnNames);
 };
 
