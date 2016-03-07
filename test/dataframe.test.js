@@ -1929,7 +1929,7 @@ describe('DataFrame', function () {
 				],
 				[false, false, true, false]
 			);
-		
+
 		var skipped = dataFrame.skipUntil(function (row, index) { 
 			return index; 
 		});
@@ -1956,6 +1956,29 @@ describe('DataFrame', function () {
 		expect(skipped.toPairs()).to.eql([
 			[0, { Column1: true }],
 			[1, { Column1: true }],
+		]);
+	});
+
+	it('can take while - with index', function () {
+
+		var dataFrame = initDataFrame(
+				["Column1"], 
+				[
+					[true],
+					[true],
+					[false],
+					[true],
+				],
+				[true, true, false, true]
+			);
+		
+		var skipped = dataFrame.takeWhile(function (row, index) { 
+			return index; 
+		});
+		
+		expect(skipped.toPairs()).to.eql([
+			[true, { Column1: true }],
+			[true, { Column1: true }],
 		]);
 	});
 
