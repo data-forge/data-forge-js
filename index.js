@@ -14,6 +14,10 @@ var DataFrame = require('./src/dataframe');
 var Series = require('./src/series');
 var Index = require('./src/index');
 var E = require('linq');
+
+//
+// Records plugins that have been registered.
+//
 var registeredPlugins = {};
 
 /**
