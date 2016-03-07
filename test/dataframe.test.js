@@ -1917,6 +1917,29 @@ describe('DataFrame', function () {
 		]);
 	});
 
+	it('can skip until - with index', function () {
+
+		var dataFrame = initDataFrame(
+				["Column1"], 
+				[
+					[false],
+					[false],
+					[true],
+					[false],
+				],
+				[false, false, true, false]
+			);
+		
+		var skipped = dataFrame.skipUntil(function (row, index) { 
+			return index; 
+		});
+
+		expect(skipped.toPairs()).to.eql([
+			[true, { Column1: true }],
+			[false, { Column1: false }]
+		]);
+	});
+
 	it('can take while', function () {
 
 		var dataFrame = initDataFrame(
