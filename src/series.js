@@ -562,30 +562,31 @@ Series.prototype.rollingWindow = function (period, selector) {
 
 	var self = this;
 
-	//todo: make this properly lazy
-
-	var index = self.getIndex().toValues();
-	var values = self.toValues();
-
-	if (values.length == 0) {
-		return new Series();
-	}
-
-	var newIndexAndValues = E.range(0, values.length-period+1)
-		.select(function (windowIndex) {
-			var _window = new Series({
-					iterable: function () {
-						return new TakeIterator(new SkipIterator(self.getIterator(), windowIndex), period);
-					},
-				});			
-			return selector(_window, windowIndex);
-		})
-		.toArray();
-
 	return new Series({
 		iterable: function () {
-			return new ArrayIterator(newIndexAndValues);
-		},
+
+			var curOutput = undefined;
+			var done = false;
+			var windowIndex = 0;
+
+			return {
+				moveNext: function () {
+					var window = self.skip(windowIndex).take(period);
+					if (window.count() < period) {
+						return false;
+					}
+
+					curOutput = selector(window, windowIndex);
+					++windowIndex;
+					return true;
+				},
+
+				getCurrent: function () {
+					return curOutput;
+				},
+			};
+
+		}
 	});
 };
 

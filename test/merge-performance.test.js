@@ -10,7 +10,7 @@ describe('merge-performance', function () {
 
 	it('merge performance test', function() {
 
-		var stopwatch = new Stopwatch()
+		var stopwatch = new Stopwatch();
 
 		var numRows = 5500;
 
