@@ -1432,11 +1432,13 @@ DataFrame.prototype.toPairs = function () {
 DataFrame.prototype.bake = function () {
 
 	var self = this;
+	var pairs = self.toPairs();
 	return new DataFrame({
-			columnNames: self.getColumnNames(),
-			rows: self.toValues(),
-			index: self.getIndex().bake(),
-		});
+		columnNames: self.getColumnNames(),
+		iterable: function () {
+			return new ArrayIterator(pairs);
+		},
+	});
 };
 
 /**

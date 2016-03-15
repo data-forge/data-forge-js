@@ -911,10 +911,11 @@ Series.prototype.toValues = function () {
 Series.prototype.bake = function () {
 
 	var self = this;
-
-	return new Series({ 
-		values: self.toValues(), 
-		index: self.getIndex().bake(),
+	var pairs = self.toPairs();
+	return new Series({
+		iterable: function () {
+			return new ArrayIterator(pairs);
+		},
 	});
 };
 
