@@ -1470,7 +1470,7 @@ DataFrame.prototype.transformColumn = function (columnNameOrColumnNames, selecto
 	var self = this; //todo: make this lazy.
 
 	if (Object.isObject(columnNameOrColumnNames)) {
-		var columnNames = Object.keys(columnNameOrColumnNames)
+		var columnNames = Object.keys(columnNameOrColumnNames);
 		return E.from(columnNames)
 			.aggregate(self, function (prevDataFrame, columnName) {
 				var columnSelector = columnNameOrColumnNames[columnName];
@@ -1747,7 +1747,7 @@ DataFrame.prototype.aggregate = function (seedOrSelector, selector) {
 	var self = this;
 
 	if (Object.isFunction(seedOrSelector) && !selector) {
-		return E.from(self.toObjects()).aggregate(seedOrSelector);		
+		return self.skip(1).aggregate(self.first(), seedOrSelector);
 	}
 	else if (selector) {
 		assert.isFunction(selector, "Expected 'selector' parameter to aggregate to be a function.");

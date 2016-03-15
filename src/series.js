@@ -1059,7 +1059,6 @@ Series.prototype.tail = function (values) {
 Series.prototype.sum = function () {
 
 	var self = this;
-	var self = this;
 	return self.aggregate(
 		function (prev, value) {
 			return prev + value;
@@ -1113,9 +1112,7 @@ Series.prototype.aggregate = function (seedOrSelector, selector) {
 	var self = this;
 
 	if (Object.isFunction(seedOrSelector) && !selector) {
-
-		return E.from(self.skip(1).toValues())
-			.aggregate(self.first(), seedOrSelector);
+		return self.skip(1).aggregate(self.first(), seedOrSelector);
 	}
 	else {
 		assert.isFunction(selector, "Expected 'selector' parameter to aggregate to be a function.");
