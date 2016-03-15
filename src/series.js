@@ -1117,8 +1117,14 @@ Series.prototype.aggregate = function (seedOrSelector, selector) {
 	else {
 		assert.isFunction(selector, "Expected 'selector' parameter to aggregate to be a function.");
 
-		return E.from(self.toValues())
-			.aggregate(seedOrSelector, selector);
+		var working = seedOrSelector;
+		var it = self.getIterator();
+		while (it.moveNext()) {
+			var curValue = it.getCurrent()[1];
+			working = selector(working, curValue); //todo: should pass index in here as well.
+		}
+
+		return working;
 	}
 };
 

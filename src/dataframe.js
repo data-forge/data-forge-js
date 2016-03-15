@@ -1751,7 +1751,15 @@ DataFrame.prototype.aggregate = function (seedOrSelector, selector) {
 	}
 	else if (selector) {
 		assert.isFunction(selector, "Expected 'selector' parameter to aggregate to be a function.");
-		return E.from(self.toObjects()).aggregate(seedOrSelector, selector);
+
+		var working = seedOrSelector;
+		var it = self.getIterator();
+		while (it.moveNext()) {
+			var curValue = it.getCurrent()[1];
+			working = selector(working, curValue); //todo: should pass index in here as well.
+		}
+
+		return working;		
 	}
 	else {
 		assert.isObject(seedOrSelector, "Expected 'seed' parameter to aggregate to be an object.");
