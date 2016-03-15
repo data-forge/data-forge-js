@@ -106,18 +106,12 @@ Series.prototype.getIterator = function () {
 Series.prototype.getIndex = function () {
 	var self = this;
 	return new Index(function () {		
-		var iterator = self.getIterator();
-		var i = -1;
-		return { //todo: can just use a select iterator here.
-			moveNext: function () {
-				++i;
-				return iterator.moveNext();
-			},
-
-			getCurrent: function () {
-				return iterator.getCurrent()[0];
-			},
-		};
+		return new SelectIterator(
+			self.getIterator(),
+			function (pair) {
+				return pair[0]; // Extract index.
+			}
+		);
 	});
 };
 
