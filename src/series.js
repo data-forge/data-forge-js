@@ -42,54 +42,60 @@ var Series = function (config) {
 		return;
 	}
 
-	var index;
-	var values;
-
 	if (!config.values) {
 		throw new Error("Expected 'values' field to be set on 'config' parameter to Series constructor.");
 	}
 
-	if (Object.isFunction(config.values)) {
-		values = config.values;
+	if (!Object.isFunction(config.values)) {
+		assert.isArray(config.values, "Expected 'values' field of 'config' parameter to Series constructor be an array of values or a function that returns an iterator.");
 	}
-	else {
-		assert.isArray(config.values, "Expected 'values' field of 'config' parameter to Series constructor be an array or an iterable.");
-
-		var valuesArray = config.values;
-
-		values = function () {
-			return new ArrayIterator(valuesArray);
-		};
-	}		
 
 	if (config.index) {
-		var inputIndex = config.index;
-		if (Object.isArray(inputIndex)) {
+		if (!Object.isArray(config.index)) {
+			assert.isObject(config.index, "Expected 'index' field of 'config' parameter to Series constructor to be an array of values or an Index object.");
+		}
+	}
 
-			index = function () {
-				return new ArrayIterator(inputIndex);
+	var values = config.values;
+
+	if (!config.index) {
+		// Index not supplied.
+		// Generate an index.
+		if (Object.isFunction(values)) {
+			self._iterable = function () {
+				return new PairIterator(new CountIterator(), values());
 			};
 		}
 		else {
-			assert.isObject(inputIndex, "Expected 'index' parameter to Series constructor to be an object.");
-
-			index = function () {
-				return inputIndex.getIterator();
+			self._iterable = function () {
+				return new PairIterator(new CountIterator(), new ArrayIterator(values));
 			};
-		} 
+		}
+		return;
+	}
+
+	var index = config.index;
+
+	if (Object.isArray(index)) {
+		if (Object.isFunction(values)) {
+			return new PairIterator(new ArrayIterator(index), values());
+		}
+		else {
+			self._iterable = function () {
+				return new PairIterator(new ArrayIterator(index), new ArrayIterator(values));
+			};			
+		}
 	}
 	else {
-		index = function () {
-			return new CountIterator();
-		};
+		if (Object.isFunction(values)) {
+			return new PairIterator(index.getIterator(), values());
+		}
+		else {
+			self._iterable = function () {
+				return new PairIterator(index.getIterator(), new ArrayIterator(values));
+			};			
+		}
 	}
-
-	assert.isFunction(values);
-	assert.isFunction(index);
-
-	self._iterable = function () {
-		return new PairIterator(index(), values());
-	};
 };
 
 /**
