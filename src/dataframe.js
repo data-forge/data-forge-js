@@ -216,62 +216,24 @@ var DataFrame = function (config) {
 			rows = config.rows;
 		}
 		else {
-			assert.isArray(config.rows, "Expected 'rows' member of 'config' parameter to DataFrame constructor to be an array of rows.");
+			assert.isArray(config.rows, "Expected 'rows' member of 'config' parameter to DataFrame constructor to be an array of JavaScript objects.");
 			
 			if (config.rows.length > 0) {
-				if (Object.isObject(config.rows[0])) {
+				assert.isObject(config.rows[0], "Expected 'rows' member of 'config' parameter to DataFrame constructor to be an array of JavaScript objects.")
 
-					if (config.debug) {
-						config.rows.forEach(function (row) {
-							assert.isObject(row, "Expect 'rows' member of 'config' parameter to DataFrame constructor to be array of objects or arrays, do not mix and match arrays and objects in 'rows'.");
-						});							
-					}
-
-					// Derive column names from object fields.
-					columnNames = function () {
-						return E.from(config.rows)
-							.selectMany(function (row) {
-								return Object.keys(row);
-							})
-							.distinct()
-							.toArray();
-					};
-
-					rows = function () {
-						return new ArrayIterator(config.rows);
-					};
-				}
-				else {
-					if (config.debug) {
-						config.rows.forEach(function (row) {
-							assert.isArray(row, "Expect 'rows' member of 'config' parameter to DataFrame constructor to be array of objects or arrays, do not mix and match arrays and objects in 'rows'.");
-						});				
-					}
-
-					// Default column names.
-					columnNames = E.range(0, config.rows[0].length)
-						.select(function (columnIndex) {
-							return columnIndex.toString();
+				// Derive column names from object fields.
+				columnNames = function () {
+					return E.from(config.rows)
+						.selectMany(function (row) {
+							return Object.keys(row);
 						})
+						.distinct()
 						.toArray();
+				};
 
-					rows = function () {
-						return new SelectIterator(
-							new ArrayIterator(config.rows),
-							function (row) {
-								return E.range(0, config.rows[0].length)
-									.toObject(
-										function (columnIndex) {
-											return columnIndex.toString();
-										},
-										function (columnIndex) {
-											return row[columnIndex];
-										}
-									);							
-							}
-						);
-					};
-				}
+				rows = function () {
+					return new ArrayIterator(config.rows);
+				};
 			}
 		}
 	}

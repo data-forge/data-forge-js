@@ -1484,6 +1484,7 @@ describe('DataFrame', function () {
 	it('can compute window - with even window size and even number of rows', function () {
 
 		var dataFrame = new DataFrame({ 
+			columnNames: ["c1", "c2"],
 			rows: [
 				[1, 2],
 				[3, 4],
@@ -1504,6 +1505,7 @@ describe('DataFrame', function () {
 	it('can compute window - with even window size and odd number of rows', function () {
 
 		var dataFrame = new DataFrame({ 
+			columnNames: ["c1", "c2"],
 			rows: [
 				[1, 2],
 				[3, 4],
@@ -1526,6 +1528,7 @@ describe('DataFrame', function () {
 	it('can compute window - with odd window size and odd number of rows', function () {
 
 		var dataFrame = new DataFrame({ 
+			columnNames: ["c1", "c2"],
 			rows: [
 				[1, 2],
 				[3, 4],
@@ -1549,6 +1552,7 @@ describe('DataFrame', function () {
 	it('can compute window - with odd window size and even number of rows', function () {
 
 		var dataFrame = new DataFrame({ 
+			columnNames: ["c1", "c2"],
 			rows: [
 				[1, 2],
 				[3, 4],
@@ -2225,16 +2229,6 @@ describe('DataFrame', function () {
 		expect(dataFrame.getColumns()).to.eql([]);
 		expect(dataFrame.toValues()).to.eql([]);
 	})
-
-	it('column names default to integer index when not specified', function () {
-
-		var rows = [
-			['foo', 11],
-			['bar', 22],
-		];
-		var dataFrame = new dataForge.DataFrame({ rows: rows });
-		expect(dataFrame.getColumnNames()).to.eql(["0", "1" ]);
-	});
 
 	it('can initialize from array of objects', function () {
 
