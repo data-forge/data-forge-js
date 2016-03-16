@@ -7,7 +7,7 @@
 var Series = require('./series');
 var Index = require('./index');
 var ArrayIterator = require('./iterators/array');
-var MultiIterator = require('./iterators/multi');
+var PairIterator = require('./iterators/pair');
 var SkipIterator = require('./iterators/skip');
 var SkipWhileIterator = require('./iterators/skip-while');
 var BabyParse = require('babyparse');
@@ -287,7 +287,7 @@ var DataFrame = function (config) {
 
 	self._columnNames = columnNames || [];
 	self._iterable = function () {
-		return new MultiIterator([index(), rows()]);
+		return new PairIterator(index(), rows());
 	};
 };
 
@@ -1014,7 +1014,7 @@ DataFrame.prototype.setIndex = function (columnNameOrIndex) {
 			return self.getColumnNames();
 		},
 		iterable: function () {
-			return new MultiIterator([
+			return new PairIterator(
 				new SelectIterator(
 					self.getSeries(columnNameOrIndex).getIterator(),
 					function (pair) {
@@ -1026,8 +1026,8 @@ DataFrame.prototype.setIndex = function (columnNameOrIndex) {
 					function (pair) {
 						return pair[1];
 					}
-				),
-			]);
+				)
+			);
 		},
 	});
 };

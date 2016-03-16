@@ -16,7 +16,7 @@ var TakeIterator = require('../src/iterators/take');
 var TakeWhileIterator = require('../src/iterators/take-while');
 var SelectIterator = require('../src/iterators/select');
 var SelectManyIterator = require('../src/iterators/select-many');
-var MultiIterator = require('../src/iterators/multi');
+var PairIterator = require('../src/iterators/pair');
 var WhereIterator = require('../src/iterators/where');
 var CountIterator = require('../src/iterators/count');
 var EmptyIterator = require('../src/iterators/empty');
@@ -88,7 +88,7 @@ var Series = function (config) {
 	assert.isFunction(index);
 
 	self._iterable = function () {
-		return new MultiIterator([index(), values()]);
+		return new PairIterator(index(), values());
 	};
 };
 
