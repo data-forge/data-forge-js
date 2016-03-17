@@ -29,7 +29,7 @@ var Series = function (config) {
 	var self = this;
 
 	if (!config) {
-		self._iterable = function () {
+		self.getIterator = function () {
 			return new EmptyIterator();
 		};
 		return;
@@ -38,7 +38,7 @@ var Series = function (config) {
 	if (config && config.iterable) {
 		assert.isFunction(config.iterable);
 
-		self._iterable = config.iterable;
+		self.getIterator = config.iterable;
 		return;
 	}
 
@@ -62,12 +62,12 @@ var Series = function (config) {
 		// Index not supplied.
 		// Generate an index.
 		if (Object.isFunction(values)) {
-			self._iterable = function () {
+			self.getIterator = function () {
 				return new PairIterator(new CountIterator(), values());
 			};
 		}
 		else {
-			self._iterable = function () {
+			self.getIterator = function () {
 				return new PairIterator(new CountIterator(), new ArrayIterator(values));
 			};
 		}
@@ -81,7 +81,7 @@ var Series = function (config) {
 			return new PairIterator(new ArrayIterator(index), values());
 		}
 		else {
-			self._iterable = function () {
+			self.getIterator = function () {
 				return new PairIterator(new ArrayIterator(index), new ArrayIterator(values));
 			};			
 		}
@@ -91,7 +91,7 @@ var Series = function (config) {
 			return new PairIterator(index.getIterator(), values());
 		}
 		else {
-			self._iterable = function () {
+			self.getIterator = function () {
 				return new PairIterator(index.getIterator(), new ArrayIterator(values));
 			};			
 		}
@@ -103,7 +103,7 @@ var Series = function (config) {
  */
 Series.prototype.getIterator = function () {
 	var self = this;
-	return self._iterable();
+	return new EmptyIterator(); // This is redefined by the constructor.
 };
 
 /**
