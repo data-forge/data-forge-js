@@ -100,7 +100,7 @@ var DataFrame = function (config) {
 
 	if (!config) {
 		self._columnNames = [];
-		self._iterable = function () {
+		self.getIterator = function () {
 			return new EmptyIterator();
 		};
 		return;
@@ -129,13 +129,13 @@ var DataFrame = function (config) {
 				return Object.keys(iterator.getCurrent()[1]);
 			};
 		}
-		self._iterable = iterable;
+		self.getIterator = iterable;
 		return;
 	}
 
 	if (!config.rows) {
 		self._columnNames = config.columnNames || [];
-		self._iterable = function () {
+		self.getIterator = function () {
 			return new EmptyIterator();
 		};
 		return;
@@ -192,24 +192,24 @@ var DataFrame = function (config) {
 			if (Object.isArray(index)) {
 
 				if (Object.isFunction(rows)) {
-					this._iterable = function () {
+					this.getIterator = function () {
 						return new PairIterator(new ArrayIterator(index), convertRowsToObjects(self._columnNames, rows()));
 					};
 				}
 				else {
-					this._iterable = function () {
+					this.getIterator = function () {
 						return new PairIterator(new ArrayIterator(index), convertRowsToObjects(self._columnNames, new ArrayIterator(rows)));
 					};
 				}
 			}
 			else {
 				if (Object.isFunction(rows)) {
-					this._iterable = function () {
+					this.getIterator = function () {
 						return new PairIterator(index.getIterator(), convertRowsToObjects(self._columnNames, rows()));
 					};
 				}
 				else {
-					this._iterable = function () {
+					this.getIterator = function () {
 						return new PairIterator(index.getIterator(), convertRowsToObjects(self._columnNames, new ArrayIterator(rows)));
 					};				
 				}
@@ -217,12 +217,12 @@ var DataFrame = function (config) {
 		}
 		else {
 			if (Object.isFunction(rows)) {
-				this._iterable = function () {
+				this.getIterator = function () {
 					return new PairIterator(new CountIterator(), convertRowsToObjects(self._columnNames, rows()));
 				};
 			}
 			else {
-				this._iterable = function () {
+				this.getIterator = function () {
 					return new PairIterator(new CountIterator(), convertRowsToObjects(self._columnNames, new ArrayIterator(rows)));
 				};
 			}
@@ -256,24 +256,24 @@ var DataFrame = function (config) {
 			if (Object.isArray(index)) {
 
 				if (Object.isFunction(rows)) {
-					this._iterable = function () {
+					this.getIterator = function () {
 						return new PairIterator(new ArrayIterator(index), rows());
 					};
 				}
 				else {
-					this._iterable = function () {
+					this.getIterator = function () {
 						return new PairIterator(new ArrayIterator(index), new ArrayIterator(rows));
 					};
 				}
 			}
 			else {
 				if (Object.isFunction(rows)) {
-					this._iterable = function () {
+					this.getIterator = function () {
 						return new PairIterator(index.getIterator(), rows());
 					};
 				}
 				else {
-					this._iterable = function () {
+					this.getIterator = function () {
 						return new PairIterator(index.getIterator(), new ArrayIterator(rows));
 					};				
 				}
@@ -281,12 +281,12 @@ var DataFrame = function (config) {
 		}
 		else {
 			if (Object.isFunction(rows)) {
-				this._iterable = function () {
+				this.getIterator = function () {
 					return new PairIterator(new CountIterator(), rows());
 				};
 			}
 			else {
-				this._iterable = function () {
+				this.getIterator = function () {
 					return new PairIterator(new CountIterator(), new ArrayIterator(rows));
 				};
 			}
@@ -314,10 +314,7 @@ DataFrame.prototype.getIndex = function () {
  */
 DataFrame.prototype.getColumnNames = function () {
 	var self = this;
-	if (self._newIterable) {
-		return self._newIterable.getColumnNames();
-	}
-	if (Object.isFunction(self._columnNames)) { //fio:
+	if (Object.isFunction(self._columnNames)) {
 		self._columnNames = self._columnNames(); // Lazy evaluate column names.
 	}
 	return self._columnNames;
@@ -327,8 +324,7 @@ DataFrame.prototype.getColumnNames = function () {
  * Get an iterator for the data-frame.
  */
 DataFrame.prototype.getIterator = function () {
-	var self = this;
-	return self._iterable();
+	return new EmptyIterator(); // This function is defined by the constructor.
 };
 
 /**
