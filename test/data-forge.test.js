@@ -272,10 +272,10 @@ describe('data-forge', function () {
 			']';
 		var dataFrame = dataForge.fromJSON(jsData);
 
-		expect(dataFrame.getColumnNames()).to.eql(['Column1', 'Column2']);
+		expect(dataFrame.getColumnNames()).to.eql(['Column1']); // 2nd column is ignored because it is not part of the first object.
 		expect(dataFrame.toValues()).to.eql([
-			['A', undefined],
-			[undefined, 2],
+			['A'],
+			[undefined],
 		]);
 	});	
 

@@ -228,17 +228,10 @@ var DataFrame = function (config) {
 			
 			if (config.rows.length > 0) {
 				assert.isObject(config.rows[0], "Expected 'rows' member of 'config' parameter to DataFrame constructor to be an array of JavaScript objects.")
-			}
 
-			// Derive column names from object fields.
-			columnNames = function () {
-				return E.from(config.rows)
-					.selectMany(function (row) {
-						return Object.keys(row);
-					})
-					.distinct()
-					.toArray();
-			};
+				// Derive column names from object fields.
+				columnNames = Object.keys(config.rows[0]);
+			}
 
 			rows = function () {
 				return new ArrayIterator(config.rows);

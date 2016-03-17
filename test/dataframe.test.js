@@ -2261,6 +2261,8 @@ describe('DataFrame', function () {
 		expect(columns[1].series.toValues()).to.eql(["hello", "computer"]);
 	});
 
+	/*todo: Would like to enable this feature again one day.
+
 	it('can initialize from array of objects with different fields', function () {
 
 		var dataFrame = new dataForge.DataFrame({
@@ -2298,6 +2300,7 @@ describe('DataFrame', function () {
 		expect(columns[3].name).to.eql("Col4");
 		expect(columns[3].series.toValues()).to.eql(["computer"]);
 	});
+	*/	
 
 	it('can initialize from array of objects with zero fields', function () {
 
