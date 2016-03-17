@@ -57,6 +57,38 @@ var parseColumnNameOrIndexToName = function (dataFrame, columnNameOrIndex, failF
 	}
 };
 
+//
+// Creates an iterator that converts rows to JavaScript objects based on passed in column names.
+//
+var convertRowsToObjects = function (columnNames, rowsIterator) {
+
+	if (Object.isFunction(columnNames)) {
+		columnNames = columnNames();
+	}
+
+	assert.isArray(columnNames);
+
+	validateIterator(rowsIterator);
+
+	return new SelectIterator(
+		rowsIterator,
+		function (row) {
+			return E.from(columnNames)
+				.select(function (columnName, columnIndex) {
+					return [columnName, columnIndex];
+				})
+				.toObject(
+					function (column) {
+						return column[0];
+					},
+					function (column) {
+						return row[column[1]];
+					}
+				);							
+		}
+	);
+}
+
 /**
  * Constructor for DataFrame.
  *
@@ -154,23 +186,7 @@ var DataFrame = function (config) {
 
 	 	if (Object.isFunction(config.rows)) {
 			rows = function () {
-				return new SelectIterator(
-					config.rows(),
-					function (row) {
-						return E.from(columnNames)
-							.select(function (columnName, columnIndex) {
-								return [columnName, columnIndex];
-							})
-							.toObject(
-								function (column) {
-									return column[0];
-								},
-								function (column) {
-									return row[column[1]];
-								}
-							);							
-					}
-				);
+				return convertRowsToObjects(columnNames, config.rows());
 			};
 		}
 		else {
@@ -183,34 +199,14 @@ var DataFrame = function (config) {
 			}
 
 	 		rows = function () {
-				return new SelectIterator(
-					new ArrayIterator(config.rows),
-					function (row) {
-						var resolvedColumnNames = columnNames;
-						if (Object.isFunction(resolvedColumnNames)) {
-							resolvedColumnNames = resolvedColumnNames();
-						}
-						return E.from(resolvedColumnNames)
-							.select(function (columnName, columnIndex) {
-								return [columnName, columnIndex];
-							})
-							.toObject(
-								function (column) {
-									return column[0];
-								},
-								function (column) {
-									return row[column[1]];
-								}
-							);							
-					}
-				);
+				return convertRowsToObjects(columnNames, new ArrayIterator(config.rows));
 	 		};		 		
 		}
 	}
 	else if (config.rows) {
 		if (Object.isFunction(config.rows)) {
 
-			var determineColumnNames = function () {
+			columnNames = function () {
 				var iterator = config.rows();
 				if (!iterator.moveNext()) {
 					return [];
@@ -218,8 +214,6 @@ var DataFrame = function (config) {
 
 				return Object.keys(iterator.getCurrent());
 			};				
-
-			columnNames = determineColumnNames;
 
 			rows = config.rows;
 		}
