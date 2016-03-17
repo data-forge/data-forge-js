@@ -1,9 +1,7 @@
 'use strict';
 
-var assert = require('chai').assert;
 var E = require('linq');
 
-var validateIterator = require('./validate');
 var ArrayIterator = require('./array');
 var SelectIterator = require('./select');
 
@@ -13,9 +11,6 @@ var SelectIterator = require('./select');
 var SelectManyIterator = function (iterator, selector) {
 
 	var self = this;
-
-	validateIterator(iterator);
-	assert.isFunction(selector);
 
 	var expandIterator = new SelectIterator(iterator, selector);
 	var childIterator = null;

@@ -102,7 +102,6 @@ var Series = function (config) {
  * Get an iterator for the iterating the values of the series.
  */
 Series.prototype.getIterator = function () {
-	var self = this;
 	return new EmptyIterator(); // This is redefined by the constructor.
 };
 

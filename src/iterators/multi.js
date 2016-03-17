@@ -1,23 +1,13 @@
 'use strict';
 
-var assert = require('chai').assert;
 var E = require('linq');
-
-var validateIterator = require('./validate');
-
 
 //
 // An iterator that can step multiple other iterators at once.
 //
 var MultiIterator = function (iterators) {
-	assert.isArray(iterators);
-
-	iterators.forEach(function (iterator) {
-			validateIterator(iterator);
-		});
 
 	var self = this;
-
 	var ok = false;
 
 	//

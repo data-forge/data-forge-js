@@ -3,7 +3,6 @@
 var RangeIterator = function (startIndex, count) {
 
 	var self = this;
-
 	var working = startIndex-1;
 
 	self.moveNext = function () {

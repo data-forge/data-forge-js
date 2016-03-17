@@ -1,15 +1,9 @@
 'use strict';
 
-var assert = require('chai').assert;
-var validateIterator = require('./validate');
-
 //
 // Iterator that skips elements while the predicate returns true.
 //
 var SkipWhileIterator = function (iterator, predicate) {
-
-	validateIterator(iterator);
-	assert.isFunction(predicate);
 
 	var self = this;
 	var skipped = false;

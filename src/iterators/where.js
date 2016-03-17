@@ -1,15 +1,9 @@
 'use strict';
 
-var assert = require('chai').assert;
-var validateIterator = require('./validate');
-
 //
 // Iterate that filters elements based on a predicate.
 //
 var WhereIterator = function (iterator, predicate) {
-
-	validateIterator(iterator);
-	assert.isFunction(predicate);
 
 	var self = this;
 	

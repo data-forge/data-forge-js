@@ -1,15 +1,9 @@
 'use strict';
 
-var assert = require('chai').assert;
-var validateIterator = require('./validate');
-
 //
 // Iterator that takes elements while the predicate returns true.
 //
 var TakeWhileIterator = function (iterator, predicate) {
-
-	validateIterator(iterator);
-	assert.isFunction(predicate);
 
 	var self = this;
 	var taking = true;

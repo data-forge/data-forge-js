@@ -1,12 +1,9 @@
 'use strict';
 
-var assert = require('chai').assert;
-
 //
 // Data-forge enumerator for iterating a standard JavaScript array.
 //
 var ArrayIterator = function (arr) {
-	assert.isArray(arr);
 
 	var self = this;
 
