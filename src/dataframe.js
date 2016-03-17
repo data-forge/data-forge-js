@@ -182,48 +182,56 @@ var DataFrame = function (config) {
 		}
 	}
 
-	var columnNames;
-	var rows;
-	var index;
+	var rows = config.rows;
 
-	if (config.index) {
-		var inputIndex = config.index;
+	if (config.columnNames)	{
+		self._columnNames = config.columnNames;
 
-		if (Object.isArray(inputIndex)) {
-			index = function () {
-				return new ArrayIterator(inputIndex);
-			};		
+		if (config.index) {
+			var index = config.index;
+			if (Object.isArray(index)) {
+
+				if (Object.isFunction(rows)) {
+					this._iterable = function () {
+						return new PairIterator(new ArrayIterator(index), convertRowsToObjects(self._columnNames, rows()));
+					};
+				}
+				else {
+					this._iterable = function () {
+						return new PairIterator(new ArrayIterator(index), convertRowsToObjects(self._columnNames, new ArrayIterator(rows)));
+					};
+				}
+			}
+			else {
+				if (Object.isFunction(rows)) {
+					this._iterable = function () {
+						return new PairIterator(index.getIterator(), convertRowsToObjects(self._columnNames, rows()));
+					};
+				}
+				else {
+					this._iterable = function () {
+						return new PairIterator(index.getIterator(), convertRowsToObjects(self._columnNames, new ArrayIterator(rows)));
+					};				
+				}
+			}
 		}
 		else {
-			index = function () {
-				return inputIndex.getIterator();
-			};
-		}
+			if (Object.isFunction(rows)) {
+				this._iterable = function () {
+					return new PairIterator(new CountIterator(), convertRowsToObjects(self._columnNames, rows()));
+				};
+			}
+			else {
+				this._iterable = function () {
+					return new PairIterator(new CountIterator(), convertRowsToObjects(self._columnNames, new ArrayIterator(rows)));
+				};
+			}
+		}	
 	}
 	else {
-		index = function () {
-			return new CountIterator();
-		};
-	}
+		if (Object.isFunction(rows)) {
 
-	if (config.columnNames) {
-		columnNames = config.columnNames;
-
-	 	if (Object.isFunction(config.rows)) {
-			rows = function () {
-				return convertRowsToObjects(columnNames, config.rows());
-			};
-		}
-		else {
-	 		rows = function () {
-				return convertRowsToObjects(columnNames, new ArrayIterator(config.rows));
-	 		};		 		
-		}
-	}
-	else if (config.rows) {
-		if (Object.isFunction(config.rows)) {
-
-			columnNames = function () {
+			self._columnNames = function () {
 				var iterator = config.rows();
 				if (!iterator.moveNext()) {
 					return [];
@@ -231,29 +239,59 @@ var DataFrame = function (config) {
 
 				return Object.keys(iterator.getCurrent());
 			};				
-
-			rows = config.rows;
 		}
 		else {
 			if (config.rows.length > 0) {
 
 				// Derive column names from object fields.
-				columnNames = Object.keys(config.rows[0]);
+				self._columnNames = Object.keys(config.rows[0]);
 			}
+			else {
+				self._columnNames = [];
+			}
+		}
 
-			rows = function () {
-				return new ArrayIterator(config.rows);
-			};
+		if (config.index) {
+			var index = config.index;
+			if (Object.isArray(index)) {
+
+				if (Object.isFunction(rows)) {
+					this._iterable = function () {
+						return new PairIterator(new ArrayIterator(index), rows());
+					};
+				}
+				else {
+					this._iterable = function () {
+						return new PairIterator(new ArrayIterator(index), new ArrayIterator(rows));
+					};
+				}
+			}
+			else {
+				if (Object.isFunction(rows)) {
+					this._iterable = function () {
+						return new PairIterator(index.getIterator(), rows());
+					};
+				}
+				else {
+					this._iterable = function () {
+						return new PairIterator(index.getIterator(), new ArrayIterator(rows));
+					};				
+				}
+			}
+		}
+		else {
+			if (Object.isFunction(rows)) {
+				this._iterable = function () {
+					return new PairIterator(new CountIterator(), rows());
+				};
+			}
+			else {
+				this._iterable = function () {
+					return new PairIterator(new CountIterator(), new ArrayIterator(rows));
+				};
+			}
 		}
 	}
-	
-	assert.isFunction(index);
-	assert.isFunction(rows);
-
-	self._columnNames = columnNames || [];
-	self._iterable = function () {
-		return new PairIterator(index(), rows());
-	};
 };
 
 /**
