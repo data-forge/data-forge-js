@@ -74,7 +74,7 @@ var DataFrame = function (config) {
 		return;
 	}
 
-	if (config && config.iterable) {
+	if (config.iterable) {
 
 		assert.isFunction(config.iterable, "Expected 'iterable' field of 'config' parameter to DataFrame constructor to be a function that returns an index/value pairs iterator.");
 
@@ -98,6 +98,14 @@ var DataFrame = function (config) {
 			};
 		}
 		self._iterable = iterable;
+		return;
+	}
+
+	if (!config.rows) {
+		self._columnNames = config.columnNames || [];
+		self._iterable = function () {
+			return new EmptyIterator();
+		};
 		return;
 	}
 
@@ -220,30 +228,24 @@ var DataFrame = function (config) {
 			
 			if (config.rows.length > 0) {
 				assert.isObject(config.rows[0], "Expected 'rows' member of 'config' parameter to DataFrame constructor to be an array of JavaScript objects.")
-
-				// Derive column names from object fields.
-				columnNames = function () {
-					return E.from(config.rows)
-						.selectMany(function (row) {
-							return Object.keys(row);
-						})
-						.distinct()
-						.toArray();
-				};
-
-				rows = function () {
-					return new ArrayIterator(config.rows);
-				};
 			}
+
+			// Derive column names from object fields.
+			columnNames = function () {
+				return E.from(config.rows)
+					.selectMany(function (row) {
+						return Object.keys(row);
+					})
+					.distinct()
+					.toArray();
+			};
+
+			rows = function () {
+				return new ArrayIterator(config.rows);
+			};
 		}
 	}
 	
-	if (!rows) {
-		rows = function () {
-			return new ArrayIterator([]);
-		};
-	}
-
 	assert.isFunction(index);
 	assert.isFunction(rows);
 
