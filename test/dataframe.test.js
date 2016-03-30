@@ -1330,8 +1330,10 @@ describe('DataFrame', function () {
 				],
 				[10, 11]
 			);
-		var modified = dataFrame.transformColumn("Column2", function (value) {
-				return value + 100;
+		var modified = dataFrame.transformColumns({
+				Column2: function (value) {
+					return value + 100;
+				}
 			});
 		expect(dataFrame.getSeries("Column2").toValues()).to.eql([1, 2]);
 		expect(modified.getSeries("Column2").toValues()).to.eql([101, 102]);
@@ -1347,11 +1349,11 @@ describe('DataFrame', function () {
 				],
 				[10, 11]
 			);
-		var modified = dataFrame.transformColumn({
-				"Column2": function (value) {
+		var modified = dataFrame.transformColumns({
+				Column2: function (value) {
 					return value + 100;
 				},
-				"Column1": function (value) {
+				Column1: function (value) {
 					return value + value;
 				},
 			});
@@ -1372,8 +1374,10 @@ describe('DataFrame', function () {
 				],
 				[10, 11]
 			);
-		var modified = dataFrame.transformColumn("non-existing-column", function (value) {
-				return value + 100;
+		var modified = dataFrame.transformColumns({
+				"non-existing-column": function (value) {
+					return value + 100;
+				},
 			});
 		expect(dataFrame).to.equal(modified);
 		expect(dataFrame.getColumnNames()).to.eql(columnNames);

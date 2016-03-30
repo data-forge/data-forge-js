@@ -1431,37 +1431,30 @@ DataFrame.prototype.count = function () {
 };
 
 /**
- * Transform a column. This is equivalent to extracting a column, calling 'select' on it,
+ * Transform one or more columns. This is equivalent to extracting a column, calling 'select' on it,
  * then plugging it back in as the same column.
  *
- * @param {string} columnName - Name of the column to transform.
- * @param {function} selector - Selector function that transforms each row to a different data structure.
+ * @param {object} columnSelectors - Object with field names for each column to be transformed. Each field you be a selector that transforms that column.
  * 
  */
-DataFrame.prototype.transformColumn = function (columnNameOrColumnNames, selector) { //todo: this should support 'column name or index'.
+DataFrame.prototype.transformColumns = function (columnSelectors) {
 
-	var self = this; //todo: make this lazy.
+	assert.isObject(columnSelectors, "Expected 'columnSelectors' parameter of 'transformColumns' function to be an object. Field names should specify columns to transform. Field values should be selector functions that specify the transformation for each column.");
 
-	if (Object.isObject(columnNameOrColumnNames)) {
-		var columnNames = Object.keys(columnNameOrColumnNames);
-		return E.from(columnNames)
-			.aggregate(self, function (prevDataFrame, columnName) {
-				var columnSelector = columnNameOrColumnNames[columnName];
-				return prevDataFrame.transformColumn(columnName, columnSelector);
-			});
-	}
-	else {
-		assert.isString(columnNameOrColumnNames, "Expected 'columnNameOrColumnNames' parameter to 'transformColumn' to be a string or object.");
-		assert.isFunction(selector, "Expected 'selector' parameter to 'transformColumn' to be a function.");
-
-		var columnName = columnNameOrColumnNames;
-		if (!self.hasSeries(columnName)) {
-			return self;
-		}
-
-		var transformedSeries = self.getSeries(columnName).select(selector);
-		return self.setSeries(columnName, transformedSeries);
-	}
+	var self = this;
+	return E.from(Object.keys(columnSelectors))
+		.aggregate(self, function (prevDataFrame, columnName) {
+			if (prevDataFrame.hasSeries(columnName)) {
+				return prevDataFrame.setSeries(
+					columnName,
+					prevDataFrame.getSeries(columnName)
+						.select(columnSelectors[columnName])
+				);			
+			}
+			else {
+				return self;
+			}	
+		});
 };
 
 /**
