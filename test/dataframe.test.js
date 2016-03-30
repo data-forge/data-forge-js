@@ -1294,7 +1294,7 @@ describe('DataFrame', function () {
 		]);
 	});
 
-	it('can rename column - specified by name', function () {
+	it('can rename column', function () {
 
 		var oldColumnName = "Column2";
 		var dataFrame = initDataFrame(
@@ -1308,27 +1308,6 @@ describe('DataFrame', function () {
 
 		var newColumnName = "NewColumnName";
 		var renamed = dataFrame.renameColumn(oldColumnName, newColumnName);
-
-		expect(dataFrame.getColumnNames()[1]).to.eql(oldColumnName);
-
-		expect(renamed.getColumnNames()[1]).to.eql(newColumnName);
-		expect(renamed.getSeries(newColumnName)).to.be.ok;
-	});
-
-	it('can rename column - specified by index', function () {
-
-		var oldColumnName = "Column2";
-		var dataFrame = initDataFrame(
-				["Column1", oldColumnName, "Column3"], 
-				[
-					['A', 1],
-					['B', 2],
-				],
-				[10, 11]
-			);
-
-		var newColumnName = "NewColumnName";
-		var renamed = dataFrame.renameColumn(1, newColumnName);
 
 		expect(dataFrame.getColumnNames()[1]).to.eql(oldColumnName);
 

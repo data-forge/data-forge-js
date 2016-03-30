@@ -26,25 +26,6 @@ var E = require('linq');
 
 var validateIterator = require('./iterators/validate');
 
-//
-// Helper function to grab a column index from a 'column name or index' parameter.
-//
-var parseColumnNameOrIndexToIndex = function (dataFrame, columnNameOrIndex, failForNonExistantColumn) {
-
-	if (Object.isString(columnNameOrIndex)) {
-		var columnIndex = dataFrame.getColumnIndex(columnNameOrIndex);
-		if (failForNonExistantColumn && columnIndex < 0) {
-			throw new Error("Failed to find column with name '" + columnNameOrIndex + "'.");
-		}
-		return columnIndex;
-	}
-	else {	
-		assert.isNumber(columnNameOrIndex, "Expected 'columnNameOrIndex' parameter to be either a string or index that specifies an existing column.");
-
-		return columnNameOrIndex;
-	}
-};
-
 var parseColumnNameOrIndexToName = function (dataFrame, columnNameOrIndex, failForNonExistantColumn) {
 
 	if (Object.isString(columnNameOrIndex)) {
@@ -590,12 +571,14 @@ DataFrame.prototype.hasSeries = function (columnName) {
  * Verify the existance of a column and return it.
  * Throws an exception if the column doesn't exist.
  *
- * @param {string|int} columnNameOrIndex - Name or index of the column to retreive.
+ * @param {string} columnName - Name or index of the column to retreive.
  */
-DataFrame.prototype.expectSeries = function (columnNameOrIndex) {
+DataFrame.prototype.expectSeries = function (columnName) {
 
 	var self = this;
-	parseColumnNameOrIndexToIndex(self, columnNameOrIndex, true);
+	if (self.getColumnNames().indexOf(columnName) < 0) {
+		throw new Error("Expected data-frame to contain series with column name: '" + columnName + "'.");
+	}
 	return self;
 };
 
@@ -1306,15 +1289,15 @@ DataFrame.prototype.renameColumns = function (newColumnNames) {
 /*
  * Create a new data frame with a single column renamed.
  * 
- * @param {string|int} columnNameOrIndex - Specifies the column to rename.
+ * @param {string} columnName - Specifies the column to rename.
  * @param {string} newColumnName - The new name for the specified column.
  */
-DataFrame.prototype.renameColumn = function (columnNameOrIndex, newColumnName) {
+DataFrame.prototype.renameColumn = function (columnName, newColumnName) {
 
 	var self = this;
-	var columnIndex = parseColumnNameOrIndexToIndex(self, columnNameOrIndex, false);
+	var columnIndex = self.getColumnIndex(columnName);
 	if (columnIndex === -1) {
-		return self;
+		return self; // No column to be renamed.
 	}
 
 	assert.isString(newColumnName, "Expected 'newColumnName' parameter to 'renameColumn' to be a string.");
