@@ -4,11 +4,11 @@ JavaScript data transformation and analysis toolkit inspired by Pandas and LINQ.
 
 Works in both NodeJS and the browser. 
 
-[Also available for C#](https://github.com/data-forge/data-forge-cs).
+[Also in development for C#](https://github.com/data-forge/data-forge-cs).
 
 ----------
 
-This project is a work in progress, please don't use unless you want to be an early adopter. Please expect API changes. Please contribute and help guide the direction of *data-forge*.
+**Warning**: This project is a work in progress, please don't use unless you want to be an early adopter. Please expect API changes. Please contribute and help guide the direction of *data-forge*.
 
 Note that some features described in this README are not yet implemented, although that list grows smaller every day.
 
@@ -203,8 +203,6 @@ This section explains the key concepts of *Data-Forge*.
 
 This is the *main* concept. A matrix of data structured as rows and columns. Can be considered a sequence of rows. Has an implicit or explicit index. Think of it as a spreadsheet in memory.
 
-A *data-frame* internal representation depends on how the data-frame was constructed. It can be stored as a collection of columns (when constructed manually) or a collection of rows (as is the case when constructed from a CSV file).
-
 A *data-frame* can be easily constructed from various formats and it can be exported to various formats. 
 
 ## Row
@@ -358,33 +356,32 @@ The *from* / *to* functions can be used in combination with Node.js `fs` functio
 
 See the [examples section](#examples) for more examples of loading various data sources and formats.
 
-## Extracting rows from a data frame
+## Extracting rows from a data-frame
 
 Rows can be extracted from a data-frame in several ways.
 
-First we can lazily iterate using an iterator. This is the lowest-level method of accessing the rows of a data frame. Iterators allow lazy evaluation (like LINQ in C#).
+Note: the follow functions cause lazy evaluation to complete (like the *toArray* function in LINQ). This can be performance intensive.
 
-	var iterator = dataFrame.getIterator();
-	while (iterator.moveNext()) {
-		var row = iterator.getCurrent();
-		// do something with the row.
-	}
+To extract rows as arrays of data (ordered by column): 
 
-There are higher-level ways to extract the rows. Under the hood these use iterators. These force lazy evaluation to complete (like the *toArray* function in LINQ).
 
 	var arrayOfArrays = dataFrame.toValues();
 
-and
+To extract rows as objects (with column names as fields):
 
 	var arrayOfObjects = dataFrame.toObjects();
 
-A new data-frame can be created from a *slice* of rows:
+To extracts index + row pairs:
+
+	var arrayOfPairs = dataFrame.toPairs();
+
+A new data-frame can also be created from a *slice* of rows:
 
 	var startIndex = ... // Starting row index to include in subset. 
 	var endIndex = ... // Ending row index to include in subset.
 	var rowSubset = dataFrame.slice(startIndex, endIndex);
 
-## Extracting columns and series from a data frame
+## Extracting columns and series from a data-frame
 
 Get the names of the columns:
 
@@ -408,45 +405,33 @@ Get the series for a column by index:
 
 	var series = dataFrame.getSeries(5); 
 
-Create a new dataframe from a sub-set of columns:
+Create a new data-frame from a subset of columns:
 
 	var columnSubset = df.subset(["Some-Column", "Some-Other-Column"]);
 
-## Enumerating a series
+## Extract values from a series
 
-Use an iterator to lazily enumerate a series:
+Note: the follow functions cause lazy evaluation to complete (like the *toArray* function in LINQ). This can be performance intensive.
 
-	var iterator = someSeries.getIterator();
-	while (iterator.moveNext()) {
-		var row = iterator.getCurrent();
-		// do something with the row.
-	}
-
-
-Extract the values from the series as an array. Note that this could be an expensive operation. 
-Lazy evaluation of the entire-data frame may be forced to complete.  
+Extract the values from the series as an array:   
 
 	var arrayOfValues = someSeries.toValues();
 
-## Enumerating an index
+Extract index + value pairs from the series as an array:
 
-Getting the index from a data-frame:
+	var arrayOfPairs = someSeries.toPairs();
+
+## Extract values from an index
+
+Retreive the index from a data-frame:
 
 	var index = dataFrame.getIndex();
 
-Getting the index from a series:
+Retreive the index from a series:
 
 	var index = someSeries.getIndex();
 
-The index can be enumerated lazily:
-
-	var iterator = dataFrame.getIndex().getIterator();
-	while (iterator.moveNext()) {
-		var row = iterator.getCurrent();
-		// do something with the row.
-	}
-
-Retrieve value from the index as an array:
+Retrieve values from the index as an array:
 
 	var arrayOfValues = index.toValues();
 
@@ -476,13 +461,13 @@ Again note that it is only the new data frame that includes the modified column.
 
 ## Removing a column
 
-A column can easily be removed:
+One or more columns can easily be removed:
 
-	var newDf = df.dropColumn('Column-to-be-dropped');
+	var newDf = df.dropColumns(['col1', 'col2']);
 
-Also works for multiple columns:
+Also works for single columns:
 
-	var newDf = df.dropColumn(['col1', 'col2']);
+	var newDf = df.dropColumns('Column-to-be-dropped');
 
 # Immutability and Chained Functions
 
@@ -492,45 +477,58 @@ Data-Forge supports only [immutable](https://en.wikipedia.org/wiki/Immutable_obj
 
 This is why, in the following example, the final data frame is captured after all operations are applied:
 
-	var df = new dataForge.DataFrame(config).setIndex("Col3").dropColumn("Col3");
+	var df = new dataForge.DataFrame(config).setIndex("Col3").dropColumns("Col3");
 
 Consider an alternate structure:
 
 	var df1 = new dataForge.DataFrame(config);
 	var df2 = df1.setIndex("Col3");
-	var df3 = df2.dropColumn("Col3");
+	var df3 = df2.dropColumns("Col3");
 
 Here *df1*, *df2* and *df3* are separate data-frames with the results of the previous operations applied. These data-frames are all immutable and cannot be changed. Any function that transforms a data-frame returns a new and independent data frame. If you are not used to this sort of thing, it may require some getting used to!
 
 # Lazy Evaluation
 
-todo:
-Lazy evaluation in Data-Forge is implemented through *iterators*.
+Lazy evaluation in Data-Forge is implemented through *iterators*. 
 
-todo: move the examples of manually iteration here.
-todo: how do we get an iterator.
-todo: there are constraints on what the iterators can return.
+An iterator is retrieved from a data-frame, series or index by calling `getIterator`. A new and distinct iterator is created each time `getIterator` is called.
 
-A data-frame can be created from an iterable:
+For example:
 
-	var df = new dataForge.DataFrame({ rows: someIterable});
+	var iterator = dataFrame.getIterator();
 
-The optional index, can also be an iterable: 
+Or
+
+	var iterator = series.getIterator();
+
+Or 
+
+	var iterator = index.getIterator();
+
+An iterator can be used to traverse a sequence and extract each index + value pair in turn.
+
+	var iterator = something.getIterator();
+	while (iterator.moveNext()) {
+		var pair = iterator.getCurrent();
+		var index  
+		// do something with the row/value.
+	}
+
+A data-frame can be created from an function that returns an iterator. This is the primary mechanism that supports creation of a pipeline of lazy DataFrames. 
 
 	var df = new dataForge.DataFrame({ 
-		rows: someIterable, 
-		index: someOtherIterable
+		iterable: function () {
+			return ... some iterator ...
+		},
 	});
 
-A series can also be created from iterables:
+A series can also be created from a function that returns an iterator:
 
 	var series = new dataForge.Series({ 
-		rows: someIterable,
-		index: someOtherIterable
+		iterable: function () {
+			return ... some iterator ...
+		},
 	});
-
-todo: show how lazy evaluation makes it possible to work with very large files.
-
   
 # Data exploration and visualization
 
@@ -609,12 +607,24 @@ Series can be transformed using `select`:
 	var oldSeries = df.getSeries("Some-Column");
 	var newSeries = oldSeries
 		.select(function (value) {
-			return transform(value); 	// <-- Apply a transformation to each value in the column.
-		});
+			// Apply a transformation to each value in the column.
+			return transform(value); 	
+		});	
+	// Plug the modified series back into the data-frame.
+	var newDf = df.setSeries("Some-Column", newSeries);
 
 The source index is preserved to the transformed series.
 
 Note: Series are immutable, the original series is unmodified.
+
+Data-Frame offers a convenience function `transformColumns` for when you want to extract, transform and plug back in one or more series at once. For example to simplify the previous code example:
+
+	var newDf = df.transformColumns({
+		Some-Column: function (value) {
+			// Apply a transformation to each value in the column.
+			return transform(value); 	
+		},
+	);
 
 ## Data-frame and series filtering
 
@@ -647,7 +657,7 @@ The `window` function allows you to produce a new series for a data-frame or ser
 
 	var windowSize = 5; // Looking at 5 rows at a times.
 	var newSeries = sourceSeriesOrDataFrame.window(windowSize,
-			function (window) {
+			function (window, windowIndex) {
 				var index = ... compute index for row ...
 				var value = ... compute value for row ...
 				return [index, value]; // Generate a row in the new series.			
@@ -663,7 +673,7 @@ As an example consider computing the weekly totals for daily sales data:
 	var salesData = ... series containing amount sold on each day ...
 
 	var weeklySales = salesData.window(7, 
-			function (window) {
+			function (window, windowIndex) {
 				return [
 					window.getIndex().last(), // Week ending.
 					window.sum(),			  // Total the amount sold during the week.
@@ -681,10 +691,11 @@ The implementation of `percentChange` looks a bit like this:
     
 	var windowSize = 2;
 	var pctChangeSeries = sourceSeries.rollingWindow(windowSize, 
-			function (indices, values) {
+			function (window, windowIndex) {
+				var values = window.toValues();
 				var amountChange = values[1] - values[0]; // Compute amount of change.
 				var pctChange = amountChange / values[0]; // Compute % change.
-				return [indices[1], pctChange]; // Return new index and value.
+				return [window.getIndex().last(), pctChange]; // Return new index and value.
 			}
 		);
    
@@ -696,7 +707,7 @@ Now consider an example that requires a variable window size. Here is some code 
 
 	var smaPeriod = ... variable window size ...
  	var smSeries = sourceSeries.rollingWindow(smaPeriod, 
-			function (window) {
+			function (window, windowIndex) {
 	    		return [
 					window.getIndex().last(),
 					window.sum() / period,
