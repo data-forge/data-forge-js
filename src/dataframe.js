@@ -793,7 +793,7 @@ DataFrame.prototype.orderByDescending = function (columnNameOrIndexOrSelector) {
  *
  * @param {string|array} columnOrColumns - Specifies the column name (a string) or columns (array of column names) to drop.
  */
-DataFrame.prototype.dropColumn = function (columnOrColumns) {
+DataFrame.prototype.dropColumns = function (columnOrColumns) {
 
 	var self = this;
 
