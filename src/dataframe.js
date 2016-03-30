@@ -26,18 +26,6 @@ var E = require('linq');
 
 var validateIterator = require('./iterators/validate');
 
-var parseColumnNameOrIndexToName = function (dataFrame, columnNameOrIndex, failForNonExistantColumn) {
-
-	if (Object.isString(columnNameOrIndex)) {
-		return columnNameOrIndex;
-	}
-	else {	
-		assert.isNumber(columnNameOrIndex, "Expected 'columnNameOrIndex' parameter to be either a string or index that specifies an existing column.");
-
-		return dataFrame.getColumnName(columnNameOrIndex);
-	}
-};
-
 //
 // Creates an iterator that converts rows to JavaScript objects based on passed in column names.
 //
@@ -529,12 +517,12 @@ DataFrame.prototype.selectMany = function (selector) {
 /**
  * Retreive a time-series from a column of the data-frame.
  *
- * @param {string|int} columnNameOrIndex - Name or index of the column to retreive.
+ * @param {string} columnName - Specifies the column to retreive.
  */
-DataFrame.prototype.getSeries = function (columnNameOrIndex) {
+DataFrame.prototype.getSeries = function (columnName) {
 	var self = this;
 
-	var columnName = parseColumnNameOrIndexToName(self, columnNameOrIndex, true);
+	assert.isString(columnName, "Expected 'columnName' parameter to getSeries function to be a string that specifies the name of the column to retreive.");
 
 	return new Series({
 		iterable: function () {
@@ -848,8 +836,9 @@ DataFrame.prototype.dropColumn = function (columnOrColumns) {
  * @param {string} columnName - The name of the column to add or replace.
  * @param {array|column} data - Array of data or column that contains data.
  */
-DataFrame.prototype.setSeries = function (columnName, data) { //todo: should allow column name or index.
-	assert.isString(columnName, "Expected 'columnName' parameter to 'setSeries' to be a string.");
+DataFrame.prototype.setSeries = function (columnName, data) {
+
+	assert.isString(columnName, "Expected 'columnName' parameter to 'setSeries' function to be a string that specifies the column to set or replace.");
 
 	var self = this;
 
@@ -984,11 +973,11 @@ DataFrame.prototype.slice = function (startIndexOrStartPredicate, endIndexOrEndP
 };
 
 /**
- * Set a column as the index of the data frame.
+ * Set a named column as the index of the data-frame.
  *
- * @param {string|int} columnNameOrIndex - Name or index of the column to set as the index.
+ * @param {string} columnName - Name or index of the column to set as the index.
  */
-DataFrame.prototype.setIndex = function (columnNameOrIndex) {
+DataFrame.prototype.setIndex = function (columnName) {
 
 	var self = this;
 	return new DataFrame({
@@ -998,7 +987,7 @@ DataFrame.prototype.setIndex = function (columnNameOrIndex) {
 		iterable: function () {
 			return new PairIterator(
 				new SelectIterator(
-					self.getSeries(columnNameOrIndex).getIterator(),
+					self.getSeries(columnName).getIterator(),
 					function (pair) {
 						return pair[1];
 					}

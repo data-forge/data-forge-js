@@ -339,29 +339,6 @@ describe('DataFrame', function () {
 		expect(series3.toValues()).to.eql([11, 22]);
 	});
 
-	it('can retreive column by index', function () {
-		
-		var dataFrame = initDataFrame(
-			[ "Date", "Value1", "Value2", "Value3" ],
-			[
-				[new Date(1975, 24, 2), 100, 'foo', 11],
-				[new Date(2015, 24, 2), 200, 'bar', 22],
-			],
-			[5, 6]
-		);
-		var series1 = dataFrame.getSeries(1);
-		expect(series1.getIndex().toValues()).to.eql([5, 6]);
-		expect(series1.toValues()).to.eql([100, 200]);
-		
-		var series2 = dataFrame.getSeries(2);
-		expect(series2.getIndex().toValues()).to.eql([5, 6]);
-		expect(series2.toValues()).to.eql(['foo', 'bar']);
-		
-		var series3 = dataFrame.getSeries(3);
-		expect(series3.getIndex().toValues()).to.eql([5, 6]);
-		expect(series3.toValues()).to.eql([11, 22]);
-	});
-
 	it('when a series is extracted from a dataframe, undefined values are stripped out.', function () {
 		
 		var dataFrame = initDataFrame(
@@ -987,29 +964,6 @@ describe('DataFrame', function () {
 			[5, 6]
 		);
 		var indexedDataFrame = dataFrame.setIndex("Date");
-
-		expect(indexedDataFrame.getIndex().toValues()).to.eql([
-			new Date(1975, 24, 2),
-			new Date(2015, 24, 2)
-		]);
-
-		expect(indexedDataFrame.toValues()).to.eql([
-			[new Date(1975, 24, 2), 100, 'foo', 11],
-			[new Date(2015, 24, 2), 200, 'bar', 22],
-		]);
-	});
-
-	it('can set index by column index', function () {
-
-		var dataFrame = initDataFrame(
-			[ "Date", "Value1", "Value2", "Value3" ],
-			[
-				[new Date(1975, 24, 2), 100, 'foo', 11],
-				[new Date(2015, 24, 2), 200, 'bar', 22],
-			],
-			[5, 6]
-		);
-		var indexedDataFrame = dataFrame.setIndex(0);
 
 		expect(indexedDataFrame.getIndex().toValues()).to.eql([
 			new Date(1975, 24, 2),
