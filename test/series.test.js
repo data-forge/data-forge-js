@@ -1027,4 +1027,6 @@ describe('Series', function () {
 
 		expect(count).to.eql(3);
 	});
+
+
 });

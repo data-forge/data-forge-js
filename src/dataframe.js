@@ -1887,4 +1887,32 @@ DataFrame.prototype.forEach = function (callback) {
 	return self;
 };
 
+/**
+ * Group the data-frame into multiple data-frames on the value defined by the selector.
+ *
+ * @param {function} selector - Function that selects the value to group by.
+ */
+DataFrame.prototype.groupBy = function (selector) {
+	assert.isFunction(selector, "Expected 'selector' parameter to 'groupBy' function to be a function.");
+
+	//todo: make this lazy.
+
+	var self = this;
+	return E.from(self.toPairs())
+		.groupBy(function (pair) {
+			return selector(pair[1], pair[0]);
+		})
+		.select(function (group) {
+			return {
+				key: group.key(),
+				data: new DataFrame({
+					iterable: function () {
+						return new ArrayIterator(group.getSource());
+					},
+				}),
+			};
+		})
+		.toArray();
+};
+
 module.exports = DataFrame;

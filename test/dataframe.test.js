@@ -2468,4 +2468,45 @@ describe('DataFrame', function () {
 
 		expect(count).to.eql(3);
 	});
+
+	it('can group by', function () {
+
+		var columnNames = ["a", "b"];
+		var dataFrame = initDataFrame(
+			columnNames, 
+			[
+				["x", 1], 
+				["x", 2],
+				["y", 10],
+				["x", 3], 
+				["y", 11],
+				["x", 4],
+			]
+		);
+
+		var count = 0;
+		var groups = dataFrame.groupBy(function (row, index) {
+				expect(index).to.eql(count);
+				++count;
+				return row.a;
+			});
+
+		expect(count).to.eql(6);		
+
+		expect(groups[0].key).to.eql("x");
+		expect(groups[0].data.getColumnNames()).to.eql(columnNames);
+		expect(groups[0].data.toPairs()).to.eql([
+			[0, { a: "x", b: 1 } ],
+			[1, { a: "x", b: 2 } ],
+			[3, { a: "x", b: 3 } ],
+			[5, { a: "x", b: 4 } ],
+		]);
+
+		expect(groups[1].key).to.eql("y");
+		expect(groups[1].data.getColumnNames()).to.eql(columnNames);
+		expect(groups[1].data.toPairs()).to.eql([
+			[2, { a: "y", b: 10 } ],
+			[4, { a: "y", b: 11 } ],
+		]);	
+	});
 });

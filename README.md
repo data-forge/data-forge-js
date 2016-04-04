@@ -654,11 +654,38 @@ More documentation will be here soon on supported LINQ functions.
 
 ## Summarization and Aggregation
 
+## Group
+
+Data in one data-frame can be grouped into multiple data-frames on values selected from the data-frame.
+
+For example, grouping raw sales data by client:
+
+	var salesByClient = salesData.groupBy(function (row, index) {
+			return row.ClientName;
+		});
+
+This returns an array of objects with the following format:
+
+	[
+		{
+			key:	<group-by-value>, 
+			data:	<data-frame-containing-grouped-data>,
+		},
+	
+		...
+	]
+
+todo: have a proper example here with data.
+
 ## Aggregate
 
 todo
 
 ### Merge
+
+todo
+
+## Group, Aggregate and Merge
 
 todo
 
