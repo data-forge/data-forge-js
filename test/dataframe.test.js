@@ -2446,4 +2446,26 @@ describe('DataFrame', function () {
 			[4, { X: 5, Y: 6 }, 5, 6],
 		]);
 	});
+
+	it('for each', function () {
+
+		var dataFrame = initDataFrame(
+			["a", "b"], 
+			[
+				[0, 10], 
+				[1, 11],
+				[2, 12],
+			]
+		);
+
+		var count = 0;
+		dataFrame.forEach(function (v, i) {
+			expect(i).to.eql(count);
+			expect(v.a).to.eql(count);
+			expect(v.b).to.eql(count + 10);
+			++count;
+		});
+
+		expect(count).to.eql(3);
+	});
 });

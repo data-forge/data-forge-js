@@ -1867,4 +1867,24 @@ DataFrame.prototype.bringToBack = function (columnOrColumns) {
 	return self.remapColumns(reorderedColumnNames);
 };
 
+/**
+ * Invoke a callback function for each row in the DataFrame.
+ *
+ * @param {function} callback - The calback to invoke for each row.
+ */
+DataFrame.prototype.forEach = function (callback) {
+	assert.isFunction(callback, "Expected 'callback' parameter to 'forEach' function to be a function.");
+
+	var self = this;
+	var iterator = self.getIterator();
+	validateIterator(iterator);
+
+	while (iterator.moveNext()) {
+		var pair = iterator.getCurrent();
+		callback(pair[1], pair[0]);
+	}
+
+	return self;
+};
+
 module.exports = DataFrame;

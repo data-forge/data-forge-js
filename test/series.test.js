@@ -1010,4 +1010,21 @@ describe('Series', function () {
 
 		expect(zipped.toValues()).to.eql([0+10+100, 1+11+101, 2+12+102]);
 	});
+
+	it('for each', function () {
+
+		var series = dataForge.range(0, 3)
+			.select(function (v) {
+				return v.toString(); 
+			});
+
+		var count = 0;
+		series.forEach(function (v, i) {
+			expect(i).to.eql(count);
+			expect(v).to.eql(count.toString());
+			++count;
+		});
+
+		expect(count).to.eql(3);
+	});
 });

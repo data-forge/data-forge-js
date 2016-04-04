@@ -287,10 +287,9 @@ To get back an array of rows:
 
 	var rows = dataFrame.toValues();
 
-To get back an array of objects (whith column names as field names):
+To get back an array of objects (with column names as field names):
 
 	var objects = dataFrame.toObjects();
-
 
 ## Setting an index
 
@@ -381,6 +380,12 @@ A new data-frame can also be created from a *slice* of rows:
 	var endIndex = ... // Ending row index to include in subset.
 	var rowSubset = dataFrame.slice(startIndex, endIndex);
 
+Invoke a callback for each row in a data-frame using `forEach`:
+
+	dataFrame.forEach(function (row, index) {
+		// Callback function invoked for each row.
+	}); 
+
 ## Extracting columns and series from a data-frame
 
 Get the names of the columns:
@@ -420,6 +425,12 @@ Extract the values from the series as an array:
 Extract index + value pairs from the series as an array:
 
 	var arrayOfPairs = someSeries.toPairs();
+
+Invoke a callback for each value in the series using `forEach`:
+
+	someSeries.forEach(function (value, index) {
+		// Callback function invoked for each value.
+	}); 
 
 ## Extract values from an index
 
