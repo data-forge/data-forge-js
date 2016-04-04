@@ -617,9 +617,9 @@ The source index is preserved to the transformed series.
 
 Note: Series are immutable, the original series is unmodified.
 
-Data-Frame offers a convenience function `transformColumns` for when you want to extract, transform and plug back in one or more series at once. For example to simplify the previous code example:
+Data-Frame offers a convenience function `transformSeries` for when you want to extract, transform and plug back in one or more series at once. For example to simplify the previous code example:
 
-	var newDf = df.transformColumns({
+	var newDf = df.transformSeries({
 		Some-Column: function (value) {
 			// Apply a transformation to each value in the column.
 			return transform(value); 	

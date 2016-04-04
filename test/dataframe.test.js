@@ -1330,7 +1330,7 @@ describe('DataFrame', function () {
 				],
 				[10, 11]
 			);
-		var modified = dataFrame.transformColumns({
+		var modified = dataFrame.transformSeries({
 				Column2: function (value) {
 					return value + 100;
 				}
@@ -1349,7 +1349,7 @@ describe('DataFrame', function () {
 				],
 				[10, 11]
 			);
-		var modified = dataFrame.transformColumns({
+		var modified = dataFrame.transformSeries({
 				Column2: function (value) {
 					return value + 100;
 				},
@@ -1374,7 +1374,7 @@ describe('DataFrame', function () {
 				],
 				[10, 11]
 			);
-		var modified = dataFrame.transformColumns({
+		var modified = dataFrame.transformSeries({
 				"non-existing-column": function (value) {
 					return value + 100;
 				},

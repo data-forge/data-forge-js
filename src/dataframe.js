@@ -1437,9 +1437,9 @@ DataFrame.prototype.count = function () {
  * @param {object} columnSelectors - Object with field names for each column to be transformed. Each field you be a selector that transforms that column.
  * 
  */
-DataFrame.prototype.transformColumns = function (columnSelectors) {
+DataFrame.prototype.transformSeries = function (columnSelectors) {
 
-	assert.isObject(columnSelectors, "Expected 'columnSelectors' parameter of 'transformColumns' function to be an object. Field names should specify columns to transform. Field values should be selector functions that specify the transformation for each column.");
+	assert.isObject(columnSelectors, "Expected 'columnSelectors' parameter of 'transformSeries' function to be an object. Field names should specify columns to transform. Field values should be selector functions that specify the transformation for each column.");
 
 	var self = this;
 	return E.from(Object.keys(columnSelectors))
