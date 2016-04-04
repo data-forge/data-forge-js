@@ -308,9 +308,9 @@ Or an existing column can be promoted to an index:
  
 	var dataFrame = new dataForge.DataFrame(someConfig).setIndex("Col3");
 
-Be aware that promoting a column to an index in Data-Forge doesn't remove the column (as it does in Pandas). You can easily achieve this by calling `dropColumn`:
+Be aware that promoting a column to an index in Data-Forge doesn't remove the column (as it does in Pandas). You can easily achieve this by calling `dropSeries`:
 
-	var dataFrame = new dataForge.DataFrame(someConfig).setIndex("Col3").dropColumn("Col3");
+	var dataFrame = new dataForge.DataFrame(someConfig).setIndex("Col3").dropSeries("Col3");
 
 An index is required for certain operations like `merge`.
 
@@ -463,11 +463,11 @@ Again note that it is only the new data frame that includes the modified column.
 
 One or more columns can easily be removed:
 
-	var newDf = df.dropColumns(['col1', 'col2']);
+	var newDf = df.dropSeries(['col1', 'col2']);
 
 Also works for single columns:
 
-	var newDf = df.dropColumns('Column-to-be-dropped');
+	var newDf = df.dropSeries('Column-to-be-dropped');
 
 # Immutability and Chained Functions
 
@@ -477,13 +477,13 @@ Data-Forge supports only [immutable](https://en.wikipedia.org/wiki/Immutable_obj
 
 This is why, in the following example, the final data frame is captured after all operations are applied:
 
-	var df = new dataForge.DataFrame(config).setIndex("Col3").dropColumns("Col3");
+	var df = new dataForge.DataFrame(config).setIndex("Col3").dropSeries("Col3");
 
 Consider an alternate structure:
 
 	var df1 = new dataForge.DataFrame(config);
 	var df2 = df1.setIndex("Col3");
-	var df3 = df2.dropColumns("Col3");
+	var df3 = df2.dropSeries("Col3");
 
 Here *df1*, *df2* and *df3* are separate data-frames with the results of the previous operations applied. These data-frames are all immutable and cannot be changed. Any function that transforms a data-frame returns a new and independent data frame. If you are not used to this sort of thing, it may require some getting used to!
 

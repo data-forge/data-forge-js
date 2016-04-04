@@ -659,7 +659,7 @@ describe('DataFrame', function () {
 			],
 			[5, 6, 7, 8]
 		);
-		var modified = dataFrame.dropColumns('Date');
+		var modified = dataFrame.dropSeries('Date');
 		expect(modified.getIndex().toValues()).to.eql([5, 6, 7, 8]);
 		expect(modified.toValues()).to.eql([
 			[300, 'c', 3],
@@ -681,7 +681,7 @@ describe('DataFrame', function () {
 			],
 			[5, 6, 7, 8]
 		);
-		var modified = dataFrame.dropColumns(['Date', 'Value2'])
+		var modified = dataFrame.dropSeries(['Date', 'Value2'])
 		expect(modified.getIndex().toValues()).to.eql([5, 6, 7, 8]);
 		expect(modified.toValues()).to.eql([
 			[300, 3],
@@ -704,7 +704,7 @@ describe('DataFrame', function () {
 			],
 			[5, 6, 7, 8]
 		);
-		var modified = dataFrame.dropColumns('non-existing-column');
+		var modified = dataFrame.dropSeries('non-existing-column');
 		expect(modified.getIndex().toValues()).to.eql([5, 6, 7, 8]);
 		expect(modified.getColumnNames()).to.eql(columnNames);
 		expect(modified.toValues()).to.eql([
