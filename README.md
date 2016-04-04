@@ -685,9 +685,26 @@ todo
 
 todo
 
-## Group, Aggregate and Merge
+## Group, Aggregate and Combine
 
-todo
+	// Group by client.
+	var groups = salesData.groupBy(function (row) { 
+			return row.ClientName;
+		});
+
+	// Aggregate each group.
+	var aggregated = Enumerable.from(groups) 	// Use regular linq. 
+		.select(function (group) {
+				return group.data.aggregate({
+					ClientName: group.key,
+					Amount: dataForge.sum, 		// Sum sales per client.
+				});
+		})
+		.toArray();
+
+	// Combine the data back together.
+	var combined = dataForge.concat(aggregated);
+	console.log(combined.toString());
 
 ### Window 
 
