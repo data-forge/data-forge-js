@@ -265,6 +265,144 @@ describe('DataFrame', function () {
 		]);
 	});		
 
+	it('responds gracefully to null return from select', function () {
+
+		var dataFrame = initDataFrame(
+			[ "V" ],
+			[
+				[300],
+			]
+		);
+		var modified = dataFrame.select(function (row) {
+				return null;
+			});		
+		expect(function () {
+				modified.toValues();
+			})
+			.to.throw();
+	});
+
+	it('responds gracefully to null return from select many', function () {
+
+		var dataFrame = initDataFrame(
+			[ "V" ],
+			[
+				[300],
+			]
+		);
+		var modified = dataFrame.selectMany(function (row) {
+				return null;
+			});		
+		expect(function () {
+				modified.toValues();
+			})
+			.to.throw();			
+	});
+
+	it('responds gracefully to undefined return from select', function () {
+
+		var dataFrame = initDataFrame(
+			[ "V" ],
+			[
+				[300],
+			]
+		);
+		var modified = dataFrame.select(function (row) {
+				// Undefined
+			});		
+		expect(function () {
+				modified.toValues();
+			})
+			.to.throw();
+	});
+
+	it('responds gracefully to undefined return from select many', function () {
+
+		var dataFrame = initDataFrame(
+			[ "V" ],
+			[
+				[300],
+			]
+		);
+		var modified = dataFrame.selectMany(function (row) {
+				// Undefined
+			});		
+		expect(function () {
+				modified.toValues();
+			})
+			.to.throw();			
+	});
+
+	it('responds gracefully to non-list return from select many', function () {
+
+		var dataFrame = initDataFrame(
+			[ "V" ],
+			[
+				[300],
+			]
+		);
+		var modified = dataFrame.selectMany(function (row) {
+				return { // Return an object, not a list!
+					Blah: 1
+				};
+			});		
+		expect(function () {
+				modified.toValues();
+			})
+			.to.throw();			
+	});
+
+	it('responds gracefully to list with null entry returned from select many', function () {
+
+		var dataFrame = initDataFrame(
+			[ "V" ],
+			[
+				[300],
+			]
+		);
+		var modified = dataFrame.selectMany(function (row) {
+				return [ null ];
+			});		
+		expect(function () {
+				modified.toValues();
+			})
+			.to.throw();			
+	});
+
+	it('responds gracefully to list with undefined entry returned from select many', function () {
+
+		var dataFrame = initDataFrame(
+			[ "V" ],
+			[
+				[300],
+			]
+		);
+		var modified = dataFrame.selectMany(function (row) {
+				return [ undefined ];
+			});		
+		expect(function () {
+				modified.toValues();
+			})
+			.to.throw();			
+	});
+
+	it('responds gracefully to list with non-object entry returned from select many', function () {
+
+		var dataFrame = initDataFrame(
+			[ "V" ],
+			[
+				[300],
+			]
+		);
+		var modified = dataFrame.selectMany(function (row) {
+				return [ 5.0 ];
+			});		
+		expect(function () {
+				modified.toValues();
+			})
+			.to.throw();			
+	});
+
 	it('throws exception when pulling a non-existing column name', function () {
 		
 		expect(function () {
@@ -2509,4 +2647,5 @@ describe('DataFrame', function () {
 			[4, { a: "y", b: 11 } ],
 		]);	
 	});
+
 });

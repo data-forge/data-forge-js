@@ -479,9 +479,13 @@ DataFrame.prototype.select = function (selector) {
 	return new DataFrame({
 		iterable: function () {
 			return new SelectIterator(self.getIterator(), function (pair) {
+					var newValue = selector(pair[1], pair[0]);
+					if (!Object.isObject(newValue)) {
+						throw new Error("Expected return value from 'select' selector to be an object that represents a new row in the resulting data-frame.");
+					};
 					return [
 						pair[0],
-						selector(pair[1], pair[0]),
+						newValue,
 					];
 				});
 		},
@@ -501,14 +505,24 @@ DataFrame.prototype.selectMany = function (selector) {
 		iterable: function () {
 			return new SelectManyIterator(self.getIterator(), function (pair) {
 				var newRows = selector(pair[1], pair[0]);
-				return E.from(newRows)
-					.select(function (newRow) {
-						return [
-							pair[0], 
-							newRow,
-						];
-					})
-					.toArray();
+				if (!Object.isArray(newRows)) {
+					throw new Error("Expected return value from 'selectMany' selector to be a list of objects, each object represents a new row in the resulting data-frame.");
+				}
+
+				var newPairs = [];
+				for (var newRowIndex = 0; newRowIndex < newRows.length; ++newRowIndex) {
+					var newRow = newRows[newRowIndex];
+					if (!Object.isObject(newRow)) {
+						throw new Error("Expected list returned from 'selectMany' selector to contain only objects, each object represents a new row in the resulting data-frame.");
+					};
+
+					newPairs.push([
+						pair[0], 
+						newRow,
+					]);
+				}
+
+				return newPairs;
 			})
 		},
 	}); 	
@@ -1317,7 +1331,7 @@ DataFrame.prototype.toValues = function () {
 		for (var columnIndex = 0; columnIndex < columnNames.length; ++columnIndex) {
 			asArray.push(curRow[columnNames[columnIndex]]);
 		}
-		
+
 		values.push(asArray);
 	}
 
