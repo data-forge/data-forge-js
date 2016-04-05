@@ -1312,11 +1312,12 @@ DataFrame.prototype.toValues = function () {
 
 	while (iterator.moveNext()) {
 		var curRow = iterator.getCurrent()[1];
-		var asArray = E.from(columnNames)
-			.select(function (columnName) {
-				return curRow[columnName];
-			})
-			.toArray();
+
+		var asArray = [];
+		for (var columnIndex = 0; columnIndex < columnNames.length; ++columnIndex) {
+			asArray.push(curRow[columnNames[columnIndex]]);
+		}
+		
 		values.push(asArray);
 	}
 
