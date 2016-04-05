@@ -498,7 +498,7 @@ DataFrame.prototype.select = function (selector) {
  * @param {function} selector - Selector function that transforms each row to a different data structure.
  */
 DataFrame.prototype.selectMany = function (selector) {
-	assert.isFunction(selector, "Expected 'selector' parameter to 'selectMany' function to be a function.");
+	assert.isFunction(selector, "Expected 'selector' parameter to 'DataFrame.selectMany' function to be a function.");
 
 	var self = this;
 	return new DataFrame({
@@ -506,14 +506,14 @@ DataFrame.prototype.selectMany = function (selector) {
 			return new SelectManyIterator(self.getIterator(), function (pair) {
 				var newRows = selector(pair[1], pair[0]);
 				if (!Object.isArray(newRows)) {
-					throw new Error("Expected return value from 'selectMany' selector to be a list of objects, each object represents a new row in the resulting data-frame.");
+					throw new Error("Expected return value from 'DataFrame.selectMany' selector to be an array of objects, each object represents a new row in the resulting data-frame.");
 				}
 
 				var newPairs = [];
 				for (var newRowIndex = 0; newRowIndex < newRows.length; ++newRowIndex) {
 					var newRow = newRows[newRowIndex];
 					if (!Object.isObject(newRow)) {
-						throw new Error("Expected list returned from 'selectMany' selector to contain only objects, each object represents a new row in the resulting data-frame.");
+						throw new Error("Expected array returned from 'DataFrame.selectMany' selector to contain only objects, each object represents a new row in the resulting data-frame.");
 					};
 
 					newPairs.push([

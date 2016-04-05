@@ -266,7 +266,7 @@ Series.prototype.select = function (selector) {
  * @param {function} selector - Selector function that transforms each value to a different data structure.
  */
 Series.prototype.selectMany = function (selector) {
-	assert.isFunction(selector, "Expected 'selector' parameter to 'selectMany' function to be a function.");
+	assert.isFunction(selector, "Expected 'selector' parameter to 'Series.selectMany' function to be a function.");
 
 	var self = this;
 
@@ -274,11 +274,17 @@ Series.prototype.selectMany = function (selector) {
 		iterable: function () {
 			return new SelectManyIterator(self.getIterator(), 
 				function (pair) {
-					return E.from(selector(pair[1]))
-						.select(function (newValue) {
-							return [pair[0], newValue];
-						})
-						.toArray();
+					var newValues = selector(pair[1]);
+					if (!Object.isArray(newValues)) {
+						throw new Error("Expected return value from 'Series.selectMany' selector to be an array, each item in the array represents a new value in the resulting series.");
+					}
+
+					var newPairs = [];
+					for (var newValueIndex = 0; newValueIndex < newValues.length; ++newValueIndex) {
+						newPairs.push([pair[0], newValues[newValueIndex]]);
+					}
+
+					return newPairs;
 				}
 			);
 		},

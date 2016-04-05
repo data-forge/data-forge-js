@@ -112,6 +112,17 @@ describe('Series', function () {
 		expect(modified.toValues()).to.eql([101, 102, 301, 302, 201, 202, 6, 7]);		
 	});
 
+	it('responds gracefully to non-list returned from selectMany selector', function () {
+		var series = initSeries([0], [100]);
+		var modified = series.selectMany(function (value) {
+				return 5.0; // non a list!
+			});
+		expect(function () {
+				modified.toValues();
+			})
+			.to.throw();
+	});
+
 	it('can sort values ascending', function () {		
 		var series = initSeries([0, 1, 2, 3], [100, 300, 200, 5]);
 		var sorted = series.order();
