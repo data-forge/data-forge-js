@@ -6,6 +6,7 @@ describe('rolling window integration', function () {
 
 	var E = require('linq');
 	var expect = require('chai').expect;
+	var assert = require('chai').assert;
 
 	it('rolling window', function () {
 
@@ -50,6 +51,88 @@ describe('rolling window integration', function () {
 			[12, 12],
 		]);
 
+	});
+
+	var initDataFrame = function (columns, values, index) {
+		assert.isArray(columns);
+		assert.isArray(values);
+		
+		var config = {
+			columnNames: columns,
+			rows: values,			
+		};
+
+		if (index) {
+			config.index = new dataForge.Index(index);
+		}
+
+		return new dataForge.DataFrame(config);
+	};
+
+	//
+	// Generate a data frame for testing.
+	//
+	var genDataFrame = function (numColumns, numRows) {
+
+		var columnNames = E.range(0, numColumns)
+			.select(function (columnIndex) {
+				return (columnIndex+1).toString();
+			})
+			.toArray();
+		var rows = E.range(0, numRows)
+			.select(function (rowIndex) {
+				return E.range(0, numColumns)
+					.select(function (columnIndex) {
+						return (rowIndex+1) * (columnIndex+1);
+					})
+					.toArray();
+			})
+			.toArray();
+		var index = E.range(0, numRows)
+			.toArray();
+
+		return initDataFrame(columnNames, rows, index);
+
+	};
+
+	it('can use window and selectMany to generate multiple elements', function () {
+
+		var dataFrame = genDataFrame(2, 4);
+		var series = dataFrame.window(2, function (window, windowIndex) {
+				return [windowIndex, [window.getSeries("1").sum(), window.getSeries("2").sum()]];
+			})
+			.selectMany(function (value) {
+				assert.isArray(value);
+				return value; // The value is already a list.
+			});
+
+		expect(series.toPairs()).to.eql([
+			[0, 3],
+			[0, 6],
+			[1, 7],
+			[1, 14],
+		]);
+	});
+
+	it('can use rollingWindow and selectMany to generate multiple elements', function () {
+
+		var dataFrame = genDataFrame(2, 4);
+		var series = dataFrame.rollingWindow(2, function (window, windowIndex) {
+				return [windowIndex, [window.getSeries("1").sum(), window.getSeries("2").sum()]];
+			})
+			.selectMany(function (value) {
+				assert.isArray(value);
+				return value; // The value is already a list.
+			});
+
+		expect(series.toPairs()).to.eql([
+			[0, 3],
+			[0, 6],
+			[1, 5],
+			[1, 10],
+			[2, 7],
+			[2, 14],
+		]);
 	});
 
 });
