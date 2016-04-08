@@ -1830,7 +1830,7 @@ describe('DataFrame', function () {
 		expect(reversed.getIndex().toValues()).to.eql([12, 11, 10]);
 	})
 
-	it('can generate column', function () {
+	it('can generate series', function () {
 
 		var initialColumns = ["Column1", "Column2"];
 		var dataFrame = initDataFrame(
@@ -1843,7 +1843,7 @@ describe('DataFrame', function () {
 				[10, 11, 12]
 			);
 
-		var modified = dataFrame.generateColumns(function (row) {
+		var modified = dataFrame.generateSeries(function (row) {
 				return {
 					NewColumn: row.Column1 + row.Column2,
 				};

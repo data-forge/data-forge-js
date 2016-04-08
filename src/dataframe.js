@@ -850,7 +850,7 @@ DataFrame.prototype.dropSeries = function (columnOrColumns) {
  * @param {string} columnName - The name of the column to add or replace.
  * @param {array|column} data - Array of data or column that contains data.
  */
-DataFrame.prototype.setSeries = function (columnName, data) {
+DataFrame.prototype.setSeries = function (columnName, data) { //todo
 
 	assert.isString(columnName, "Expected 'columnName' parameter to 'setSeries' function to be a string that specifies the column to set or replace.");
 
@@ -1627,9 +1627,9 @@ DataFrame.prototype.reverse = function () {
  *
  * @param {function} selector - Selector function that transforms each row to a new set of columns.
  */
-DataFrame.prototype.generateColumns = function (selector) {
+DataFrame.prototype.generateSeries = function (selector) {
 
-	assert.isFunction(selector, "Expected 'selector' parameter to 'generateColumns' function to be a function.");
+	assert.isFunction(selector, "Expected 'selector' parameter to 'generateSeries' function to be a function.");
 
 	var self = this;
 
