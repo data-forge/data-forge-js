@@ -272,6 +272,50 @@ var dataForge = {
 			});
 	},
 
+	/**
+	 * Generate a data-frame containing a matrix of values.
+	 *
+	 * @param {int} numColumns - The number of columns in the data-frame.
+	 * @param {int} numRows - The number of rows in the data-frame.
+	 * @param {number} start - The starting value.
+	 * @param {number} increment - The value to increment by for each new value.
+	 */
+	matrix: function (numColumns, numRows, start, increment) {
+		return new DataFrame({
+			columnNames: E.range(1, numColumns)
+				.select(function (columnNumber) {
+					return columnNumber.toString();
+				})
+				.toArray(),
+
+			rows: function () {
+				var rowIndex = 0;
+				var nextValue = start;
+				var curRow = undefined;
+
+				return {
+					moveNext: function () {
+						if (rowIndex >= numRows) {
+							return false;
+						}
+						curRow = E.range(0, numColumns)
+							.select(function (columnIndex) {
+								return nextValue + (columnIndex * increment);
+							})
+							.toArray();
+						nextValue += numColumns * increment;
+						++rowIndex;
+						return true;
+					},
+
+					getCurrent: function () {
+						return curRow;
+					}
+				};
+			},
+		})
+	},
+
 	/*
 	 * Zip together multiple series to create a new series.
 	 *

@@ -292,6 +292,22 @@ describe('data-forge', function () {
 
 	});
 
+	it('can generate data-frame from matrix', function () {
+
+		var dataFrame = dataForge.matrix(3, 4, 2, 3);
+		expect(dataFrame.getColumnNames()).to.eql([
+			"1",
+			"2",
+			"3",
+		]);
+		expect(dataFrame.toPairs()).to.eql([
+			[0, { "1": 2, 	"2": 5, 	"3": 8}],
+			[1, { "1": 11, 	"2": 14,	"3": 17}],
+			[2, { "1": 20, 	"2": 23, 	"3": 26}],
+			[3, { "1": 29, 	"2": 32, 	"3": 35}],
+		]);
+	});
+
 	it('can zip multiple series', function () {
 
 		var series1 = dataForge.range(0, 3);
