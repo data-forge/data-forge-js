@@ -1208,4 +1208,30 @@ Series.prototype.forEach = function (callback) {
 	return self;
 };
 
+/**
+ * Determine if the predicate returns truthy for all elements.
+ *
+ * @param {function} predicate - Predicate function that receives the value for each element and turns truthy for a match, otherwise falsy.
+ */
+Series.prototype.all = function (predicate) {
+	assert.isFunction(predicate, "Expected 'predicate' parameter to 'all' to be a function.")
+
+	var self = this;
+	var iterator = self.getIterator();
+	validateIterator(iterator);
+
+	var count = 0;
+
+	while (iterator.moveNext()) {
+		var pair = iterator.getCurrent();
+		if (!predicate(pair[1], pair[0])) {
+			return false;
+		}
+
+		++count;
+	}
+
+	return count > 0;
+};
+
 module.exports = Series;

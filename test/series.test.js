@@ -1039,5 +1039,39 @@ describe('Series', function () {
 		expect(count).to.eql(3);
 	});
 
+	it('all - zero elements', function () {
 
+		var series = new Series({ values: [] });
+
+		expect(series.all(function (value) { 
+				return value === 200; 
+			})).to.eql(false);
+	});
+
+	it('all - no elements match', function () {
+
+		var series = new Series({ values: [1, 2, 3, 4] });
+
+		expect(series.all(function (value) { 
+				return value === 200; 
+			})).to.eql(false);
+	});
+
+	it('all - some elements match', function () {
+
+		var series = new Series({ values: [1, 3, 3, 4] });
+
+		expect(series.all(function (value) { 
+				return value === 3; 
+			})).to.eql(false);
+	});
+
+	it('all - all elements match', function () {
+
+		var series = new Series({ values: [5, 5, 5, 5] });
+
+		expect(series.all(function (value) { 
+				return value === 5; 
+			})).to.eql(true);
+	});
 });
