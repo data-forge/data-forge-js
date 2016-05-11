@@ -1074,4 +1074,40 @@ describe('Series', function () {
 				return value === 5; 
 			})).to.eql(true);
 	});
+
+	it('any - zero elements', function () {
+
+		var series = new Series({ values: [] });
+
+		expect(series.any(function (value) { 
+				return value === 200; 
+			})).to.eql(false);
+	});
+
+	it('any - no elements match', function () {
+
+		var series = new Series({ values: [1, 2, 3, 4] });
+
+		expect(series.any(function (value) { 
+				return value === 200; 
+			})).to.eql(false);
+	});
+
+	it('any - some elements match', function () {
+
+		var series = new Series({ values: [1, 3, 3, 4] });
+
+		expect(series.any(function (value) { 
+				return value === 3; 
+			})).to.eql(true);
+	});
+
+	it('any - all elements match', function () {
+
+		var series = new Series({ values: [5, 5, 5, 5] });
+
+		expect(series.any(function (value) { 
+				return value === 5; 
+			})).to.eql(true);
+	});	
 });
