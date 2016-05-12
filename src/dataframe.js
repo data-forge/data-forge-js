@@ -1593,13 +1593,11 @@ DataFrame.prototype.last = function () {
 		throw new Error("No rows in data-frame.");
 	}
 
-	var last = iterator.getCurrent();
-
 	while (iterator.moveNext()) {
-		last = iterator.getCurrent();
+		; // Don't evaluate current item, it's too expensive.
 	}
 
-	return last[1];
+	return iterator.getCurrent()[1]; // Return the last item.
 };
 
 /** 
