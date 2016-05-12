@@ -2648,4 +2648,174 @@ describe('DataFrame', function () {
 		]);	
 	});
 
+	it('all - zero elements', function () {
+
+		var df = new DataFrame();
+
+		expect(df.all(function (row) { 
+				return row.a === 200; 
+			})).to.eql(false);
+	});
+
+	it('all - no elements match', function () {
+
+		var df = new DataFrame({
+				columnNames: ["a", "b"],
+				rows: [
+					[1, "hello"],
+					[2, "computer"],
+					[3, "yo"],
+				],
+			});
+
+		expect(df.all(function (row) { 
+				return row.a === 200; 
+			})).to.eql(false);
+	});
+
+	it('all - some elements match', function () {
+
+		var df = new DataFrame({
+				columnNames: ["a", "b"],
+				rows: [
+					[1, "hello"],
+					[3, "computer"],
+					[3, "yo"],
+				],
+			});
+
+		expect(df.all(function (row) { 
+				return row.a === 3; 
+			})).to.eql(false);
+	});
+
+	it('all - all elements match', function () {
+
+		var df = new DataFrame({
+				columnNames: ["a", "b"],
+				rows: [
+					[5, "hello"],
+					[5, "computer"],
+					[5, "yo"],
+				],
+			});
+
+		expect(df.all(function (row) { 
+				return row.a === 5; 
+			})).to.eql(true);
+	});
+
+	it('any - zero elements', function () {
+
+		var df = new DataFrame();
+
+		expect(df.any(function (row) { 
+				return row.a === 200; 
+			})).to.eql(false);
+	});
+
+	it('any - no elements match', function () {
+
+		var df = new DataFrame({
+				columnNames: ["a", "b"],
+				rows: [
+					[1, "hello"],
+					[2, "computer"],
+					[3, "yo"],
+				],
+			});
+
+		expect(df.any(function (row) { 
+				return row.a === 200; 
+			})).to.eql(false);
+	});
+
+	it('any - some elements match', function () {
+
+		var df = new DataFrame({
+				columnNames: ["a", "b"],
+				rows: [
+					[1, "hello"],
+					[3, "computer"],
+					[3, "yo"],
+				],
+			});
+
+		expect(df.any(function (row) { 
+				return row.a === 3; 
+			})).to.eql(true);
+	});
+
+	it('any - all elements match', function () {
+
+		var df = new DataFrame({
+				columnNames: ["a", "b"],
+				rows: [
+					[5, "hello"],
+					[5, "computer"],
+					[5, "yo"],
+				],
+			});
+
+		expect(df.any(function (row) { 
+				return row.a === 5; 
+			})).to.eql(true);
+	});	
+
+	it('none - zero elements', function () {
+
+		var df = new DataFrame();
+
+		expect(df.none(function (row) { 
+				return row.a === 200; 
+			})).to.eql(true);
+	});
+
+	it('none - no elements match', function () {
+
+		var df = new DataFrame({
+				columnNames: ["a", "b"],
+				rows: [
+					[1, "hello"],
+					[2, "computer"],
+					[3, "yo"],
+				],
+			});
+	
+		expect(df.none(function (row) { 
+				return row.a === 200; 
+			})).to.eql(true);
+	});
+
+	it('none - some elements match', function () {
+
+		var df = new DataFrame({
+				columnNames: ["a", "b"],
+				rows: [
+					[1, "hello"],
+					[3, "computer"],
+					[3, "yo"],
+				],
+			});
+
+		expect(df.none(function (row) { 
+				return row.a === 3; 
+			})).to.eql(false);
+	});
+
+	it('none - all elements match', function () {
+
+		var df = new DataFrame({
+				columnNames: ["a", "b"],
+				rows: [
+					[5, "hello"],
+					[5, "computer"],
+					[5, "yo"],
+				],
+			});
+
+		expect(df.none(function (row) { 
+				return row.a === 5; 
+			})).to.eql(false);
+	});	
 });

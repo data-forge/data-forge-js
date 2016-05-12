@@ -1930,4 +1930,82 @@ DataFrame.prototype.groupBy = function (selector) {
 		.toArray();
 };
 
+/**
+ * Determine if the predicate returns truthy for all values.
+ * Returns false as soon as the predicate evaluates to falsy.
+ * Returns true if the predicate returns truthy for all values in the DataFrame.
+ * Returns false if the series is empty.
+ *
+ * @param {function} predicate - Predicate function that receives each value in turn and returns truthy for a match, otherwise falsy.
+ */
+DataFrame.prototype.all = function (predicate) {
+	assert.isFunction(predicate, "Expected 'predicate' parameter to 'all' to be a function.")
+
+	var self = this;
+	var iterator = self.getIterator();
+	validateIterator(iterator);
+
+	var count = 0;
+
+	while (iterator.moveNext()) {
+		var pair = iterator.getCurrent();
+		if (!predicate(pair[1], pair[0])) {
+			return false;
+		}
+
+		++count;
+	}
+
+	return count > 0;
+};
+
+/**
+ * Determine if the predicate returns truthy for any of the values.
+ * Returns true as soon as the predicate returns truthy.
+ * Returns false if the predicate never returns truthy.
+ *
+ * @param {function} predicate - Predicate function that receives each value in turn and returns truthy for a match, otherwise falsy.
+ */
+DataFrame.prototype.any = function (predicate) {
+	assert.isFunction(predicate, "Expected 'predicate' parameter to 'all' to be a function.")
+
+	var self = this;
+	var iterator = self.getIterator();
+	validateIterator(iterator);
+
+	while (iterator.moveNext()) {
+		var pair = iterator.getCurrent();
+		if (predicate(pair[1], pair[0])) {
+			return true;
+		}
+	}
+
+	return false;
+};
+
+/**
+ * Determine if the predicate returns truthy for none of the values.
+ * Returns true for an empty DataFrame.
+ * Returns true if the predicate always returns falsy.
+ * Otherwise returns false.
+ *
+ * @param {function} predicate - Predicate function that receives each value in turn and returns truthy for a match, otherwise falsy.
+ */
+DataFrame.prototype.none = function (predicate) {
+	assert.isFunction(predicate, "Expected 'predicate' parameter to 'all' to be a function.")
+
+	var self = this;
+	var iterator = self.getIterator();
+	validateIterator(iterator);
+
+	while (iterator.moveNext()) {
+		var pair = iterator.getCurrent();
+		if (predicate(pair[1], pair[0])) {
+			return false;
+		}
+	}
+
+	return true;
+};
+
 module.exports = DataFrame;
