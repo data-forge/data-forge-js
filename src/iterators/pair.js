@@ -9,7 +9,6 @@ var PairIterator = function (it1, it2) {
 
 	var self = this;
 	var started = false;
-	var ok = true;
 
 	self.moveNext = function () {	
 
@@ -17,20 +16,15 @@ var PairIterator = function (it1, it2) {
 			started = true;
 		}
 
-		if (!ok) {
-			return false;
-		}
-
 		if (it1.moveNext() && it2.moveNext()) {
 			return true;
 		}
 
-		ok = false;
 		return false;
 	};
 
 	self.getCurrent = function () {
-		if (!started || !ok) {
+		if (!started) {
 			return undefined;
 		}
 

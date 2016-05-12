@@ -51,4 +51,15 @@ describe('take iterator', function () {
 		expect(testObject.moveNext()).to.eql(false);
 	});
 
+	it('can always get last item at the end', function () {
+
+		var testObject = new TakeIterator(new ArrayIterator([1, 2, 3, 4, 5]), 2);
+
+		testObject.moveNext();
+		testObject.moveNext();
+		testObject.moveNext();
+
+		expect(testObject.getCurrent()).to.eql(2);
+	});
+
 });

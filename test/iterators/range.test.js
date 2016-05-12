@@ -24,4 +24,14 @@ describe('Range iterator', function () {
 		expect(testObject.moveNext()).to.eql(false);
 	});
 
+	it('can always get last item at the end', function () {
+
+		var testObject = new RangeIterator(5, 2);
+
+		testObject.moveNext();
+		testObject.moveNext();
+		testObject.moveNext();
+
+		expect(testObject.getCurrent()).to.eql(6);
+	});
 });

@@ -6,13 +6,16 @@ describe('multi iterator', function () {
 	var ArrayIterator = require('../src/iterators/array');
 	var expect = require('chai').expect;
 
-	it('result is undefined before moving to first element', function () {
+	it('result is undefined before first element', function () {
 
-		var multi = new MultiIterator([]);
-		expect(multi.getCurrent()).to.be.undefined;
+		var multi = new MultiIterator([
+			new ArrayIterator([1,2]), 
+			new ArrayIterator([1,2])
+		]);
+		expect(multi.getCurrent()).to.eql(undefined);
 	});
 
-	it('completes straight way when there are no child iterators', function () {
+	it('completes straight away when there are no child iterators', function () {
 
 		var multi = new MultiIterator([]);
 		expect(multi.moveNext()).to.eql(false);
@@ -93,13 +96,23 @@ describe('multi iterator', function () {
 		expect(multi.moveNext()).to.eql(true);
 		expect(multi.getCurrent()).to.eql([2, 20]);
 		expect(multi.moveNext()).to.eql(false);
-		expect(multi.getCurrent()).to.be.undefined;
 	});
 
 	it('can realise', function () {
 
 		var multi = new MultiIterator([new ArrayIterator([1, 2]), new ArrayIterator([10, 20])]);
 		expect(multi.realize()).to.eql([[1, 10], [2, 20]]);
+	});
+
+	it('can always get last item at the end', function () {
+
+		var multi = new MultiIterator([new ArrayIterator([1, 2]), new ArrayIterator([10, 20])]);
+
+		multi.moveNext();
+		multi.moveNext();
+		multi.moveNext();
+
+		expect(multi.getCurrent()).to.eql([2, 20]);
 	});
 
 });

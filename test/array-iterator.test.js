@@ -45,12 +45,15 @@ describe('array iterator', function () {
 		expect(testObject.realize()).to.eql(values);
 	})
 
-	it('result is undefined at end', function () {
+	it('can always get last item at the end', function () {
 
-		var testObject = new ArrayIterator([1]);
+		var testObject = new ArrayIterator([1, 2]);
+
 		testObject.moveNext();
 		testObject.moveNext();
-		expect(testObject.getCurrent()).to.be.undefined;
+		testObject.moveNext();
+
+		expect(testObject.getCurrent()).to.eql(2);
 	});
 
 });

@@ -1286,4 +1286,6 @@ Series.prototype.none = function (predicate) {
 	return true;
 };
 
+
+
 module.exports = Series;

@@ -62,4 +62,17 @@ describe('concat iterator', function () {
 		expect(concat.moveNext()).to.eql(false);
 	});
 
+	it('can always get last item at the end', function () {
+
+		var testObject = new ConcatIterator([new ArrayIterator([1, 2]), new ArrayIterator([3, 4])]);
+
+		testObject.moveNext();
+		testObject.moveNext();
+		testObject.moveNext();
+		testObject.moveNext();
+		testObject.moveNext();
+
+		expect(testObject.getCurrent()).to.eql(4);
+	});
+
 });

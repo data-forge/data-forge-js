@@ -24,4 +24,14 @@ describe('empty iterator', function () {
 		expect(testObject.getCurrent()).to.eql(undefined);
 	});
 
+	it('can always get last item at the end', function () {
+
+		var testObject = new EmptyIterator();
+
+		testObject.moveNext();
+		testObject.moveNext();
+		testObject.moveNext();
+
+		expect(testObject.getCurrent()).to.eql(undefined);
+	});
 });

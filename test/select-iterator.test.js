@@ -106,5 +106,19 @@ describe('select iterator', function () {
 		expect(select.realize()).to.eql([2, 3]);
 	});
 
+	it('can always get last item at the end', function () {
+
+		var testObject = new SelectIterator(new ArrayIterator([1, 2]), 
+				function (value) {
+					return value + 1;
+				}
+			);
+
+		testObject.moveNext();
+		testObject.moveNext();
+		testObject.moveNext();
+
+		expect(testObject.getCurrent()).to.eql(3);
+	});
 
 });

@@ -56,4 +56,15 @@ describe('skip-while iterator', function () {
 		expect(testObject.moveNext()).to.eql(false);
 	});
 
+	it('can always get last item at the end', function () {
+
+		var testObject = new SkipWhileIterator(new ArrayIterator([1, 2, 3, 4]), function (value) { return value < 3; });
+
+		testObject.moveNext();
+		testObject.moveNext();
+		testObject.moveNext();
+
+		expect(testObject.getCurrent()).to.eql(4);
+	});
+
 });

@@ -26,10 +26,11 @@ var MultiIterator = function (iterators) {
 				return true;
 			}
 
-			++curIterator;
-			if (curIterator >= iterators.length) {
+			if (curIterator >= iterators.length-1) {
 				return false;
 			}
+
+			++curIterator;
 		}
 	};
 

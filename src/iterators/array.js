@@ -10,7 +10,12 @@ var ArrayIterator = function (arr) {
 	var rowIndex = -1;
 	
 	self.moveNext = function () {
-		return ++rowIndex < arr.length;
+		if (rowIndex < arr.length-1) {
+			++rowIndex;
+			return true;
+		}
+		
+		return false;
 	};
 
 	self.getCurrent = function () {

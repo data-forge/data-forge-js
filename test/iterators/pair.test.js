@@ -143,7 +143,6 @@ describe('pair iterator', function () {
 		expect(pair.moveNext()).to.eql(true);
 		expect(pair.getCurrent()).to.eql([2, 20]);
 		expect(pair.moveNext()).to.eql(false);
-		expect(pair.getCurrent()).to.be.undefined;
 	});
 
 	it('can realise', function () {
@@ -152,4 +151,14 @@ describe('pair iterator', function () {
 		expect(pair.realize()).to.eql([[1, 10], [2, 20]]);
 	});
 
+	it('can always get last item at the end', function () {
+
+		var testObject = new PairIterator(new ArrayIterator([1, 2]), new ArrayIterator([10, 20]));
+
+		testObject.moveNext();
+		testObject.moveNext();
+		testObject.moveNext();
+
+		expect(testObject.getCurrent()).to.eql([2, 20]);
+	});
 });

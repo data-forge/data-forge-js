@@ -8,7 +8,7 @@ var E = require('linq');
 var MultiIterator = function (iterators) {
 
 	var self = this;
-	var ok = false;
+	var started = false;
 
 	//
 	// Move all iterators to the next element.
@@ -16,29 +16,30 @@ var MultiIterator = function (iterators) {
 	// Completes when first iterator completes.
 	//	
 	self.moveNext = function () {				
+		started = true;
 
 		if (iterators.length > 0) {
-			ok = E.from(iterators)
+			return  E.from(iterators)
 					.select(function (iterator) {
 						return iterator.moveNext();
 					})
 					.all();
 		}
-
-		return ok;
+		else {
+			return false;
+		}
 	};
 
 	self.getCurrent = function () {
-		if (ok) {
-			return E.from(iterators)
-				.select(function (iterator) {
-					return iterator.getCurrent();
-				})
-				.toArray();
-		}
-		else {
+		if (!started) {
 			return undefined;
 		}
+		
+		return E.from(iterators)
+			.select(function (iterator) {
+				return iterator.getCurrent();
+			})
+			.toArray();
 	};
 
 	//
