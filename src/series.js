@@ -991,13 +991,11 @@ Series.prototype.last = function () {
 		throw new Error("No rows in series.");
 	}
 
-	var last = iterator.getCurrent();
-
 	while (iterator.moveNext()) {
-		last = iterator.getCurrent();
+		; // Don't evaluate each item, it's too expensive.
 	}
 
-	return last[1];
+	return iterator.getCurrent()[1]; // Just evaluate the last item of the iterator.
 };
 
 /** 
@@ -1206,9 +1204,7 @@ Series.prototype.forEach = function (callback) {
 	}
 
 	return self;
-};
-
-/**
+};/**
  * Determine if the predicate returns truthy for all values.
  * Returns false as soon as the predicate evaluates to falsy.
  * Returns true if the predicate returns truthy for all values in the Series.
