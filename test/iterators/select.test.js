@@ -2,8 +2,8 @@
 
 describe('select iterator', function () {
 
-	var SelectIterator = require('../src/iterators/select');
-	var ArrayIterator = require('../src/iterators/array');
+	var SelectIterator = require('../../src/iterators/select');
+	var ArrayIterator = require('../../src/iterators/array');
 	var expect = require('chai').expect;
 
 	it('result is undefined before moving to first element', function () {
