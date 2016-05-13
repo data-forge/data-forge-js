@@ -2,8 +2,8 @@
 
 describe('skip-while iterator', function () {
 
-	var ArrayIterator = require('../src/iterators/array');
-	var SkipWhileIterator = require('../src/iterators/skip-while');
+	var ArrayIterator = require('../../src/iterators/array');
+	var SkipWhileIterator = require('../../src/iterators/skip-while');
 	var expect = require('chai').expect;
 
 	it('result is undefined before moving to first element', function () {

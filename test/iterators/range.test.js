@@ -1,6 +1,6 @@
 'use strict';
 
-describe('Range iterator', function () {
+describe('range iterator', function () {
 
 	var RangeIterator = require('../../src/iterators/range.js');
 

@@ -2,8 +2,8 @@
 
 describe('take-while iterator', function () {
 
-	var ArrayIterator = require('../src/iterators/array');
-	var TakeWhileIterator = require('../src/iterators/take-while');
+	var ArrayIterator = require('../../src/iterators/array');
+	var TakeWhileIterator = require('../../src/iterators/take-while');
 	var expect = require('chai').expect;
 
 	it('result is undefined before moving to first element', function () {

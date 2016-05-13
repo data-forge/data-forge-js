@@ -2,8 +2,8 @@
 
 describe('multi iterator', function () {
 
-	var MultiIterator = require('../src/iterators/multi');
-	var ArrayIterator = require('../src/iterators/array');
+	var MultiIterator = require('../../src/iterators/multi');
+	var ArrayIterator = require('../../src/iterators/array');
 	var expect = require('chai').expect;
 
 	it('result is undefined before first element', function () {

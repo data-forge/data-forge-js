@@ -1,6 +1,6 @@
 'use strict';
 
-describe('select iterator', function () {
+describe('select-many iterator', function () {
 
 	var SelectManyIterator = require('../../src/iterators/select-many');
 	var ArrayIterator = require('../../src/iterators/array');

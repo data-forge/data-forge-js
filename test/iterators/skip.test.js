@@ -2,8 +2,8 @@
 
 describe('skip iterator', function () {
 
-	var ArrayIterator = require('../src/iterators/array');
-	var SkipIterator = require('../src/iterators/skip');
+	var ArrayIterator = require('../../src/iterators/array');
+	var SkipIterator = require('../../src/iterators/skip');
 	var expect = require('chai').expect;
 
 	it('result is undefined before moving to first element', function () {

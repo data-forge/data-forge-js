@@ -1,6 +1,6 @@
 'use strict';
 
-describe('select iterator', function () {
+describe('where iterator', function () {
 
 	var WhereIterator = require('../../src/iterators/where');
 	var ArrayIterator = require('../../src/iterators/array');
