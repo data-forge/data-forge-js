@@ -7,6 +7,7 @@
 var Series = require('./series');
 var Index = require('./index');
 var ArrayIterator = require('./iterators/array');
+var MultiIterator = require('./iterators/multi');
 var PairIterator = require('./iterators/pair');
 var SkipIterator = require('./iterators/skip');
 var SkipWhileIterator = require('./iterators/skip-while');
@@ -102,7 +103,7 @@ var DataFrame = function (config) {
 		return;
 	}
 
-	if (!config.rows) {
+	if (!config.rows &&  !config.columns) {
 		self._columnNames = config.columnNames || [];
 		self.getIterator = function () {
 			return new EmptyIterator();
@@ -142,6 +143,8 @@ var DataFrame = function (config) {
 		}
 	}
 	else if (config.rows) {
+		assert(!config.columns, "Can't use both 'rows' and 'columns' fields of 'config' parameter to DataFrame constructor.");
+
 		if (!Object.isFunction(config.rows)) {
 			assert.isArray(config.rows, "Expected 'rows' member of 'config' parameter to DataFrame constructor to be an array of JavaScript objects.");
 			
@@ -150,8 +153,12 @@ var DataFrame = function (config) {
 			}
 		}
 	}
+	else if (config.columns) {
+		assert.isObject(config.columns, "Expected 'columns' member of 'config' parameter to DataFrame constructor to be an object with fields that define columns.");
+	}
 
 	var rows = config.rows;
+	var columns = config.columns;
 
 	if (config.columnNames)	{
 		self._columnNames = config.columnNames;
@@ -198,65 +205,106 @@ var DataFrame = function (config) {
 		}	
 	}
 	else {
-		if (Object.isFunction(rows)) {
+		if (rows) {
+			if (Object.isFunction(rows)) {
 
-			self._columnNames = function () {
-				var iterator = config.rows();
-				if (!iterator.moveNext()) {
-					return [];
-				}
+				self._columnNames = function () {
+					var iterator = config.rows();
+					if (!iterator.moveNext()) {
+						return [];
+					}
 
-				return Object.keys(iterator.getCurrent());
-			};				
-		}
-		else {
-			if (config.rows.length > 0) {
-
-				// Derive column names from object fields.
-				self._columnNames = Object.keys(config.rows[0]);
+					return Object.keys(iterator.getCurrent());
+				};				
 			}
 			else {
-				self._columnNames = [];
+				if (config.rows.length > 0) {
+
+					// Derive column names from object fields.
+					self._columnNames = Object.keys(config.rows[0]);
+				}
+				else {
+					self._columnNames = [];
+				}
 			}
+		}
+		else {
+			self._columnNames = Object.keys(columns);
 		}
 
 		if (config.index) {
 			var index = config.index;
 			if (Object.isArray(index)) {
 
-				if (Object.isFunction(rows)) {
-					this.getIterator = function () {
-						return new PairIterator(new ArrayIterator(index), rows());
-					};
+				if (rows) {
+					if (Object.isFunction(rows)) {
+						this.getIterator = function () {
+							return new PairIterator(new ArrayIterator(index), rows());
+						};
+					}
+					else {
+						this.getIterator = function () {
+							return new PairIterator(new ArrayIterator(index), new ArrayIterator(rows));
+						};
+					}
 				}
 				else {
 					this.getIterator = function () {
-						return new PairIterator(new ArrayIterator(index), new ArrayIterator(rows));
+						var columnIterators = E.from(self._columnNames)
+							.select(function (columnName) {
+								return new ArrayIterator(columns[columnName]);
+							})
+							.toArray();
+						return new PairIterator(new ArrayIterator(index), convertRowsToObjects(self._columnNames, new MultiIterator(columnIterators)));
 					};
 				}
 			}
 			else {
-				if (Object.isFunction(rows)) {
-					this.getIterator = function () {
-						return new PairIterator(index.getIterator(), rows());
-					};
+				if (rows) {
+					if (Object.isFunction(rows)) {
+						this.getIterator = function () {
+							return new PairIterator(index.getIterator(), rows());
+						};
+					}
+					else {
+						this.getIterator = function () {
+							return new PairIterator(index.getIterator(), new ArrayIterator(rows));
+						};				
+					}
 				}
 				else {
 					this.getIterator = function () {
-						return new PairIterator(index.getIterator(), new ArrayIterator(rows));
-					};				
+						var columnIterators = E.from(self._columnNames)
+							.select(function (columnName) {
+								return new ArrayIterator(columns[columnName]);
+							})
+							.toArray();
+						return new PairIterator(index.getIterator(), convertRowsToObjects(self._columnNames, new MultiIterator(columnIterators)));
+					};
 				}
 			}
 		}
 		else {
-			if (Object.isFunction(rows)) {
-				this.getIterator = function () {
-					return new PairIterator(new CountIterator(), rows());
-				};
+			if (rows) {
+				if (Object.isFunction(rows)) {
+					this.getIterator = function () {
+						return new PairIterator(new CountIterator(), rows());
+					};
+				}
+				else {
+					this.getIterator = function () {
+						return new PairIterator(new CountIterator(), new ArrayIterator(rows));
+					};
+				}
 			}
 			else {
 				this.getIterator = function () {
-					return new PairIterator(new CountIterator(), new ArrayIterator(rows));
+						var columnIterators = E.from(self._columnNames)
+							.select(function (columnName) {
+								return new ArrayIterator(columns[columnName]);
+							})
+							.toArray();
+						return new PairIterator(new CountIterator(), convertRowsToObjects(self._columnNames, new MultiIterator(columnIterators)));
 				};
 			}
 		}

@@ -342,4 +342,59 @@ describe('dataframe creation', function () {
 			});
 		}).to.throw();
 	});
+
+	it('can create data frame from column arrays - index', function () {
+
+		var df = new DataFrame({
+			columns: {
+				A: [1, 2, 3, 4],
+				B: ['a', 'b', 'c', 'd'],
+			},
+
+			index: new Index([10, 20, 30, 40]),
+		});
+
+		expect(df.toPairs()).to.eql([
+			[10, { A: 1, B: 'a' }],
+			[20, { A: 2, B: 'b' }],
+			[30, { A: 3, B: 'c' }],
+			[40, { A: 4, B: 'd' }],
+		]);
+	});
+
+	it('can create data frame from column arrays - array', function () {
+
+		var df = new DataFrame({
+			columns: {
+				A: [1, 2, 3, 4],
+				B: ['a', 'b', 'c', 'd'],
+			},
+
+			index: [11, 12, 13, 14],
+		});
+
+		expect(df.toPairs()).to.eql([
+			[11, { A: 1, B: 'a' }],
+			[12, { A: 2, B: 'b' }],
+			[13, { A: 3, B: 'c' }],
+			[14, { A: 4, B: 'd' }],
+		]);
+	});
+
+	it('can create data frame from column arrays - default index', function () {
+
+		var df = new DataFrame({
+			columns: {
+				A: [1, 2, 3, 4],
+				B: ['a', 'b', 'c', 'd'],
+			},
+		});
+
+		expect(df.toPairs()).to.eql([
+			[0, { A: 1, B: 'a' }],
+			[1, { A: 2, B: 'b' }],
+			[2, { A: 3, B: 'c' }],
+			[3, { A: 4, B: 'd' }],
+		]);
+	});
 });
