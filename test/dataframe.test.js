@@ -2477,6 +2477,42 @@ describe('DataFrame', function () {
 		]);
 	});
 
+	it('zip preserves index of first dataframe', function () {
+
+		var df1 = new DataFrame({
+			columnNames: ["c"],
+			rows: [[1], [2]],
+			index: [20, 27],
+		});
+
+		var df2 = new DataFrame({
+			columnNames: ["x"],
+			rows: [[100], [200]],
+			index: [30, 62],
+		});
+
+		var zipped = df1.zip(df2, 
+				function (row1, row2) {
+					return extend({}, row1, row2);
+				}
+			);
+
+		expect(zipped.toPairs()).to.eql([
+			[20,
+				{
+					c: 1,
+					x: 100,
+				}
+			],			
+			[27,
+				{
+					c: 2,
+					x: 200,
+				}
+			],
+		]);
+	});
+
 	it('can bring column to front', function () {
 
 		var dataFrame = initDataFrame(["a", "b", "c"], [[1, 2, 3], [4, 5, 6]]);

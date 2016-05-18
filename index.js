@@ -352,6 +352,7 @@ var dataForge = {
 		}
 
 		return new Series({
+			index: series[0].getIndex(),
 			values: output,
 		});
 	},
@@ -392,6 +393,7 @@ var dataForge = {
 		}
 
 		return new DataFrame({
+			index: dataFrames[0].getIndex(),
 			rows: output,
 		});
 	},	

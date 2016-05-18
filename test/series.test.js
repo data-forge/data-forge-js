@@ -1022,6 +1022,31 @@ describe('Series', function () {
 		expect(zipped.toValues()).to.eql([0+10+100, 1+11+101, 2+12+102]);
 	});
 
+	it('zip preserves the index of the first series', function () {
+
+		var s1 = new Series({ 
+			values: [1, 2, 3],
+			index: [10, 11, 12],
+		});
+
+		var s2 = new Series({ 
+			values: [10, 20, 30],
+			index: [50, 51, 52],
+		});
+
+		var zipped = s1.zip(s2, 
+				function (s1, s2) {
+				return s1 + s2;
+				}
+			);
+
+		expect(zipped.toPairs()).to.eql([
+			[10, 1+10],
+			[11, 2+20],
+			[12, 3+30],
+		]);
+	});
+
 	it('for each', function () {
 
 		var series = dataForge.range(0, 3)

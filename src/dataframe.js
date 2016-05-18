@@ -1729,7 +1729,7 @@ DataFrame.prototype.inflateColumn = function (columnNameOrIndex, selector) {
 	var self = this;
 	var dataForge = require('../index');
 
-	return self.zip(  //todo: this shoudn't purge the index.
+	return self.zip(
 		self.getSeries(columnNameOrIndex).inflate(selector),
 		function (row1, row2) {
 			return extend({}, row1, row2); //todo: this be should zip's default operation.
