@@ -18,7 +18,7 @@ var dataFrame = new dataForge.DataFrame({
 		rows: values
 	})
 	.setIndex("index")
-	.dropColumn("index");
+	.dropSeries("index");
 
 console.log(dataFrame.skip(4).take(5).toString());
 

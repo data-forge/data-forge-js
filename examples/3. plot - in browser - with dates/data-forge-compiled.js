@@ -1,4 +1,117 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+
+},{}],2:[function(require,module,exports){
+'use strict'
+
+exports.toByteArray = toByteArray
+exports.fromByteArray = fromByteArray
+
+var lookup = []
+var revLookup = []
+var Arr = typeof Uint8Array !== 'undefined' ? Uint8Array : Array
+
+function init () {
+  var code = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
+  for (var i = 0, len = code.length; i < len; ++i) {
+    lookup[i] = code[i]
+    revLookup[code.charCodeAt(i)] = i
+  }
+
+  revLookup['-'.charCodeAt(0)] = 62
+  revLookup['_'.charCodeAt(0)] = 63
+}
+
+init()
+
+function toByteArray (b64) {
+  var i, j, l, tmp, placeHolders, arr
+  var len = b64.length
+
+  if (len % 4 > 0) {
+    throw new Error('Invalid string. Length must be a multiple of 4')
+  }
+
+  // the number of equal signs (place holders)
+  // if there are two placeholders, than the two characters before it
+  // represent one byte
+  // if there is only one, then the three characters before it represent 2 bytes
+  // this is just a cheap hack to not do indexOf twice
+  placeHolders = b64[len - 2] === '=' ? 2 : b64[len - 1] === '=' ? 1 : 0
+
+  // base64 is 4/3 + up to two characters of the original data
+  arr = new Arr(len * 3 / 4 - placeHolders)
+
+  // if there are placeholders, only get up to the last complete 4 chars
+  l = placeHolders > 0 ? len - 4 : len
+
+  var L = 0
+
+  for (i = 0, j = 0; i < l; i += 4, j += 3) {
+    tmp = (revLookup[b64.charCodeAt(i)] << 18) | (revLookup[b64.charCodeAt(i + 1)] << 12) | (revLookup[b64.charCodeAt(i + 2)] << 6) | revLookup[b64.charCodeAt(i + 3)]
+    arr[L++] = (tmp >> 16) & 0xFF
+    arr[L++] = (tmp >> 8) & 0xFF
+    arr[L++] = tmp & 0xFF
+  }
+
+  if (placeHolders === 2) {
+    tmp = (revLookup[b64.charCodeAt(i)] << 2) | (revLookup[b64.charCodeAt(i + 1)] >> 4)
+    arr[L++] = tmp & 0xFF
+  } else if (placeHolders === 1) {
+    tmp = (revLookup[b64.charCodeAt(i)] << 10) | (revLookup[b64.charCodeAt(i + 1)] << 4) | (revLookup[b64.charCodeAt(i + 2)] >> 2)
+    arr[L++] = (tmp >> 8) & 0xFF
+    arr[L++] = tmp & 0xFF
+  }
+
+  return arr
+}
+
+function tripletToBase64 (num) {
+  return lookup[num >> 18 & 0x3F] + lookup[num >> 12 & 0x3F] + lookup[num >> 6 & 0x3F] + lookup[num & 0x3F]
+}
+
+function encodeChunk (uint8, start, end) {
+  var tmp
+  var output = []
+  for (var i = start; i < end; i += 3) {
+    tmp = (uint8[i] << 16) + (uint8[i + 1] << 8) + (uint8[i + 2])
+    output.push(tripletToBase64(tmp))
+  }
+  return output.join('')
+}
+
+function fromByteArray (uint8) {
+  var tmp
+  var len = uint8.length
+  var extraBytes = len % 3 // if we have 1 byte left, pad 2 bytes
+  var output = ''
+  var parts = []
+  var maxChunkLength = 16383 // must be multiple of 3
+
+  // go through the array every three bytes, we'll deal with trailing stuff later
+  for (var i = 0, len2 = len - extraBytes; i < len2; i += maxChunkLength) {
+    parts.push(encodeChunk(uint8, i, (i + maxChunkLength) > len2 ? len2 : (i + maxChunkLength)))
+  }
+
+  // pad the end with zeros, but make sure to not forget the extra bytes
+  if (extraBytes === 1) {
+    tmp = uint8[len - 1]
+    output += lookup[tmp >> 2]
+    output += lookup[(tmp << 4) & 0x3F]
+    output += '=='
+  } else if (extraBytes === 2) {
+    tmp = (uint8[len - 2] << 8) + (uint8[len - 1])
+    output += lookup[tmp >> 10]
+    output += lookup[(tmp >> 4) & 0x3F]
+    output += lookup[(tmp << 2) & 0x3F]
+    output += '='
+  }
+
+  parts.push(output)
+
+  return parts.join('')
+}
+
+},{}],3:[function(require,module,exports){
 (function (global){
 /*!
  * The buffer module from node.js, for the browser.
@@ -8,16 +121,15 @@
  */
 /* eslint-disable no-proto */
 
+'use strict'
+
 var base64 = require('base64-js')
 var ieee754 = require('ieee754')
-var isArray = require('is-array')
+var isArray = require('isarray')
 
 exports.Buffer = Buffer
 exports.SlowBuffer = SlowBuffer
 exports.INSPECT_MAX_BYTES = 50
-Buffer.poolSize = 8192 // not used by this implementation
-
-var rootParent = {}
 
 /**
  * If `Buffer.TYPED_ARRAY_SUPPORT`:
@@ -35,9 +147,6 @@ var rootParent = {}
  *   - Firefox 4-29 lacks support for adding new properties to `Uint8Array` instances,
  *     See: https://bugzilla.mozilla.org/show_bug.cgi?id=695438.
  *
- *   - Safari 5-7 lacks support for changing the `Object.prototype.constructor` property
- *     on objects.
- *
  *   - Chrome 9-10 is missing the `TypedArray.prototype.subarray` function.
  *
  *   - IE10 has a broken `TypedArray.prototype.subarray` function which returns arrays of
@@ -50,14 +159,16 @@ Buffer.TYPED_ARRAY_SUPPORT = global.TYPED_ARRAY_SUPPORT !== undefined
   ? global.TYPED_ARRAY_SUPPORT
   : typedArraySupport()
 
+/*
+ * Export kMaxLength after typed array support is determined.
+ */
+exports.kMaxLength = kMaxLength()
+
 function typedArraySupport () {
-  function Bar () {}
   try {
     var arr = new Uint8Array(1)
     arr.foo = function () { return 42 }
-    arr.constructor = Bar
     return arr.foo() === 42 && // typed array instances can be augmented
-        arr.constructor === Bar && // constructor can be set
         typeof arr.subarray === 'function' && // chrome 9-10 lack `subarray`
         arr.subarray(1, 1).byteLength === 0 // ie10 has broken `subarray`
   } catch (e) {
@@ -71,174 +182,236 @@ function kMaxLength () {
     : 0x3fffffff
 }
 
-/**
- * Class: Buffer
- * =============
- *
- * The Buffer constructor returns instances of `Uint8Array` that are augmented
- * with function properties for all the node `Buffer` API functions. We use
- * `Uint8Array` so that square bracket notation works as expected -- it returns
- * a single octet.
- *
- * By augmenting the instances, we can avoid modifying the `Uint8Array`
- * prototype.
- */
-function Buffer (arg) {
-  if (!(this instanceof Buffer)) {
-    // Avoid going through an ArgumentsAdaptorTrampoline in the common case.
-    if (arguments.length > 1) return new Buffer(arg, arguments[1])
-    return new Buffer(arg)
+function createBuffer (that, length) {
+  if (kMaxLength() < length) {
+    throw new RangeError('Invalid typed array length')
+  }
+  if (Buffer.TYPED_ARRAY_SUPPORT) {
+    // Return an augmented `Uint8Array` instance, for best performance
+    that = new Uint8Array(length)
+    that.__proto__ = Buffer.prototype
+  } else {
+    // Fallback: Return an object instance of the Buffer class
+    if (that === null) {
+      that = new Buffer(length)
+    }
+    that.length = length
   }
 
-  this.length = 0
-  this.parent = undefined
+  return that
+}
+
+/**
+ * The Buffer constructor returns instances of `Uint8Array` that have their
+ * prototype changed to `Buffer.prototype`. Furthermore, `Buffer` is a subclass of
+ * `Uint8Array`, so the returned instances will have all the node `Buffer` methods
+ * and the `Uint8Array` methods. Square bracket notation works as expected -- it
+ * returns a single octet.
+ *
+ * The `Uint8Array` prototype remains unmodified.
+ */
+
+function Buffer (arg, encodingOrOffset, length) {
+  if (!Buffer.TYPED_ARRAY_SUPPORT && !(this instanceof Buffer)) {
+    return new Buffer(arg, encodingOrOffset, length)
+  }
 
   // Common case.
   if (typeof arg === 'number') {
-    return fromNumber(this, arg)
+    if (typeof encodingOrOffset === 'string') {
+      throw new Error(
+        'If encoding is specified then the first argument must be a string'
+      )
+    }
+    return allocUnsafe(this, arg)
   }
-
-  // Slightly less common case.
-  if (typeof arg === 'string') {
-    return fromString(this, arg, arguments.length > 1 ? arguments[1] : 'utf8')
-  }
-
-  // Unusual.
-  return fromObject(this, arg)
+  return from(this, arg, encodingOrOffset, length)
 }
 
-function fromNumber (that, length) {
-  that = allocate(that, length < 0 ? 0 : checked(length) | 0)
+Buffer.poolSize = 8192 // not used by this implementation
+
+// TODO: Legacy, not needed anymore. Remove in next major version.
+Buffer._augment = function (arr) {
+  arr.__proto__ = Buffer.prototype
+  return arr
+}
+
+function from (that, value, encodingOrOffset, length) {
+  if (typeof value === 'number') {
+    throw new TypeError('"value" argument must not be a number')
+  }
+
+  if (typeof ArrayBuffer !== 'undefined' && value instanceof ArrayBuffer) {
+    return fromArrayBuffer(that, value, encodingOrOffset, length)
+  }
+
+  if (typeof value === 'string') {
+    return fromString(that, value, encodingOrOffset)
+  }
+
+  return fromObject(that, value)
+}
+
+/**
+ * Functionally equivalent to Buffer(arg, encoding) but throws a TypeError
+ * if value is a number.
+ * Buffer.from(str[, encoding])
+ * Buffer.from(array)
+ * Buffer.from(buffer)
+ * Buffer.from(arrayBuffer[, byteOffset[, length]])
+ **/
+Buffer.from = function (value, encodingOrOffset, length) {
+  return from(null, value, encodingOrOffset, length)
+}
+
+if (Buffer.TYPED_ARRAY_SUPPORT) {
+  Buffer.prototype.__proto__ = Uint8Array.prototype
+  Buffer.__proto__ = Uint8Array
+  if (typeof Symbol !== 'undefined' && Symbol.species &&
+      Buffer[Symbol.species] === Buffer) {
+    // Fix subarray() in ES2016. See: https://github.com/feross/buffer/pull/97
+    Object.defineProperty(Buffer, Symbol.species, {
+      value: null,
+      configurable: true
+    })
+  }
+}
+
+function assertSize (size) {
+  if (typeof size !== 'number') {
+    throw new TypeError('"size" argument must be a number')
+  }
+}
+
+function alloc (that, size, fill, encoding) {
+  assertSize(size)
+  if (size <= 0) {
+    return createBuffer(that, size)
+  }
+  if (fill !== undefined) {
+    // Only pay attention to encoding if it's a string. This
+    // prevents accidentally sending in a number that would
+    // be interpretted as a start offset.
+    return typeof encoding === 'string'
+      ? createBuffer(that, size).fill(fill, encoding)
+      : createBuffer(that, size).fill(fill)
+  }
+  return createBuffer(that, size)
+}
+
+/**
+ * Creates a new filled Buffer instance.
+ * alloc(size[, fill[, encoding]])
+ **/
+Buffer.alloc = function (size, fill, encoding) {
+  return alloc(null, size, fill, encoding)
+}
+
+function allocUnsafe (that, size) {
+  assertSize(size)
+  that = createBuffer(that, size < 0 ? 0 : checked(size) | 0)
   if (!Buffer.TYPED_ARRAY_SUPPORT) {
-    for (var i = 0; i < length; i++) {
+    for (var i = 0; i < size; i++) {
       that[i] = 0
     }
   }
   return that
 }
 
-function fromString (that, string, encoding) {
-  if (typeof encoding !== 'string' || encoding === '') encoding = 'utf8'
+/**
+ * Equivalent to Buffer(num), by default creates a non-zero-filled Buffer instance.
+ * */
+Buffer.allocUnsafe = function (size) {
+  return allocUnsafe(null, size)
+}
+/**
+ * Equivalent to SlowBuffer(num), by default creates a non-zero-filled Buffer instance.
+ */
+Buffer.allocUnsafeSlow = function (size) {
+  return allocUnsafe(null, size)
+}
 
-  // Assumption: byteLength() return value is always < kMaxLength.
+function fromString (that, string, encoding) {
+  if (typeof encoding !== 'string' || encoding === '') {
+    encoding = 'utf8'
+  }
+
+  if (!Buffer.isEncoding(encoding)) {
+    throw new TypeError('"encoding" must be a valid string encoding')
+  }
+
   var length = byteLength(string, encoding) | 0
-  that = allocate(that, length)
+  that = createBuffer(that, length)
 
   that.write(string, encoding)
   return that
 }
 
-function fromObject (that, object) {
-  if (Buffer.isBuffer(object)) return fromBuffer(that, object)
-
-  if (isArray(object)) return fromArray(that, object)
-
-  if (object == null) {
-    throw new TypeError('must start with number, buffer, array or string')
-  }
-
-  if (typeof ArrayBuffer !== 'undefined') {
-    if (object.buffer instanceof ArrayBuffer) {
-      return fromTypedArray(that, object)
-    }
-    if (object instanceof ArrayBuffer) {
-      return fromArrayBuffer(that, object)
-    }
-  }
-
-  if (object.length) return fromArrayLike(that, object)
-
-  return fromJsonObject(that, object)
-}
-
-function fromBuffer (that, buffer) {
-  var length = checked(buffer.length) | 0
-  that = allocate(that, length)
-  buffer.copy(that, 0, 0, length)
-  return that
-}
-
-function fromArray (that, array) {
-  var length = checked(array.length) | 0
-  that = allocate(that, length)
-  for (var i = 0; i < length; i += 1) {
-    that[i] = array[i] & 255
-  }
-  return that
-}
-
-// Duplicate of fromArray() to keep fromArray() monomorphic.
-function fromTypedArray (that, array) {
-  var length = checked(array.length) | 0
-  that = allocate(that, length)
-  // Truncating the elements is probably not what people expect from typed
-  // arrays with BYTES_PER_ELEMENT > 1 but it's compatible with the behavior
-  // of the old Buffer constructor.
-  for (var i = 0; i < length; i += 1) {
-    that[i] = array[i] & 255
-  }
-  return that
-}
-
-function fromArrayBuffer (that, array) {
-  if (Buffer.TYPED_ARRAY_SUPPORT) {
-    // Return an augmented `Uint8Array` instance, for best performance
-    array.byteLength
-    that = Buffer._augment(new Uint8Array(array))
-  } else {
-    // Fallback: Return an object instance of the Buffer class
-    that = fromTypedArray(that, new Uint8Array(array))
-  }
-  return that
-}
-
 function fromArrayLike (that, array) {
   var length = checked(array.length) | 0
-  that = allocate(that, length)
+  that = createBuffer(that, length)
   for (var i = 0; i < length; i += 1) {
     that[i] = array[i] & 255
   }
   return that
 }
 
-// Deserialize { type: 'Buffer', data: [1,2,3,...] } into a Buffer object.
-// Returns a zero-length buffer for inputs that don't conform to the spec.
-function fromJsonObject (that, object) {
-  var array
-  var length = 0
+function fromArrayBuffer (that, array, byteOffset, length) {
+  array.byteLength // this throws if `array` is not a valid ArrayBuffer
 
-  if (object.type === 'Buffer' && isArray(object.data)) {
-    array = object.data
-    length = checked(array.length) | 0
+  if (byteOffset < 0 || array.byteLength < byteOffset) {
+    throw new RangeError('\'offset\' is out of bounds')
   }
-  that = allocate(that, length)
 
-  for (var i = 0; i < length; i += 1) {
-    that[i] = array[i] & 255
+  if (array.byteLength < byteOffset + (length || 0)) {
+    throw new RangeError('\'length\' is out of bounds')
   }
-  return that
-}
 
-if (Buffer.TYPED_ARRAY_SUPPORT) {
-  Buffer.prototype.__proto__ = Uint8Array.prototype
-  Buffer.__proto__ = Uint8Array
-}
+  if (length === undefined) {
+    array = new Uint8Array(array, byteOffset)
+  } else {
+    array = new Uint8Array(array, byteOffset, length)
+  }
 
-function allocate (that, length) {
   if (Buffer.TYPED_ARRAY_SUPPORT) {
     // Return an augmented `Uint8Array` instance, for best performance
-    that = Buffer._augment(new Uint8Array(length))
+    that = array
     that.__proto__ = Buffer.prototype
   } else {
     // Fallback: Return an object instance of the Buffer class
-    that.length = length
-    that._isBuffer = true
+    that = fromArrayLike(that, array)
+  }
+  return that
+}
+
+function fromObject (that, obj) {
+  if (Buffer.isBuffer(obj)) {
+    var len = checked(obj.length) | 0
+    that = createBuffer(that, len)
+
+    if (that.length === 0) {
+      return that
+    }
+
+    obj.copy(that, 0, 0, len)
+    return that
   }
 
-  var fromPool = length !== 0 && length <= Buffer.poolSize >>> 1
-  if (fromPool) that.parent = rootParent
+  if (obj) {
+    if ((typeof ArrayBuffer !== 'undefined' &&
+        obj.buffer instanceof ArrayBuffer) || 'length' in obj) {
+      if (typeof obj.length !== 'number' || isnan(obj.length)) {
+        return createBuffer(that, 0)
+      }
+      return fromArrayLike(that, obj)
+    }
 
-  return that
+    if (obj.type === 'Buffer' && isArray(obj.data)) {
+      return fromArrayLike(that, obj.data)
+    }
+  }
+
+  throw new TypeError('First argument must be a string, Buffer, ArrayBuffer, Array, or array-like object.')
 }
 
 function checked (length) {
@@ -251,12 +424,11 @@ function checked (length) {
   return length | 0
 }
 
-function SlowBuffer (subject, encoding) {
-  if (!(this instanceof SlowBuffer)) return new SlowBuffer(subject, encoding)
-
-  var buf = new Buffer(subject, encoding)
-  delete buf.parent
-  return buf
+function SlowBuffer (length) {
+  if (+length != length) { // eslint-disable-line eqeqeq
+    length = 0
+  }
+  return Buffer.alloc(+length)
 }
 
 Buffer.isBuffer = function isBuffer (b) {
@@ -273,17 +445,12 @@ Buffer.compare = function compare (a, b) {
   var x = a.length
   var y = b.length
 
-  var i = 0
-  var len = Math.min(x, y)
-  while (i < len) {
-    if (a[i] !== b[i]) break
-
-    ++i
-  }
-
-  if (i !== len) {
-    x = a[i]
-    y = b[i]
+  for (var i = 0, len = Math.min(x, y); i < len; ++i) {
+    if (a[i] !== b[i]) {
+      x = a[i]
+      y = b[i]
+      break
+    }
   }
 
   if (x < y) return -1
@@ -311,10 +478,12 @@ Buffer.isEncoding = function isEncoding (encoding) {
 }
 
 Buffer.concat = function concat (list, length) {
-  if (!isArray(list)) throw new TypeError('list argument must be an Array of Buffers.')
+  if (!isArray(list)) {
+    throw new TypeError('"list" argument must be an Array of Buffers')
+  }
 
   if (list.length === 0) {
-    return new Buffer(0)
+    return Buffer.alloc(0)
   }
 
   var i
@@ -325,18 +494,30 @@ Buffer.concat = function concat (list, length) {
     }
   }
 
-  var buf = new Buffer(length)
+  var buffer = Buffer.allocUnsafe(length)
   var pos = 0
   for (i = 0; i < list.length; i++) {
-    var item = list[i]
-    item.copy(buf, pos)
-    pos += item.length
+    var buf = list[i]
+    if (!Buffer.isBuffer(buf)) {
+      throw new TypeError('"list" argument must be an Array of Buffers')
+    }
+    buf.copy(buffer, pos)
+    pos += buf.length
   }
-  return buf
+  return buffer
 }
 
 function byteLength (string, encoding) {
-  if (typeof string !== 'string') string = '' + string
+  if (Buffer.isBuffer(string)) {
+    return string.length
+  }
+  if (typeof ArrayBuffer !== 'undefined' && typeof ArrayBuffer.isView === 'function' &&
+      (ArrayBuffer.isView(string) || string instanceof ArrayBuffer)) {
+    return string.byteLength
+  }
+  if (typeof string !== 'string') {
+    string = '' + string
+  }
 
   var len = string.length
   if (len === 0) return 0
@@ -353,6 +534,7 @@ function byteLength (string, encoding) {
         return len
       case 'utf8':
       case 'utf-8':
+      case undefined:
         return utf8ToBytes(string).length
       case 'ucs2':
       case 'ucs-2':
@@ -372,20 +554,42 @@ function byteLength (string, encoding) {
 }
 Buffer.byteLength = byteLength
 
-// pre-set for values that may exist in the future
-Buffer.prototype.length = undefined
-Buffer.prototype.parent = undefined
-
 function slowToString (encoding, start, end) {
   var loweredCase = false
 
-  start = start | 0
-  end = end === undefined || end === Infinity ? this.length : end | 0
+  // No need to verify that "this.length <= MAX_UINT32" since it's a read-only
+  // property of a typed array.
+
+  // This behaves neither like String nor Uint8Array in that we set start/end
+  // to their upper/lower bounds if the value passed is out of range.
+  // undefined is handled specially as per ECMA-262 6th Edition,
+  // Section 13.3.3.7 Runtime Semantics: KeyedBindingInitialization.
+  if (start === undefined || start < 0) {
+    start = 0
+  }
+  // Return early if start > this.length. Done here to prevent potential uint32
+  // coercion fail below.
+  if (start > this.length) {
+    return ''
+  }
+
+  if (end === undefined || end > this.length) {
+    end = this.length
+  }
+
+  if (end <= 0) {
+    return ''
+  }
+
+  // Force coersion to uint32. This will also coerce falsey/NaN values to 0.
+  end >>>= 0
+  start >>>= 0
+
+  if (end <= start) {
+    return ''
+  }
 
   if (!encoding) encoding = 'utf8'
-  if (start < 0) start = 0
-  if (end > this.length) end = this.length
-  if (end <= start) return ''
 
   while (true) {
     switch (encoding) {
@@ -419,6 +623,39 @@ function slowToString (encoding, start, end) {
   }
 }
 
+// The property is used by `Buffer.isBuffer` and `is-buffer` (in Safari 5-7) to detect
+// Buffer instances.
+Buffer.prototype._isBuffer = true
+
+function swap (b, n, m) {
+  var i = b[n]
+  b[n] = b[m]
+  b[m] = i
+}
+
+Buffer.prototype.swap16 = function swap16 () {
+  var len = this.length
+  if (len % 2 !== 0) {
+    throw new RangeError('Buffer size must be a multiple of 16-bits')
+  }
+  for (var i = 0; i < len; i += 2) {
+    swap(this, i, i + 1)
+  }
+  return this
+}
+
+Buffer.prototype.swap32 = function swap32 () {
+  var len = this.length
+  if (len % 4 !== 0) {
+    throw new RangeError('Buffer size must be a multiple of 32-bits')
+  }
+  for (var i = 0; i < len; i += 4) {
+    swap(this, i, i + 3)
+    swap(this, i + 1, i + 2)
+  }
+  return this
+}
+
 Buffer.prototype.toString = function toString () {
   var length = this.length | 0
   if (length === 0) return ''
@@ -442,15 +679,114 @@ Buffer.prototype.inspect = function inspect () {
   return '<Buffer ' + str + '>'
 }
 
-Buffer.prototype.compare = function compare (b) {
-  if (!Buffer.isBuffer(b)) throw new TypeError('Argument must be a Buffer')
-  if (this === b) return 0
-  return Buffer.compare(this, b)
+Buffer.prototype.compare = function compare (target, start, end, thisStart, thisEnd) {
+  if (!Buffer.isBuffer(target)) {
+    throw new TypeError('Argument must be a Buffer')
+  }
+
+  if (start === undefined) {
+    start = 0
+  }
+  if (end === undefined) {
+    end = target ? target.length : 0
+  }
+  if (thisStart === undefined) {
+    thisStart = 0
+  }
+  if (thisEnd === undefined) {
+    thisEnd = this.length
+  }
+
+  if (start < 0 || end > target.length || thisStart < 0 || thisEnd > this.length) {
+    throw new RangeError('out of range index')
+  }
+
+  if (thisStart >= thisEnd && start >= end) {
+    return 0
+  }
+  if (thisStart >= thisEnd) {
+    return -1
+  }
+  if (start >= end) {
+    return 1
+  }
+
+  start >>>= 0
+  end >>>= 0
+  thisStart >>>= 0
+  thisEnd >>>= 0
+
+  if (this === target) return 0
+
+  var x = thisEnd - thisStart
+  var y = end - start
+  var len = Math.min(x, y)
+
+  var thisCopy = this.slice(thisStart, thisEnd)
+  var targetCopy = target.slice(start, end)
+
+  for (var i = 0; i < len; ++i) {
+    if (thisCopy[i] !== targetCopy[i]) {
+      x = thisCopy[i]
+      y = targetCopy[i]
+      break
+    }
+  }
+
+  if (x < y) return -1
+  if (y < x) return 1
+  return 0
 }
 
-Buffer.prototype.indexOf = function indexOf (val, byteOffset) {
-  if (byteOffset > 0x7fffffff) byteOffset = 0x7fffffff
-  else if (byteOffset < -0x80000000) byteOffset = -0x80000000
+function arrayIndexOf (arr, val, byteOffset, encoding) {
+  var indexSize = 1
+  var arrLength = arr.length
+  var valLength = val.length
+
+  if (encoding !== undefined) {
+    encoding = String(encoding).toLowerCase()
+    if (encoding === 'ucs2' || encoding === 'ucs-2' ||
+        encoding === 'utf16le' || encoding === 'utf-16le') {
+      if (arr.length < 2 || val.length < 2) {
+        return -1
+      }
+      indexSize = 2
+      arrLength /= 2
+      valLength /= 2
+      byteOffset /= 2
+    }
+  }
+
+  function read (buf, i) {
+    if (indexSize === 1) {
+      return buf[i]
+    } else {
+      return buf.readUInt16BE(i * indexSize)
+    }
+  }
+
+  var foundIndex = -1
+  for (var i = 0; byteOffset + i < arrLength; i++) {
+    if (read(arr, byteOffset + i) === read(val, foundIndex === -1 ? 0 : i - foundIndex)) {
+      if (foundIndex === -1) foundIndex = i
+      if (i - foundIndex + 1 === valLength) return (byteOffset + foundIndex) * indexSize
+    } else {
+      if (foundIndex !== -1) i -= i - foundIndex
+      foundIndex = -1
+    }
+  }
+  return -1
+}
+
+Buffer.prototype.indexOf = function indexOf (val, byteOffset, encoding) {
+  if (typeof byteOffset === 'string') {
+    encoding = byteOffset
+    byteOffset = 0
+  } else if (byteOffset > 0x7fffffff) {
+    byteOffset = 0x7fffffff
+  } else if (byteOffset < -0x80000000) {
+    byteOffset = -0x80000000
+  }
   byteOffset >>= 0
 
   if (this.length === 0) return -1
@@ -460,45 +796,28 @@ Buffer.prototype.indexOf = function indexOf (val, byteOffset) {
   if (byteOffset < 0) byteOffset = Math.max(this.length + byteOffset, 0)
 
   if (typeof val === 'string') {
-    if (val.length === 0) return -1 // special case: looking for empty string always fails
-    return String.prototype.indexOf.call(this, val, byteOffset)
+    val = Buffer.from(val, encoding)
   }
+
   if (Buffer.isBuffer(val)) {
-    return arrayIndexOf(this, val, byteOffset)
+    // special case: looking for empty string/buffer always fails
+    if (val.length === 0) {
+      return -1
+    }
+    return arrayIndexOf(this, val, byteOffset, encoding)
   }
   if (typeof val === 'number') {
     if (Buffer.TYPED_ARRAY_SUPPORT && Uint8Array.prototype.indexOf === 'function') {
       return Uint8Array.prototype.indexOf.call(this, val, byteOffset)
     }
-    return arrayIndexOf(this, [ val ], byteOffset)
-  }
-
-  function arrayIndexOf (arr, val, byteOffset) {
-    var foundIndex = -1
-    for (var i = 0; byteOffset + i < arr.length; i++) {
-      if (arr[byteOffset + i] === val[foundIndex === -1 ? 0 : i - foundIndex]) {
-        if (foundIndex === -1) foundIndex = i
-        if (i - foundIndex + 1 === val.length) return byteOffset + foundIndex
-      } else {
-        foundIndex = -1
-      }
-    }
-    return -1
+    return arrayIndexOf(this, [ val ], byteOffset, encoding)
   }
 
   throw new TypeError('val must be string, number or Buffer')
 }
 
-// `get` is deprecated
-Buffer.prototype.get = function get (offset) {
-  console.log('.get() is deprecated. Access using array indexes instead.')
-  return this.readUInt8(offset)
-}
-
-// `set` is deprecated
-Buffer.prototype.set = function set (v, offset) {
-  console.log('.set() is deprecated. Access using array indexes instead.')
-  return this.writeUInt8(v, offset)
+Buffer.prototype.includes = function includes (val, byteOffset, encoding) {
+  return this.indexOf(val, byteOffset, encoding) !== -1
 }
 
 function hexWrite (buf, string, offset, length) {
@@ -522,7 +841,7 @@ function hexWrite (buf, string, offset, length) {
   }
   for (var i = 0; i < length; i++) {
     var parsed = parseInt(string.substr(i * 2, 2), 16)
-    if (isNaN(parsed)) throw new Error('Invalid hex string')
+    if (isNaN(parsed)) return i
     buf[offset + i] = parsed
   }
   return i
@@ -571,17 +890,16 @@ Buffer.prototype.write = function write (string, offset, length, encoding) {
     }
   // legacy write(string, encoding, offset, length) - remove in v0.13
   } else {
-    var swap = encoding
-    encoding = offset
-    offset = length | 0
-    length = swap
+    throw new Error(
+      'Buffer.write(string, encoding, offset[, length]) is no longer supported'
+    )
   }
 
   var remaining = this.length - offset
   if (length === undefined || length > remaining) length = remaining
 
   if ((string.length > 0 && (length < 0 || offset < 0)) || offset > this.length) {
-    throw new RangeError('attempt to write outside buffer bounds')
+    throw new RangeError('Attempt to write outside buffer bounds')
   }
 
   if (!encoding) encoding = 'utf8'
@@ -796,7 +1114,8 @@ Buffer.prototype.slice = function slice (start, end) {
 
   var newBuf
   if (Buffer.TYPED_ARRAY_SUPPORT) {
-    newBuf = Buffer._augment(this.subarray(start, end))
+    newBuf = this.subarray(start, end)
+    newBuf.__proto__ = Buffer.prototype
   } else {
     var sliceLen = end - start
     newBuf = new Buffer(sliceLen, undefined)
@@ -804,8 +1123,6 @@ Buffer.prototype.slice = function slice (start, end) {
       newBuf[i] = this[i + start]
     }
   }
-
-  if (newBuf.length) newBuf.parent = this.parent || this
 
   return newBuf
 }
@@ -975,16 +1292,19 @@ Buffer.prototype.readDoubleBE = function readDoubleBE (offset, noAssert) {
 }
 
 function checkInt (buf, value, offset, ext, max, min) {
-  if (!Buffer.isBuffer(buf)) throw new TypeError('buffer must be a Buffer instance')
-  if (value > max || value < min) throw new RangeError('value is out of bounds')
-  if (offset + ext > buf.length) throw new RangeError('index out of range')
+  if (!Buffer.isBuffer(buf)) throw new TypeError('"buffer" argument must be a Buffer instance')
+  if (value > max || value < min) throw new RangeError('"value" argument is out of bounds')
+  if (offset + ext > buf.length) throw new RangeError('Index out of range')
 }
 
 Buffer.prototype.writeUIntLE = function writeUIntLE (value, offset, byteLength, noAssert) {
   value = +value
   offset = offset | 0
   byteLength = byteLength | 0
-  if (!noAssert) checkInt(this, value, offset, byteLength, Math.pow(2, 8 * byteLength), 0)
+  if (!noAssert) {
+    var maxBytes = Math.pow(2, 8 * byteLength) - 1
+    checkInt(this, value, offset, byteLength, maxBytes, 0)
+  }
 
   var mul = 1
   var i = 0
@@ -1000,7 +1320,10 @@ Buffer.prototype.writeUIntBE = function writeUIntBE (value, offset, byteLength, 
   value = +value
   offset = offset | 0
   byteLength = byteLength | 0
-  if (!noAssert) checkInt(this, value, offset, byteLength, Math.pow(2, 8 * byteLength), 0)
+  if (!noAssert) {
+    var maxBytes = Math.pow(2, 8 * byteLength) - 1
+    checkInt(this, value, offset, byteLength, maxBytes, 0)
+  }
 
   var i = byteLength - 1
   var mul = 1
@@ -1103,9 +1426,12 @@ Buffer.prototype.writeIntLE = function writeIntLE (value, offset, byteLength, no
 
   var i = 0
   var mul = 1
-  var sub = value < 0 ? 1 : 0
+  var sub = 0
   this[offset] = value & 0xFF
   while (++i < byteLength && (mul *= 0x100)) {
+    if (value < 0 && sub === 0 && this[offset + i - 1] !== 0) {
+      sub = 1
+    }
     this[offset + i] = ((value / mul) >> 0) - sub & 0xFF
   }
 
@@ -1123,9 +1449,12 @@ Buffer.prototype.writeIntBE = function writeIntBE (value, offset, byteLength, no
 
   var i = byteLength - 1
   var mul = 1
-  var sub = value < 0 ? 1 : 0
+  var sub = 0
   this[offset + i] = value & 0xFF
   while (--i >= 0 && (mul *= 0x100)) {
+    if (value < 0 && sub === 0 && this[offset + i + 1] !== 0) {
+      sub = 1
+    }
     this[offset + i] = ((value / mul) >> 0) - sub & 0xFF
   }
 
@@ -1200,9 +1529,8 @@ Buffer.prototype.writeInt32BE = function writeInt32BE (value, offset, noAssert) 
 }
 
 function checkIEEE754 (buf, value, offset, ext, max, min) {
-  if (value > max || value < min) throw new RangeError('value is out of bounds')
-  if (offset + ext > buf.length) throw new RangeError('index out of range')
-  if (offset < 0) throw new RangeError('index out of range')
+  if (offset + ext > buf.length) throw new RangeError('Index out of range')
+  if (offset < 0) throw new RangeError('Index out of range')
 }
 
 function writeFloat (buf, value, offset, littleEndian, noAssert) {
@@ -1276,133 +1604,81 @@ Buffer.prototype.copy = function copy (target, targetStart, start, end) {
       target[i + targetStart] = this[i + start]
     }
   } else {
-    target._set(this.subarray(start, start + len), targetStart)
+    Uint8Array.prototype.set.call(
+      target,
+      this.subarray(start, start + len),
+      targetStart
+    )
   }
 
   return len
 }
 
-// fill(value, start=0, end=buffer.length)
-Buffer.prototype.fill = function fill (value, start, end) {
-  if (!value) value = 0
-  if (!start) start = 0
-  if (!end) end = this.length
+// Usage:
+//    buffer.fill(number[, offset[, end]])
+//    buffer.fill(buffer[, offset[, end]])
+//    buffer.fill(string[, offset[, end]][, encoding])
+Buffer.prototype.fill = function fill (val, start, end, encoding) {
+  // Handle string cases:
+  if (typeof val === 'string') {
+    if (typeof start === 'string') {
+      encoding = start
+      start = 0
+      end = this.length
+    } else if (typeof end === 'string') {
+      encoding = end
+      end = this.length
+    }
+    if (val.length === 1) {
+      var code = val.charCodeAt(0)
+      if (code < 256) {
+        val = code
+      }
+    }
+    if (encoding !== undefined && typeof encoding !== 'string') {
+      throw new TypeError('encoding must be a string')
+    }
+    if (typeof encoding === 'string' && !Buffer.isEncoding(encoding)) {
+      throw new TypeError('Unknown encoding: ' + encoding)
+    }
+  } else if (typeof val === 'number') {
+    val = val & 255
+  }
 
-  if (end < start) throw new RangeError('end < start')
+  // Invalid ranges are not set to a default, so can range check early.
+  if (start < 0 || this.length < start || this.length < end) {
+    throw new RangeError('Out of range index')
+  }
 
-  // Fill 0 bytes; we're done
-  if (end === start) return
-  if (this.length === 0) return
+  if (end <= start) {
+    return this
+  }
 
-  if (start < 0 || start >= this.length) throw new RangeError('start out of bounds')
-  if (end < 0 || end > this.length) throw new RangeError('end out of bounds')
+  start = start >>> 0
+  end = end === undefined ? this.length : end >>> 0
+
+  if (!val) val = 0
 
   var i
-  if (typeof value === 'number') {
+  if (typeof val === 'number') {
     for (i = start; i < end; i++) {
-      this[i] = value
+      this[i] = val
     }
   } else {
-    var bytes = utf8ToBytes(value.toString())
+    var bytes = Buffer.isBuffer(val)
+      ? val
+      : utf8ToBytes(new Buffer(val, encoding).toString())
     var len = bytes.length
-    for (i = start; i < end; i++) {
-      this[i] = bytes[i % len]
+    for (i = 0; i < end - start; i++) {
+      this[i + start] = bytes[i % len]
     }
   }
 
   return this
 }
 
-/**
- * Creates a new `ArrayBuffer` with the *copied* memory of the buffer instance.
- * Added in Node 0.12. Only available in browsers that support ArrayBuffer.
- */
-Buffer.prototype.toArrayBuffer = function toArrayBuffer () {
-  if (typeof Uint8Array !== 'undefined') {
-    if (Buffer.TYPED_ARRAY_SUPPORT) {
-      return (new Buffer(this)).buffer
-    } else {
-      var buf = new Uint8Array(this.length)
-      for (var i = 0, len = buf.length; i < len; i += 1) {
-        buf[i] = this[i]
-      }
-      return buf.buffer
-    }
-  } else {
-    throw new TypeError('Buffer.toArrayBuffer not supported in this browser')
-  }
-}
-
 // HELPER FUNCTIONS
 // ================
-
-var BP = Buffer.prototype
-
-/**
- * Augment a Uint8Array *instance* (not the Uint8Array class!) with Buffer methods
- */
-Buffer._augment = function _augment (arr) {
-  arr.constructor = Buffer
-  arr._isBuffer = true
-
-  // save reference to original Uint8Array set method before overwriting
-  arr._set = arr.set
-
-  // deprecated
-  arr.get = BP.get
-  arr.set = BP.set
-
-  arr.write = BP.write
-  arr.toString = BP.toString
-  arr.toLocaleString = BP.toString
-  arr.toJSON = BP.toJSON
-  arr.equals = BP.equals
-  arr.compare = BP.compare
-  arr.indexOf = BP.indexOf
-  arr.copy = BP.copy
-  arr.slice = BP.slice
-  arr.readUIntLE = BP.readUIntLE
-  arr.readUIntBE = BP.readUIntBE
-  arr.readUInt8 = BP.readUInt8
-  arr.readUInt16LE = BP.readUInt16LE
-  arr.readUInt16BE = BP.readUInt16BE
-  arr.readUInt32LE = BP.readUInt32LE
-  arr.readUInt32BE = BP.readUInt32BE
-  arr.readIntLE = BP.readIntLE
-  arr.readIntBE = BP.readIntBE
-  arr.readInt8 = BP.readInt8
-  arr.readInt16LE = BP.readInt16LE
-  arr.readInt16BE = BP.readInt16BE
-  arr.readInt32LE = BP.readInt32LE
-  arr.readInt32BE = BP.readInt32BE
-  arr.readFloatLE = BP.readFloatLE
-  arr.readFloatBE = BP.readFloatBE
-  arr.readDoubleLE = BP.readDoubleLE
-  arr.readDoubleBE = BP.readDoubleBE
-  arr.writeUInt8 = BP.writeUInt8
-  arr.writeUIntLE = BP.writeUIntLE
-  arr.writeUIntBE = BP.writeUIntBE
-  arr.writeUInt16LE = BP.writeUInt16LE
-  arr.writeUInt16BE = BP.writeUInt16BE
-  arr.writeUInt32LE = BP.writeUInt32LE
-  arr.writeUInt32BE = BP.writeUInt32BE
-  arr.writeIntLE = BP.writeIntLE
-  arr.writeIntBE = BP.writeIntBE
-  arr.writeInt8 = BP.writeInt8
-  arr.writeInt16LE = BP.writeInt16LE
-  arr.writeInt16BE = BP.writeInt16BE
-  arr.writeInt32LE = BP.writeInt32LE
-  arr.writeInt32BE = BP.writeInt32BE
-  arr.writeFloatLE = BP.writeFloatLE
-  arr.writeFloatBE = BP.writeFloatBE
-  arr.writeDoubleLE = BP.writeDoubleLE
-  arr.writeDoubleBE = BP.writeDoubleBE
-  arr.fill = BP.fill
-  arr.inspect = BP.inspect
-  arr.toArrayBuffer = BP.toArrayBuffer
-
-  return arr
-}
 
 var INVALID_BASE64_RE = /[^+\/0-9A-Za-z-_]/g
 
@@ -1467,7 +1743,7 @@ function utf8ToBytes (string, units) {
       }
 
       // valid surrogate pair
-      codePoint = leadSurrogate - 0xD800 << 10 | codePoint - 0xDC00 | 0x10000
+      codePoint = (leadSurrogate - 0xD800 << 10 | codePoint - 0xDC00) + 0x10000
     } else if (leadSurrogate) {
       // valid bmp char, but last char was a lead
       if ((units -= 3) > -1) bytes.push(0xEF, 0xBF, 0xBD)
@@ -1545,134 +1821,12 @@ function blitBuffer (src, dst, offset, length) {
   return i
 }
 
+function isnan (val) {
+  return val !== val // eslint-disable-line no-self-compare
+}
+
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"base64-js":2,"ieee754":3,"is-array":4}],2:[function(require,module,exports){
-var lookup = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
-
-;(function (exports) {
-	'use strict';
-
-  var Arr = (typeof Uint8Array !== 'undefined')
-    ? Uint8Array
-    : Array
-
-	var PLUS   = '+'.charCodeAt(0)
-	var SLASH  = '/'.charCodeAt(0)
-	var NUMBER = '0'.charCodeAt(0)
-	var LOWER  = 'a'.charCodeAt(0)
-	var UPPER  = 'A'.charCodeAt(0)
-	var PLUS_URL_SAFE = '-'.charCodeAt(0)
-	var SLASH_URL_SAFE = '_'.charCodeAt(0)
-
-	function decode (elt) {
-		var code = elt.charCodeAt(0)
-		if (code === PLUS ||
-		    code === PLUS_URL_SAFE)
-			return 62 // '+'
-		if (code === SLASH ||
-		    code === SLASH_URL_SAFE)
-			return 63 // '/'
-		if (code < NUMBER)
-			return -1 //no match
-		if (code < NUMBER + 10)
-			return code - NUMBER + 26 + 26
-		if (code < UPPER + 26)
-			return code - UPPER
-		if (code < LOWER + 26)
-			return code - LOWER + 26
-	}
-
-	function b64ToByteArray (b64) {
-		var i, j, l, tmp, placeHolders, arr
-
-		if (b64.length % 4 > 0) {
-			throw new Error('Invalid string. Length must be a multiple of 4')
-		}
-
-		// the number of equal signs (place holders)
-		// if there are two placeholders, than the two characters before it
-		// represent one byte
-		// if there is only one, then the three characters before it represent 2 bytes
-		// this is just a cheap hack to not do indexOf twice
-		var len = b64.length
-		placeHolders = '=' === b64.charAt(len - 2) ? 2 : '=' === b64.charAt(len - 1) ? 1 : 0
-
-		// base64 is 4/3 + up to two characters of the original data
-		arr = new Arr(b64.length * 3 / 4 - placeHolders)
-
-		// if there are placeholders, only get up to the last complete 4 chars
-		l = placeHolders > 0 ? b64.length - 4 : b64.length
-
-		var L = 0
-
-		function push (v) {
-			arr[L++] = v
-		}
-
-		for (i = 0, j = 0; i < l; i += 4, j += 3) {
-			tmp = (decode(b64.charAt(i)) << 18) | (decode(b64.charAt(i + 1)) << 12) | (decode(b64.charAt(i + 2)) << 6) | decode(b64.charAt(i + 3))
-			push((tmp & 0xFF0000) >> 16)
-			push((tmp & 0xFF00) >> 8)
-			push(tmp & 0xFF)
-		}
-
-		if (placeHolders === 2) {
-			tmp = (decode(b64.charAt(i)) << 2) | (decode(b64.charAt(i + 1)) >> 4)
-			push(tmp & 0xFF)
-		} else if (placeHolders === 1) {
-			tmp = (decode(b64.charAt(i)) << 10) | (decode(b64.charAt(i + 1)) << 4) | (decode(b64.charAt(i + 2)) >> 2)
-			push((tmp >> 8) & 0xFF)
-			push(tmp & 0xFF)
-		}
-
-		return arr
-	}
-
-	function uint8ToBase64 (uint8) {
-		var i,
-			extraBytes = uint8.length % 3, // if we have 1 byte left, pad 2 bytes
-			output = "",
-			temp, length
-
-		function encode (num) {
-			return lookup.charAt(num)
-		}
-
-		function tripletToBase64 (num) {
-			return encode(num >> 18 & 0x3F) + encode(num >> 12 & 0x3F) + encode(num >> 6 & 0x3F) + encode(num & 0x3F)
-		}
-
-		// go through the array every three bytes, we'll deal with trailing stuff later
-		for (i = 0, length = uint8.length - extraBytes; i < length; i += 3) {
-			temp = (uint8[i] << 16) + (uint8[i + 1] << 8) + (uint8[i + 2])
-			output += tripletToBase64(temp)
-		}
-
-		// pad the end with zeros, but make sure to not forget the extra bytes
-		switch (extraBytes) {
-			case 1:
-				temp = uint8[uint8.length - 1]
-				output += encode(temp >> 2)
-				output += encode((temp << 4) & 0x3F)
-				output += '=='
-				break
-			case 2:
-				temp = (uint8[uint8.length - 2] << 8) + (uint8[uint8.length - 1])
-				output += encode(temp >> 10)
-				output += encode((temp >> 4) & 0x3F)
-				output += encode((temp << 2) & 0x3F)
-				output += '='
-				break
-		}
-
-		return output
-	}
-
-	exports.toByteArray = b64ToByteArray
-	exports.fromByteArray = uint8ToBase64
-}(typeof exports === 'undefined' ? (this.base64js = {}) : exports))
-
-},{}],3:[function(require,module,exports){
+},{"base64-js":2,"ieee754":4,"isarray":5}],4:[function(require,module,exports){
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
   var e, m
   var eLen = nBytes * 8 - mLen - 1
@@ -1758,48 +1912,20 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
   buffer[offset + i - d] |= s * 128
 }
 
-},{}],4:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
+var toString = {}.toString;
 
-/**
- * isArray
- */
-
-var isArray = Array.isArray;
-
-/**
- * toString
- */
-
-var str = Object.prototype.toString;
-
-/**
- * Whether or not the given `val`
- * is an array.
- *
- * example:
- *
- *        isArray([]);
- *        // > true
- *        isArray(arguments);
- *        // > false
- *        isArray('');
- *        // > false
- *
- * @param {mixed} val
- * @return {bool}
- */
-
-module.exports = isArray || function (val) {
-  return !! val && '[object Array]' == str.call(val);
+module.exports = Array.isArray || function (arr) {
+  return toString.call(arr) == '[object Array]';
 };
 
-},{}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 
 window.dataForge = require('../../index');
 window.moment = require('moment');
 window.E = require('linq');
 
-},{"../../index":6,"linq":46,"moment":47}],6:[function(require,module,exports){
+},{"../../index":7,"linq":45,"moment":46}],7:[function(require,module,exports){
 'use strict';
 
 var assert = require('chai').assert;
@@ -2074,6 +2200,50 @@ var dataForge = {
 			});
 	},
 
+	/**
+	 * Generate a data-frame containing a matrix of values.
+	 *
+	 * @param {int} numColumns - The number of columns in the data-frame.
+	 * @param {int} numRows - The number of rows in the data-frame.
+	 * @param {number} start - The starting value.
+	 * @param {number} increment - The value to increment by for each new value.
+	 */
+	matrix: function (numColumns, numRows, start, increment) {
+		return new DataFrame({
+			columnNames: E.range(1, numColumns)
+				.select(function (columnNumber) {
+					return columnNumber.toString();
+				})
+				.toArray(),
+
+			rows: function () {
+				var rowIndex = 0;
+				var nextValue = start;
+				var curRow = undefined;
+
+				return {
+					moveNext: function () {
+						if (rowIndex >= numRows) {
+							return false;
+						}
+						curRow = E.range(0, numColumns)
+							.select(function (columnIndex) {
+								return nextValue + (columnIndex * increment);
+							})
+							.toArray();
+						nextValue += numColumns * increment;
+						++rowIndex;
+						return true;
+					},
+
+					getCurrent: function () {
+						return curRow;
+					}
+				};
+			},
+		})
+	},
+
 	/*
 	 * Zip together multiple series to create a new series.
 	 *
@@ -2110,6 +2280,7 @@ var dataForge = {
 		}
 
 		return new Series({
+			index: series[0].getIndex(),
 			values: output,
 		});
 	},
@@ -2150,13 +2321,128 @@ var dataForge = {
 		}
 
 		return new DataFrame({
+			index: dataFrames[0].getIndex(),
 			rows: output,
 		});
 	},	
 };
 
 module.exports = dataForge;
-},{"./src/dataframe":49,"./src/index":50,"./src/iterators/array":51,"./src/iterators/concat":52,"./src/iterators/multi":55,"./src/iterators/select":57,"./src/series":64,"./src/utils":65,"babyparse":7,"chai":8,"linq":46,"sugar":48}],7:[function(require,module,exports){
+},{"./src/dataframe":50,"./src/index":51,"./src/iterators/array":52,"./src/iterators/concat":53,"./src/iterators/multi":56,"./src/iterators/select":59,"./src/series":66,"./src/utils":67,"babyparse":9,"chai":10,"linq":45,"sugar":47}],8:[function(require,module,exports){
+/*!
+ * assertion-error
+ * Copyright(c) 2013 Jake Luer <jake@qualiancy.com>
+ * MIT Licensed
+ */
+
+/*!
+ * Return a function that will copy properties from
+ * one object to another excluding any originally
+ * listed. Returned function will create a new `{}`.
+ *
+ * @param {String} excluded properties ...
+ * @return {Function}
+ */
+
+function exclude () {
+  var excludes = [].slice.call(arguments);
+
+  function excludeProps (res, obj) {
+    Object.keys(obj).forEach(function (key) {
+      if (!~excludes.indexOf(key)) res[key] = obj[key];
+    });
+  }
+
+  return function extendExclude () {
+    var args = [].slice.call(arguments)
+      , i = 0
+      , res = {};
+
+    for (; i < args.length; i++) {
+      excludeProps(res, args[i]);
+    }
+
+    return res;
+  };
+};
+
+/*!
+ * Primary Exports
+ */
+
+module.exports = AssertionError;
+
+/**
+ * ### AssertionError
+ *
+ * An extension of the JavaScript `Error` constructor for
+ * assertion and validation scenarios.
+ *
+ * @param {String} message
+ * @param {Object} properties to include (optional)
+ * @param {callee} start stack function (optional)
+ */
+
+function AssertionError (message, _props, ssf) {
+  var extend = exclude('name', 'message', 'stack', 'constructor', 'toJSON')
+    , props = extend(_props || {});
+
+  // default values
+  this.message = message || 'Unspecified AssertionError';
+  this.showDiff = false;
+
+  // copy from properties
+  for (var key in props) {
+    this[key] = props[key];
+  }
+
+  // capture stack trace
+  ssf = ssf || arguments.callee;
+  if (ssf && Error.captureStackTrace) {
+    Error.captureStackTrace(this, ssf);
+  } else {
+    this.stack = new Error().stack;
+  }
+}
+
+/*!
+ * Inherit from Error.prototype
+ */
+
+AssertionError.prototype = Object.create(Error.prototype);
+
+/*!
+ * Statically set name
+ */
+
+AssertionError.prototype.name = 'AssertionError';
+
+/*!
+ * Ensure correct constructor
+ */
+
+AssertionError.prototype.constructor = AssertionError;
+
+/**
+ * Allow errors to be converted to JSON for static transfer.
+ *
+ * @param {Boolean} include stack (default: `true`)
+ * @return {Object} object that can be `JSON.stringify`
+ */
+
+AssertionError.prototype.toJSON = function (stack) {
+  var extend = exclude('constructor', 'toJSON', 'stack')
+    , props = extend({ name: this.name }, this);
+
+  // include stack if exists and not turned off
+  if (false !== stack && this.stack) {
+    props.stack = this.stack;
+  }
+
+  return props;
+};
+
+},{}],9:[function(require,module,exports){
 /*
 	Baby Parse
 	v0.4.1
@@ -2187,6 +2473,7 @@ module.exports = dataForge;
 
 	var Baby = {};
 	Baby.parse = CsvToJson;
+	Baby.parseFiles = ParseFiles;
 	Baby.unparse = JsonToCsv;
 	Baby.RECORD_SEP = String.fromCharCode(30);
 	Baby.UNIT_SEP = String.fromCharCode(31);
@@ -2195,15 +2482,50 @@ module.exports = dataForge;
 	Baby.DefaultDelimiter = ",";		// Used if not specified and detection fails
 	Baby.Parser = Parser;				// For testing/dev only
 	Baby.ParserHandle = ParserHandle;	// For testing/dev only
-
+	
+	var fs = fs || require('fs')
+	
+	function ParseFiles(_input, _config)
+	{
+		if (Array.isArray(_input)) {
+			var results = [];
+			_input.forEach(function(input) {
+				if(typeof input === 'object')
+					results.push(ParseFiles(input.file, input.config));
+				else
+					results.push(ParseFiles(input, _config));
+			});
+			return results;
+		} else {
+			var results = {
+				data: [],
+				errors: []
+			};
+			if ((/(\.csv|\.txt)$/).test(_input)) {
+				try {
+					var contents = fs.readFileSync(_input).toString();
+					return CsvToJson(contents, _config);
+				} catch (err) {
+					results.errors.push(err);
+					return results;
+				}
+			} else {
+				results.errors.push({
+					type: '',
+					code: '',
+					message: 'Unsupported file type.',
+					row: ''
+				});
+				return results;
+			}
+		}
+	}
 
 	function CsvToJson(_input, _config)
 	{
 		var config = copyAndValidateConfig(_config);
 		var ph = new ParserHandle(config);
 		var results = ph.parse(_input);
-		if (isFunction(config.complete))
-			config.complete(results);
 		return results;
 	}
 
@@ -3003,10 +3325,10 @@ module.exports = dataForge;
 
 })(typeof window !== 'undefined' ? window : this);
 
-},{}],8:[function(require,module,exports){
+},{"fs":1}],10:[function(require,module,exports){
 module.exports = require('./lib/chai');
 
-},{"./lib/chai":9}],9:[function(require,module,exports){
+},{"./lib/chai":11}],11:[function(require,module,exports){
 /*!
  * chai
  * Copyright(c) 2011-2014 Jake Luer <jake@alogicalparadox.com>
@@ -3020,7 +3342,7 @@ var used = []
  * Chai version
  */
 
-exports.version = '3.4.0';
+exports.version = '3.5.0';
 
 /*!
  * Assertion Error
@@ -3101,7 +3423,7 @@ exports.use(should);
 var assert = require('./chai/interface/assert');
 exports.use(assert);
 
-},{"./chai/assertion":10,"./chai/config":11,"./chai/core/assertions":12,"./chai/interface/assert":13,"./chai/interface/expect":14,"./chai/interface/should":15,"./chai/utils":29,"assertion-error":37}],10:[function(require,module,exports){
+},{"./chai/assertion":12,"./chai/config":13,"./chai/core/assertions":14,"./chai/interface/assert":15,"./chai/interface/expect":16,"./chai/interface/should":17,"./chai/utils":31,"assertion-error":8}],12:[function(require,module,exports){
 /*!
  * chai
  * http://chaijs.com
@@ -3192,8 +3514,8 @@ module.exports = function (_chai, util) {
    *
    * @name assert
    * @param {Philosophical} expression to be tested
-   * @param {String or Function} message or function that returns message to display if expression fails
-   * @param {String or Function} negatedMessage or function that returns negatedMessage to display if negated expression fails
+   * @param {String|Function} message or function that returns message to display if expression fails
+   * @param {String|Function} negatedMessage or function that returns negatedMessage to display if negated expression fails
    * @param {Mixed} expected value (remember to check for negation)
    * @param {Mixed} actual (optional) will default to `this.obj`
    * @param {Boolean} showDiff (optional) when set to `true`, assert will display a diff in addition to the message if expression fails
@@ -3234,7 +3556,7 @@ module.exports = function (_chai, util) {
   });
 };
 
-},{"./config":11}],11:[function(require,module,exports){
+},{"./config":13}],13:[function(require,module,exports){
 module.exports = {
 
   /**
@@ -3291,7 +3613,7 @@ module.exports = {
 
 };
 
-},{}],12:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 /*!
  * chai
  * http://chaijs.com
@@ -3329,6 +3651,7 @@ module.exports = function (chai, _) {
    * - same
    *
    * @name language chains
+   * @namespace BDD
    * @api public
    */
 
@@ -3352,6 +3675,7 @@ module.exports = function (chai, _) {
    *       .and.not.equal('bar');
    *
    * @name not
+   * @namespace BDD
    * @api public
    */
 
@@ -3376,6 +3700,7 @@ module.exports = function (chai, _) {
    *     expect(deepCss).to.have.deep.property('\\.link.\\[target\\]', 42);
    *
    * @name deep
+   * @namespace BDD
    * @api public
    */
 
@@ -3392,6 +3717,7 @@ module.exports = function (chai, _) {
    *     expect(foo).to.have.any.keys('bar', 'baz');
    *
    * @name any
+   * @namespace BDD
    * @api public
    */
 
@@ -3410,6 +3736,7 @@ module.exports = function (chai, _) {
    *     expect(foo).to.have.all.keys('bar', 'baz');
    *
    * @name all
+   * @namespace BDD
    * @api public
    */
 
@@ -3445,6 +3772,7 @@ module.exports = function (chai, _) {
    * @alias an
    * @param {String} type
    * @param {String} message _optional_
+   * @namespace BDD
    * @api public
    */
 
@@ -3482,6 +3810,7 @@ module.exports = function (chai, _) {
    * @alias contains
    * @param {Object|String|Number} obj
    * @param {String} message _optional_
+   * @namespace BDD
    * @api public
    */
 
@@ -3537,6 +3866,7 @@ module.exports = function (chai, _) {
    *     expect(null).to.not.be.ok;
    *
    * @name ok
+   * @namespace BDD
    * @api public
    */
 
@@ -3556,6 +3886,7 @@ module.exports = function (chai, _) {
    *     expect(1).to.not.be.true;
    *
    * @name true
+   * @namespace BDD
    * @api public
    */
 
@@ -3577,6 +3908,7 @@ module.exports = function (chai, _) {
    *     expect(0).to.not.be.false;
    *
    * @name false
+   * @namespace BDD
    * @api public
    */
 
@@ -3598,6 +3930,7 @@ module.exports = function (chai, _) {
    *     expect(undefined).to.not.be.null;
    *
    * @name null
+   * @namespace BDD
    * @api public
    */
 
@@ -3618,6 +3951,7 @@ module.exports = function (chai, _) {
    *     expect(null).to.not.be.undefined;
    *
    * @name undefined
+   * @namespace BDD
    * @api public
    */
 
@@ -3637,6 +3971,7 @@ module.exports = function (chai, _) {
    *     expect(4).not.to.be.NaN;
    *
    * @name NaN
+   * @namespace BDD
    * @api public
    */
 
@@ -3662,6 +3997,7 @@ module.exports = function (chai, _) {
    *     expect(baz).to.not.exist;
    *
    * @name exist
+   * @namespace BDD
    * @api public
    */
 
@@ -3686,6 +4022,7 @@ module.exports = function (chai, _) {
    *     expect({}).to.be.empty;
    *
    * @name empty
+   * @namespace BDD
    * @api public
    */
 
@@ -3717,6 +4054,7 @@ module.exports = function (chai, _) {
    *
    * @name arguments
    * @alias Arguments
+   * @namespace BDD
    * @api public
    */
 
@@ -3752,6 +4090,7 @@ module.exports = function (chai, _) {
    * @alias deep.equal
    * @param {Mixed} value
    * @param {String} message _optional_
+   * @namespace BDD
    * @api public
    */
 
@@ -3788,6 +4127,7 @@ module.exports = function (chai, _) {
    * @alias eqls
    * @param {Mixed} value
    * @param {String} message _optional_
+   * @namespace BDD
    * @api public
    */
 
@@ -3826,6 +4166,7 @@ module.exports = function (chai, _) {
    * @alias greaterThan
    * @param {Number} value
    * @param {String} message _optional_
+   * @namespace BDD
    * @api public
    */
 
@@ -3874,6 +4215,7 @@ module.exports = function (chai, _) {
    * @alias gte
    * @param {Number} value
    * @param {String} message _optional_
+   * @namespace BDD
    * @api public
    */
 
@@ -3922,6 +4264,7 @@ module.exports = function (chai, _) {
    * @alias lessThan
    * @param {Number} value
    * @param {String} message _optional_
+   * @namespace BDD
    * @api public
    */
 
@@ -3970,6 +4313,7 @@ module.exports = function (chai, _) {
    * @alias lte
    * @param {Number} value
    * @param {String} message _optional_
+   * @namespace BDD
    * @api public
    */
 
@@ -4017,6 +4361,7 @@ module.exports = function (chai, _) {
    * @param {Number} start lowerbound inclusive
    * @param {Number} finish upperbound inclusive
    * @param {String} message _optional_
+   * @namespace BDD
    * @api public
    */
 
@@ -4056,6 +4401,7 @@ module.exports = function (chai, _) {
    * @param {Constructor} constructor
    * @param {String} message _optional_
    * @alias instanceOf
+   * @namespace BDD
    * @api public
    */
 
@@ -4140,6 +4486,7 @@ module.exports = function (chai, _) {
    * @param {Mixed} value (optional)
    * @param {String} message _optional_
    * @returns value of property for chaining
+   * @namespace BDD
    * @api public
    */
 
@@ -4195,6 +4542,7 @@ module.exports = function (chai, _) {
    * @alias haveOwnProperty
    * @param {String} name
    * @param {String} message _optional_
+   * @namespace BDD
    * @api public
    */
 
@@ -4227,6 +4575,7 @@ module.exports = function (chai, _) {
    * @param {String} name
    * @param {Object} descriptor _optional_
    * @param {String} message _optional_
+   * @namespace BDD
    * @api public
    */
 
@@ -4279,6 +4628,7 @@ module.exports = function (chai, _) {
    * switched to use `lengthOf(value)` instead.
    *
    * @name length
+   * @namespace BDD
    * @api public
    */
 
@@ -4294,6 +4644,7 @@ module.exports = function (chai, _) {
    * @name lengthOf
    * @param {Number} length
    * @param {String} message _optional_
+   * @namespace BDD
    * @api public
    */
 
@@ -4330,6 +4681,7 @@ module.exports = function (chai, _) {
    * @alias matches
    * @param {RegExp} RegularExpression
    * @param {String} message _optional_
+   * @namespace BDD
    * @api public
    */
   function assertMatch(re, msg) {
@@ -4355,6 +4707,7 @@ module.exports = function (chai, _) {
    * @name string
    * @param {String} string
    * @param {String} message _optional_
+   * @namespace BDD
    * @api public
    */
 
@@ -4405,7 +4758,8 @@ module.exports = function (chai, _) {
    *
    * @name keys
    * @alias key
-   * @param {String...|Array|Object} keys
+   * @param {...String|Array|Object} keys
+   * @namespace BDD
    * @api public
    */
 
@@ -4508,7 +4862,6 @@ module.exports = function (chai, _) {
    *     expect(fn).to.not.throw('good function');
    *     expect(fn).to.throw(ReferenceError, /bad function/);
    *     expect(fn).to.throw(err);
-   *     expect(fn).to.not.throw(new RangeError('Out of range.'));
    *
    * Please note that when a throw expectation is negated, it will check each
    * parameter independently, starting with error constructor type. The appropriate way
@@ -4526,6 +4879,7 @@ module.exports = function (chai, _) {
    * @param {String} message _optional_
    * @see https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Error#Error_types
    * @returns error for chaining (null if no error)
+   * @namespace BDD
    * @api public
    */
 
@@ -4669,6 +5023,7 @@ module.exports = function (chai, _) {
    * @alias respondsTo
    * @param {String} method
    * @param {String} message _optional_
+   * @namespace BDD
    * @api public
    */
 
@@ -4703,6 +5058,7 @@ module.exports = function (chai, _) {
    *     expect(Foo).itself.not.to.respondTo('baz');
    *
    * @name itself
+   * @namespace BDD
    * @api public
    */
 
@@ -4721,6 +5077,7 @@ module.exports = function (chai, _) {
    * @alias satisfies
    * @param {Function} matcher
    * @param {String} message _optional_
+   * @namespace BDD
    * @api public
    */
 
@@ -4752,6 +5109,7 @@ module.exports = function (chai, _) {
    * @param {Number} expected
    * @param {Number} delta
    * @param {String} message _optional_
+   * @namespace BDD
    * @api public
    */
 
@@ -4803,6 +5161,7 @@ module.exports = function (chai, _) {
    * @name members
    * @param {Array} set
    * @param {String} message _optional_
+   * @namespace BDD
    * @api public
    */
 
@@ -4852,6 +5211,7 @@ module.exports = function (chai, _) {
    * @name oneOf
    * @param {Array<*>} list
    * @param {String} message _optional_
+   * @namespace BDD
    * @api public
    */
 
@@ -4881,7 +5241,7 @@ module.exports = function (chai, _) {
    *     var fn = function() { obj.val += 3 };
    *     var noChangeFn = function() { return 'foo' + 'bar'; }
    *     expect(fn).to.change(obj, 'val');
-   *     expect(noChangFn).to.not.change(obj, 'val')
+   *     expect(noChangeFn).to.not.change(obj, 'val')
    *
    * @name change
    * @alias changes
@@ -4889,6 +5249,7 @@ module.exports = function (chai, _) {
    * @param {String} object
    * @param {String} property name
    * @param {String} message _optional_
+   * @namespace BDD
    * @api public
    */
 
@@ -4926,6 +5287,7 @@ module.exports = function (chai, _) {
    * @param {String} object
    * @param {String} property name
    * @param {String} message _optional_
+   * @namespace BDD
    * @api public
    */
 
@@ -4963,6 +5325,7 @@ module.exports = function (chai, _) {
    * @param {String} object
    * @param {String} property name
    * @param {String} message _optional_
+   * @namespace BDD
    * @api public
    */
 
@@ -5001,6 +5364,7 @@ module.exports = function (chai, _) {
    *     expect(frozenObject).to.not.be.extensible;
    *
    * @name extensible
+   * @namespace BDD
    * @api public
    */
 
@@ -5042,6 +5406,7 @@ module.exports = function (chai, _) {
    *     expect({}).to.not.be.sealed;
    *
    * @name sealed
+   * @namespace BDD
    * @api public
    */
 
@@ -5081,6 +5446,7 @@ module.exports = function (chai, _) {
    *     expect({}).to.not.be.frozen;
    *
    * @name frozen
+   * @namespace BDD
    * @api public
    */
 
@@ -5109,7 +5475,7 @@ module.exports = function (chai, _) {
   });
 };
 
-},{}],13:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 /*!
  * chai
  * Copyright(c) 2011-2014 Jake Luer <jake@alogicalparadox.com>
@@ -5141,6 +5507,7 @@ module.exports = function (chai, util) {
    * @param {Mixed} expression to test for truthiness
    * @param {String} message to display on error
    * @name assert
+   * @namespace Assert
    * @api public
    */
 
@@ -5163,6 +5530,7 @@ module.exports = function (chai, util) {
    * @param {Mixed} expected
    * @param {String} message
    * @param {String} operator
+   * @namespace Assert
    * @api public
    */
 
@@ -5187,6 +5555,7 @@ module.exports = function (chai, util) {
    * @alias ok
    * @param {Mixed} object to test
    * @param {String} message
+   * @namespace Assert
    * @api public
    */
 
@@ -5206,6 +5575,7 @@ module.exports = function (chai, util) {
    * @alias notOk
    * @param {Mixed} object to test
    * @param {String} message
+   * @namespace Assert
    * @api public
    */
 
@@ -5224,6 +5594,7 @@ module.exports = function (chai, util) {
    * @param {Mixed} actual
    * @param {Mixed} expected
    * @param {String} message
+   * @namespace Assert
    * @api public
    */
 
@@ -5250,6 +5621,7 @@ module.exports = function (chai, util) {
    * @param {Mixed} actual
    * @param {Mixed} expected
    * @param {String} message
+   * @namespace Assert
    * @api public
    */
 
@@ -5276,6 +5648,7 @@ module.exports = function (chai, util) {
    * @param {Mixed} actual
    * @param {Mixed} expected
    * @param {String} message
+   * @namespace Assert
    * @api public
    */
 
@@ -5294,6 +5667,7 @@ module.exports = function (chai, util) {
    * @param {Mixed} actual
    * @param {Mixed} expected
    * @param {String} message
+   * @namespace Assert
    * @api public
    */
 
@@ -5312,6 +5686,7 @@ module.exports = function (chai, util) {
    * @param {Mixed} actual
    * @param {Mixed} expected
    * @param {String} message
+   * @namespace Assert
    * @api public
    */
 
@@ -5330,6 +5705,7 @@ module.exports = function (chai, util) {
    * @param {Mixed} actual
    * @param {Mixed} expected
    * @param {String} message
+   * @namespace Assert
    * @api public
    */
 
@@ -5348,6 +5724,7 @@ module.exports = function (chai, util) {
    * @param {Mixed} valueToCheck
    * @param {Mixed} valueToBeAbove
    * @param {String} message
+   * @namespace Assert
    * @api public
    */
 
@@ -5367,6 +5744,7 @@ module.exports = function (chai, util) {
    * @param {Mixed} valueToCheck
    * @param {Mixed} valueToBeAtLeast
    * @param {String} message
+   * @namespace Assert
    * @api public
    */
 
@@ -5385,6 +5763,7 @@ module.exports = function (chai, util) {
    * @param {Mixed} valueToCheck
    * @param {Mixed} valueToBeBelow
    * @param {String} message
+   * @namespace Assert
    * @api public
    */
 
@@ -5404,6 +5783,7 @@ module.exports = function (chai, util) {
    * @param {Mixed} valueToCheck
    * @param {Mixed} valueToBeAtMost
    * @param {String} message
+   * @namespace Assert
    * @api public
    */
 
@@ -5422,6 +5802,7 @@ module.exports = function (chai, util) {
    * @name isTrue
    * @param {Mixed} value
    * @param {String} message
+   * @namespace Assert
    * @api public
    */
 
@@ -5440,6 +5821,7 @@ module.exports = function (chai, util) {
    * @name isNotTrue
    * @param {Mixed} value
    * @param {String} message
+   * @namespace Assert
    * @api public
    */
 
@@ -5458,6 +5840,7 @@ module.exports = function (chai, util) {
    * @name isFalse
    * @param {Mixed} value
    * @param {String} message
+   * @namespace Assert
    * @api public
    */
 
@@ -5476,6 +5859,7 @@ module.exports = function (chai, util) {
    * @name isNotFalse
    * @param {Mixed} value
    * @param {String} message
+   * @namespace Assert
    * @api public
    */
 
@@ -5493,6 +5877,7 @@ module.exports = function (chai, util) {
    * @name isNull
    * @param {Mixed} value
    * @param {String} message
+   * @namespace Assert
    * @api public
    */
 
@@ -5511,6 +5896,7 @@ module.exports = function (chai, util) {
    * @name isNotNull
    * @param {Mixed} value
    * @param {String} message
+   * @namespace Assert
    * @api public
    */
 
@@ -5527,6 +5913,7 @@ module.exports = function (chai, util) {
    * @name isNaN
    * @param {Mixed} value
    * @param {String} message
+   * @namespace Assert
    * @api public
    */
 
@@ -5543,6 +5930,7 @@ module.exports = function (chai, util) {
    * @name isNotNaN
    * @param {Mixed} value
    * @param {String} message
+   * @namespace Assert
    * @api public
    */
   assert.isNotNaN = function (val, msg) {
@@ -5560,6 +5948,7 @@ module.exports = function (chai, util) {
    * @name isUndefined
    * @param {Mixed} value
    * @param {String} message
+   * @namespace Assert
    * @api public
    */
 
@@ -5578,6 +5967,7 @@ module.exports = function (chai, util) {
    * @name isDefined
    * @param {Mixed} value
    * @param {String} message
+   * @namespace Assert
    * @api public
    */
 
@@ -5596,6 +5986,7 @@ module.exports = function (chai, util) {
    * @name isFunction
    * @param {Mixed} value
    * @param {String} message
+   * @namespace Assert
    * @api public
    */
 
@@ -5614,6 +6005,7 @@ module.exports = function (chai, util) {
    * @name isNotFunction
    * @param {Mixed} value
    * @param {String} message
+   * @namespace Assert
    * @api public
    */
 
@@ -5624,8 +6016,8 @@ module.exports = function (chai, util) {
   /**
    * ### .isObject(value, [message])
    *
-   * Asserts that `value` is an object (as revealed by
-   * `Object.prototype.toString`).
+   * Asserts that `value` is an object of type 'Object' (as revealed by `Object.prototype.toString`).
+   * _The assertion does not match subclassed objects._
    *
    *     var selection = { name: 'Chai', serve: 'with spices' };
    *     assert.isObject(selection, 'tea selection is an object');
@@ -5633,6 +6025,7 @@ module.exports = function (chai, util) {
    * @name isObject
    * @param {Mixed} value
    * @param {String} message
+   * @namespace Assert
    * @api public
    */
 
@@ -5643,7 +6036,7 @@ module.exports = function (chai, util) {
   /**
    * ### .isNotObject(value, [message])
    *
-   * Asserts that `value` is _not_ an object.
+   * Asserts that `value` is _not_ an object of type 'Object' (as revealed by `Object.prototype.toString`).
    *
    *     var selection = 'chai'
    *     assert.isNotObject(selection, 'tea selection is not an object');
@@ -5652,6 +6045,7 @@ module.exports = function (chai, util) {
    * @name isNotObject
    * @param {Mixed} value
    * @param {String} message
+   * @namespace Assert
    * @api public
    */
 
@@ -5670,6 +6064,7 @@ module.exports = function (chai, util) {
    * @name isArray
    * @param {Mixed} value
    * @param {String} message
+   * @namespace Assert
    * @api public
    */
 
@@ -5688,6 +6083,7 @@ module.exports = function (chai, util) {
    * @name isNotArray
    * @param {Mixed} value
    * @param {String} message
+   * @namespace Assert
    * @api public
    */
 
@@ -5706,6 +6102,7 @@ module.exports = function (chai, util) {
    * @name isString
    * @param {Mixed} value
    * @param {String} message
+   * @namespace Assert
    * @api public
    */
 
@@ -5724,6 +6121,7 @@ module.exports = function (chai, util) {
    * @name isNotString
    * @param {Mixed} value
    * @param {String} message
+   * @namespace Assert
    * @api public
    */
 
@@ -5742,6 +6140,7 @@ module.exports = function (chai, util) {
    * @name isNumber
    * @param {Number} value
    * @param {String} message
+   * @namespace Assert
    * @api public
    */
 
@@ -5760,6 +6159,7 @@ module.exports = function (chai, util) {
    * @name isNotNumber
    * @param {Mixed} value
    * @param {String} message
+   * @namespace Assert
    * @api public
    */
 
@@ -5781,6 +6181,7 @@ module.exports = function (chai, util) {
    * @name isBoolean
    * @param {Mixed} value
    * @param {String} message
+   * @namespace Assert
    * @api public
    */
 
@@ -5802,6 +6203,7 @@ module.exports = function (chai, util) {
    * @name isNotBoolean
    * @param {Mixed} value
    * @param {String} message
+   * @namespace Assert
    * @api public
    */
 
@@ -5826,6 +6228,7 @@ module.exports = function (chai, util) {
    * @param {Mixed} value
    * @param {String} name
    * @param {String} message
+   * @namespace Assert
    * @api public
    */
 
@@ -5845,6 +6248,7 @@ module.exports = function (chai, util) {
    * @param {Mixed} value
    * @param {String} typeof name
    * @param {String} message
+   * @namespace Assert
    * @api public
    */
 
@@ -5866,6 +6270,7 @@ module.exports = function (chai, util) {
    * @param {Object} object
    * @param {Constructor} constructor
    * @param {String} message
+   * @namespace Assert
    * @api public
    */
 
@@ -5887,6 +6292,7 @@ module.exports = function (chai, util) {
    * @param {Object} object
    * @param {Constructor} constructor
    * @param {String} message
+   * @namespace Assert
    * @api public
    */
 
@@ -5907,6 +6313,7 @@ module.exports = function (chai, util) {
    * @param {Array|String} haystack
    * @param {Mixed} needle
    * @param {String} message
+   * @namespace Assert
    * @api public
    */
 
@@ -5927,6 +6334,7 @@ module.exports = function (chai, util) {
    * @param {Array|String} haystack
    * @param {Mixed} needle
    * @param {String} message
+   * @namespace Assert
    * @api public
    */
 
@@ -5945,6 +6353,7 @@ module.exports = function (chai, util) {
    * @param {Mixed} value
    * @param {RegExp} regexp
    * @param {String} message
+   * @namespace Assert
    * @api public
    */
 
@@ -5963,6 +6372,7 @@ module.exports = function (chai, util) {
    * @param {Mixed} value
    * @param {RegExp} regexp
    * @param {String} message
+   * @namespace Assert
    * @api public
    */
 
@@ -5981,6 +6391,7 @@ module.exports = function (chai, util) {
    * @param {Object} object
    * @param {String} property
    * @param {String} message
+   * @namespace Assert
    * @api public
    */
 
@@ -5999,6 +6410,7 @@ module.exports = function (chai, util) {
    * @param {Object} object
    * @param {String} property
    * @param {String} message
+   * @namespace Assert
    * @api public
    */
 
@@ -6018,6 +6430,7 @@ module.exports = function (chai, util) {
    * @param {Object} object
    * @param {String} property
    * @param {String} message
+   * @namespace Assert
    * @api public
    */
 
@@ -6037,6 +6450,7 @@ module.exports = function (chai, util) {
    * @param {Object} object
    * @param {String} property
    * @param {String} message
+   * @namespace Assert
    * @api public
    */
 
@@ -6057,6 +6471,7 @@ module.exports = function (chai, util) {
    * @param {String} property
    * @param {Mixed} value
    * @param {String} message
+   * @namespace Assert
    * @api public
    */
 
@@ -6077,6 +6492,7 @@ module.exports = function (chai, util) {
    * @param {String} property
    * @param {Mixed} value
    * @param {String} message
+   * @namespace Assert
    * @api public
    */
 
@@ -6098,6 +6514,7 @@ module.exports = function (chai, util) {
    * @param {String} property
    * @param {Mixed} value
    * @param {String} message
+   * @namespace Assert
    * @api public
    */
 
@@ -6119,6 +6536,7 @@ module.exports = function (chai, util) {
    * @param {String} property
    * @param {Mixed} value
    * @param {String} message
+   * @namespace Assert
    * @api public
    */
 
@@ -6138,6 +6556,7 @@ module.exports = function (chai, util) {
    * @param {Mixed} object
    * @param {Number} length
    * @param {String} message
+   * @namespace Assert
    * @api public
    */
 
@@ -6166,6 +6585,7 @@ module.exports = function (chai, util) {
    * @param {RegExp} regexp
    * @param {String} message
    * @see https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Error#Error_types
+   * @namespace Assert
    * @api public
    */
 
@@ -6194,6 +6614,7 @@ module.exports = function (chai, util) {
    * @param {RegExp} regexp
    * @param {String} message
    * @see https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Error#Error_types
+   * @namespace Assert
    * @api public
    */
 
@@ -6219,6 +6640,7 @@ module.exports = function (chai, util) {
    * @param {String} operator
    * @param {Mixed} val2
    * @param {String} message
+   * @namespace Assert
    * @api public
    */
 
@@ -6271,6 +6693,7 @@ module.exports = function (chai, util) {
    * @param {Number} expected
    * @param {Number} delta
    * @param {String} message
+   * @namespace Assert
    * @api public
    */
 
@@ -6290,6 +6713,7 @@ module.exports = function (chai, util) {
    * @param {Number} expected
    * @param {Number} delta
    * @param {String} message
+   * @namespace Assert
    * @api public
    */
 
@@ -6309,6 +6733,7 @@ module.exports = function (chai, util) {
    * @param {Array} set1
    * @param {Array} set2
    * @param {String} message
+   * @namespace Assert
    * @api public
    */
 
@@ -6328,6 +6753,7 @@ module.exports = function (chai, util) {
    * @param {Array} set1
    * @param {Array} set2
    * @param {String} message
+   * @namespace Assert
    * @api public
    */
 
@@ -6347,11 +6773,33 @@ module.exports = function (chai, util) {
    * @param {Array} superset
    * @param {Array} subset
    * @param {String} message
+   * @namespace Assert
    * @api public
    */
 
   assert.includeMembers = function (superset, subset, msg) {
     new Assertion(superset, msg).to.include.members(subset);
+  }
+
+  /**
+   * ### .includeDeepMembers(superset, subset, [message])
+   *
+   * Asserts that `subset` is included in `superset` - using deep equality checking.
+   * Order is not taken into account.
+   * Duplicates are ignored.
+   *
+   *     assert.includeDeepMembers([ {a: 1}, {b: 2}, {c: 3} ], [ {b: 2}, {a: 1}, {b: 2} ], 'include deep members');
+   *
+   * @name includeDeepMembers
+   * @param {Array} superset
+   * @param {Array} subset
+   * @param {String} message
+   * @namespace Assert
+   * @api public
+   */
+
+  assert.includeDeepMembers = function (superset, subset, msg) {
+    new Assertion(superset, msg).to.include.deep.members(subset);
   }
 
   /**
@@ -6365,6 +6813,7 @@ module.exports = function (chai, util) {
    * @param {*} inList
    * @param {Array<*>} list
    * @param {String} message
+   * @namespace Assert
    * @api public
    */
 
@@ -6386,6 +6835,7 @@ module.exports = function (chai, util) {
    * @param {Object} object
    * @param {String} property name
    * @param {String} message _optional_
+   * @namespace Assert
    * @api public
    */
 
@@ -6407,6 +6857,7 @@ module.exports = function (chai, util) {
    * @param {Object} object
    * @param {String} property name
    * @param {String} message _optional_
+   * @namespace Assert
    * @api public
    */
 
@@ -6428,6 +6879,7 @@ module.exports = function (chai, util) {
    * @param {Object} object
    * @param {String} property name
    * @param {String} message _optional_
+   * @namespace Assert
    * @api public
    */
 
@@ -6449,6 +6901,7 @@ module.exports = function (chai, util) {
    * @param {Object} object
    * @param {String} property name
    * @param {String} message _optional_
+   * @namespace Assert
    * @api public
    */
 
@@ -6470,6 +6923,7 @@ module.exports = function (chai, util) {
    * @param {Object} object
    * @param {String} property name
    * @param {String} message _optional_
+   * @namespace Assert
    * @api public
    */
 
@@ -6491,6 +6945,7 @@ module.exports = function (chai, util) {
    * @param {Object} object
    * @param {String} property name
    * @param {String} message _optional_
+   * @namespace Assert
    * @api public
    */
 
@@ -6510,6 +6965,7 @@ module.exports = function (chai, util) {
    *
    * @name ifError
    * @param {Object} object
+   * @namespace Assert
    * @api public
    */
 
@@ -6530,6 +6986,7 @@ module.exports = function (chai, util) {
    * @alias extensible
    * @param {Object} object
    * @param {String} message _optional_
+   * @namespace Assert
    * @api public
    */
 
@@ -6554,6 +7011,7 @@ module.exports = function (chai, util) {
    * @alias notExtensible
    * @param {Object} object
    * @param {String} message _optional_
+   * @namespace Assert
    * @api public
    */
 
@@ -6577,6 +7035,7 @@ module.exports = function (chai, util) {
    * @alias sealed
    * @param {Object} object
    * @param {String} message _optional_
+   * @namespace Assert
    * @api public
    */
 
@@ -6595,6 +7054,7 @@ module.exports = function (chai, util) {
    * @alias notSealed
    * @param {Object} object
    * @param {String} message _optional_
+   * @namespace Assert
    * @api public
    */
 
@@ -6615,6 +7075,7 @@ module.exports = function (chai, util) {
    * @alias frozen
    * @param {Object} object
    * @param {String} message _optional_
+   * @namespace Assert
    * @api public
    */
 
@@ -6633,6 +7094,7 @@ module.exports = function (chai, util) {
    * @alias notFrozen
    * @param {Object} object
    * @param {String} message _optional_
+   * @namespace Assert
    * @api public
    */
 
@@ -6660,7 +7122,7 @@ module.exports = function (chai, util) {
   ('isNotFrozen', 'notFrozen');
 };
 
-},{}],14:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 /*!
  * chai
  * Copyright(c) 2011-2014 Jake Luer <jake@alogicalparadox.com>
@@ -6682,6 +7144,7 @@ module.exports = function (chai, util) {
    * @param {Mixed} expected
    * @param {String} message
    * @param {String} operator
+   * @namespace Expect
    * @api public
    */
 
@@ -6695,7 +7158,7 @@ module.exports = function (chai, util) {
   };
 };
 
-},{}],15:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 /*!
  * chai
  * Copyright(c) 2011-2014 Jake Luer <jake@alogicalparadox.com>
@@ -6746,6 +7209,7 @@ module.exports = function (chai, util) {
      * @param {Mixed} expected
      * @param {String} message
      * @param {String} operator
+     * @namespace Should
      * @api public
      */
 
@@ -6758,13 +7222,66 @@ module.exports = function (chai, util) {
       }, should.fail);
     };
 
+    /**
+     * ### .equal(actual, expected, [message])
+     *
+     * Asserts non-strict equality (`==`) of `actual` and `expected`.
+     *
+     *     should.equal(3, '3', '== coerces values to strings');
+     *
+     * @name equal
+     * @param {Mixed} actual
+     * @param {Mixed} expected
+     * @param {String} message
+     * @namespace Should
+     * @api public
+     */
+
     should.equal = function (val1, val2, msg) {
       new Assertion(val1, msg).to.equal(val2);
     };
 
+    /**
+     * ### .throw(function, [constructor/string/regexp], [string/regexp], [message])
+     *
+     * Asserts that `function` will throw an error that is an instance of
+     * `constructor`, or alternately that it will throw an error with message
+     * matching `regexp`.
+     *
+     *     should.throw(fn, 'function throws a reference error');
+     *     should.throw(fn, /function throws a reference error/);
+     *     should.throw(fn, ReferenceError);
+     *     should.throw(fn, ReferenceError, 'function throws a reference error');
+     *     should.throw(fn, ReferenceError, /function throws a reference error/);
+     *
+     * @name throw
+     * @alias Throw
+     * @param {Function} function
+     * @param {ErrorConstructor} constructor
+     * @param {RegExp} regexp
+     * @param {String} message
+     * @see https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Error#Error_types
+     * @namespace Should
+     * @api public
+     */
+
     should.Throw = function (fn, errt, errs, msg) {
       new Assertion(fn, msg).to.Throw(errt, errs);
     };
+
+    /**
+     * ### .exist
+     *
+     * Asserts that the target is neither `null` nor `undefined`.
+     *
+     *     var foo = 'hi';
+     *
+     *     should.exist(foo, 'foo exists');
+     *
+     * @name exist
+     * @namespace Should
+     * @api public
+     */
 
     should.exist = function (val, msg) {
       new Assertion(val, msg).to.exist;
@@ -6773,13 +7290,62 @@ module.exports = function (chai, util) {
     // negation
     should.not = {}
 
+    /**
+     * ### .not.equal(actual, expected, [message])
+     *
+     * Asserts non-strict inequality (`!=`) of `actual` and `expected`.
+     *
+     *     should.not.equal(3, 4, 'these numbers are not equal');
+     *
+     * @name not.equal
+     * @param {Mixed} actual
+     * @param {Mixed} expected
+     * @param {String} message
+     * @namespace Should
+     * @api public
+     */
+
     should.not.equal = function (val1, val2, msg) {
       new Assertion(val1, msg).to.not.equal(val2);
     };
 
+    /**
+     * ### .throw(function, [constructor/regexp], [message])
+     *
+     * Asserts that `function` will _not_ throw an error that is an instance of
+     * `constructor`, or alternately that it will not throw an error with message
+     * matching `regexp`.
+     *
+     *     should.not.throw(fn, Error, 'function does not throw');
+     *
+     * @name not.throw
+     * @alias not.Throw
+     * @param {Function} function
+     * @param {ErrorConstructor} constructor
+     * @param {RegExp} regexp
+     * @param {String} message
+     * @see https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Error#Error_types
+     * @namespace Should
+     * @api public
+     */
+
     should.not.Throw = function (fn, errt, errs, msg) {
       new Assertion(fn, msg).to.not.Throw(errt, errs);
     };
+
+    /**
+     * ### .not.exist
+     *
+     * Asserts that the target is neither `null` nor `undefined`.
+     *
+     *     var bar = null;
+     *
+     *     should.not.exist(bar, 'bar does not exist');
+     *
+     * @name not.exist
+     * @namespace Should
+     * @api public
+     */
 
     should.not.exist = function (val, msg) {
       new Assertion(val, msg).to.not.exist;
@@ -6795,7 +7361,7 @@ module.exports = function (chai, util) {
   chai.Should = loadShould;
 };
 
-},{}],16:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 /*!
  * Chai - addChainingMethod utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -6850,6 +7416,7 @@ var call  = Function.prototype.call,
  * @param {String} name of method to add
  * @param {Function} method function to be used for `name`, when called
  * @param {Function} chainingBehavior function to be called every time the property is accessed
+ * @namespace Utils
  * @name addChainableMethod
  * @api public
  */
@@ -6908,7 +7475,7 @@ module.exports = function (ctx, name, method, chainingBehavior) {
   });
 };
 
-},{"../config":11,"./flag":20,"./transferFlags":36}],17:[function(require,module,exports){
+},{"../config":13,"./flag":22,"./transferFlags":38}],19:[function(require,module,exports){
 /*!
  * Chai - addMethod utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -6938,6 +7505,7 @@ var config = require('../config');
  * @param {Object} ctx object to which the method is added
  * @param {String} name of method to add
  * @param {Function} method function to be used for name
+ * @namespace Utils
  * @name addMethod
  * @api public
  */
@@ -6953,7 +7521,7 @@ module.exports = function (ctx, name, method) {
   };
 };
 
-},{"../config":11,"./flag":20}],18:[function(require,module,exports){
+},{"../config":13,"./flag":22}],20:[function(require,module,exports){
 /*!
  * Chai - addProperty utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -6984,6 +7552,7 @@ var flag = require('./flag');
  * @param {Object} ctx object to which the property is added
  * @param {String} name of property to add
  * @param {Function} getter function to be used for name
+ * @namespace Utils
  * @name addProperty
  * @api public
  */
@@ -7002,7 +7571,7 @@ module.exports = function (ctx, name, getter) {
   });
 };
 
-},{"../config":11,"./flag":20}],19:[function(require,module,exports){
+},{"../config":13,"./flag":22}],21:[function(require,module,exports){
 /*!
  * Chai - expectTypes utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -7018,6 +7587,7 @@ module.exports = function (ctx, name, getter) {
  *
  * @param {Mixed} obj constructed Assertion
  * @param {Array} type A list of allowed types for this assertion
+ * @namespace Utils
  * @name expectTypes
  * @api public
  */
@@ -7045,7 +7615,7 @@ module.exports = function (obj, types) {
   }
 };
 
-},{"./flag":20,"assertion-error":37,"type-detect":42}],20:[function(require,module,exports){
+},{"./flag":22,"assertion-error":8,"type-detect":48}],22:[function(require,module,exports){
 /*!
  * Chai - flag utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -7066,6 +7636,7 @@ module.exports = function (obj, types) {
  * @param {Object} object constructed Assertion
  * @param {String} key
  * @param {Mixed} value (optional)
+ * @namespace Utils
  * @name flag
  * @api private
  */
@@ -7079,7 +7650,7 @@ module.exports = function (obj, key, value) {
   }
 };
 
-},{}],21:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 /*!
  * Chai - getActual utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -7093,13 +7664,15 @@ module.exports = function (obj, key, value) {
  *
  * @param {Object} object (constructed Assertion)
  * @param {Arguments} chai.Assertion.prototype.assert arguments
+ * @namespace Utils
+ * @name getActual
  */
 
 module.exports = function (obj, args) {
   return args.length > 4 ? args[4] : obj._obj;
 };
 
-},{}],22:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 /*!
  * Chai - getEnumerableProperties utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -7114,6 +7687,7 @@ module.exports = function (obj, args) {
  *
  * @param {Object} object
  * @returns {Array}
+ * @namespace Utils
  * @name getEnumerableProperties
  * @api public
  */
@@ -7126,7 +7700,7 @@ module.exports = function getEnumerableProperties(object) {
   return result;
 };
 
-},{}],23:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 /*!
  * Chai - message composition utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -7156,6 +7730,7 @@ var flag = require('./flag')
  *
  * @param {Object} object (constructed Assertion)
  * @param {Arguments} chai.Assertion.prototype.assert arguments
+ * @namespace Utils
  * @name getMessage
  * @api public
  */
@@ -7171,14 +7746,14 @@ module.exports = function (obj, args) {
   if(typeof msg === "function") msg = msg();
   msg = msg || '';
   msg = msg
-    .replace(/#{this}/g, objDisplay(val))
-    .replace(/#{act}/g, objDisplay(actual))
-    .replace(/#{exp}/g, objDisplay(expected));
+    .replace(/#\{this\}/g, function () { return objDisplay(val); })
+    .replace(/#\{act\}/g, function () { return objDisplay(actual); })
+    .replace(/#\{exp\}/g, function () { return objDisplay(expected); });
 
   return flagMsg ? flagMsg + ': ' + msg : msg;
 };
 
-},{"./flag":20,"./getActual":21,"./inspect":30,"./objDisplay":31}],24:[function(require,module,exports){
+},{"./flag":22,"./getActual":23,"./inspect":32,"./objDisplay":33}],26:[function(require,module,exports){
 /*!
  * Chai - getName utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -7191,6 +7766,8 @@ module.exports = function (obj, args) {
  * Gets the name of a function, in a cross-browser way.
  *
  * @param {Function} a function (usually a constructor)
+ * @namespace Utils
+ * @name getName
  */
 
 module.exports = function (func) {
@@ -7200,7 +7777,7 @@ module.exports = function (func) {
   return match && match[1] ? match[1] : "";
 };
 
-},{}],25:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 /*!
  * Chai - getPathInfo utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -7226,6 +7803,7 @@ var hasProperty = require('./hasProperty');
  * @param {String} path
  * @param {Object} object
  * @returns {Object} info
+ * @namespace Utils
  * @name getPathInfo
  * @api public
  */
@@ -7312,7 +7890,7 @@ function _getPathValue (parsed, obj, index) {
   return res;
 }
 
-},{"./hasProperty":28}],26:[function(require,module,exports){
+},{"./hasProperty":30}],28:[function(require,module,exports){
 /*!
  * Chai - getPathValue utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -7348,15 +7926,16 @@ var getPathInfo = require('./getPathInfo');
  * @param {String} path
  * @param {Object} object
  * @returns {Object} value or `undefined`
+ * @namespace Utils
  * @name getPathValue
  * @api public
  */
 module.exports = function(path, obj) {
   var info = getPathInfo(path, obj);
   return info.value;
-}; 
+};
 
-},{"./getPathInfo":25}],27:[function(require,module,exports){
+},{"./getPathInfo":27}],29:[function(require,module,exports){
 /*!
  * Chai - getProperties utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -7371,6 +7950,7 @@ module.exports = function(path, obj) {
  *
  * @param {Object} object
  * @returns {Array}
+ * @namespace Utils
  * @name getProperties
  * @api public
  */
@@ -7393,7 +7973,7 @@ module.exports = function getProperties(object) {
   return result;
 };
 
-},{}],28:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 /*!
  * Chai - hasProperty utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -7422,7 +8002,7 @@ var type = require('type-detect');
  *     hasProperty('str', obj);  // true
  *     hasProperty('constructor', obj);  // true
  *     hasProperty('bar', obj);  // false
- *     
+ *
  *     hasProperty('length', obj.str); // true
  *     hasProperty(1, obj.str);  // true
  *     hasProperty(5, obj.str);  // false
@@ -7434,6 +8014,7 @@ var type = require('type-detect');
  * @param {Objuect} object
  * @param {String|Number} name
  * @returns {Boolean} whether it exists
+ * @namespace Utils
  * @name getPathInfo
  * @api public
  */
@@ -7458,7 +8039,7 @@ module.exports = function hasProperty(name, obj) {
   return name in obj;
 };
 
-},{"type-detect":42}],29:[function(require,module,exports){
+},{"type-detect":48}],31:[function(require,module,exports){
 /*!
  * chai
  * Copyright(c) 2011 Jake Luer <jake@alogicalparadox.com>
@@ -7590,7 +8171,7 @@ exports.addChainableMethod = require('./addChainableMethod');
 
 exports.overwriteChainableMethod = require('./overwriteChainableMethod');
 
-},{"./addChainableMethod":16,"./addMethod":17,"./addProperty":18,"./expectTypes":19,"./flag":20,"./getActual":21,"./getMessage":23,"./getName":24,"./getPathInfo":25,"./getPathValue":26,"./hasProperty":28,"./inspect":30,"./objDisplay":31,"./overwriteChainableMethod":32,"./overwriteMethod":33,"./overwriteProperty":34,"./test":35,"./transferFlags":36,"deep-eql":38,"type-detect":42}],30:[function(require,module,exports){
+},{"./addChainableMethod":18,"./addMethod":19,"./addProperty":20,"./expectTypes":21,"./flag":22,"./getActual":23,"./getMessage":25,"./getName":26,"./getPathInfo":27,"./getPathValue":28,"./hasProperty":30,"./inspect":32,"./objDisplay":33,"./overwriteChainableMethod":34,"./overwriteMethod":35,"./overwriteProperty":36,"./test":37,"./transferFlags":38,"deep-eql":39,"type-detect":48}],32:[function(require,module,exports){
 // This is (almost) directly from Node.js utils
 // https://github.com/joyent/node/blob/f8c335d0caf47f16d31413f89aa28eda3878e3aa/lib/util.js
 
@@ -7610,6 +8191,8 @@ module.exports = inspect;
  * @param {Number} depth Depth in which to descend in object. Default is 2.
  * @param {Boolean} colors Flag to turn on ANSI escape codes to color the
  *    output. Default is false (no coloring).
+ * @namespace Utils
+ * @name inspect
  */
 function inspect(obj, showHidden, depth, colors) {
   var ctx = {
@@ -7925,7 +8508,7 @@ function objectToString(o) {
   return Object.prototype.toString.call(o);
 }
 
-},{"./getEnumerableProperties":22,"./getName":24,"./getProperties":27}],31:[function(require,module,exports){
+},{"./getEnumerableProperties":24,"./getName":26,"./getProperties":29}],33:[function(require,module,exports){
 /*!
  * Chai - flag utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -7948,6 +8531,7 @@ var config = require('../config');
  *
  * @param {Mixed} javascript object to inspect
  * @name objDisplay
+ * @namespace Utils
  * @api public
  */
 
@@ -7976,7 +8560,7 @@ module.exports = function (obj) {
   }
 };
 
-},{"../config":11,"./inspect":30}],32:[function(require,module,exports){
+},{"../config":13,"./inspect":32}],34:[function(require,module,exports){
 /*!
  * Chai - overwriteChainableMethod utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -8011,6 +8595,7 @@ module.exports = function (obj) {
  * @param {String} name of method / property to overwrite
  * @param {Function} method function that returns a function to be used for name
  * @param {Function} chainingBehavior function that returns a function to be used for property
+ * @namespace Utils
  * @name overwriteChainableMethod
  * @api public
  */
@@ -8031,7 +8616,7 @@ module.exports = function (ctx, name, method, chainingBehavior) {
   };
 };
 
-},{}],33:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 /*!
  * Chai - overwriteMethod utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -8067,6 +8652,7 @@ module.exports = function (ctx, name, method, chainingBehavior) {
  * @param {Object} ctx object whose method is to be overwritten
  * @param {String} name of method to overwrite
  * @param {Function} method function that returns a function to be used for name
+ * @namespace Utils
  * @name overwriteMethod
  * @api public
  */
@@ -8084,7 +8670,7 @@ module.exports = function (ctx, name, method) {
   }
 };
 
-},{}],34:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 /*!
  * Chai - overwriteProperty utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -8120,6 +8706,7 @@ module.exports = function (ctx, name, method) {
  * @param {Object} ctx object whose property is to be overwritten
  * @param {String} name of property to overwrite
  * @param {Function} getter function that returns a getter function to be used for name
+ * @namespace Utils
  * @name overwriteProperty
  * @api public
  */
@@ -8140,7 +8727,7 @@ module.exports = function (ctx, name, getter) {
   });
 };
 
-},{}],35:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
 /*!
  * Chai - test utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -8160,6 +8747,8 @@ var flag = require('./flag');
  *
  * @param {Object} object (constructed Assertion)
  * @param {Arguments} chai.Assertion.prototype.assert arguments
+ * @namespace Utils
+ * @name test
  */
 
 module.exports = function (obj, args) {
@@ -8168,7 +8757,7 @@ module.exports = function (obj, args) {
   return negate ? !expr : expr;
 };
 
-},{"./flag":20}],36:[function(require,module,exports){
+},{"./flag":22}],38:[function(require,module,exports){
 /*!
  * Chai - transferFlags utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -8193,6 +8782,7 @@ module.exports = function (obj, args) {
  * @param {Assertion} assertion the assertion to transfer the flags from
  * @param {Object} object the object to transfer the flags to; usually a new assertion
  * @param {Boolean} includeAll
+ * @namespace Utils
  * @name transferFlags
  * @api private
  */
@@ -8214,124 +8804,10 @@ module.exports = function (assertion, object, includeAll) {
   }
 };
 
-},{}],37:[function(require,module,exports){
-/*!
- * assertion-error
- * Copyright(c) 2013 Jake Luer <jake@qualiancy.com>
- * MIT Licensed
- */
-
-/*!
- * Return a function that will copy properties from
- * one object to another excluding any originally
- * listed. Returned function will create a new `{}`.
- *
- * @param {String} excluded properties ...
- * @return {Function}
- */
-
-function exclude () {
-  var excludes = [].slice.call(arguments);
-
-  function excludeProps (res, obj) {
-    Object.keys(obj).forEach(function (key) {
-      if (!~excludes.indexOf(key)) res[key] = obj[key];
-    });
-  }
-
-  return function extendExclude () {
-    var args = [].slice.call(arguments)
-      , i = 0
-      , res = {};
-
-    for (; i < args.length; i++) {
-      excludeProps(res, args[i]);
-    }
-
-    return res;
-  };
-};
-
-/*!
- * Primary Exports
- */
-
-module.exports = AssertionError;
-
-/**
- * ### AssertionError
- *
- * An extension of the JavaScript `Error` constructor for
- * assertion and validation scenarios.
- *
- * @param {String} message
- * @param {Object} properties to include (optional)
- * @param {callee} start stack function (optional)
- */
-
-function AssertionError (message, _props, ssf) {
-  var extend = exclude('name', 'message', 'stack', 'constructor', 'toJSON')
-    , props = extend(_props || {});
-
-  // default values
-  this.message = message || 'Unspecified AssertionError';
-  this.showDiff = false;
-
-  // copy from properties
-  for (var key in props) {
-    this[key] = props[key];
-  }
-
-  // capture stack trace
-  ssf = ssf || arguments.callee;
-  if (ssf && Error.captureStackTrace) {
-    Error.captureStackTrace(this, ssf);
-  } else {
-    this.stack = new Error().stack;
-  }
-}
-
-/*!
- * Inherit from Error.prototype
- */
-
-AssertionError.prototype = Object.create(Error.prototype);
-
-/*!
- * Statically set name
- */
-
-AssertionError.prototype.name = 'AssertionError';
-
-/*!
- * Ensure correct constructor
- */
-
-AssertionError.prototype.constructor = AssertionError;
-
-/**
- * Allow errors to be converted to JSON for static transfer.
- *
- * @param {Boolean} include stack (default: `true`)
- * @return {Object} object that can be `JSON.stringify`
- */
-
-AssertionError.prototype.toJSON = function (stack) {
-  var extend = exclude('constructor', 'toJSON', 'stack')
-    , props = extend({ name: this.name }, this);
-
-  // include stack if exists and not turned off
-  if (false !== stack && this.stack) {
-    props.stack = this.stack;
-  }
-
-  return props;
-};
-
-},{}],38:[function(require,module,exports){
+},{}],39:[function(require,module,exports){
 module.exports = require('./lib/eql');
 
-},{"./lib/eql":39}],39:[function(require,module,exports){
+},{"./lib/eql":40}],40:[function(require,module,exports){
 /*!
  * deep-eql
  * Copyright(c) 2013 Jake Luer <jake@alogicalparadox.com>
@@ -8590,10 +9066,10 @@ function objectEqual(a, b, m) {
   return true;
 }
 
-},{"buffer":1,"type-detect":40}],40:[function(require,module,exports){
+},{"buffer":3,"type-detect":41}],41:[function(require,module,exports){
 module.exports = require('./lib/type');
 
-},{"./lib/type":41}],41:[function(require,module,exports){
+},{"./lib/type":42}],42:[function(require,module,exports){
 /*!
  * type-detect
  * Copyright(c) 2013 jake luer <jake@alogicalparadox.com>
@@ -8737,145 +9213,7 @@ Library.prototype.test = function (obj, type) {
   }
 };
 
-},{}],42:[function(require,module,exports){
-arguments[4][40][0].apply(exports,arguments)
-},{"./lib/type":43,"dup":40}],43:[function(require,module,exports){
-/*!
- * type-detect
- * Copyright(c) 2013 jake luer <jake@alogicalparadox.com>
- * MIT Licensed
- */
-
-/*!
- * Primary Exports
- */
-
-var exports = module.exports = getType;
-
-/**
- * ### typeOf (obj)
- *
- * Use several different techniques to determine
- * the type of object being tested.
- *
- *
- * @param {Mixed} object
- * @return {String} object type
- * @api public
- */
-var objectTypeRegexp = /^\[object (.*)\]$/;
-
-function getType(obj) {
-  var type = Object.prototype.toString.call(obj).match(objectTypeRegexp)[1].toLowerCase();
-  // Let "new String('')" return 'object'
-  if (typeof Promise === 'function' && obj instanceof Promise) return 'promise';
-  // PhantomJS has type "DOMWindow" for null
-  if (obj === null) return 'null';
-  // PhantomJS has type "DOMWindow" for undefined
-  if (obj === undefined) return 'undefined';
-  return type;
-}
-
-exports.Library = Library;
-
-/**
- * ### Library
- *
- * Create a repository for custom type detection.
- *
- * ```js
- * var lib = new type.Library;
- * ```
- *
- */
-
-function Library() {
-  if (!(this instanceof Library)) return new Library();
-  this.tests = {};
-}
-
-/**
- * #### .of (obj)
- *
- * Expose replacement `typeof` detection to the library.
- *
- * ```js
- * if ('string' === lib.of('hello world')) {
- *   // ...
- * }
- * ```
- *
- * @param {Mixed} object to test
- * @return {String} type
- */
-
-Library.prototype.of = getType;
-
-/**
- * #### .define (type, test)
- *
- * Add a test to for the `.test()` assertion.
- *
- * Can be defined as a regular expression:
- *
- * ```js
- * lib.define('int', /^[0-9]+$/);
- * ```
- *
- * ... or as a function:
- *
- * ```js
- * lib.define('bln', function (obj) {
- *   if ('boolean' === lib.of(obj)) return true;
- *   var blns = [ 'yes', 'no', 'true', 'false', 1, 0 ];
- *   if ('string' === lib.of(obj)) obj = obj.toLowerCase();
- *   return !! ~blns.indexOf(obj);
- * });
- * ```
- *
- * @param {String} type
- * @param {RegExp|Function} test
- * @api public
- */
-
-Library.prototype.define = function(type, test) {
-  if (arguments.length === 1) return this.tests[type];
-  this.tests[type] = test;
-  return this;
-};
-
-/**
- * #### .test (obj, test)
- *
- * Assert that an object is of type. Will first
- * check natives, and if that does not pass it will
- * use the user defined custom tests.
- *
- * ```js
- * assert(lib.test('1', 'int'));
- * assert(lib.test('yes', 'bln'));
- * ```
- *
- * @param {Mixed} object
- * @param {String} type
- * @return {Boolean} result
- * @api public
- */
-
-Library.prototype.test = function(obj, type) {
-  if (type === getType(obj)) return true;
-  var test = this.tests[type];
-
-  if (test && 'regexp' === getType(test)) {
-    return test.test(obj);
-  } else if (test && 'function' === getType(test)) {
-    return test(obj);
-  } else {
-    throw new ReferenceError('Type test "' + type + '" not defined or invalid.');
-  }
-};
-
-},{}],44:[function(require,module,exports){
+},{}],43:[function(require,module,exports){
 module.exports = Table
 
 function Table() {
@@ -9315,7 +9653,7 @@ Table.prototype.log = function() {
   console.log(this.toString())
 }
 
-},{}],45:[function(require,module,exports){
+},{}],44:[function(require,module,exports){
 'use strict';
 
 var hasOwn = Object.prototype.hasOwnProperty;
@@ -9403,7 +9741,7 @@ module.exports = function extend() {
 };
 
 
-},{}],46:[function(require,module,exports){
+},{}],45:[function(require,module,exports){
 /*--------------------------------------------------------------------------
  * linq.js - LINQ for JavaScript
  * ver 3.0.4-Beta5 (Jun. 20th, 2013)
@@ -12421,14 +12759,14 @@ module.exports = function extend() {
         root.Enumerable = Enumerable;
     }
 })(this);
-},{}],47:[function(require,module,exports){
+},{}],46:[function(require,module,exports){
 //! moment.js
-//! version : 2.10.6
+//! version : 2.13.0
 //! authors : Tim Wood, Iskren Chernev, Moment.js contributors
 //! license : MIT
 //! momentjs.com
 
-(function (global, factory) {
+;(function (global, factory) {
     typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
     typeof define === 'function' && define.amd ? define(factory) :
     global.moment = factory()
@@ -12447,7 +12785,7 @@ module.exports = function extend() {
     }
 
     function isArray(input) {
-        return Object.prototype.toString.call(input) === '[object Array]';
+        return input instanceof Array || Object.prototype.toString.call(input) === '[object Array]';
     }
 
     function isDate(input) {
@@ -12500,7 +12838,9 @@ module.exports = function extend() {
             invalidMonth    : null,
             invalidFormat   : false,
             userInvalidated : false,
-            iso             : false
+            iso             : false,
+            parsedDateParts : [],
+            meridiem        : null
         };
     }
 
@@ -12511,9 +12851,30 @@ module.exports = function extend() {
         return m._pf;
     }
 
+    var some;
+    if (Array.prototype.some) {
+        some = Array.prototype.some;
+    } else {
+        some = function (fun) {
+            var t = Object(this);
+            var len = t.length >>> 0;
+
+            for (var i = 0; i < len; i++) {
+                if (i in t && fun.call(this, t[i], i, t)) {
+                    return true;
+                }
+            }
+
+            return false;
+        };
+    }
+
     function valid__isValid(m) {
         if (m._isValid == null) {
             var flags = getParsingFlags(m);
+            var parsedParts = some.call(flags.parsedDateParts, function (i) {
+                return i != null;
+            });
             m._isValid = !isNaN(m._d.getTime()) &&
                 flags.overflow < 0 &&
                 !flags.empty &&
@@ -12521,7 +12882,8 @@ module.exports = function extend() {
                 !flags.invalidWeekday &&
                 !flags.nullInput &&
                 !flags.invalidFormat &&
-                !flags.userInvalidated;
+                !flags.userInvalidated &&
+                (!flags.meridiem || (flags.meridiem && parsedParts));
 
             if (m._strict) {
                 m._isValid = m._isValid &&
@@ -12545,39 +12907,45 @@ module.exports = function extend() {
         return m;
     }
 
+    function isUndefined(input) {
+        return input === void 0;
+    }
+
+    // Plugins that add properties should also add the key here (null value),
+    // so we can properly clone ourselves.
     var momentProperties = utils_hooks__hooks.momentProperties = [];
 
     function copyConfig(to, from) {
         var i, prop, val;
 
-        if (typeof from._isAMomentObject !== 'undefined') {
+        if (!isUndefined(from._isAMomentObject)) {
             to._isAMomentObject = from._isAMomentObject;
         }
-        if (typeof from._i !== 'undefined') {
+        if (!isUndefined(from._i)) {
             to._i = from._i;
         }
-        if (typeof from._f !== 'undefined') {
+        if (!isUndefined(from._f)) {
             to._f = from._f;
         }
-        if (typeof from._l !== 'undefined') {
+        if (!isUndefined(from._l)) {
             to._l = from._l;
         }
-        if (typeof from._strict !== 'undefined') {
+        if (!isUndefined(from._strict)) {
             to._strict = from._strict;
         }
-        if (typeof from._tzm !== 'undefined') {
+        if (!isUndefined(from._tzm)) {
             to._tzm = from._tzm;
         }
-        if (typeof from._isUTC !== 'undefined') {
+        if (!isUndefined(from._isUTC)) {
             to._isUTC = from._isUTC;
         }
-        if (typeof from._offset !== 'undefined') {
+        if (!isUndefined(from._offset)) {
             to._offset = from._offset;
         }
-        if (typeof from._pf !== 'undefined') {
+        if (!isUndefined(from._pf)) {
             to._pf = getParsingFlags(from);
         }
-        if (typeof from._locale !== 'undefined') {
+        if (!isUndefined(from._locale)) {
             to._locale = from._locale;
         }
 
@@ -12585,7 +12953,7 @@ module.exports = function extend() {
             for (i in momentProperties) {
                 prop = momentProperties[i];
                 val = from[prop];
-                if (typeof val !== 'undefined') {
+                if (!isUndefined(val)) {
                     to[prop] = val;
                 }
             }
@@ -12632,6 +13000,7 @@ module.exports = function extend() {
         return value;
     }
 
+    // compare two arrays, return the number of differences
     function compareArrays(array1, array2, dontConvert) {
         var len = Math.min(array1.length, array2.length),
             lengthDiff = Math.abs(array1.length - array2.length),
@@ -12646,9 +13015,108 @@ module.exports = function extend() {
         return diffs + lengthDiff;
     }
 
-    function Locale() {
+    function warn(msg) {
+        if (utils_hooks__hooks.suppressDeprecationWarnings === false &&
+                (typeof console !==  'undefined') && console.warn) {
+            console.warn('Deprecation warning: ' + msg);
+        }
     }
 
+    function deprecate(msg, fn) {
+        var firstTime = true;
+
+        return extend(function () {
+            if (utils_hooks__hooks.deprecationHandler != null) {
+                utils_hooks__hooks.deprecationHandler(null, msg);
+            }
+            if (firstTime) {
+                warn(msg + '\nArguments: ' + Array.prototype.slice.call(arguments).join(', ') + '\n' + (new Error()).stack);
+                firstTime = false;
+            }
+            return fn.apply(this, arguments);
+        }, fn);
+    }
+
+    var deprecations = {};
+
+    function deprecateSimple(name, msg) {
+        if (utils_hooks__hooks.deprecationHandler != null) {
+            utils_hooks__hooks.deprecationHandler(name, msg);
+        }
+        if (!deprecations[name]) {
+            warn(msg);
+            deprecations[name] = true;
+        }
+    }
+
+    utils_hooks__hooks.suppressDeprecationWarnings = false;
+    utils_hooks__hooks.deprecationHandler = null;
+
+    function isFunction(input) {
+        return input instanceof Function || Object.prototype.toString.call(input) === '[object Function]';
+    }
+
+    function isObject(input) {
+        return Object.prototype.toString.call(input) === '[object Object]';
+    }
+
+    function locale_set__set (config) {
+        var prop, i;
+        for (i in config) {
+            prop = config[i];
+            if (isFunction(prop)) {
+                this[i] = prop;
+            } else {
+                this['_' + i] = prop;
+            }
+        }
+        this._config = config;
+        // Lenient ordinal parsing accepts just a number in addition to
+        // number + (possibly) stuff coming from _ordinalParseLenient.
+        this._ordinalParseLenient = new RegExp(this._ordinalParse.source + '|' + (/\d{1,2}/).source);
+    }
+
+    function mergeConfigs(parentConfig, childConfig) {
+        var res = extend({}, parentConfig), prop;
+        for (prop in childConfig) {
+            if (hasOwnProp(childConfig, prop)) {
+                if (isObject(parentConfig[prop]) && isObject(childConfig[prop])) {
+                    res[prop] = {};
+                    extend(res[prop], parentConfig[prop]);
+                    extend(res[prop], childConfig[prop]);
+                } else if (childConfig[prop] != null) {
+                    res[prop] = childConfig[prop];
+                } else {
+                    delete res[prop];
+                }
+            }
+        }
+        return res;
+    }
+
+    function Locale(config) {
+        if (config != null) {
+            this.set(config);
+        }
+    }
+
+    var keys;
+
+    if (Object.keys) {
+        keys = Object.keys;
+    } else {
+        keys = function (obj) {
+            var i, res = [];
+            for (i in obj) {
+                if (hasOwnProp(obj, i)) {
+                    res.push(i);
+                }
+            }
+            return res;
+        };
+    }
+
+    // internal storage for locale config files
     var locales = {};
     var globalLocale;
 
@@ -12686,7 +13154,7 @@ module.exports = function extend() {
     function loadLocale(name) {
         var oldLocale = null;
         // TODO: Find a better way to register and load all the locales in Node
-        if (!locales[name] && typeof module !== 'undefined' &&
+        if (!locales[name] && (typeof module !== 'undefined') &&
                 module && module.exports) {
             try {
                 oldLocale = globalLocale._abbr;
@@ -12705,7 +13173,7 @@ module.exports = function extend() {
     function locale_locales__getSetGlobalLocale (key, values) {
         var data;
         if (key) {
-            if (typeof values === 'undefined') {
+            if (isUndefined(values)) {
                 data = locale_locales__getLocale(key);
             }
             else {
@@ -12721,11 +13189,25 @@ module.exports = function extend() {
         return globalLocale._abbr;
     }
 
-    function defineLocale (name, values) {
-        if (values !== null) {
-            values.abbr = name;
-            locales[name] = locales[name] || new Locale();
-            locales[name].set(values);
+    function defineLocale (name, config) {
+        if (config !== null) {
+            config.abbr = name;
+            if (locales[name] != null) {
+                deprecateSimple('defineLocaleOverride',
+                        'use moment.updateLocale(localeName, config) to change ' +
+                        'an existing locale. moment.defineLocale(localeName, ' +
+                        'config) should only be used for creating a new locale');
+                config = mergeConfigs(locales[name]._config, config);
+            } else if (config.parentLocale != null) {
+                if (locales[config.parentLocale] != null) {
+                    config = mergeConfigs(locales[config.parentLocale]._config, config);
+                } else {
+                    // treat as if there is no base config
+                    deprecateSimple('parentLocaleUndefined',
+                            'specified parentLocale is not defined yet');
+                }
+            }
+            locales[name] = new Locale(config);
 
             // backwards compat for now: also set the locale
             locale_locales__getSetGlobalLocale(name);
@@ -12736,6 +13218,31 @@ module.exports = function extend() {
             delete locales[name];
             return null;
         }
+    }
+
+    function updateLocale(name, config) {
+        if (config != null) {
+            var locale;
+            if (locales[name] != null) {
+                config = mergeConfigs(locales[name]._config, config);
+            }
+            locale = new Locale(config);
+            locale.parentLocale = locales[name];
+            locales[name] = locale;
+
+            // backwards compat for now: also set the locale
+            locale_locales__getSetGlobalLocale(name);
+        } else {
+            // pass null for config to unupdate, useful for tests
+            if (locales[name] != null) {
+                if (locales[name].parentLocale != null) {
+                    locales[name] = locales[name].parentLocale;
+                } else if (locales[name] != null) {
+                    delete locales[name];
+                }
+            }
+        }
+        return locales[name];
     }
 
     // returns locale data
@@ -12760,6 +13267,10 @@ module.exports = function extend() {
         }
 
         return chooseLocale(key);
+    }
+
+    function locale_locales__listLocales() {
+        return keys(locales);
     }
 
     var aliases = {};
@@ -12803,11 +13314,14 @@ module.exports = function extend() {
     }
 
     function get_set__get (mom, unit) {
-        return mom._d['get' + (mom._isUTC ? 'UTC' : '') + unit]();
+        return mom.isValid() ?
+            mom._d['get' + (mom._isUTC ? 'UTC' : '') + unit]() : NaN;
     }
 
     function get_set__set (mom, unit, value) {
-        return mom._d['set' + (mom._isUTC ? 'UTC' : '') + unit](value);
+        if (mom.isValid()) {
+            mom._d['set' + (mom._isUTC ? 'UTC' : '') + unit](value);
+        }
     }
 
     // MOMENTS
@@ -12820,7 +13334,7 @@ module.exports = function extend() {
             }
         } else {
             units = normalizeUnits(units);
-            if (typeof this[units] === 'function') {
+            if (isFunction(this[units])) {
                 return this[units](value);
             }
         }
@@ -12835,7 +13349,7 @@ module.exports = function extend() {
             Math.pow(10, Math.max(0, zerosToFill)).toString().substr(1) + absNumber;
     }
 
-    var formattingTokens = /(\[[^\[]*\])|(\\)?(Mo|MM?M?M?|Do|DDDo|DD?D?D?|ddd?d?|do?|w[o|w]?|W[o|W]?|Q|YYYYYY|YYYYY|YYYY|YY|gg(ggg?)?|GG(GGG?)?|e|E|a|A|hh?|HH?|mm?|ss?|S{1,9}|x|X|zz?|ZZ?|.)/g;
+    var formattingTokens = /(\[[^\[]*\])|(\\)?([Hh]mm(ss)?|Mo|MM?M?M?|Do|DDDo|DD?D?D?|ddd?d?|do?|w[o|w]?|W[o|W]?|Qo?|YYYYYY|YYYYY|YYYY|YY|gg(ggg?)?|GG(GGG?)?|e|E|a|A|hh?|HH?|kk?|mm?|ss?|S{1,9}|x|X|zz?|ZZ?|.)/g;
 
     var localFormattingTokens = /(\[[^\[]*\])|(\\)?(LTS|LT|LL?L?L?|l{1,4})/g;
 
@@ -12888,7 +13402,7 @@ module.exports = function extend() {
         }
 
         return function (mom) {
-            var output = '';
+            var output = '', i;
             for (i = 0; i < length; i++) {
                 output += array[i] instanceof Function ? array[i].call(mom, format) : array[i];
             }
@@ -12931,6 +13445,8 @@ module.exports = function extend() {
     var match4         = /\d{4}/;         //    0000 - 9999
     var match6         = /[+-]?\d{6}/;    // -999999 - 999999
     var match1to2      = /\d\d?/;         //       0 - 99
+    var match3to4      = /\d\d\d\d?/;     //     999 - 9999
+    var match5to6      = /\d\d\d\d\d\d?/; //   99999 - 999999
     var match1to3      = /\d{1,3}/;       //       0 - 999
     var match1to4      = /\d{1,4}/;       //       0 - 9999
     var match1to6      = /[+-]?\d{1,6}/;  // -999999 - 999999
@@ -12939,23 +13455,19 @@ module.exports = function extend() {
     var matchSigned    = /[+-]?\d+/;      //    -inf - inf
 
     var matchOffset    = /Z|[+-]\d\d:?\d\d/gi; // +00:00 -00:00 +0000 -0000 or Z
+    var matchShortOffset = /Z|[+-]\d\d(?::?\d\d)?/gi; // +00 -00 +00:00 -00:00 +0000 -0000 or Z
 
     var matchTimestamp = /[+-]?\d+(\.\d{1,3})?/; // 123456789 123456789.123
 
     // any word (or two) characters or numbers including two/three word month in arabic.
+    // includes scottish gaelic two word and hyphenated months
     var matchWord = /[0-9]*['a-z\u00A0-\u05FF\u0700-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]+|[\u0600-\u06FF\/]+(\s*?[\u0600-\u06FF]+){1,2}/i;
+
 
     var regexes = {};
 
-    function isFunction (sth) {
-        // https://github.com/moment/moment/issues/2325
-        return typeof sth === 'function' &&
-            Object.prototype.toString.call(sth) === '[object Function]';
-    }
-
-
     function addRegexToken (token, regex, strictRegex) {
-        regexes[token] = isFunction(regex) ? regex : function (isStrict) {
+        regexes[token] = isFunction(regex) ? regex : function (isStrict, localeData) {
             return (isStrict && strictRegex) ? strictRegex : regex;
         };
     }
@@ -12970,9 +13482,13 @@ module.exports = function extend() {
 
     // Code from http://stackoverflow.com/questions/3561493/is-there-a-regexp-escape-function-in-javascript
     function unescapeFormat(s) {
-        return s.replace('\\', '').replace(/\\(\[)|\\(\])|\[([^\]\[]*)\]|\\(.)/g, function (matched, p1, p2, p3, p4) {
+        return regexEscape(s.replace('\\', '').replace(/\\(\[)|\\(\])|\[([^\]\[]*)\]|\\(.)/g, function (matched, p1, p2, p3, p4) {
             return p1 || p2 || p3 || p4;
-        }).replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+        }));
+    }
+
+    function regexEscape(s) {
+        return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
     }
 
     var tokens = {};
@@ -13012,6 +13528,25 @@ module.exports = function extend() {
     var MINUTE = 4;
     var SECOND = 5;
     var MILLISECOND = 6;
+    var WEEK = 7;
+    var WEEKDAY = 8;
+
+    var indexOf;
+
+    if (Array.prototype.indexOf) {
+        indexOf = Array.prototype.indexOf;
+    } else {
+        indexOf = function (o) {
+            // I know
+            var i;
+            for (i = 0; i < this.length; ++i) {
+                if (this[i] === o) {
+                    return i;
+                }
+            }
+            return -1;
+        };
+    }
 
     function daysInMonth(year, month) {
         return new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
@@ -13039,8 +13574,12 @@ module.exports = function extend() {
 
     addRegexToken('M',    match1to2);
     addRegexToken('MM',   match1to2, match2);
-    addRegexToken('MMM',  matchWord);
-    addRegexToken('MMMM', matchWord);
+    addRegexToken('MMM',  function (isStrict, locale) {
+        return locale.monthsShortRegex(isStrict);
+    });
+    addRegexToken('MMMM', function (isStrict, locale) {
+        return locale.monthsRegex(isStrict);
+    });
 
     addParseToken(['M', 'MM'], function (input, array) {
         array[MONTH] = toInt(input) - 1;
@@ -13058,18 +13597,66 @@ module.exports = function extend() {
 
     // LOCALES
 
+    var MONTHS_IN_FORMAT = /D[oD]?(\[[^\[\]]*\]|\s+)+MMMM?/;
     var defaultLocaleMonths = 'January_February_March_April_May_June_July_August_September_October_November_December'.split('_');
-    function localeMonths (m) {
-        return this._months[m.month()];
+    function localeMonths (m, format) {
+        return isArray(this._months) ? this._months[m.month()] :
+            this._months[MONTHS_IN_FORMAT.test(format) ? 'format' : 'standalone'][m.month()];
     }
 
     var defaultLocaleMonthsShort = 'Jan_Feb_Mar_Apr_May_Jun_Jul_Aug_Sep_Oct_Nov_Dec'.split('_');
-    function localeMonthsShort (m) {
-        return this._monthsShort[m.month()];
+    function localeMonthsShort (m, format) {
+        return isArray(this._monthsShort) ? this._monthsShort[m.month()] :
+            this._monthsShort[MONTHS_IN_FORMAT.test(format) ? 'format' : 'standalone'][m.month()];
+    }
+
+    function units_month__handleStrictParse(monthName, format, strict) {
+        var i, ii, mom, llc = monthName.toLocaleLowerCase();
+        if (!this._monthsParse) {
+            // this is not used
+            this._monthsParse = [];
+            this._longMonthsParse = [];
+            this._shortMonthsParse = [];
+            for (i = 0; i < 12; ++i) {
+                mom = create_utc__createUTC([2000, i]);
+                this._shortMonthsParse[i] = this.monthsShort(mom, '').toLocaleLowerCase();
+                this._longMonthsParse[i] = this.months(mom, '').toLocaleLowerCase();
+            }
+        }
+
+        if (strict) {
+            if (format === 'MMM') {
+                ii = indexOf.call(this._shortMonthsParse, llc);
+                return ii !== -1 ? ii : null;
+            } else {
+                ii = indexOf.call(this._longMonthsParse, llc);
+                return ii !== -1 ? ii : null;
+            }
+        } else {
+            if (format === 'MMM') {
+                ii = indexOf.call(this._shortMonthsParse, llc);
+                if (ii !== -1) {
+                    return ii;
+                }
+                ii = indexOf.call(this._longMonthsParse, llc);
+                return ii !== -1 ? ii : null;
+            } else {
+                ii = indexOf.call(this._longMonthsParse, llc);
+                if (ii !== -1) {
+                    return ii;
+                }
+                ii = indexOf.call(this._shortMonthsParse, llc);
+                return ii !== -1 ? ii : null;
+            }
+        }
     }
 
     function localeMonthsParse (monthName, format, strict) {
         var i, mom, regex;
+
+        if (this._monthsParseExact) {
+            return units_month__handleStrictParse.call(this, monthName, format, strict);
+        }
 
         if (!this._monthsParse) {
             this._monthsParse = [];
@@ -13077,6 +13664,9 @@ module.exports = function extend() {
             this._shortMonthsParse = [];
         }
 
+        // TODO: add sorting
+        // Sorting makes sure if one month (or abbr) is a prefix of another
+        // see sorting in computeMonthsParse
         for (i = 0; i < 12; i++) {
             // make the regex if we don't have it already
             mom = create_utc__createUTC([2000, i]);
@@ -13104,12 +13694,20 @@ module.exports = function extend() {
     function setMonth (mom, value) {
         var dayOfMonth;
 
-        // TODO: Move this out of here!
+        if (!mom.isValid()) {
+            // No op
+            return mom;
+        }
+
         if (typeof value === 'string') {
-            value = mom.localeData().monthsParse(value);
-            // TODO: Another silent failure?
-            if (typeof value !== 'number') {
-                return mom;
+            if (/^\d+$/.test(value)) {
+                value = toInt(value);
+            } else {
+                value = mom.localeData().monthsParse(value);
+                // TODO: Another silent failure?
+                if (typeof value !== 'number') {
+                    return mom;
+                }
             }
         }
 
@@ -13132,6 +13730,72 @@ module.exports = function extend() {
         return daysInMonth(this.year(), this.month());
     }
 
+    var defaultMonthsShortRegex = matchWord;
+    function monthsShortRegex (isStrict) {
+        if (this._monthsParseExact) {
+            if (!hasOwnProp(this, '_monthsRegex')) {
+                computeMonthsParse.call(this);
+            }
+            if (isStrict) {
+                return this._monthsShortStrictRegex;
+            } else {
+                return this._monthsShortRegex;
+            }
+        } else {
+            return this._monthsShortStrictRegex && isStrict ?
+                this._monthsShortStrictRegex : this._monthsShortRegex;
+        }
+    }
+
+    var defaultMonthsRegex = matchWord;
+    function monthsRegex (isStrict) {
+        if (this._monthsParseExact) {
+            if (!hasOwnProp(this, '_monthsRegex')) {
+                computeMonthsParse.call(this);
+            }
+            if (isStrict) {
+                return this._monthsStrictRegex;
+            } else {
+                return this._monthsRegex;
+            }
+        } else {
+            return this._monthsStrictRegex && isStrict ?
+                this._monthsStrictRegex : this._monthsRegex;
+        }
+    }
+
+    function computeMonthsParse () {
+        function cmpLenRev(a, b) {
+            return b.length - a.length;
+        }
+
+        var shortPieces = [], longPieces = [], mixedPieces = [],
+            i, mom;
+        for (i = 0; i < 12; i++) {
+            // make the regex if we don't have it already
+            mom = create_utc__createUTC([2000, i]);
+            shortPieces.push(this.monthsShort(mom, ''));
+            longPieces.push(this.months(mom, ''));
+            mixedPieces.push(this.months(mom, ''));
+            mixedPieces.push(this.monthsShort(mom, ''));
+        }
+        // Sorting makes sure if one month (or abbr) is a prefix of another it
+        // will match the longer piece.
+        shortPieces.sort(cmpLenRev);
+        longPieces.sort(cmpLenRev);
+        mixedPieces.sort(cmpLenRev);
+        for (i = 0; i < 12; i++) {
+            shortPieces[i] = regexEscape(shortPieces[i]);
+            longPieces[i] = regexEscape(longPieces[i]);
+            mixedPieces[i] = regexEscape(mixedPieces[i]);
+        }
+
+        this._monthsRegex = new RegExp('^(' + mixedPieces.join('|') + ')', 'i');
+        this._monthsShortRegex = this._monthsRegex;
+        this._monthsStrictRegex = new RegExp('^(' + longPieces.join('|') + ')', 'i');
+        this._monthsShortStrictRegex = new RegExp('^(' + shortPieces.join('|') + ')', 'i');
+    }
+
     function checkOverflow (m) {
         var overflow;
         var a = m._a;
@@ -13149,6 +13813,12 @@ module.exports = function extend() {
             if (getParsingFlags(m)._overflowDayOfYear && (overflow < YEAR || overflow > DATE)) {
                 overflow = DATE;
             }
+            if (getParsingFlags(m)._overflowWeeks && overflow === -1) {
+                overflow = WEEK;
+            }
+            if (getParsingFlags(m)._overflowWeekday && overflow === -1) {
+                overflow = WEEKDAY;
+            }
 
             getParsingFlags(m).overflow = overflow;
         }
@@ -13156,51 +13826,39 @@ module.exports = function extend() {
         return m;
     }
 
-    function warn(msg) {
-        if (utils_hooks__hooks.suppressDeprecationWarnings === false && typeof console !== 'undefined' && console.warn) {
-            console.warn('Deprecation warning: ' + msg);
-        }
-    }
+    // iso 8601 regex
+    // 0000-00-00 0000-W00 or 0000-W00-0 + T + 00 or 00:00 or 00:00:00 or 00:00:00.000 + +00:00 or +0000 or +00)
+    var extendedIsoRegex = /^\s*((?:[+-]\d{6}|\d{4})-(?:\d\d-\d\d|W\d\d-\d|W\d\d|\d\d\d|\d\d))(?:(T| )(\d\d(?::\d\d(?::\d\d(?:[.,]\d+)?)?)?)([\+\-]\d\d(?::?\d\d)?|\s*Z)?)?/;
+    var basicIsoRegex = /^\s*((?:[+-]\d{6}|\d{4})(?:\d\d\d\d|W\d\d\d|W\d\d|\d\d\d|\d\d))(?:(T| )(\d\d(?:\d\d(?:\d\d(?:[.,]\d+)?)?)?)([\+\-]\d\d(?::?\d\d)?|\s*Z)?)?/;
 
-    function deprecate(msg, fn) {
-        var firstTime = true;
-
-        return extend(function () {
-            if (firstTime) {
-                warn(msg + '\n' + (new Error()).stack);
-                firstTime = false;
-            }
-            return fn.apply(this, arguments);
-        }, fn);
-    }
-
-    var deprecations = {};
-
-    function deprecateSimple(name, msg) {
-        if (!deprecations[name]) {
-            warn(msg);
-            deprecations[name] = true;
-        }
-    }
-
-    utils_hooks__hooks.suppressDeprecationWarnings = false;
-
-    var from_string__isoRegex = /^\s*(?:[+-]\d{6}|\d{4})-(?:(\d\d-\d\d)|(W\d\d$)|(W\d\d-\d)|(\d\d\d))((T| )(\d\d(:\d\d(:\d\d(\.\d+)?)?)?)?([\+\-]\d\d(?::?\d\d)?|\s*Z)?)?$/;
+    var tzRegex = /Z|[+-]\d\d(?::?\d\d)?/;
 
     var isoDates = [
-        ['YYYYYY-MM-DD', /[+-]\d{6}-\d{2}-\d{2}/],
-        ['YYYY-MM-DD', /\d{4}-\d{2}-\d{2}/],
-        ['GGGG-[W]WW-E', /\d{4}-W\d{2}-\d/],
-        ['GGGG-[W]WW', /\d{4}-W\d{2}/],
-        ['YYYY-DDD', /\d{4}-\d{3}/]
+        ['YYYYYY-MM-DD', /[+-]\d{6}-\d\d-\d\d/],
+        ['YYYY-MM-DD', /\d{4}-\d\d-\d\d/],
+        ['GGGG-[W]WW-E', /\d{4}-W\d\d-\d/],
+        ['GGGG-[W]WW', /\d{4}-W\d\d/, false],
+        ['YYYY-DDD', /\d{4}-\d{3}/],
+        ['YYYY-MM', /\d{4}-\d\d/, false],
+        ['YYYYYYMMDD', /[+-]\d{10}/],
+        ['YYYYMMDD', /\d{8}/],
+        // YYYYMM is NOT allowed by the standard
+        ['GGGG[W]WWE', /\d{4}W\d{3}/],
+        ['GGGG[W]WW', /\d{4}W\d{2}/, false],
+        ['YYYYDDD', /\d{7}/]
     ];
 
     // iso time formats and regexes
     var isoTimes = [
-        ['HH:mm:ss.SSSS', /(T| )\d\d:\d\d:\d\d\.\d+/],
-        ['HH:mm:ss', /(T| )\d\d:\d\d:\d\d/],
-        ['HH:mm', /(T| )\d\d:\d\d/],
-        ['HH', /(T| )\d\d/]
+        ['HH:mm:ss.SSSS', /\d\d:\d\d:\d\d\.\d+/],
+        ['HH:mm:ss,SSSS', /\d\d:\d\d:\d\d,\d+/],
+        ['HH:mm:ss', /\d\d:\d\d:\d\d/],
+        ['HH:mm', /\d\d:\d\d/],
+        ['HHmmss.SSSS', /\d\d\d\d\d\d\.\d+/],
+        ['HHmmss,SSSS', /\d\d\d\d\d\d,\d+/],
+        ['HHmmss', /\d\d\d\d\d\d/],
+        ['HHmm', /\d\d\d\d/],
+        ['HH', /\d\d/]
     ];
 
     var aspNetJsonRegex = /^\/?Date\((\-?\d+)/i;
@@ -13209,26 +13867,49 @@ module.exports = function extend() {
     function configFromISO(config) {
         var i, l,
             string = config._i,
-            match = from_string__isoRegex.exec(string);
+            match = extendedIsoRegex.exec(string) || basicIsoRegex.exec(string),
+            allowTime, dateFormat, timeFormat, tzFormat;
 
         if (match) {
             getParsingFlags(config).iso = true;
+
             for (i = 0, l = isoDates.length; i < l; i++) {
-                if (isoDates[i][1].exec(string)) {
-                    config._f = isoDates[i][0];
+                if (isoDates[i][1].exec(match[1])) {
+                    dateFormat = isoDates[i][0];
+                    allowTime = isoDates[i][2] !== false;
                     break;
                 }
             }
-            for (i = 0, l = isoTimes.length; i < l; i++) {
-                if (isoTimes[i][1].exec(string)) {
-                    // match[6] should be 'T' or space
-                    config._f += (match[6] || ' ') + isoTimes[i][0];
-                    break;
+            if (dateFormat == null) {
+                config._isValid = false;
+                return;
+            }
+            if (match[3]) {
+                for (i = 0, l = isoTimes.length; i < l; i++) {
+                    if (isoTimes[i][1].exec(match[3])) {
+                        // match[2] should be 'T' or space
+                        timeFormat = (match[2] || ' ') + isoTimes[i][0];
+                        break;
+                    }
+                }
+                if (timeFormat == null) {
+                    config._isValid = false;
+                    return;
                 }
             }
-            if (string.match(matchOffset)) {
-                config._f += 'Z';
+            if (!allowTime && timeFormat != null) {
+                config._isValid = false;
+                return;
             }
+            if (match[4]) {
+                if (tzRegex.exec(match[4])) {
+                    tzFormat = 'Z';
+                } else {
+                    config._isValid = false;
+                    return;
+                }
+            }
+            config._f = dateFormat + (timeFormat || '') + (tzFormat || '');
             configFromStringAndFormat(config);
         } else {
             config._isValid = false;
@@ -13266,8 +13947,8 @@ module.exports = function extend() {
         //http://stackoverflow.com/questions/181348/instantiating-a-javascript-object-by-calling-prototype-constructor-apply
         var date = new Date(y, m, d, h, M, s, ms);
 
-        //the date constructor doesn't accept years < 1970
-        if (y < 1970) {
+        //the date constructor remaps years 0-99 to 1900-1999
+        if (y < 100 && y >= 0 && isFinite(date.getFullYear())) {
             date.setFullYear(y);
         }
         return date;
@@ -13275,11 +13956,20 @@ module.exports = function extend() {
 
     function createUTCDate (y) {
         var date = new Date(Date.UTC.apply(null, arguments));
-        if (y < 1970) {
+
+        //the Date.UTC function remaps years 0-99 to 1900-1999
+        if (y < 100 && y >= 0 && isFinite(date.getUTCFullYear())) {
             date.setUTCFullYear(y);
         }
         return date;
     }
+
+    // FORMATTING
+
+    addFormatToken('Y', 0, 0, function () {
+        var y = this.year();
+        return y <= 9999 ? '' + y : '+' + y;
+    });
 
     addFormatToken(0, ['YY', 2], 0, function () {
         return this.year() % 100;
@@ -13308,6 +13998,9 @@ module.exports = function extend() {
     addParseToken('YY', function (input, array) {
         array[YEAR] = utils_hooks__hooks.parseTwoDigitYear(input);
     });
+    addParseToken('Y', function (input, array) {
+        array[YEAR] = parseInt(input, 10);
+    });
 
     // HELPERS
 
@@ -13327,130 +14020,72 @@ module.exports = function extend() {
 
     // MOMENTS
 
-    var getSetYear = makeGetSet('FullYear', false);
+    var getSetYear = makeGetSet('FullYear', true);
 
     function getIsLeapYear () {
         return isLeapYear(this.year());
     }
 
-    addFormatToken('w', ['ww', 2], 'wo', 'week');
-    addFormatToken('W', ['WW', 2], 'Wo', 'isoWeek');
+    // start-of-first-week - start-of-year
+    function firstWeekOffset(year, dow, doy) {
+        var // first-week day -- which january is always in the first week (4 for iso, 1 for other)
+            fwd = 7 + dow - doy,
+            // first-week day local weekday -- which local weekday is fwd
+            fwdlw = (7 + createUTCDate(year, 0, fwd).getUTCDay() - dow) % 7;
 
-    // ALIASES
-
-    addUnitAlias('week', 'w');
-    addUnitAlias('isoWeek', 'W');
-
-    // PARSING
-
-    addRegexToken('w',  match1to2);
-    addRegexToken('ww', match1to2, match2);
-    addRegexToken('W',  match1to2);
-    addRegexToken('WW', match1to2, match2);
-
-    addWeekParseToken(['w', 'ww', 'W', 'WW'], function (input, week, config, token) {
-        week[token.substr(0, 1)] = toInt(input);
-    });
-
-    // HELPERS
-
-    // firstDayOfWeek       0 = sun, 6 = sat
-    //                      the day of the week that starts the week
-    //                      (usually sunday or monday)
-    // firstDayOfWeekOfYear 0 = sun, 6 = sat
-    //                      the first week is the week that contains the first
-    //                      of this day of the week
-    //                      (eg. ISO weeks use thursday (4))
-    function weekOfYear(mom, firstDayOfWeek, firstDayOfWeekOfYear) {
-        var end = firstDayOfWeekOfYear - firstDayOfWeek,
-            daysToDayOfWeek = firstDayOfWeekOfYear - mom.day(),
-            adjustedMoment;
-
-
-        if (daysToDayOfWeek > end) {
-            daysToDayOfWeek -= 7;
-        }
-
-        if (daysToDayOfWeek < end - 7) {
-            daysToDayOfWeek += 7;
-        }
-
-        adjustedMoment = local__createLocal(mom).add(daysToDayOfWeek, 'd');
-        return {
-            week: Math.ceil(adjustedMoment.dayOfYear() / 7),
-            year: adjustedMoment.year()
-        };
+        return -fwdlw + fwd - 1;
     }
-
-    // LOCALES
-
-    function localeWeek (mom) {
-        return weekOfYear(mom, this._week.dow, this._week.doy).week;
-    }
-
-    var defaultLocaleWeek = {
-        dow : 0, // Sunday is the first day of the week.
-        doy : 6  // The week that contains Jan 1st is the first week of the year.
-    };
-
-    function localeFirstDayOfWeek () {
-        return this._week.dow;
-    }
-
-    function localeFirstDayOfYear () {
-        return this._week.doy;
-    }
-
-    // MOMENTS
-
-    function getSetWeek (input) {
-        var week = this.localeData().week(this);
-        return input == null ? week : this.add((input - week) * 7, 'd');
-    }
-
-    function getSetISOWeek (input) {
-        var week = weekOfYear(this, 1, 4).week;
-        return input == null ? week : this.add((input - week) * 7, 'd');
-    }
-
-    addFormatToken('DDD', ['DDDD', 3], 'DDDo', 'dayOfYear');
-
-    // ALIASES
-
-    addUnitAlias('dayOfYear', 'DDD');
-
-    // PARSING
-
-    addRegexToken('DDD',  match1to3);
-    addRegexToken('DDDD', match3);
-    addParseToken(['DDD', 'DDDD'], function (input, array, config) {
-        config._dayOfYear = toInt(input);
-    });
-
-    // HELPERS
 
     //http://en.wikipedia.org/wiki/ISO_week_date#Calculating_a_date_given_the_year.2C_week_number_and_weekday
-    function dayOfYearFromWeeks(year, week, weekday, firstDayOfWeekOfYear, firstDayOfWeek) {
-        var week1Jan = 6 + firstDayOfWeek - firstDayOfWeekOfYear, janX = createUTCDate(year, 0, 1 + week1Jan), d = janX.getUTCDay(), dayOfYear;
-        if (d < firstDayOfWeek) {
-            d += 7;
+    function dayOfYearFromWeeks(year, week, weekday, dow, doy) {
+        var localWeekday = (7 + weekday - dow) % 7,
+            weekOffset = firstWeekOffset(year, dow, doy),
+            dayOfYear = 1 + 7 * (week - 1) + localWeekday + weekOffset,
+            resYear, resDayOfYear;
+
+        if (dayOfYear <= 0) {
+            resYear = year - 1;
+            resDayOfYear = daysInYear(resYear) + dayOfYear;
+        } else if (dayOfYear > daysInYear(year)) {
+            resYear = year + 1;
+            resDayOfYear = dayOfYear - daysInYear(year);
+        } else {
+            resYear = year;
+            resDayOfYear = dayOfYear;
         }
 
-        weekday = weekday != null ? 1 * weekday : firstDayOfWeek;
-
-        dayOfYear = 1 + week1Jan + 7 * (week - 1) - d + weekday;
-
         return {
-            year: dayOfYear > 0 ? year : year - 1,
-            dayOfYear: dayOfYear > 0 ?  dayOfYear : daysInYear(year - 1) + dayOfYear
+            year: resYear,
+            dayOfYear: resDayOfYear
         };
     }
 
-    // MOMENTS
+    function weekOfYear(mom, dow, doy) {
+        var weekOffset = firstWeekOffset(mom.year(), dow, doy),
+            week = Math.floor((mom.dayOfYear() - weekOffset - 1) / 7) + 1,
+            resWeek, resYear;
 
-    function getSetDayOfYear (input) {
-        var dayOfYear = Math.round((this.clone().startOf('day') - this.clone().startOf('year')) / 864e5) + 1;
-        return input == null ? dayOfYear : this.add((input - dayOfYear), 'd');
+        if (week < 1) {
+            resYear = mom.year() - 1;
+            resWeek = week + weeksInYear(resYear, dow, doy);
+        } else if (week > weeksInYear(mom.year(), dow, doy)) {
+            resWeek = week - weeksInYear(mom.year(), dow, doy);
+            resYear = mom.year() + 1;
+        } else {
+            resYear = mom.year();
+            resWeek = week;
+        }
+
+        return {
+            week: resWeek,
+            year: resYear
+        };
+    }
+
+    function weeksInYear(year, dow, doy) {
+        var weekOffset = firstWeekOffset(year, dow, doy),
+            weekOffsetNext = firstWeekOffset(year + 1, dow, doy);
+        return (daysInYear(year) - weekOffset + weekOffsetNext) / 7;
     }
 
     // Pick the first defined of two or three arguments.
@@ -13465,11 +14100,12 @@ module.exports = function extend() {
     }
 
     function currentDateArray(config) {
-        var now = new Date();
+        // hooks is actually the exported moment object
+        var nowValue = new Date(utils_hooks__hooks.now());
         if (config._useUTC) {
-            return [now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()];
+            return [nowValue.getUTCFullYear(), nowValue.getUTCMonth(), nowValue.getUTCDate()];
         }
-        return [now.getFullYear(), now.getMonth(), now.getDate()];
+        return [nowValue.getFullYear(), nowValue.getMonth(), nowValue.getDate()];
     }
 
     // convert an array to a date.
@@ -13539,7 +14175,7 @@ module.exports = function extend() {
     }
 
     function dayOfYearFromWeekInfo(config) {
-        var w, weekYear, week, weekday, dow, doy, temp;
+        var w, weekYear, week, weekday, dow, doy, temp, weekdayOverflow;
 
         w = config._w;
         if (w.GG != null || w.W != null || w.E != null) {
@@ -13553,6 +14189,9 @@ module.exports = function extend() {
             weekYear = defaults(w.GG, config._a[YEAR], weekOfYear(local__createLocal(), 1, 4).year);
             week = defaults(w.W, 1);
             weekday = defaults(w.E, 1);
+            if (weekday < 1 || weekday > 7) {
+                weekdayOverflow = true;
+            }
         } else {
             dow = config._locale._week.dow;
             doy = config._locale._week.doy;
@@ -13563,23 +14202,32 @@ module.exports = function extend() {
             if (w.d != null) {
                 // weekday -- low day numbers are considered next week
                 weekday = w.d;
-                if (weekday < dow) {
-                    ++week;
+                if (weekday < 0 || weekday > 6) {
+                    weekdayOverflow = true;
                 }
             } else if (w.e != null) {
                 // local weekday -- counting starts from begining of week
                 weekday = w.e + dow;
+                if (w.e < 0 || w.e > 6) {
+                    weekdayOverflow = true;
+                }
             } else {
                 // default to begining of week
                 weekday = dow;
             }
         }
-        temp = dayOfYearFromWeeks(weekYear, week, weekday, doy, dow);
-
-        config._a[YEAR] = temp.year;
-        config._dayOfYear = temp.dayOfYear;
+        if (week < 1 || week > weeksInYear(weekYear, dow, doy)) {
+            getParsingFlags(config)._overflowWeeks = true;
+        } else if (weekdayOverflow != null) {
+            getParsingFlags(config)._overflowWeekday = true;
+        } else {
+            temp = dayOfYearFromWeeks(weekYear, week, weekday, dow, doy);
+            config._a[YEAR] = temp.year;
+            config._dayOfYear = temp.dayOfYear;
+        }
     }
 
+    // constant that refers to the ISO standard
     utils_hooks__hooks.ISO_8601 = function () {};
 
     // date from string and format string
@@ -13604,6 +14252,8 @@ module.exports = function extend() {
         for (i = 0; i < tokens.length; i++) {
             token = tokens[i];
             parsedInput = (string.match(getParseRegexForToken(token, config)) || [])[0];
+            // console.log('token', token, 'parsedInput', parsedInput,
+            //         'regex', getParseRegexForToken(token, config));
             if (parsedInput) {
                 skipped = string.substr(0, string.indexOf(parsedInput));
                 if (skipped.length > 0) {
@@ -13639,6 +14289,9 @@ module.exports = function extend() {
                 config._a[HOUR] > 0) {
             getParsingFlags(config).bigHour = undefined;
         }
+
+        getParsingFlags(config).parsedDateParts = config._a.slice(0);
+        getParsingFlags(config).meridiem = config._meridiem;
         // handle meridiem
         config._a[HOUR] = meridiemFixWrap(config._locale, config._a[HOUR], config._meridiem);
 
@@ -13672,6 +14325,7 @@ module.exports = function extend() {
         }
     }
 
+    // date from string and array of format strings
     function configFromStringAndArray(config) {
         var tempConfig,
             bestMoment,
@@ -13722,7 +14376,9 @@ module.exports = function extend() {
         }
 
         var i = normalizeObjectUnits(config._i);
-        config._a = [i.year, i.month, i.day || i.date, i.hour, i.minute, i.second, i.millisecond];
+        config._a = map([i.year, i.month, i.day || i.date, i.hour, i.minute, i.second, i.millisecond], function (obj) {
+            return obj && parseInt(obj, 10);
+        });
 
         configFromArray(config);
     }
@@ -13764,15 +14420,19 @@ module.exports = function extend() {
             configFromInput(config);
         }
 
+        if (!valid__isValid(config)) {
+            config._d = null;
+        }
+
         return config;
     }
 
     function configFromInput(config) {
         var input = config._i;
         if (input === undefined) {
-            config._d = new Date();
+            config._d = new Date(utils_hooks__hooks.now());
         } else if (isDate(input)) {
-            config._d = new Date(+input);
+            config._d = new Date(input.valueOf());
         } else if (typeof input === 'string') {
             configFromString(config);
         } else if (isArray(input)) {
@@ -13814,18 +14474,26 @@ module.exports = function extend() {
     }
 
     var prototypeMin = deprecate(
-         'moment().min is deprecated, use moment.min instead. https://github.com/moment/moment/issues/1548',
+         'moment().min is deprecated, use moment.max instead. https://github.com/moment/moment/issues/1548',
          function () {
              var other = local__createLocal.apply(null, arguments);
-             return other < this ? this : other;
+             if (this.isValid() && other.isValid()) {
+                 return other < this ? this : other;
+             } else {
+                 return valid__createInvalid();
+             }
          }
      );
 
     var prototypeMax = deprecate(
-        'moment().max is deprecated, use moment.max instead. https://github.com/moment/moment/issues/1548',
+        'moment().max is deprecated, use moment.min instead. https://github.com/moment/moment/issues/1548',
         function () {
             var other = local__createLocal.apply(null, arguments);
-            return other > this ? this : other;
+            if (this.isValid() && other.isValid()) {
+                return other > this ? this : other;
+            } else {
+                return valid__createInvalid();
+            }
         }
     );
 
@@ -13864,6 +14532,10 @@ module.exports = function extend() {
         return pickBy('isAfter', args);
     }
 
+    var now = function () {
+        return Date.now ? Date.now() : +(new Date());
+    };
+
     function Duration (duration) {
         var normalizedInput = normalizeObjectUnits(duration),
             years = normalizedInput.year || 0,
@@ -13880,7 +14552,7 @@ module.exports = function extend() {
         this._milliseconds = +milliseconds +
             seconds * 1e3 + // 1000
             minutes * 6e4 + // 1000 * 60
-            hours * 36e5; // 1000 * 60 * 60
+            hours * 1000 * 60 * 60; //using 1000 * 60 * 60 instead of 36e5 to avoid floating point rounding errors https://github.com/moment/moment/issues/2978
         // Because of dateAddRemove treats 24 hours as different from a
         // day when working around DST, we need to store them separately
         this._days = +days +
@@ -13903,6 +14575,8 @@ module.exports = function extend() {
         return obj instanceof Duration;
     }
 
+    // FORMATTING
+
     function offset (token, separator) {
         addFormatToken(token, 0, 0, function () {
             var offset = this.utcOffset();
@@ -13920,11 +14594,11 @@ module.exports = function extend() {
 
     // PARSING
 
-    addRegexToken('Z',  matchOffset);
-    addRegexToken('ZZ', matchOffset);
+    addRegexToken('Z',  matchShortOffset);
+    addRegexToken('ZZ', matchShortOffset);
     addParseToken(['Z', 'ZZ'], function (input, array, config) {
         config._useUTC = true;
-        config._tzm = offsetFromString(input);
+        config._tzm = offsetFromString(matchShortOffset, input);
     });
 
     // HELPERS
@@ -13934,8 +14608,8 @@ module.exports = function extend() {
     // '-1530'  > ['-15', '30']
     var chunkOffset = /([\+\-]|\d\d)/gi;
 
-    function offsetFromString(string) {
-        var matches = ((string || '').match(matchOffset) || []);
+    function offsetFromString(matcher, string) {
+        var matches = ((string || '').match(matcher) || []);
         var chunk   = matches[matches.length - 1] || [];
         var parts   = (chunk + '').match(chunkOffset) || ['-', 0, 0];
         var minutes = +(parts[1] * 60) + toInt(parts[2]);
@@ -13948,9 +14622,9 @@ module.exports = function extend() {
         var res, diff;
         if (model._isUTC) {
             res = model.clone();
-            diff = (isMoment(input) || isDate(input) ? +input : +local__createLocal(input)) - (+res);
+            diff = (isMoment(input) || isDate(input) ? input.valueOf() : local__createLocal(input).valueOf()) - res.valueOf();
             // Use low-level api, because this fn is low-level api.
-            res._d.setTime(+res._d + diff);
+            res._d.setTime(res._d.valueOf() + diff);
             utils_hooks__hooks.updateOffset(res, false);
             return res;
         } else {
@@ -13985,11 +14659,13 @@ module.exports = function extend() {
     function getSetOffset (input, keepLocalTime) {
         var offset = this._offset || 0,
             localAdjust;
+        if (!this.isValid()) {
+            return input != null ? this : NaN;
+        }
         if (input != null) {
             if (typeof input === 'string') {
-                input = offsetFromString(input);
-            }
-            if (Math.abs(input) < 16) {
+                input = offsetFromString(matchShortOffset, input);
+            } else if (Math.abs(input) < 16) {
                 input = input * 60;
             }
             if (!this._isUTC && keepLocalTime) {
@@ -14049,12 +14725,15 @@ module.exports = function extend() {
         if (this._tzm) {
             this.utcOffset(this._tzm);
         } else if (typeof this._i === 'string') {
-            this.utcOffset(offsetFromString(this._i));
+            this.utcOffset(offsetFromString(matchOffset, this._i));
         }
         return this;
     }
 
     function hasAlignedHourOffset (input) {
+        if (!this.isValid()) {
+            return false;
+        }
         input = input ? local__createLocal(input).utcOffset() : 0;
 
         return (this.utcOffset() - input) % 60 === 0;
@@ -14068,7 +14747,7 @@ module.exports = function extend() {
     }
 
     function isDaylightSavingTimeShifted () {
-        if (typeof this._isDSTShifted !== 'undefined') {
+        if (!isUndefined(this._isDSTShifted)) {
             return this._isDSTShifted;
         }
 
@@ -14089,22 +14768,24 @@ module.exports = function extend() {
     }
 
     function isLocal () {
-        return !this._isUTC;
+        return this.isValid() ? !this._isUTC : false;
     }
 
     function isUtcOffset () {
-        return this._isUTC;
+        return this.isValid() ? this._isUTC : false;
     }
 
     function isUtc () {
-        return this._isUTC && this._offset === 0;
+        return this.isValid() ? this._isUTC && this._offset === 0 : false;
     }
 
-    var aspNetRegex = /(\-)?(?:(\d*)\.)?(\d+)\:(\d+)(?:\:(\d+)\.?(\d{3})?)?/;
+    // ASP.NET json date format regex
+    var aspNetRegex = /^(\-)?(?:(\d*)[. ])?(\d+)\:(\d+)(?:\:(\d+)\.?(\d{3})?\d*)?$/;
 
     // from http://docs.closure-library.googlecode.com/git/closure_goog_date_date.js.source.html
     // somewhat more in line with 4.4.3.2 2004 spec, but allows decimal anywhere
-    var create__isoRegex = /^(-)?P(?:(?:([0-9,.]*)Y)?(?:([0-9,.]*)M)?(?:([0-9,.]*)D)?(?:T(?:([0-9,.]*)H)?(?:([0-9,.]*)M)?(?:([0-9,.]*)S)?)?|([0-9,.]*)W)$/;
+    // and further modified to allow for strings containing both week and day
+    var isoRegex = /^(-)?P(?:(-?[0-9,.]*)Y)?(?:(-?[0-9,.]*)M)?(?:(-?[0-9,.]*)W)?(?:(-?[0-9,.]*)D)?(?:T(?:(-?[0-9,.]*)H)?(?:(-?[0-9,.]*)M)?(?:(-?[0-9,.]*)S)?)?$/;
 
     function create__createDuration (input, key) {
         var duration = input,
@@ -14137,16 +14818,16 @@ module.exports = function extend() {
                 s  : toInt(match[SECOND])      * sign,
                 ms : toInt(match[MILLISECOND]) * sign
             };
-        } else if (!!(match = create__isoRegex.exec(input))) {
+        } else if (!!(match = isoRegex.exec(input))) {
             sign = (match[1] === '-') ? -1 : 1;
             duration = {
                 y : parseIso(match[2], sign),
                 M : parseIso(match[3], sign),
-                d : parseIso(match[4], sign),
-                h : parseIso(match[5], sign),
-                m : parseIso(match[6], sign),
-                s : parseIso(match[7], sign),
-                w : parseIso(match[8], sign)
+                w : parseIso(match[4], sign),
+                d : parseIso(match[5], sign),
+                h : parseIso(match[6], sign),
+                m : parseIso(match[7], sign),
+                s : parseIso(match[8], sign)
             };
         } else if (duration == null) {// checks for null or undefined
             duration = {};
@@ -14194,6 +14875,10 @@ module.exports = function extend() {
 
     function momentsDifference(base, other) {
         var res;
+        if (!(base.isValid() && other.isValid())) {
+            return {milliseconds: 0, months: 0};
+        }
+
         other = cloneWithOffset(other, base);
         if (base.isBefore(other)) {
             res = positiveMomentsDifference(base, other);
@@ -14206,6 +14891,15 @@ module.exports = function extend() {
         return res;
     }
 
+    function absRound (number) {
+        if (number < 0) {
+            return Math.round(-1 * number) * -1;
+        } else {
+            return Math.round(number);
+        }
+    }
+
+    // TODO: remove 'name' arg after deprecation is removed
     function createAdder(direction, name) {
         return function (val, period) {
             var dur, tmp;
@@ -14224,12 +14918,18 @@ module.exports = function extend() {
 
     function add_subtract__addSubtract (mom, duration, isAdding, updateOffset) {
         var milliseconds = duration._milliseconds,
-            days = duration._days,
-            months = duration._months;
+            days = absRound(duration._days),
+            months = absRound(duration._months);
+
+        if (!mom.isValid()) {
+            // No op
+            return;
+        }
+
         updateOffset = updateOffset == null ? true : updateOffset;
 
         if (milliseconds) {
-            mom._d.setTime(+mom._d + milliseconds * isAdding);
+            mom._d.setTime(mom._d.valueOf() + milliseconds * isAdding);
         }
         if (days) {
             get_set__set(mom, 'Date', get_set__get(mom, 'Date') + days * isAdding);
@@ -14257,7 +14957,10 @@ module.exports = function extend() {
                 diff < 1 ? 'sameDay' :
                 diff < 2 ? 'nextDay' :
                 diff < 7 ? 'nextWeek' : 'sameElse';
-        return this.format(formats && formats[format] || this.localeData().calendar(format, this, local__createLocal(now)));
+
+        var output = formats && (isFunction(formats[format]) ? formats[format]() : formats[format]);
+
+        return this.format(output || this.localeData().calendar(format, this, local__createLocal(now)));
     }
 
     function clone () {
@@ -14265,49 +14968,76 @@ module.exports = function extend() {
     }
 
     function isAfter (input, units) {
-        var inputMs;
-        units = normalizeUnits(typeof units !== 'undefined' ? units : 'millisecond');
+        var localInput = isMoment(input) ? input : local__createLocal(input);
+        if (!(this.isValid() && localInput.isValid())) {
+            return false;
+        }
+        units = normalizeUnits(!isUndefined(units) ? units : 'millisecond');
         if (units === 'millisecond') {
-            input = isMoment(input) ? input : local__createLocal(input);
-            return +this > +input;
+            return this.valueOf() > localInput.valueOf();
         } else {
-            inputMs = isMoment(input) ? +input : +local__createLocal(input);
-            return inputMs < +this.clone().startOf(units);
+            return localInput.valueOf() < this.clone().startOf(units).valueOf();
         }
     }
 
     function isBefore (input, units) {
-        var inputMs;
-        units = normalizeUnits(typeof units !== 'undefined' ? units : 'millisecond');
+        var localInput = isMoment(input) ? input : local__createLocal(input);
+        if (!(this.isValid() && localInput.isValid())) {
+            return false;
+        }
+        units = normalizeUnits(!isUndefined(units) ? units : 'millisecond');
         if (units === 'millisecond') {
-            input = isMoment(input) ? input : local__createLocal(input);
-            return +this < +input;
+            return this.valueOf() < localInput.valueOf();
         } else {
-            inputMs = isMoment(input) ? +input : +local__createLocal(input);
-            return +this.clone().endOf(units) < inputMs;
+            return this.clone().endOf(units).valueOf() < localInput.valueOf();
         }
     }
 
-    function isBetween (from, to, units) {
-        return this.isAfter(from, units) && this.isBefore(to, units);
+    function isBetween (from, to, units, inclusivity) {
+        inclusivity = inclusivity || '()';
+        return (inclusivity[0] === '(' ? this.isAfter(from, units) : !this.isBefore(from, units)) &&
+            (inclusivity[1] === ')' ? this.isBefore(to, units) : !this.isAfter(to, units));
     }
 
     function isSame (input, units) {
-        var inputMs;
+        var localInput = isMoment(input) ? input : local__createLocal(input),
+            inputMs;
+        if (!(this.isValid() && localInput.isValid())) {
+            return false;
+        }
         units = normalizeUnits(units || 'millisecond');
         if (units === 'millisecond') {
-            input = isMoment(input) ? input : local__createLocal(input);
-            return +this === +input;
+            return this.valueOf() === localInput.valueOf();
         } else {
-            inputMs = +local__createLocal(input);
-            return +(this.clone().startOf(units)) <= inputMs && inputMs <= +(this.clone().endOf(units));
+            inputMs = localInput.valueOf();
+            return this.clone().startOf(units).valueOf() <= inputMs && inputMs <= this.clone().endOf(units).valueOf();
         }
     }
 
+    function isSameOrAfter (input, units) {
+        return this.isSame(input, units) || this.isAfter(input,units);
+    }
+
+    function isSameOrBefore (input, units) {
+        return this.isSame(input, units) || this.isBefore(input,units);
+    }
+
     function diff (input, units, asFloat) {
-        var that = cloneWithOffset(input, this),
-            zoneDelta = (that.utcOffset() - this.utcOffset()) * 6e4,
+        var that,
+            zoneDelta,
             delta, output;
+
+        if (!this.isValid()) {
+            return NaN;
+        }
+
+        that = cloneWithOffset(input, this);
+
+        if (!that.isValid()) {
+            return NaN;
+        }
+
+        zoneDelta = (that.utcOffset() - this.utcOffset()) * 6e4;
 
         units = normalizeUnits(units);
 
@@ -14347,10 +15077,12 @@ module.exports = function extend() {
             adjust = (b - anchor) / (anchor2 - anchor);
         }
 
-        return -(wholeMonthDiff + adjust);
+        //check for negative zero, return zero if negative zero
+        return -(wholeMonthDiff + adjust) || 0;
     }
 
     utils_hooks__hooks.defaultFormat = 'YYYY-MM-DDTHH:mm:ssZ';
+    utils_hooks__hooks.defaultFormatUtc = 'YYYY-MM-DDTHH:mm:ss[Z]';
 
     function toString () {
         return this.clone().locale('en').format('ddd MMM DD YYYY HH:mm:ss [GMT]ZZ');
@@ -14359,7 +15091,7 @@ module.exports = function extend() {
     function moment_format__toISOString () {
         var m = this.clone().utc();
         if (0 < m.year() && m.year() <= 9999) {
-            if ('function' === typeof Date.prototype.toISOString) {
+            if (isFunction(Date.prototype.toISOString)) {
                 // native implementation is ~50x faster, use it when we can
                 return this.toDate().toISOString();
             } else {
@@ -14371,15 +15103,21 @@ module.exports = function extend() {
     }
 
     function format (inputString) {
-        var output = formatMoment(this, inputString || utils_hooks__hooks.defaultFormat);
+        if (!inputString) {
+            inputString = this.isUtc() ? utils_hooks__hooks.defaultFormatUtc : utils_hooks__hooks.defaultFormat;
+        }
+        var output = formatMoment(this, inputString);
         return this.localeData().postformat(output);
     }
 
     function from (time, withoutSuffix) {
-        if (!this.isValid()) {
+        if (this.isValid() &&
+                ((isMoment(time) && time.isValid()) ||
+                 local__createLocal(time).isValid())) {
+            return create__createDuration({to: this, from: time}).locale(this.locale()).humanize(!withoutSuffix);
+        } else {
             return this.localeData().invalidDate();
         }
-        return create__createDuration({to: this, from: time}).locale(this.locale()).humanize(!withoutSuffix);
     }
 
     function fromNow (withoutSuffix) {
@@ -14387,16 +15125,22 @@ module.exports = function extend() {
     }
 
     function to (time, withoutSuffix) {
-        if (!this.isValid()) {
+        if (this.isValid() &&
+                ((isMoment(time) && time.isValid()) ||
+                 local__createLocal(time).isValid())) {
+            return create__createDuration({from: this, to: time}).locale(this.locale()).humanize(!withoutSuffix);
+        } else {
             return this.localeData().invalidDate();
         }
-        return create__createDuration({from: this, to: time}).locale(this.locale()).humanize(!withoutSuffix);
     }
 
     function toNow (withoutSuffix) {
         return this.to(local__createLocal(), withoutSuffix);
     }
 
+    // If passed a locale key, it will set the locale for this
+    // instance.  Otherwise, it will return the locale configuration
+    // variables for this instance.
     function locale (key) {
         var newLocaleData;
 
@@ -14441,6 +15185,7 @@ module.exports = function extend() {
         case 'week':
         case 'isoWeek':
         case 'day':
+        case 'date':
             this.hours(0);
             /* falls through */
         case 'hour':
@@ -14474,19 +15219,25 @@ module.exports = function extend() {
         if (units === undefined || units === 'millisecond') {
             return this;
         }
+
+        // 'date' is an alias for 'day', so it should be considered as such.
+        if (units === 'date') {
+            units = 'day';
+        }
+
         return this.startOf(units).add(1, (units === 'isoWeek' ? 'week' : units)).subtract(1, 'ms');
     }
 
     function to_type__valueOf () {
-        return +this._d - ((this._offset || 0) * 60000);
+        return this._d.valueOf() - ((this._offset || 0) * 60000);
     }
 
     function unix () {
-        return Math.floor(+this / 1000);
+        return Math.floor(this.valueOf() / 1000);
     }
 
     function toDate () {
-        return this._offset ? new Date(+this) : this._d;
+        return this._offset ? new Date(this.valueOf()) : this._d;
     }
 
     function toArray () {
@@ -14507,6 +15258,11 @@ module.exports = function extend() {
         };
     }
 
+    function toJSON () {
+        // new Date(NaN).toJSON() === null
+        return this.isValid() ? this.toISOString() : null;
+    }
+
     function moment_valid__isValid () {
         return valid__isValid(this);
     }
@@ -14518,6 +15274,18 @@ module.exports = function extend() {
     function invalidAt () {
         return getParsingFlags(this).overflow;
     }
+
+    function creationData() {
+        return {
+            input: this._i,
+            format: this._f,
+            locale: this._locale,
+            isUTC: this._isUTC,
+            strict: this._strict
+        };
+    }
+
+    // FORMATTING
 
     addFormatToken(0, ['gg', 2], 0, function () {
         return this.weekYear() % 100;
@@ -14560,22 +15328,20 @@ module.exports = function extend() {
         week[token] = utils_hooks__hooks.parseTwoDigitYear(input);
     });
 
-    // HELPERS
-
-    function weeksInYear(year, dow, doy) {
-        return weekOfYear(local__createLocal([year, 11, 31 + dow - doy]), dow, doy).week;
-    }
-
     // MOMENTS
 
     function getSetWeekYear (input) {
-        var year = weekOfYear(this, this.localeData()._week.dow, this.localeData()._week.doy).year;
-        return input == null ? year : this.add((input - year), 'y');
+        return getSetWeekYearHelper.call(this,
+                input,
+                this.week(),
+                this.weekday(),
+                this.localeData()._week.dow,
+                this.localeData()._week.doy);
     }
 
     function getSetISOWeekYear (input) {
-        var year = weekOfYear(this, 1, 4).year;
-        return input == null ? year : this.add((input - year), 'y');
+        return getSetWeekYearHelper.call(this,
+                input, this.isoWeek(), this.isoWeekday(), 1, 4);
     }
 
     function getISOWeeksInYear () {
@@ -14587,7 +15353,32 @@ module.exports = function extend() {
         return weeksInYear(this.year(), weekInfo.dow, weekInfo.doy);
     }
 
-    addFormatToken('Q', 0, 0, 'quarter');
+    function getSetWeekYearHelper(input, week, weekday, dow, doy) {
+        var weeksTarget;
+        if (input == null) {
+            return weekOfYear(this, dow, doy).year;
+        } else {
+            weeksTarget = weeksInYear(input, dow, doy);
+            if (week > weeksTarget) {
+                week = weeksTarget;
+            }
+            return setWeekAll.call(this, input, week, weekday, dow, doy);
+        }
+    }
+
+    function setWeekAll(weekYear, week, weekday, dow, doy) {
+        var dayOfYearData = dayOfYearFromWeeks(weekYear, week, weekday, dow, doy),
+            date = createUTCDate(dayOfYearData.year, 0, dayOfYearData.dayOfYear);
+
+        this.year(date.getUTCFullYear());
+        this.month(date.getUTCMonth());
+        this.date(date.getUTCDate());
+        return this;
+    }
+
+    // FORMATTING
+
+    addFormatToken('Q', 0, 'Qo', 'quarter');
 
     // ALIASES
 
@@ -14605,6 +15396,62 @@ module.exports = function extend() {
     function getSetQuarter (input) {
         return input == null ? Math.ceil((this.month() + 1) / 3) : this.month((input - 1) * 3 + this.month() % 3);
     }
+
+    // FORMATTING
+
+    addFormatToken('w', ['ww', 2], 'wo', 'week');
+    addFormatToken('W', ['WW', 2], 'Wo', 'isoWeek');
+
+    // ALIASES
+
+    addUnitAlias('week', 'w');
+    addUnitAlias('isoWeek', 'W');
+
+    // PARSING
+
+    addRegexToken('w',  match1to2);
+    addRegexToken('ww', match1to2, match2);
+    addRegexToken('W',  match1to2);
+    addRegexToken('WW', match1to2, match2);
+
+    addWeekParseToken(['w', 'ww', 'W', 'WW'], function (input, week, config, token) {
+        week[token.substr(0, 1)] = toInt(input);
+    });
+
+    // HELPERS
+
+    // LOCALES
+
+    function localeWeek (mom) {
+        return weekOfYear(mom, this._week.dow, this._week.doy).week;
+    }
+
+    var defaultLocaleWeek = {
+        dow : 0, // Sunday is the first day of the week.
+        doy : 6  // The week that contains Jan 1st is the first week of the year.
+    };
+
+    function localeFirstDayOfWeek () {
+        return this._week.dow;
+    }
+
+    function localeFirstDayOfYear () {
+        return this._week.doy;
+    }
+
+    // MOMENTS
+
+    function getSetWeek (input) {
+        var week = this.localeData().week(this);
+        return input == null ? week : this.add((input - week) * 7, 'd');
+    }
+
+    function getSetISOWeek (input) {
+        var week = weekOfYear(this, 1, 4).week;
+        return input == null ? week : this.add((input - week) * 7, 'd');
+    }
+
+    // FORMATTING
 
     addFormatToken('D', ['DD', 2], 'Do', 'date');
 
@@ -14628,6 +15475,8 @@ module.exports = function extend() {
     // MOMENTS
 
     var getSetDayOfMonth = makeGetSet('Date', true);
+
+    // FORMATTING
 
     addFormatToken('d', 0, 'do', 'day');
 
@@ -14657,12 +15506,18 @@ module.exports = function extend() {
     addRegexToken('d',    match1to2);
     addRegexToken('e',    match1to2);
     addRegexToken('E',    match1to2);
-    addRegexToken('dd',   matchWord);
-    addRegexToken('ddd',  matchWord);
-    addRegexToken('dddd', matchWord);
+    addRegexToken('dd',   function (isStrict, locale) {
+        return locale.weekdaysMinRegex(isStrict);
+    });
+    addRegexToken('ddd',   function (isStrict, locale) {
+        return locale.weekdaysShortRegex(isStrict);
+    });
+    addRegexToken('dddd',   function (isStrict, locale) {
+        return locale.weekdaysRegex(isStrict);
+    });
 
-    addWeekParseToken(['dd', 'ddd', 'dddd'], function (input, week, config) {
-        var weekday = config._locale.weekdaysParse(input);
+    addWeekParseToken(['dd', 'ddd', 'dddd'], function (input, week, config, token) {
+        var weekday = config._locale.weekdaysParse(input, token, config._strict);
         // if we didn't get a weekday name, mark the date as invalid
         if (weekday != null) {
             week.d = weekday;
@@ -14697,8 +15552,9 @@ module.exports = function extend() {
     // LOCALES
 
     var defaultLocaleWeekdays = 'Sunday_Monday_Tuesday_Wednesday_Thursday_Friday_Saturday'.split('_');
-    function localeWeekdays (m) {
-        return this._weekdays[m.day()];
+    function localeWeekdays (m, format) {
+        return isArray(this._weekdays) ? this._weekdays[m.day()] :
+            this._weekdays[this._weekdays.isFormat.test(format) ? 'format' : 'standalone'][m.day()];
     }
 
     var defaultLocaleWeekdaysShort = 'Sun_Mon_Tue_Wed_Thu_Fri_Sat'.split('_');
@@ -14711,20 +15567,105 @@ module.exports = function extend() {
         return this._weekdaysMin[m.day()];
     }
 
-    function localeWeekdaysParse (weekdayName) {
+    function day_of_week__handleStrictParse(weekdayName, format, strict) {
+        var i, ii, mom, llc = weekdayName.toLocaleLowerCase();
+        if (!this._weekdaysParse) {
+            this._weekdaysParse = [];
+            this._shortWeekdaysParse = [];
+            this._minWeekdaysParse = [];
+
+            for (i = 0; i < 7; ++i) {
+                mom = create_utc__createUTC([2000, 1]).day(i);
+                this._minWeekdaysParse[i] = this.weekdaysMin(mom, '').toLocaleLowerCase();
+                this._shortWeekdaysParse[i] = this.weekdaysShort(mom, '').toLocaleLowerCase();
+                this._weekdaysParse[i] = this.weekdays(mom, '').toLocaleLowerCase();
+            }
+        }
+
+        if (strict) {
+            if (format === 'dddd') {
+                ii = indexOf.call(this._weekdaysParse, llc);
+                return ii !== -1 ? ii : null;
+            } else if (format === 'ddd') {
+                ii = indexOf.call(this._shortWeekdaysParse, llc);
+                return ii !== -1 ? ii : null;
+            } else {
+                ii = indexOf.call(this._minWeekdaysParse, llc);
+                return ii !== -1 ? ii : null;
+            }
+        } else {
+            if (format === 'dddd') {
+                ii = indexOf.call(this._weekdaysParse, llc);
+                if (ii !== -1) {
+                    return ii;
+                }
+                ii = indexOf.call(this._shortWeekdaysParse, llc);
+                if (ii !== -1) {
+                    return ii;
+                }
+                ii = indexOf.call(this._minWeekdaysParse, llc);
+                return ii !== -1 ? ii : null;
+            } else if (format === 'ddd') {
+                ii = indexOf.call(this._shortWeekdaysParse, llc);
+                if (ii !== -1) {
+                    return ii;
+                }
+                ii = indexOf.call(this._weekdaysParse, llc);
+                if (ii !== -1) {
+                    return ii;
+                }
+                ii = indexOf.call(this._minWeekdaysParse, llc);
+                return ii !== -1 ? ii : null;
+            } else {
+                ii = indexOf.call(this._minWeekdaysParse, llc);
+                if (ii !== -1) {
+                    return ii;
+                }
+                ii = indexOf.call(this._weekdaysParse, llc);
+                if (ii !== -1) {
+                    return ii;
+                }
+                ii = indexOf.call(this._shortWeekdaysParse, llc);
+                return ii !== -1 ? ii : null;
+            }
+        }
+    }
+
+    function localeWeekdaysParse (weekdayName, format, strict) {
         var i, mom, regex;
 
-        this._weekdaysParse = this._weekdaysParse || [];
+        if (this._weekdaysParseExact) {
+            return day_of_week__handleStrictParse.call(this, weekdayName, format, strict);
+        }
+
+        if (!this._weekdaysParse) {
+            this._weekdaysParse = [];
+            this._minWeekdaysParse = [];
+            this._shortWeekdaysParse = [];
+            this._fullWeekdaysParse = [];
+        }
 
         for (i = 0; i < 7; i++) {
             // make the regex if we don't have it already
+
+            mom = create_utc__createUTC([2000, 1]).day(i);
+            if (strict && !this._fullWeekdaysParse[i]) {
+                this._fullWeekdaysParse[i] = new RegExp('^' + this.weekdays(mom, '').replace('.', '\.?') + '$', 'i');
+                this._shortWeekdaysParse[i] = new RegExp('^' + this.weekdaysShort(mom, '').replace('.', '\.?') + '$', 'i');
+                this._minWeekdaysParse[i] = new RegExp('^' + this.weekdaysMin(mom, '').replace('.', '\.?') + '$', 'i');
+            }
             if (!this._weekdaysParse[i]) {
-                mom = local__createLocal([2000, 1]).day(i);
                 regex = '^' + this.weekdays(mom, '') + '|^' + this.weekdaysShort(mom, '') + '|^' + this.weekdaysMin(mom, '');
                 this._weekdaysParse[i] = new RegExp(regex.replace('.', ''), 'i');
             }
             // test the regex
-            if (this._weekdaysParse[i].test(weekdayName)) {
+            if (strict && format === 'dddd' && this._fullWeekdaysParse[i].test(weekdayName)) {
+                return i;
+            } else if (strict && format === 'ddd' && this._shortWeekdaysParse[i].test(weekdayName)) {
+                return i;
+            } else if (strict && format === 'dd' && this._minWeekdaysParse[i].test(weekdayName)) {
+                return i;
+            } else if (!strict && this._weekdaysParse[i].test(weekdayName)) {
                 return i;
             }
         }
@@ -14733,6 +15674,9 @@ module.exports = function extend() {
     // MOMENTS
 
     function getSetDayOfWeek (input) {
+        if (!this.isValid()) {
+            return input != null ? this : NaN;
+        }
         var day = this._isUTC ? this._d.getUTCDay() : this._d.getDay();
         if (input != null) {
             input = parseWeekday(input, this.localeData());
@@ -14743,20 +15687,171 @@ module.exports = function extend() {
     }
 
     function getSetLocaleDayOfWeek (input) {
+        if (!this.isValid()) {
+            return input != null ? this : NaN;
+        }
         var weekday = (this.day() + 7 - this.localeData()._week.dow) % 7;
         return input == null ? weekday : this.add(input - weekday, 'd');
     }
 
     function getSetISODayOfWeek (input) {
+        if (!this.isValid()) {
+            return input != null ? this : NaN;
+        }
         // behaves the same as moment#day except
         // as a getter, returns 7 instead of 0 (1-7 range instead of 0-6)
         // as a setter, sunday should belong to the previous week.
         return input == null ? this.day() || 7 : this.day(this.day() % 7 ? input : input - 7);
     }
 
-    addFormatToken('H', ['HH', 2], 0, 'hour');
-    addFormatToken('h', ['hh', 2], 0, function () {
+    var defaultWeekdaysRegex = matchWord;
+    function weekdaysRegex (isStrict) {
+        if (this._weekdaysParseExact) {
+            if (!hasOwnProp(this, '_weekdaysRegex')) {
+                computeWeekdaysParse.call(this);
+            }
+            if (isStrict) {
+                return this._weekdaysStrictRegex;
+            } else {
+                return this._weekdaysRegex;
+            }
+        } else {
+            return this._weekdaysStrictRegex && isStrict ?
+                this._weekdaysStrictRegex : this._weekdaysRegex;
+        }
+    }
+
+    var defaultWeekdaysShortRegex = matchWord;
+    function weekdaysShortRegex (isStrict) {
+        if (this._weekdaysParseExact) {
+            if (!hasOwnProp(this, '_weekdaysRegex')) {
+                computeWeekdaysParse.call(this);
+            }
+            if (isStrict) {
+                return this._weekdaysShortStrictRegex;
+            } else {
+                return this._weekdaysShortRegex;
+            }
+        } else {
+            return this._weekdaysShortStrictRegex && isStrict ?
+                this._weekdaysShortStrictRegex : this._weekdaysShortRegex;
+        }
+    }
+
+    var defaultWeekdaysMinRegex = matchWord;
+    function weekdaysMinRegex (isStrict) {
+        if (this._weekdaysParseExact) {
+            if (!hasOwnProp(this, '_weekdaysRegex')) {
+                computeWeekdaysParse.call(this);
+            }
+            if (isStrict) {
+                return this._weekdaysMinStrictRegex;
+            } else {
+                return this._weekdaysMinRegex;
+            }
+        } else {
+            return this._weekdaysMinStrictRegex && isStrict ?
+                this._weekdaysMinStrictRegex : this._weekdaysMinRegex;
+        }
+    }
+
+
+    function computeWeekdaysParse () {
+        function cmpLenRev(a, b) {
+            return b.length - a.length;
+        }
+
+        var minPieces = [], shortPieces = [], longPieces = [], mixedPieces = [],
+            i, mom, minp, shortp, longp;
+        for (i = 0; i < 7; i++) {
+            // make the regex if we don't have it already
+            mom = create_utc__createUTC([2000, 1]).day(i);
+            minp = this.weekdaysMin(mom, '');
+            shortp = this.weekdaysShort(mom, '');
+            longp = this.weekdays(mom, '');
+            minPieces.push(minp);
+            shortPieces.push(shortp);
+            longPieces.push(longp);
+            mixedPieces.push(minp);
+            mixedPieces.push(shortp);
+            mixedPieces.push(longp);
+        }
+        // Sorting makes sure if one weekday (or abbr) is a prefix of another it
+        // will match the longer piece.
+        minPieces.sort(cmpLenRev);
+        shortPieces.sort(cmpLenRev);
+        longPieces.sort(cmpLenRev);
+        mixedPieces.sort(cmpLenRev);
+        for (i = 0; i < 7; i++) {
+            shortPieces[i] = regexEscape(shortPieces[i]);
+            longPieces[i] = regexEscape(longPieces[i]);
+            mixedPieces[i] = regexEscape(mixedPieces[i]);
+        }
+
+        this._weekdaysRegex = new RegExp('^(' + mixedPieces.join('|') + ')', 'i');
+        this._weekdaysShortRegex = this._weekdaysRegex;
+        this._weekdaysMinRegex = this._weekdaysRegex;
+
+        this._weekdaysStrictRegex = new RegExp('^(' + longPieces.join('|') + ')', 'i');
+        this._weekdaysShortStrictRegex = new RegExp('^(' + shortPieces.join('|') + ')', 'i');
+        this._weekdaysMinStrictRegex = new RegExp('^(' + minPieces.join('|') + ')', 'i');
+    }
+
+    // FORMATTING
+
+    addFormatToken('DDD', ['DDDD', 3], 'DDDo', 'dayOfYear');
+
+    // ALIASES
+
+    addUnitAlias('dayOfYear', 'DDD');
+
+    // PARSING
+
+    addRegexToken('DDD',  match1to3);
+    addRegexToken('DDDD', match3);
+    addParseToken(['DDD', 'DDDD'], function (input, array, config) {
+        config._dayOfYear = toInt(input);
+    });
+
+    // HELPERS
+
+    // MOMENTS
+
+    function getSetDayOfYear (input) {
+        var dayOfYear = Math.round((this.clone().startOf('day') - this.clone().startOf('year')) / 864e5) + 1;
+        return input == null ? dayOfYear : this.add((input - dayOfYear), 'd');
+    }
+
+    // FORMATTING
+
+    function hFormat() {
         return this.hours() % 12 || 12;
+    }
+
+    function kFormat() {
+        return this.hours() || 24;
+    }
+
+    addFormatToken('H', ['HH', 2], 0, 'hour');
+    addFormatToken('h', ['hh', 2], 0, hFormat);
+    addFormatToken('k', ['kk', 2], 0, kFormat);
+
+    addFormatToken('hmm', 0, 0, function () {
+        return '' + hFormat.apply(this) + zeroFill(this.minutes(), 2);
+    });
+
+    addFormatToken('hmmss', 0, 0, function () {
+        return '' + hFormat.apply(this) + zeroFill(this.minutes(), 2) +
+            zeroFill(this.seconds(), 2);
+    });
+
+    addFormatToken('Hmm', 0, 0, function () {
+        return '' + this.hours() + zeroFill(this.minutes(), 2);
+    });
+
+    addFormatToken('Hmmss', 0, 0, function () {
+        return '' + this.hours() + zeroFill(this.minutes(), 2) +
+            zeroFill(this.seconds(), 2);
     });
 
     function meridiem (token, lowercase) {
@@ -14785,6 +15880,11 @@ module.exports = function extend() {
     addRegexToken('HH', match1to2, match2);
     addRegexToken('hh', match1to2, match2);
 
+    addRegexToken('hmm', match3to4);
+    addRegexToken('hmmss', match5to6);
+    addRegexToken('Hmm', match3to4);
+    addRegexToken('Hmmss', match5to6);
+
     addParseToken(['H', 'HH'], HOUR);
     addParseToken(['a', 'A'], function (input, array, config) {
         config._isPm = config._locale.isPM(input);
@@ -14793,6 +15893,32 @@ module.exports = function extend() {
     addParseToken(['h', 'hh'], function (input, array, config) {
         array[HOUR] = toInt(input);
         getParsingFlags(config).bigHour = true;
+    });
+    addParseToken('hmm', function (input, array, config) {
+        var pos = input.length - 2;
+        array[HOUR] = toInt(input.substr(0, pos));
+        array[MINUTE] = toInt(input.substr(pos));
+        getParsingFlags(config).bigHour = true;
+    });
+    addParseToken('hmmss', function (input, array, config) {
+        var pos1 = input.length - 4;
+        var pos2 = input.length - 2;
+        array[HOUR] = toInt(input.substr(0, pos1));
+        array[MINUTE] = toInt(input.substr(pos1, 2));
+        array[SECOND] = toInt(input.substr(pos2));
+        getParsingFlags(config).bigHour = true;
+    });
+    addParseToken('Hmm', function (input, array, config) {
+        var pos = input.length - 2;
+        array[HOUR] = toInt(input.substr(0, pos));
+        array[MINUTE] = toInt(input.substr(pos));
+    });
+    addParseToken('Hmmss', function (input, array, config) {
+        var pos1 = input.length - 4;
+        var pos2 = input.length - 2;
+        array[HOUR] = toInt(input.substr(0, pos1));
+        array[MINUTE] = toInt(input.substr(pos1, 2));
+        array[SECOND] = toInt(input.substr(pos2));
     });
 
     // LOCALES
@@ -14821,6 +15947,8 @@ module.exports = function extend() {
     // this rule.
     var getSetHour = makeGetSet('Hours', true);
 
+    // FORMATTING
+
     addFormatToken('m', ['mm', 2], 0, 'minute');
 
     // ALIASES
@@ -14837,6 +15965,8 @@ module.exports = function extend() {
 
     var getSetMinute = makeGetSet('Minutes', false);
 
+    // FORMATTING
+
     addFormatToken('s', ['ss', 2], 0, 'second');
 
     // ALIASES
@@ -14852,6 +15982,8 @@ module.exports = function extend() {
     // MOMENTS
 
     var getSetSecond = makeGetSet('Seconds', false);
+
+    // FORMATTING
 
     addFormatToken('S', 0, 0, function () {
         return ~~(this.millisecond() / 100);
@@ -14908,6 +16040,8 @@ module.exports = function extend() {
 
     var getSetMillisecond = makeGetSet('Milliseconds', false);
 
+    // FORMATTING
+
     addFormatToken('z',  0, 0, 'zoneAbbr');
     addFormatToken('zz', 0, 0, 'zoneName');
 
@@ -14923,40 +16057,43 @@ module.exports = function extend() {
 
     var momentPrototype__proto = Moment.prototype;
 
-    momentPrototype__proto.add          = add_subtract__add;
-    momentPrototype__proto.calendar     = moment_calendar__calendar;
-    momentPrototype__proto.clone        = clone;
-    momentPrototype__proto.diff         = diff;
-    momentPrototype__proto.endOf        = endOf;
-    momentPrototype__proto.format       = format;
-    momentPrototype__proto.from         = from;
-    momentPrototype__proto.fromNow      = fromNow;
-    momentPrototype__proto.to           = to;
-    momentPrototype__proto.toNow        = toNow;
-    momentPrototype__proto.get          = getSet;
-    momentPrototype__proto.invalidAt    = invalidAt;
-    momentPrototype__proto.isAfter      = isAfter;
-    momentPrototype__proto.isBefore     = isBefore;
-    momentPrototype__proto.isBetween    = isBetween;
-    momentPrototype__proto.isSame       = isSame;
-    momentPrototype__proto.isValid      = moment_valid__isValid;
-    momentPrototype__proto.lang         = lang;
-    momentPrototype__proto.locale       = locale;
-    momentPrototype__proto.localeData   = localeData;
-    momentPrototype__proto.max          = prototypeMax;
-    momentPrototype__proto.min          = prototypeMin;
-    momentPrototype__proto.parsingFlags = parsingFlags;
-    momentPrototype__proto.set          = getSet;
-    momentPrototype__proto.startOf      = startOf;
-    momentPrototype__proto.subtract     = add_subtract__subtract;
-    momentPrototype__proto.toArray      = toArray;
-    momentPrototype__proto.toObject     = toObject;
-    momentPrototype__proto.toDate       = toDate;
-    momentPrototype__proto.toISOString  = moment_format__toISOString;
-    momentPrototype__proto.toJSON       = moment_format__toISOString;
-    momentPrototype__proto.toString     = toString;
-    momentPrototype__proto.unix         = unix;
-    momentPrototype__proto.valueOf      = to_type__valueOf;
+    momentPrototype__proto.add               = add_subtract__add;
+    momentPrototype__proto.calendar          = moment_calendar__calendar;
+    momentPrototype__proto.clone             = clone;
+    momentPrototype__proto.diff              = diff;
+    momentPrototype__proto.endOf             = endOf;
+    momentPrototype__proto.format            = format;
+    momentPrototype__proto.from              = from;
+    momentPrototype__proto.fromNow           = fromNow;
+    momentPrototype__proto.to                = to;
+    momentPrototype__proto.toNow             = toNow;
+    momentPrototype__proto.get               = getSet;
+    momentPrototype__proto.invalidAt         = invalidAt;
+    momentPrototype__proto.isAfter           = isAfter;
+    momentPrototype__proto.isBefore          = isBefore;
+    momentPrototype__proto.isBetween         = isBetween;
+    momentPrototype__proto.isSame            = isSame;
+    momentPrototype__proto.isSameOrAfter     = isSameOrAfter;
+    momentPrototype__proto.isSameOrBefore    = isSameOrBefore;
+    momentPrototype__proto.isValid           = moment_valid__isValid;
+    momentPrototype__proto.lang              = lang;
+    momentPrototype__proto.locale            = locale;
+    momentPrototype__proto.localeData        = localeData;
+    momentPrototype__proto.max               = prototypeMax;
+    momentPrototype__proto.min               = prototypeMin;
+    momentPrototype__proto.parsingFlags      = parsingFlags;
+    momentPrototype__proto.set               = getSet;
+    momentPrototype__proto.startOf           = startOf;
+    momentPrototype__proto.subtract          = add_subtract__subtract;
+    momentPrototype__proto.toArray           = toArray;
+    momentPrototype__proto.toObject          = toObject;
+    momentPrototype__proto.toDate            = toDate;
+    momentPrototype__proto.toISOString       = moment_format__toISOString;
+    momentPrototype__proto.toJSON            = toJSON;
+    momentPrototype__proto.toString          = toString;
+    momentPrototype__proto.unix              = unix;
+    momentPrototype__proto.valueOf           = to_type__valueOf;
+    momentPrototype__proto.creationData      = creationData;
 
     // Year
     momentPrototype__proto.year       = getSetYear;
@@ -15042,7 +16179,7 @@ module.exports = function extend() {
 
     function locale_calendar__calendar (key, mom, now) {
         var output = this._calendar[key];
-        return typeof output === 'function' ? output.call(mom, now) : output;
+        return isFunction(output) ? output.call(mom, now) : output;
     }
 
     var defaultLongDateFormat = {
@@ -15104,29 +16241,14 @@ module.exports = function extend() {
 
     function relative__relativeTime (number, withoutSuffix, string, isFuture) {
         var output = this._relativeTime[string];
-        return (typeof output === 'function') ?
+        return (isFunction(output)) ?
             output(number, withoutSuffix, string, isFuture) :
             output.replace(/%d/i, number);
     }
 
     function pastFuture (diff, output) {
         var format = this._relativeTime[diff > 0 ? 'future' : 'past'];
-        return typeof format === 'function' ? format(output) : format.replace(/%s/i, output);
-    }
-
-    function locale_set__set (config) {
-        var prop, i;
-        for (i in config) {
-            prop = config[i];
-            if (typeof prop === 'function') {
-                this[i] = prop;
-            } else {
-                this['_' + i] = prop;
-            }
-        }
-        // Lenient ordinal parsing accepts just a number in addition to
-        // number + (possibly) stuff coming from _ordinalParseLenient.
-        this._ordinalParseLenient = new RegExp(this._ordinalParse.source + '|' + (/\d{1,2}/).source);
+        return isFunction(format) ? format(output) : format.replace(/%s/i, output);
     }
 
     var prototype__proto = Locale.prototype;
@@ -15148,11 +16270,15 @@ module.exports = function extend() {
     prototype__proto.set             = locale_set__set;
 
     // Month
-    prototype__proto.months       =        localeMonths;
-    prototype__proto._months      = defaultLocaleMonths;
-    prototype__proto.monthsShort  =        localeMonthsShort;
-    prototype__proto._monthsShort = defaultLocaleMonthsShort;
-    prototype__proto.monthsParse  =        localeMonthsParse;
+    prototype__proto.months            =        localeMonths;
+    prototype__proto._months           = defaultLocaleMonths;
+    prototype__proto.monthsShort       =        localeMonthsShort;
+    prototype__proto._monthsShort      = defaultLocaleMonthsShort;
+    prototype__proto.monthsParse       =        localeMonthsParse;
+    prototype__proto._monthsRegex      = defaultMonthsRegex;
+    prototype__proto.monthsRegex       = monthsRegex;
+    prototype__proto._monthsShortRegex = defaultMonthsShortRegex;
+    prototype__proto.monthsShortRegex  = monthsShortRegex;
 
     // Week
     prototype__proto.week = localeWeek;
@@ -15169,6 +16295,13 @@ module.exports = function extend() {
     prototype__proto._weekdaysShort = defaultLocaleWeekdaysShort;
     prototype__proto.weekdaysParse  =        localeWeekdaysParse;
 
+    prototype__proto._weekdaysRegex      = defaultWeekdaysRegex;
+    prototype__proto.weekdaysRegex       =        weekdaysRegex;
+    prototype__proto._weekdaysShortRegex = defaultWeekdaysShortRegex;
+    prototype__proto.weekdaysShortRegex  =        weekdaysShortRegex;
+    prototype__proto._weekdaysMinRegex   = defaultWeekdaysMinRegex;
+    prototype__proto.weekdaysMinRegex    =        weekdaysMinRegex;
+
     // Hours
     prototype__proto.isPM = localeIsPM;
     prototype__proto._meridiemParse = defaultLocaleMeridiemParse;
@@ -15180,7 +16313,7 @@ module.exports = function extend() {
         return locale[field](utc, format);
     }
 
-    function list (format, index, field, count, setter) {
+    function listMonthsImpl (format, index, field) {
         if (typeof format === 'number') {
             index = format;
             format = undefined;
@@ -15189,35 +16322,79 @@ module.exports = function extend() {
         format = format || '';
 
         if (index != null) {
-            return lists__get(format, index, field, setter);
+            return lists__get(format, index, field, 'month');
         }
 
         var i;
         var out = [];
-        for (i = 0; i < count; i++) {
-            out[i] = lists__get(format, i, field, setter);
+        for (i = 0; i < 12; i++) {
+            out[i] = lists__get(format, i, field, 'month');
+        }
+        return out;
+    }
+
+    // ()
+    // (5)
+    // (fmt, 5)
+    // (fmt)
+    // (true)
+    // (true, 5)
+    // (true, fmt, 5)
+    // (true, fmt)
+    function listWeekdaysImpl (localeSorted, format, index, field) {
+        if (typeof localeSorted === 'boolean') {
+            if (typeof format === 'number') {
+                index = format;
+                format = undefined;
+            }
+
+            format = format || '';
+        } else {
+            format = localeSorted;
+            index = format;
+            localeSorted = false;
+
+            if (typeof format === 'number') {
+                index = format;
+                format = undefined;
+            }
+
+            format = format || '';
+        }
+
+        var locale = locale_locales__getLocale(),
+            shift = localeSorted ? locale._week.dow : 0;
+
+        if (index != null) {
+            return lists__get(format, (index + shift) % 7, field, 'day');
+        }
+
+        var i;
+        var out = [];
+        for (i = 0; i < 7; i++) {
+            out[i] = lists__get(format, (i + shift) % 7, field, 'day');
         }
         return out;
     }
 
     function lists__listMonths (format, index) {
-        return list(format, index, 'months', 12, 'month');
+        return listMonthsImpl(format, index, 'months');
     }
 
     function lists__listMonthsShort (format, index) {
-        return list(format, index, 'monthsShort', 12, 'month');
+        return listMonthsImpl(format, index, 'monthsShort');
     }
 
-    function lists__listWeekdays (format, index) {
-        return list(format, index, 'weekdays', 7, 'day');
+    function lists__listWeekdays (localeSorted, format, index) {
+        return listWeekdaysImpl(localeSorted, format, index, 'weekdays');
     }
 
-    function lists__listWeekdaysShort (format, index) {
-        return list(format, index, 'weekdaysShort', 7, 'day');
+    function lists__listWeekdaysShort (localeSorted, format, index) {
+        return listWeekdaysImpl(localeSorted, format, index, 'weekdaysShort');
     }
 
-    function lists__listWeekdaysMin (format, index) {
-        return list(format, index, 'weekdaysMin', 7, 'day');
+    function lists__listWeekdaysMin (localeSorted, format, index) {
+        return listWeekdaysImpl(localeSorted, format, index, 'weekdaysMin');
     }
 
     locale_locales__getSetGlobalLocale('en', {
@@ -15440,15 +16617,15 @@ module.exports = function extend() {
         var years    = round(duration.as('y'));
 
         var a = seconds < thresholds.s && ['s', seconds]  ||
-                minutes === 1          && ['m']           ||
+                minutes <= 1           && ['m']           ||
                 minutes < thresholds.m && ['mm', minutes] ||
-                hours   === 1          && ['h']           ||
+                hours   <= 1           && ['h']           ||
                 hours   < thresholds.h && ['hh', hours]   ||
-                days    === 1          && ['d']           ||
+                days    <= 1           && ['d']           ||
                 days    < thresholds.d && ['dd', days]    ||
-                months  === 1          && ['M']           ||
+                months  <= 1           && ['M']           ||
                 months  < thresholds.M && ['MM', months]  ||
-                years   === 1          && ['y']           || ['yy', years];
+                years   <= 1           && ['y']           || ['yy', years];
 
         a[2] = withoutSuffix;
         a[3] = +posNegDuration > 0;
@@ -15569,6 +16746,8 @@ module.exports = function extend() {
 
     // Side effect imports
 
+    // FORMATTING
+
     addFormatToken('X', 0, 0, 'unix');
     addFormatToken('x', 0, 0, 'valueOf');
 
@@ -15586,13 +16765,14 @@ module.exports = function extend() {
     // Side effect imports
 
 
-    utils_hooks__hooks.version = '2.10.6';
+    utils_hooks__hooks.version = '2.13.0';
 
     setHookCallback(local__createLocal);
 
     utils_hooks__hooks.fn                    = momentPrototype;
     utils_hooks__hooks.min                   = min;
     utils_hooks__hooks.max                   = max;
+    utils_hooks__hooks.now                   = now;
     utils_hooks__hooks.utc                   = create_utc__createUTC;
     utils_hooks__hooks.unix                  = moment__createUnix;
     utils_hooks__hooks.months                = lists__listMonths;
@@ -15608,16 +16788,19 @@ module.exports = function extend() {
     utils_hooks__hooks.monthsShort           = lists__listMonthsShort;
     utils_hooks__hooks.weekdaysMin           = lists__listWeekdaysMin;
     utils_hooks__hooks.defineLocale          = defineLocale;
+    utils_hooks__hooks.updateLocale          = updateLocale;
+    utils_hooks__hooks.locales               = locale_locales__listLocales;
     utils_hooks__hooks.weekdaysShort         = lists__listWeekdaysShort;
     utils_hooks__hooks.normalizeUnits        = normalizeUnits;
     utils_hooks__hooks.relativeTimeThreshold = duration_humanize__getSetRelativeTimeThreshold;
+    utils_hooks__hooks.prototype             = momentPrototype;
 
     var _moment = utils_hooks__hooks;
 
     return _moment;
 
 }));
-},{}],48:[function(require,module,exports){
+},{}],47:[function(require,module,exports){
 (function (global){
 /*
  *  Sugar Library v1.4.1
@@ -24866,7 +26049,145 @@ Date.addLocale('zh-TW', {
 }).call(this);
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],49:[function(require,module,exports){
+},{}],48:[function(require,module,exports){
+arguments[4][41][0].apply(exports,arguments)
+},{"./lib/type":49,"dup":41}],49:[function(require,module,exports){
+/*!
+ * type-detect
+ * Copyright(c) 2013 jake luer <jake@alogicalparadox.com>
+ * MIT Licensed
+ */
+
+/*!
+ * Primary Exports
+ */
+
+var exports = module.exports = getType;
+
+/**
+ * ### typeOf (obj)
+ *
+ * Use several different techniques to determine
+ * the type of object being tested.
+ *
+ *
+ * @param {Mixed} object
+ * @return {String} object type
+ * @api public
+ */
+var objectTypeRegexp = /^\[object (.*)\]$/;
+
+function getType(obj) {
+  var type = Object.prototype.toString.call(obj).match(objectTypeRegexp)[1].toLowerCase();
+  // Let "new String('')" return 'object'
+  if (typeof Promise === 'function' && obj instanceof Promise) return 'promise';
+  // PhantomJS has type "DOMWindow" for null
+  if (obj === null) return 'null';
+  // PhantomJS has type "DOMWindow" for undefined
+  if (obj === undefined) return 'undefined';
+  return type;
+}
+
+exports.Library = Library;
+
+/**
+ * ### Library
+ *
+ * Create a repository for custom type detection.
+ *
+ * ```js
+ * var lib = new type.Library;
+ * ```
+ *
+ */
+
+function Library() {
+  if (!(this instanceof Library)) return new Library();
+  this.tests = {};
+}
+
+/**
+ * #### .of (obj)
+ *
+ * Expose replacement `typeof` detection to the library.
+ *
+ * ```js
+ * if ('string' === lib.of('hello world')) {
+ *   // ...
+ * }
+ * ```
+ *
+ * @param {Mixed} object to test
+ * @return {String} type
+ */
+
+Library.prototype.of = getType;
+
+/**
+ * #### .define (type, test)
+ *
+ * Add a test to for the `.test()` assertion.
+ *
+ * Can be defined as a regular expression:
+ *
+ * ```js
+ * lib.define('int', /^[0-9]+$/);
+ * ```
+ *
+ * ... or as a function:
+ *
+ * ```js
+ * lib.define('bln', function (obj) {
+ *   if ('boolean' === lib.of(obj)) return true;
+ *   var blns = [ 'yes', 'no', 'true', 'false', 1, 0 ];
+ *   if ('string' === lib.of(obj)) obj = obj.toLowerCase();
+ *   return !! ~blns.indexOf(obj);
+ * });
+ * ```
+ *
+ * @param {String} type
+ * @param {RegExp|Function} test
+ * @api public
+ */
+
+Library.prototype.define = function(type, test) {
+  if (arguments.length === 1) return this.tests[type];
+  this.tests[type] = test;
+  return this;
+};
+
+/**
+ * #### .test (obj, test)
+ *
+ * Assert that an object is of type. Will first
+ * check natives, and if that does not pass it will
+ * use the user defined custom tests.
+ *
+ * ```js
+ * assert(lib.test('1', 'int'));
+ * assert(lib.test('yes', 'bln'));
+ * ```
+ *
+ * @param {Mixed} object
+ * @param {String} type
+ * @return {Boolean} result
+ * @api public
+ */
+
+Library.prototype.test = function(obj, type) {
+  if (type === getType(obj)) return true;
+  var test = this.tests[type];
+
+  if (test && 'regexp' === getType(test)) {
+    return test.test(obj);
+  } else if (test && 'function' === getType(test)) {
+    return test(obj);
+  } else {
+    throw new ReferenceError('Type test "' + type + '" not defined or invalid.');
+  }
+};
+
+},{}],50:[function(require,module,exports){
 'use strict';
 
 // 
@@ -24877,6 +26198,7 @@ var Series = require('./series');
 var Index = require('./index');
 var ArrayIterator = require('./iterators/array');
 var MultiIterator = require('./iterators/multi');
+var PairIterator = require('./iterators/pair');
 var SkipIterator = require('./iterators/skip');
 var SkipWhileIterator = require('./iterators/skip-while');
 var BabyParse = require('babyparse');
@@ -24896,35 +26218,36 @@ var E = require('linq');
 var validateIterator = require('./iterators/validate');
 
 //
-// Helper function to grab a column index from a 'column name or index' parameter.
+// Creates an iterator that converts rows to JavaScript objects based on passed in column names.
 //
-var parseColumnNameOrIndexToIndex = function (dataFrame, columnNameOrIndex, failForNonExistantColumn) {
+var convertRowsToObjects = function (columnNames, rowsIterator) {
 
-	if (Object.isString(columnNameOrIndex)) {
-		var columnIndex = dataFrame.getColumnIndex(columnNameOrIndex);
-		if (failForNonExistantColumn && columnIndex < 0) {
-			throw new Error("Failed to find column with name '" + columnNameOrIndex + "'.");
+	if (Object.isFunction(columnNames)) {
+		columnNames = columnNames();
+	}
+
+	assert.isArray(columnNames);
+
+	validateIterator(rowsIterator);
+
+	return new SelectIterator(
+		rowsIterator,
+		function (row) {
+			return E.from(columnNames)
+				.select(function (columnName, columnIndex) {
+					return [columnName, columnIndex];
+				})
+				.toObject(
+					function (column) {
+						return column[0];
+					},
+					function (column) {
+						return row[column[1]];
+					}
+				);							
 		}
-		return columnIndex;
-	}
-	else {	
-		assert.isNumber(columnNameOrIndex, "Expected 'columnNameOrIndex' parameter to be either a string or index that specifies an existing column.");
-
-		return columnNameOrIndex;
-	}
-};
-
-var parseColumnNameOrIndexToName = function (dataFrame, columnNameOrIndex, failForNonExistantColumn) {
-
-	if (Object.isString(columnNameOrIndex)) {
-		return columnNameOrIndex;
-	}
-	else {	
-		assert.isNumber(columnNameOrIndex, "Expected 'columnNameOrIndex' parameter to be either a string or index that specifies an existing column.");
-
-		return dataFrame.getColumnName(columnNameOrIndex);
-	}
-};
+	);
+}
 
 /**
  * Constructor for DataFrame.
@@ -24937,13 +26260,13 @@ var DataFrame = function (config) {
 
 	if (!config) {
 		self._columnNames = [];
-		self._iterable = function () {
+		self.getIterator = function () {
 			return new EmptyIterator();
 		};
 		return;
 	}
 
-	if (config && config.iterable) {
+	if (config.iterable) {
 
 		assert.isFunction(config.iterable, "Expected 'iterable' field of 'config' parameter to DataFrame constructor to be a function that returns an index/value pairs iterator.");
 
@@ -24966,36 +26289,24 @@ var DataFrame = function (config) {
 				return Object.keys(iterator.getCurrent()[1]);
 			};
 		}
-		self._iterable = iterable;
+		self.getIterator = iterable;
 		return;
 	}
 
-	var columnNames;
-	var rows;
-	var index;
+	if (!config.rows &&  !config.columns) {
+		self._columnNames = config.columnNames || [];
+		self.getIterator = function () {
+			return new EmptyIterator();
+		};
+		return;
+	}
 
 	assert.isObject(config, "Expected 'config' parameter to DataFrame constructor to be an object with options for initialisation.");
 
 	if (config.index) {
-		var inputIndex = config.index;
-
-		if (Object.isArray(inputIndex)) {
-			index = function () {
-				return new ArrayIterator(inputIndex);
-			};		
-		}
-		else {
+		if (!Object.isArray(config.index)) {
 			assert.isObject(config.index, "Expected 'index' member of 'config' parameter to DataFrame constructor to be an object.");			
-
-			index = function () {
-				return inputIndex.getIterator();
-			};
 		}
-	}
-	else {
-		index = function () {
-			return new CountIterator();
-		};
 	}
 
 	if (config.columnNames) {
@@ -25011,30 +26322,7 @@ var DataFrame = function (config) {
 			throw new Error("Expected to find a 'rows' member of 'config' parameter to DataFrame constructor.");
 		}
 
-		columnNames = config.columnNames;
-
-	 	if (Object.isFunction(config.rows)) {
-			rows = function () {
-				return new SelectIterator(
-					config.rows(),
-					function (row) {
-						return E.from(columnNames)
-							.select(function (columnName, columnIndex) {
-								return [columnName, columnIndex];
-							})
-							.toObject(
-								function (column) {
-									return column[0];
-								},
-								function (column) {
-									return row[column[1]];
-								}
-							);							
-					}
-				);
-			};
-		}
-		else {
+	 	if (!Object.isFunction(config.rows)) {
 			assert.isArray(config.rows, "Expected 'rows' member of 'config' parameter to DataFrame constructor to be an array of rows.");
 
 			if (config.debug) {
@@ -25042,122 +26330,175 @@ var DataFrame = function (config) {
 					assert.isArray(row, "Expected 'rows' member of 'config' parameter to DataFrame constructor to be an array of arrays, an array of objects or an iterator.");
 				});
 			}
-
-	 		rows = function () {
-				return new SelectIterator(
-					new ArrayIterator(config.rows),
-					function (row) {
-						var resolvedColumnNames = columnNames;
-						if (Object.isFunction(resolvedColumnNames)) {
-							resolvedColumnNames = resolvedColumnNames();
-						}
-						return E.from(resolvedColumnNames)
-							.select(function (columnName, columnIndex) {
-								return [columnName, columnIndex];
-							})
-							.toObject(
-								function (column) {
-									return column[0];
-								},
-								function (column) {
-									return row[column[1]];
-								}
-							);							
-					}
-				);
-	 		};		 		
 		}
 	}
 	else if (config.rows) {
-		if (Object.isFunction(config.rows)) {
+		assert(!config.columns, "Can't use both 'rows' and 'columns' fields of 'config' parameter to DataFrame constructor.");
 
-			var determineColumnNames = function () {
-				var iterator = config.rows();
-				if (!iterator.moveNext()) {
-					return [];
-				}
-
-				return Object.keys(iterator.getCurrent());
-			};				
-
-			columnNames = determineColumnNames;
-
-			rows = config.rows;
-		}
-		else {
-			assert.isArray(config.rows, "Expected 'rows' member of 'config' parameter to DataFrame constructor to be an array of rows.");
+		if (!Object.isFunction(config.rows)) {
+			assert.isArray(config.rows, "Expected 'rows' member of 'config' parameter to DataFrame constructor to be an array of JavaScript objects.");
 			
 			if (config.rows.length > 0) {
-				if (Object.isObject(config.rows[0])) {
+				assert.isObject(config.rows[0], "Expected 'rows' member of 'config' parameter to DataFrame constructor to be an array of JavaScript objects.")
+			}
+		}
+	}
+	else if (config.columns) {
+		assert.isObject(config.columns, "Expected 'columns' member of 'config' parameter to DataFrame constructor to be an object with fields that define columns.");
+	}
 
-					if (config.debug) {
-						config.rows.forEach(function (row) {
-							assert.isObject(row, "Expect 'rows' member of 'config' parameter to DataFrame constructor to be array of objects or arrays, do not mix and match arrays and objects in 'rows'.");
-						});							
-					}
+	var rows = config.rows;
+	var columns = config.columns;
 
-					// Derive column names from object fields.
-					columnNames = function () {
-						return E.from(config.rows)
-							.selectMany(function (row) {
-								return Object.keys(row);
-							})
-							.distinct()
-							.toArray();
-					};
+	if (config.columnNames)	{
+		self._columnNames = config.columnNames;
 
-					rows = function () {
-						return new ArrayIterator(config.rows);
+		if (config.index) {
+			var index = config.index;
+			if (Object.isArray(index)) {
+
+				if (Object.isFunction(rows)) {
+					this.getIterator = function () {
+						return new PairIterator(new ArrayIterator(index), convertRowsToObjects(self._columnNames, rows()));
 					};
 				}
 				else {
-					if (config.debug) {
-						config.rows.forEach(function (row) {
-							assert.isArray(row, "Expect 'rows' member of 'config' parameter to DataFrame constructor to be array of objects or arrays, do not mix and match arrays and objects in 'rows'.");
-						});				
+					this.getIterator = function () {
+						return new PairIterator(new ArrayIterator(index), convertRowsToObjects(self._columnNames, new ArrayIterator(rows)));
+					};
+				}
+			}
+			else {
+				if (Object.isFunction(rows)) {
+					this.getIterator = function () {
+						return new PairIterator(index.getIterator(), convertRowsToObjects(self._columnNames, rows()));
+					};
+				}
+				else {
+					this.getIterator = function () {
+						return new PairIterator(index.getIterator(), convertRowsToObjects(self._columnNames, new ArrayIterator(rows)));
+					};				
+				}
+			}
+		}
+		else {
+			if (Object.isFunction(rows)) {
+				this.getIterator = function () {
+					return new PairIterator(new CountIterator(), convertRowsToObjects(self._columnNames, rows()));
+				};
+			}
+			else {
+				this.getIterator = function () {
+					return new PairIterator(new CountIterator(), convertRowsToObjects(self._columnNames, new ArrayIterator(rows)));
+				};
+			}
+		}	
+	}
+	else {
+		if (rows) {
+			if (Object.isFunction(rows)) {
+
+				self._columnNames = function () {
+					var iterator = config.rows();
+					if (!iterator.moveNext()) {
+						return [];
 					}
 
-					// Default column names.
-					columnNames = E.range(0, config.rows[0].length)
-						.select(function (columnIndex) {
-							return columnIndex.toString();
-						})
-						.toArray();
+					return Object.keys(iterator.getCurrent());
+				};				
+			}
+			else {
+				if (config.rows.length > 0) {
 
-					rows = function () {
-						return new SelectIterator(
-							new ArrayIterator(config.rows),
-							function (row) {
-								return E.range(0, config.rows[0].length)
-									.toObject(
-										function (columnIndex) {
-											return columnIndex.toString();
-										},
-										function (columnIndex) {
-											return row[columnIndex];
-										}
-									);							
-							}
-						);
+					// Derive column names from object fields.
+					self._columnNames = Object.keys(config.rows[0]);
+				}
+				else {
+					self._columnNames = [];
+				}
+			}
+		}
+		else {
+			self._columnNames = Object.keys(columns);
+		}
+
+		if (config.index) {
+			var index = config.index;
+			if (Object.isArray(index)) {
+
+				if (rows) {
+					if (Object.isFunction(rows)) {
+						this.getIterator = function () {
+							return new PairIterator(new ArrayIterator(index), rows());
+						};
+					}
+					else {
+						this.getIterator = function () {
+							return new PairIterator(new ArrayIterator(index), new ArrayIterator(rows));
+						};
+					}
+				}
+				else {
+					this.getIterator = function () {
+						var columnIterators = E.from(self._columnNames)
+							.select(function (columnName) {
+								return new ArrayIterator(columns[columnName]);
+							})
+							.toArray();
+						return new PairIterator(new ArrayIterator(index), convertRowsToObjects(self._columnNames, new MultiIterator(columnIterators)));
+					};
+				}
+			}
+			else {
+				if (rows) {
+					if (Object.isFunction(rows)) {
+						this.getIterator = function () {
+							return new PairIterator(index.getIterator(), rows());
+						};
+					}
+					else {
+						this.getIterator = function () {
+							return new PairIterator(index.getIterator(), new ArrayIterator(rows));
+						};				
+					}
+				}
+				else {
+					this.getIterator = function () {
+						var columnIterators = E.from(self._columnNames)
+							.select(function (columnName) {
+								return new ArrayIterator(columns[columnName]);
+							})
+							.toArray();
+						return new PairIterator(index.getIterator(), convertRowsToObjects(self._columnNames, new MultiIterator(columnIterators)));
 					};
 				}
 			}
 		}
+		else {
+			if (rows) {
+				if (Object.isFunction(rows)) {
+					this.getIterator = function () {
+						return new PairIterator(new CountIterator(), rows());
+					};
+				}
+				else {
+					this.getIterator = function () {
+						return new PairIterator(new CountIterator(), new ArrayIterator(rows));
+					};
+				}
+			}
+			else {
+				this.getIterator = function () {
+						var columnIterators = E.from(self._columnNames)
+							.select(function (columnName) {
+								return new ArrayIterator(columns[columnName]);
+							})
+							.toArray();
+						return new PairIterator(new CountIterator(), convertRowsToObjects(self._columnNames, new MultiIterator(columnIterators)));
+				};
+			}
+		}
 	}
-	
-	if (!rows) {
-		rows = function () {
-			return new ArrayIterator([]);
-		};
-	}
-
-	assert.isFunction(index);
-	assert.isFunction(rows);
-
-	self._columnNames = columnNames || [];
-	self._iterable = function () {
-		return new MultiIterator([index(), rows()]);
-	};
 };
 
 /**
@@ -25180,10 +26521,7 @@ DataFrame.prototype.getIndex = function () {
  */
 DataFrame.prototype.getColumnNames = function () {
 	var self = this;
-	if (self._newIterable) {
-		return self._newIterable.getColumnNames();
-	}
-	if (Object.isFunction(self._columnNames)) { //fio:
+	if (Object.isFunction(self._columnNames)) {
 		self._columnNames = self._columnNames(); // Lazy evaluate column names.
 	}
 	return self._columnNames;
@@ -25193,8 +26531,7 @@ DataFrame.prototype.getColumnNames = function () {
  * Get an iterator for the data-frame.
  */
 DataFrame.prototype.getIterator = function () {
-	var self = this;
-	return self._iterable();
+	return new EmptyIterator(); // This function is defined by the constructor.
 };
 
 /**
@@ -25380,9 +26717,13 @@ DataFrame.prototype.select = function (selector) {
 	return new DataFrame({
 		iterable: function () {
 			return new SelectIterator(self.getIterator(), function (pair) {
+					var newValue = selector(pair[1], pair[0]);
+					if (!Object.isObject(newValue)) {
+						throw new Error("Expected return value from 'select' selector to be an object that represents a new row in the resulting data-frame.");
+					};
 					return [
 						pair[0],
-						selector(pair[1], pair[0]),
+						newValue,
 					];
 				});
 		},
@@ -25395,21 +26736,31 @@ DataFrame.prototype.select = function (selector) {
  * @param {function} selector - Selector function that transforms each row to a different data structure.
  */
 DataFrame.prototype.selectMany = function (selector) {
-	assert.isFunction(selector, "Expected 'selector' parameter to 'selectMany' function to be a function.");
+	assert.isFunction(selector, "Expected 'selector' parameter to 'DataFrame.selectMany' function to be a function.");
 
 	var self = this;
 	return new DataFrame({
 		iterable: function () {
 			return new SelectManyIterator(self.getIterator(), function (pair) {
 				var newRows = selector(pair[1], pair[0]);
-				return E.from(newRows)
-					.select(function (newRow) {
-						return [
-							pair[0], 
-							newRow,
-						];
-					})
-					.toArray();
+				if (!Object.isArray(newRows)) {
+					throw new Error("Expected return value from 'DataFrame.selectMany' selector to be an array of objects, each object represents a new row in the resulting data-frame.");
+				}
+
+				var newPairs = [];
+				for (var newRowIndex = 0; newRowIndex < newRows.length; ++newRowIndex) {
+					var newRow = newRows[newRowIndex];
+					if (!Object.isObject(newRow)) {
+						throw new Error("Expected array returned from 'DataFrame.selectMany' selector to contain only objects, each object represents a new row in the resulting data-frame.");
+					};
+
+					newPairs.push([
+						pair[0], 
+						newRow,
+					]);
+				}
+
+				return newPairs;
 			})
 		},
 	}); 	
@@ -25418,12 +26769,12 @@ DataFrame.prototype.selectMany = function (selector) {
 /**
  * Retreive a time-series from a column of the data-frame.
  *
- * @param {string|int} columnNameOrIndex - Name or index of the column to retreive.
+ * @param {string} columnName - Specifies the column to retreive.
  */
-DataFrame.prototype.getSeries = function (columnNameOrIndex) {
+DataFrame.prototype.getSeries = function (columnName) {
 	var self = this;
 
-	var columnName = parseColumnNameOrIndexToName(self, columnNameOrIndex, true);
+	assert.isString(columnName, "Expected 'columnName' parameter to getSeries function to be a string that specifies the name of the column to retreive.");
 
 	return new Series({
 		iterable: function () {
@@ -25460,12 +26811,14 @@ DataFrame.prototype.hasSeries = function (columnName) {
  * Verify the existance of a column and return it.
  * Throws an exception if the column doesn't exist.
  *
- * @param {string|int} columnNameOrIndex - Name or index of the column to retreive.
+ * @param {string} columnName - Name or index of the column to retreive.
  */
-DataFrame.prototype.expectSeries = function (columnNameOrIndex) {
+DataFrame.prototype.expectSeries = function (columnName) {
 
 	var self = this;
-	parseColumnNameOrIndexToIndex(self, columnNameOrIndex, true);
+	if (self.getColumnNames().indexOf(columnName) < 0) {
+		throw new Error("Expected data-frame to contain series with column name: '" + columnName + "'.");
+	}
 	return self;
 };
 
@@ -25692,12 +27045,12 @@ DataFrame.prototype.orderByDescending = function (columnNameOrIndexOrSelector) {
  *
  * @param {string|array} columnOrColumns - Specifies the column name (a string) or columns (array of column names) to drop.
  */
-DataFrame.prototype.dropColumn = function (columnOrColumns) {
+DataFrame.prototype.dropSeries = function (columnOrColumns) {
 
 	var self = this;
 
 	if (!Object.isArray(columnOrColumns)) {
-		assert.isString(columnOrColumns, "'dropColumn' expected either a string or an array or strings.");
+		assert.isString(columnOrColumns, "'dropSeries' expected either a string or an array or strings.");
 
 		columnOrColumns = [columnOrColumns]; // Convert to array for coding convenience.
 	}
@@ -25735,8 +27088,9 @@ DataFrame.prototype.dropColumn = function (columnOrColumns) {
  * @param {string} columnName - The name of the column to add or replace.
  * @param {array|column} data - Array of data or column that contains data.
  */
-DataFrame.prototype.setSeries = function (columnName, data) { //todo: should allow column name or index.
-	assert.isString(columnName, "Expected 'columnName' parameter to 'setSeries' to be a string.");
+DataFrame.prototype.setSeries = function (columnName, data) { //todo
+
+	assert.isString(columnName, "Expected 'columnName' parameter to 'setSeries' function to be a string that specifies the column to set or replace.");
 
 	var self = this;
 
@@ -25871,11 +27225,11 @@ DataFrame.prototype.slice = function (startIndexOrStartPredicate, endIndexOrEndP
 };
 
 /**
- * Set a column as the index of the data frame.
+ * Set a named column as the index of the data-frame.
  *
- * @param {string|int} columnNameOrIndex - Name or index of the column to set as the index.
+ * @param {string} columnName - Name or index of the column to set as the index.
  */
-DataFrame.prototype.setIndex = function (columnNameOrIndex) {
+DataFrame.prototype.setIndex = function (columnName) {
 
 	var self = this;
 	return new DataFrame({
@@ -25883,9 +27237,9 @@ DataFrame.prototype.setIndex = function (columnNameOrIndex) {
 			return self.getColumnNames();
 		},
 		iterable: function () {
-			return new MultiIterator([
+			return new PairIterator(
 				new SelectIterator(
-					self.getSeries(columnNameOrIndex).getIterator(),
+					self.getSeries(columnName).getIterator(),
 					function (pair) {
 						return pair[1];
 					}
@@ -25895,8 +27249,8 @@ DataFrame.prototype.setIndex = function (columnNameOrIndex) {
 					function (pair) {
 						return pair[1];
 					}
-				),
-			]);
+				)
+			);
 		},
 	});
 };
@@ -26176,15 +27530,15 @@ DataFrame.prototype.renameColumns = function (newColumnNames) {
 /*
  * Create a new data frame with a single column renamed.
  * 
- * @param {string|int} columnNameOrIndex - Specifies the column to rename.
+ * @param {string} columnName - Specifies the column to rename.
  * @param {string} newColumnName - The new name for the specified column.
  */
-DataFrame.prototype.renameColumn = function (columnNameOrIndex, newColumnName) {
+DataFrame.prototype.renameColumn = function (columnName, newColumnName) {
 
 	var self = this;
-	var columnIndex = parseColumnNameOrIndexToIndex(self, columnNameOrIndex, false);
+	var columnIndex = self.getColumnIndex(columnName);
 	if (columnIndex === -1) {
-		return self;
+		return self; // No column to be renamed.
 	}
 
 	assert.isString(newColumnName, "Expected 'newColumnName' parameter to 'renameColumn' to be a string.");
@@ -26210,11 +27564,12 @@ DataFrame.prototype.toValues = function () {
 
 	while (iterator.moveNext()) {
 		var curRow = iterator.getCurrent()[1];
-		var asArray = E.from(columnNames)
-			.select(function (columnName) {
-				return curRow[columnName];
-			})
-			.toArray();
+
+		var asArray = [];
+		for (var columnIndex = 0; columnIndex < columnNames.length; ++columnIndex) {
+			asArray.push(curRow[columnNames[columnIndex]]);
+		}
+
 		values.push(asArray);
 	}
 
@@ -26301,11 +27656,13 @@ DataFrame.prototype.toPairs = function () {
 DataFrame.prototype.bake = function () {
 
 	var self = this;
+	var pairs = self.toPairs();
 	return new DataFrame({
-			columnNames: self.getColumnNames(),
-			rows: self.toValues(),
-			index: self.getIndex().bake(),
-		});
+		columnNames: self.getColumnNames(),
+		iterable: function () {
+			return new ArrayIterator(pairs);
+		},
+	});
 };
 
 /**
@@ -26327,37 +27684,30 @@ DataFrame.prototype.count = function () {
 };
 
 /**
- * Transform a column. This is equivalent to extracting a column, calling 'select' on it,
+ * Transform one or more columns. This is equivalent to extracting a column, calling 'select' on it,
  * then plugging it back in as the same column.
  *
- * @param {string} columnName - Name of the column to transform.
- * @param {function} selector - Selector function that transforms each row to a different data structure.
+ * @param {object} columnSelectors - Object with field names for each column to be transformed. Each field you be a selector that transforms that column.
  * 
  */
-DataFrame.prototype.transformColumn = function (columnNameOrColumnNames, selector) { //todo: this should support 'column name or index'.
+DataFrame.prototype.transformSeries = function (columnSelectors) {
 
-	var self = this; //todo: make this lazy.
+	assert.isObject(columnSelectors, "Expected 'columnSelectors' parameter of 'transformSeries' function to be an object. Field names should specify columns to transform. Field values should be selector functions that specify the transformation for each column.");
 
-	if (Object.isObject(columnNameOrColumnNames)) {
-		var columnNames = Object.keys(columnNameOrColumnNames)
-		return E.from(columnNames)
-			.aggregate(self, function (prevDataFrame, columnName) {
-				var columnSelector = columnNameOrColumnNames[columnName];
-				return prevDataFrame.transformColumn(columnName, columnSelector);
-			});
-	}
-	else {
-		assert.isString(columnNameOrColumnNames, "Expected 'columnNameOrColumnNames' parameter to 'transformColumn' to be a string or object.");
-		assert.isFunction(selector, "Expected 'selector' parameter to 'transformColumn' to be a function.");
-
-		var columnName = columnNameOrColumnNames;
-		if (!self.hasSeries(columnName)) {
-			return self;
-		}
-
-		var transformedSeries = self.getSeries(columnName).select(selector);
-		return self.setSeries(columnName, transformedSeries);
-	}
+	var self = this;
+	return E.from(Object.keys(columnSelectors))
+		.aggregate(self, function (prevDataFrame, columnName) {
+			if (prevDataFrame.hasSeries(columnName)) {
+				return prevDataFrame.setSeries(
+					columnName,
+					prevDataFrame.getSeries(columnName)
+						.select(columnSelectors[columnName])
+				);			
+			}
+			else {
+				return self;
+			}	
+		});
 };
 
 /**
@@ -26378,47 +27728,32 @@ DataFrame.prototype.window = function (period, selector) {
 
 	var self = this;
 
-	//todo: make this properly lazy
-
-	var index = self.getIndex().toValues();
-	var values = self.toValues();
-
-	if (values.length == 0) {
-		return new Series();
-	}
-
-	var numWindows = Math.ceil(values.length/period);
-	if (numWindows == 0) {
-		return new Series();
-	}
-	
-	//todo: make this properly lazy
-
-	var newIndexAndValues = E.range(0, numWindows)
-		.select(function (windowIndex) {
-			var _window = new DataFrame({
-				iterable: function () {
-					return new TakeIterator(
-						new SkipIterator(
-							self.getIterator(), 
-							windowIndex*period
-						), 
-						period
-					);
-				},
-			});
-			var selectorOutput = selector(_window, windowIndex);
-			assert.isArray(selectorOutput, "Expected output from 'window' selector to be an array.");
-			assert(selectorOutput.length === 2, "Expected output from 'window' selector to be an array with 2 elements: index and value.");
-			return selectorOutput;
-		})
-		.toArray();
-
 	return new Series({
 		iterable: function () {
-			return new ArrayIterator(newIndexAndValues);
-		},
-	});
+
+			var curOutput = undefined;
+			var done = false;
+			var windowIndex = 0;
+
+			return {
+				moveNext: function () {
+					var window = self.skip(windowIndex*period).take(period);
+					if (window.count() === 0) {
+						return false; //todo: should use .any() function.
+					}
+
+					curOutput = selector(window, windowIndex);
+					++windowIndex;
+					return true;
+				},
+
+				getCurrent: function () {
+					return curOutput;
+				},
+			};
+
+		}
+	});	
 };
 
 /** 
@@ -26439,36 +27774,31 @@ DataFrame.prototype.rollingWindow = function (period, selector) {
 
 	var self = this;
 
-	//todo: make this properly lazy
-
-	var index = self.getIndex().toValues();
-	var values = self.toObjects();
-
-	if (values.length == 0) {
-		return new Series();
-	}
-
-	var newIndexAndValues = E.range(0, values.length-period+1)
-		.select(function (windowIndex) {
-			var _window = new DataFrame({
-					iterable: function () {
-						return new TakeIterator(
-							new SkipIterator(
-								self.getIterator(), 
-								windowIndex
-							), 
-							period
-						);
-					},
-				});
-			return selector(_window, windowIndex);			
-		})
-		.toArray();
-
 	return new Series({
 		iterable: function () {
-			return new ArrayIterator(newIndexAndValues);
-		},
+
+			var curOutput = undefined;
+			var done = false;
+			var windowIndex = 0;
+
+			return {
+				moveNext: function () {
+					var window = self.skip(windowIndex).take(period);
+					if (window.count() < period) {
+						return false;
+					}
+
+					curOutput = selector(window, windowIndex);
+					++windowIndex;
+					return true;
+				},
+
+				getCurrent: function () {
+					return curOutput;
+				},
+			};
+
+		}
 	});
 };
 
@@ -26501,13 +27831,11 @@ DataFrame.prototype.last = function () {
 		throw new Error("No rows in data-frame.");
 	}
 
-	var last = iterator.getCurrent();
-
 	while (iterator.moveNext()) {
-		last = iterator.getCurrent();
+		; // Don't evaluate current item, it's too expensive.
 	}
 
-	return last[1];
+	return iterator.getCurrent()[1]; // Return the last item.
 };
 
 /** 
@@ -26535,9 +27863,9 @@ DataFrame.prototype.reverse = function () {
  *
  * @param {function} selector - Selector function that transforms each row to a new set of columns.
  */
-DataFrame.prototype.generateColumns = function (selector) {
+DataFrame.prototype.generateSeries = function (selector) {
 
-	assert.isFunction(selector, "Expected 'selector' parameter to 'generateColumns' function to be a function.");
+	assert.isFunction(selector, "Expected 'selector' parameter to 'generateSeries' function to be a function.");
 
 	var self = this;
 
@@ -26591,7 +27919,7 @@ DataFrame.prototype.inflateColumn = function (columnNameOrIndex, selector) {
 	var self = this;
 	var dataForge = require('../index');
 
-	return self.zip(  //todo: this shoudn't purge the index.
+	return self.zip(
 		self.getSeries(columnNameOrIndex).inflate(selector),
 		function (row1, row2) {
 			return extend({}, row1, row2); //todo: this be should zip's default operation.
@@ -26636,11 +27964,19 @@ DataFrame.prototype.aggregate = function (seedOrSelector, selector) {
 	var self = this;
 
 	if (Object.isFunction(seedOrSelector) && !selector) {
-		return E.from(self.toObjects()).aggregate(seedOrSelector);		
+		return self.skip(1).aggregate(self.first(), seedOrSelector);
 	}
 	else if (selector) {
 		assert.isFunction(selector, "Expected 'selector' parameter to aggregate to be a function.");
-		return E.from(self.toObjects()).aggregate(seedOrSelector, selector);
+
+		var working = seedOrSelector;
+		var it = self.getIterator();
+		while (it.moveNext()) {
+			var curValue = it.getCurrent()[1];
+			working = selector(working, curValue); //todo: should pass index in here as well.
+		}
+
+		return working;		
 	}
 	else {
 		assert.isObject(seedOrSelector, "Expected 'seed' parameter to aggregate to be an object.");
@@ -26782,8 +28118,134 @@ DataFrame.prototype.bringToBack = function (columnOrColumns) {
 	return self.remapColumns(reorderedColumnNames);
 };
 
+/**
+ * Invoke a callback function for each row in the DataFrame.
+ *
+ * @param {function} callback - The calback to invoke for each row.
+ */
+DataFrame.prototype.forEach = function (callback) {
+	assert.isFunction(callback, "Expected 'callback' parameter to 'forEach' function to be a function.");
+
+	var self = this;
+	var iterator = self.getIterator();
+	validateIterator(iterator);
+
+	while (iterator.moveNext()) {
+		var pair = iterator.getCurrent();
+		callback(pair[1], pair[0]);
+	}
+
+	return self;
+};
+
+/**
+ * Group the data-frame into multiple data-frames on the value defined by the selector.
+ *
+ * @param {function} selector - Function that selects the value to group by.
+ */
+DataFrame.prototype.groupBy = function (selector) {
+	assert.isFunction(selector, "Expected 'selector' parameter to 'groupBy' function to be a function.");
+
+	//todo: make this lazy.
+
+	var self = this;
+	return E.from(self.toPairs())
+		.groupBy(function (pair) {
+			return selector(pair[1], pair[0]);
+		})
+		.select(function (group) {
+			return {
+				key: group.key(),
+				data: new DataFrame({
+					iterable: function () {
+						return new ArrayIterator(group.getSource());
+					},
+				}),
+			};
+		})
+		.toArray();
+};
+
+/**
+ * Determine if the predicate returns truthy for all values.
+ * Returns false as soon as the predicate evaluates to falsy.
+ * Returns true if the predicate returns truthy for all values in the DataFrame.
+ * Returns false if the series is empty.
+ *
+ * @param {function} predicate - Predicate function that receives each value in turn and returns truthy for a match, otherwise falsy.
+ */
+DataFrame.prototype.all = function (predicate) {
+	assert.isFunction(predicate, "Expected 'predicate' parameter to 'all' to be a function.")
+
+	var self = this;
+	var iterator = self.getIterator();
+	validateIterator(iterator);
+
+	var count = 0;
+
+	while (iterator.moveNext()) {
+		var pair = iterator.getCurrent();
+		if (!predicate(pair[1], pair[0])) {
+			return false;
+		}
+
+		++count;
+	}
+
+	return count > 0;
+};
+
+/**
+ * Determine if the predicate returns truthy for any of the values.
+ * Returns true as soon as the predicate returns truthy.
+ * Returns false if the predicate never returns truthy.
+ *
+ * @param {function} predicate - Predicate function that receives each value in turn and returns truthy for a match, otherwise falsy.
+ */
+DataFrame.prototype.any = function (predicate) {
+	assert.isFunction(predicate, "Expected 'predicate' parameter to 'all' to be a function.")
+
+	var self = this;
+	var iterator = self.getIterator();
+	validateIterator(iterator);
+
+	while (iterator.moveNext()) {
+		var pair = iterator.getCurrent();
+		if (predicate(pair[1], pair[0])) {
+			return true;
+		}
+	}
+
+	return false;
+};
+
+/**
+ * Determine if the predicate returns truthy for none of the values.
+ * Returns true for an empty DataFrame.
+ * Returns true if the predicate always returns falsy.
+ * Otherwise returns false.
+ *
+ * @param {function} predicate - Predicate function that receives each value in turn and returns truthy for a match, otherwise falsy.
+ */
+DataFrame.prototype.none = function (predicate) {
+	assert.isFunction(predicate, "Expected 'predicate' parameter to 'all' to be a function.")
+
+	var self = this;
+	var iterator = self.getIterator();
+	validateIterator(iterator);
+
+	while (iterator.moveNext()) {
+		var pair = iterator.getCurrent();
+		if (predicate(pair[1], pair[0])) {
+			return false;
+		}
+	}
+
+	return true;
+};
+
 module.exports = DataFrame;
-},{"../index":6,"../index.js":6,"../src/iterators/count":53,"../src/iterators/empty":54,"../src/iterators/select":57,"../src/iterators/select-many":56,"../src/iterators/take":61,"../src/iterators/take-while":60,"../src/iterators/where":63,"./index":50,"./iterators/array":51,"./iterators/multi":55,"./iterators/skip":59,"./iterators/skip-while":58,"./iterators/validate":62,"./series":64,"./utils":65,"babyparse":7,"chai":8,"easy-table":44,"extend":45,"linq":46}],50:[function(require,module,exports){
+},{"../index":7,"../index.js":7,"../src/iterators/count":54,"../src/iterators/empty":55,"../src/iterators/select":59,"../src/iterators/select-many":58,"../src/iterators/take":63,"../src/iterators/take-while":62,"../src/iterators/where":65,"./index":51,"./iterators/array":52,"./iterators/multi":56,"./iterators/pair":57,"./iterators/skip":61,"./iterators/skip-while":60,"./iterators/validate":64,"./series":66,"./utils":67,"babyparse":9,"chai":10,"easy-table":43,"extend":44,"linq":45}],51:[function(require,module,exports){
 'use strict';
 
 var ArrayIterator = require('./iterators/array');
@@ -27022,23 +28484,25 @@ Index.prototype.tail = function (values) {
 };
 
 module.exports = Index;
-},{"../src/iterators/take":61,"../src/iterators/take-while":60,"./index":50,"./iterators/array":51,"./iterators/skip":59,"./iterators/skip-while":58,"./iterators/validate":62,"chai":8,"linq":46}],51:[function(require,module,exports){
+},{"../src/iterators/take":63,"../src/iterators/take-while":62,"./index":51,"./iterators/array":52,"./iterators/skip":61,"./iterators/skip-while":60,"./iterators/validate":64,"chai":10,"linq":45}],52:[function(require,module,exports){
 'use strict';
-
-var assert = require('chai').assert;
 
 //
 // Data-forge enumerator for iterating a standard JavaScript array.
 //
 var ArrayIterator = function (arr) {
-	assert.isArray(arr);
 
 	var self = this;
 
 	var rowIndex = -1;
 	
 	self.moveNext = function () {
-		return ++rowIndex < arr.length;
+		if (rowIndex < arr.length-1) {
+			++rowIndex;
+			return true;
+		}
+		
+		return false;
 	};
 
 	self.getCurrent = function () {
@@ -27066,24 +28530,15 @@ var ArrayIterator = function (arr) {
 };
 
 module.exports = ArrayIterator;
-},{"chai":8}],52:[function(require,module,exports){
+},{}],53:[function(require,module,exports){
 'use strict';
 
-var assert = require('chai').assert;
 var E = require('linq');
-
-var validateIterator = require('./validate');
-
 
 //
 // An iterator that can step multiple other iterators at once.
 //
 var MultiIterator = function (iterators) {
-	assert.isArray(iterators);
-
-	iterators.forEach(function (iterator) {
-			validateIterator(iterator);
-		});
 
 	var self = this;
 
@@ -27104,10 +28559,11 @@ var MultiIterator = function (iterators) {
 				return true;
 			}
 
-			++curIterator;
-			if (curIterator >= iterators.length) {
+			if (curIterator >= iterators.length-1) {
 				return false;
 			}
+
+			++curIterator;
 		}
 	};
 
@@ -27123,7 +28579,7 @@ var MultiIterator = function (iterators) {
 };
 
 module.exports = MultiIterator;
-},{"./validate":62,"chai":8,"linq":46}],53:[function(require,module,exports){
+},{"linq":45}],54:[function(require,module,exports){
 'use strict';
 
 var CountIterator = function () {
@@ -27149,7 +28605,7 @@ var CountIterator = function () {
 };
 
 module.exports = CountIterator;
-},{}],54:[function(require,module,exports){
+},{}],55:[function(require,module,exports){
 'use strict';
 
 /*
@@ -27171,28 +28627,18 @@ var EmptyIterator = function () {
 };
 
 module.exports = EmptyIterator;
-},{}],55:[function(require,module,exports){
+},{}],56:[function(require,module,exports){
 'use strict';
 
-var assert = require('chai').assert;
 var E = require('linq');
-
-var validateIterator = require('./validate');
-
 
 //
 // An iterator that can step multiple other iterators at once.
 //
 var MultiIterator = function (iterators) {
-	assert.isArray(iterators);
-
-	iterators.forEach(function (iterator) {
-			validateIterator(iterator);
-		});
 
 	var self = this;
-
-	var ok = false;
+	var started = false;
 
 	//
 	// Move all iterators to the next element.
@@ -27200,29 +28646,30 @@ var MultiIterator = function (iterators) {
 	// Completes when first iterator completes.
 	//	
 	self.moveNext = function () {				
+		started = true;
 
 		if (iterators.length > 0) {
-			ok = E.from(iterators)
+			return  E.from(iterators)
 					.select(function (iterator) {
 						return iterator.moveNext();
 					})
 					.all();
 		}
-
-		return ok;
+		else {
+			return false;
+		}
 	};
 
 	self.getCurrent = function () {
-		if (ok) {
-			return E.from(iterators)
-				.select(function (iterator) {
-					return iterator.getCurrent();
-				})
-				.toArray();
-		}
-		else {
+		if (!started) {
 			return undefined;
 		}
+		
+		return E.from(iterators)
+			.select(function (iterator) {
+				return iterator.getCurrent();
+			})
+			.toArray();
 	};
 
 	//
@@ -27241,13 +28688,64 @@ var MultiIterator = function (iterators) {
 };
 
 module.exports = MultiIterator;
-},{"./validate":62,"chai":8,"linq":46}],56:[function(require,module,exports){
+},{"linq":45}],57:[function(require,module,exports){
 'use strict';
 
-var assert = require('chai').assert;
 var E = require('linq');
 
-var validateIterator = require('./validate');
+//
+// An iterator that can step multiple other iterators at once.
+//
+var PairIterator = function (it1, it2) {
+
+	var self = this;
+	var started = false;
+
+	self.moveNext = function () {	
+
+		if (!started) {
+			started = true;
+		}
+
+		if (it1.moveNext() && it2.moveNext()) {
+			return true;
+		}
+
+		return false;
+	};
+
+	self.getCurrent = function () {
+		if (!started) {
+			return undefined;
+		}
+
+		return [
+			it1.getCurrent(),
+			it2.getCurrent(),
+		];
+	};
+
+	//
+	// Bake the iterator into an array.
+	//
+	self.realize = function () {
+
+		var output = [];
+
+		while (self.moveNext()) {
+			output.push(self.getCurrent());
+		}
+
+		return output;
+	};
+};
+
+module.exports = PairIterator;
+},{"linq":45}],58:[function(require,module,exports){
+'use strict';
+
+var E = require('linq');
+
 var ArrayIterator = require('./array');
 var SelectIterator = require('./select');
 
@@ -27257,9 +28755,6 @@ var SelectIterator = require('./select');
 var SelectManyIterator = function (iterator, selector) {
 
 	var self = this;
-
-	validateIterator(iterator);
-	assert.isFunction(selector);
 
 	var expandIterator = new SelectIterator(iterator, selector);
 	var childIterator = null;
@@ -27315,13 +28810,10 @@ var SelectManyIterator = function (iterator, selector) {
 };
 
 module.exports = SelectManyIterator;
-},{"./array":51,"./select":57,"./validate":62,"chai":8,"linq":46}],57:[function(require,module,exports){
+},{"./array":52,"./select":59,"linq":45}],59:[function(require,module,exports){
 'use strict';
 
-var assert = require('chai').assert;
 var E = require('linq');
-
-var validateIterator = require('./validate');
 
 //
 // An iterator that can step multiple other iterators at once.
@@ -27329,10 +28821,6 @@ var validateIterator = require('./validate');
 var SelectIterator = function (iterator, selector) {
 
 	var self = this;
-
-	validateIterator(iterator);
-	assert.isFunction(selector);
-
 	var i = -1; //todo: test this.
 
 	self.moveNext = function () {				
@@ -27360,19 +28848,13 @@ var SelectIterator = function (iterator, selector) {
 };
 
 module.exports = SelectIterator;
-},{"./validate":62,"chai":8,"linq":46}],58:[function(require,module,exports){
+},{"linq":45}],60:[function(require,module,exports){
 'use strict';
-
-var assert = require('chai').assert;
-var validateIterator = require('./validate');
 
 //
 // Iterator that skips elements while the predicate returns true.
 //
 var SkipWhileIterator = function (iterator, predicate) {
-
-	validateIterator(iterator);
-	assert.isFunction(predicate);
 
 	var self = this;
 	var skipped = false;
@@ -27403,19 +28885,13 @@ var SkipWhileIterator = function (iterator, predicate) {
 };
 
 module.exports = SkipWhileIterator;
-},{"./validate":62,"chai":8}],59:[function(require,module,exports){
+},{}],61:[function(require,module,exports){
 'use strict';
-
-var assert = require('chai').assert;
-var validateIterator = require('./validate');
 
 //
 // Data-forge enumerator for iterating a standard JavaScript array.
 //
 var SkipIterator = function (iterator, skipAmount) {
-
-	validateIterator(iterator);
-	assert.isNumber(skipAmount);
 
 	var self = this;
 
@@ -27433,19 +28909,13 @@ var SkipIterator = function (iterator, skipAmount) {
 };
 
 module.exports = SkipIterator;
-},{"./validate":62,"chai":8}],60:[function(require,module,exports){
+},{}],62:[function(require,module,exports){
 'use strict';
-
-var assert = require('chai').assert;
-var validateIterator = require('./validate');
 
 //
 // Iterator that takes elements while the predicate returns true.
 //
 var TakeWhileIterator = function (iterator, predicate) {
-
-	validateIterator(iterator);
-	assert.isFunction(predicate);
 
 	var self = this;
 	var taking = true;
@@ -27474,19 +28944,13 @@ var TakeWhileIterator = function (iterator, predicate) {
 };
 
 module.exports = TakeWhileIterator;
-},{"./validate":62,"chai":8}],61:[function(require,module,exports){
+},{}],63:[function(require,module,exports){
 'use strict';
-
-var assert = require('chai').assert;
-var validateIterator = require('./validate');
 
 //
 // Data-forge enumerator for iterating a standard JavaScript array.
 //
 var TakeIterator = function (iterator, takeAmount) {
-
-	validateIterator(iterator);
-	assert.isNumber(takeAmount);
 
 	var self = this;
 
@@ -27504,7 +28968,7 @@ var TakeIterator = function (iterator, takeAmount) {
 };
 
 module.exports = TakeIterator;
-},{"./validate":62,"chai":8}],62:[function(require,module,exports){
+},{}],64:[function(require,module,exports){
 'use strict';
 
 var assert = require('chai').assert;
@@ -27517,19 +28981,13 @@ module.exports = function (iterator) {
 	assert.isFunction(iterator.moveNext, "Expected iterator to have function 'moveNext'.");
 	assert.isFunction(iterator.getCurrent, "Expected iterator to have function 'getCurrent'.");
 };
-},{"chai":8}],63:[function(require,module,exports){
+},{"chai":10}],65:[function(require,module,exports){
 'use strict';
-
-var assert = require('chai').assert;
-var validateIterator = require('./validate');
 
 //
 // Iterate that filters elements based on a predicate.
 //
 var WhereIterator = function (iterator, predicate) {
-
-	validateIterator(iterator);
-	assert.isFunction(predicate);
 
 	var self = this;
 	
@@ -27566,7 +29024,7 @@ var WhereIterator = function (iterator, predicate) {
 };
 
 module.exports = WhereIterator;
-},{"./validate":62,"chai":8}],64:[function(require,module,exports){
+},{}],66:[function(require,module,exports){
 'use strict';
 
 // 
@@ -27585,7 +29043,7 @@ var TakeIterator = require('../src/iterators/take');
 var TakeWhileIterator = require('../src/iterators/take-while');
 var SelectIterator = require('../src/iterators/select');
 var SelectManyIterator = require('../src/iterators/select-many');
-var MultiIterator = require('../src/iterators/multi');
+var PairIterator = require('../src/iterators/pair');
 var WhereIterator = require('../src/iterators/where');
 var CountIterator = require('../src/iterators/count');
 var EmptyIterator = require('../src/iterators/empty');
@@ -27598,7 +29056,7 @@ var Series = function (config) {
 	var self = this;
 
 	if (!config) {
-		self._iterable = function () {
+		self.getIterator = function () {
 			return new EmptyIterator();
 		};
 		return;
@@ -27607,66 +29065,71 @@ var Series = function (config) {
 	if (config && config.iterable) {
 		assert.isFunction(config.iterable);
 
-		self._iterable = config.iterable;
+		self.getIterator = config.iterable;
 		return;
 	}
-
-	var index;
-	var values;
 
 	if (!config.values) {
 		throw new Error("Expected 'values' field to be set on 'config' parameter to Series constructor.");
 	}
 
-	if (Object.isFunction(config.values)) {
-		values = config.values;
+	if (!Object.isFunction(config.values)) {
+		assert.isArray(config.values, "Expected 'values' field of 'config' parameter to Series constructor be an array of values or a function that returns an iterator.");
 	}
-	else {
-		assert.isArray(config.values, "Expected 'values' field of 'config' parameter to Series constructor be an array or an iterable.");
-
-		var valuesArray = config.values;
-
-		values = function () {
-			return new ArrayIterator(valuesArray);
-		};
-	}		
 
 	if (config.index) {
-		var inputIndex = config.index;
-		if (Object.isArray(inputIndex)) {
+		if (!Object.isArray(config.index)) {
+			assert.isObject(config.index, "Expected 'index' field of 'config' parameter to Series constructor to be an array of values or an Index object.");
+		}
+	}
 
-			index = function () {
-				return new ArrayIterator(inputIndex);
+	var values = config.values;
+
+	if (!config.index) {
+		// Index not supplied.
+		// Generate an index.
+		if (Object.isFunction(values)) {
+			self.getIterator = function () {
+				return new PairIterator(new CountIterator(), values());
 			};
 		}
 		else {
-			assert.isObject(inputIndex, "Expected 'index' parameter to Series constructor to be an object.");
-
-			index = function () {
-				return inputIndex.getIterator();
+			self.getIterator = function () {
+				return new PairIterator(new CountIterator(), new ArrayIterator(values));
 			};
-		} 
+		}
+		return;
+	}
+
+	var index = config.index;
+
+	if (Object.isArray(index)) {
+		if (Object.isFunction(values)) {
+			return new PairIterator(new ArrayIterator(index), values());
+		}
+		else {
+			self.getIterator = function () {
+				return new PairIterator(new ArrayIterator(index), new ArrayIterator(values));
+			};			
+		}
 	}
 	else {
-		index = function () {
-			return new CountIterator();
-		};
+		if (Object.isFunction(values)) {
+			return new PairIterator(index.getIterator(), values());
+		}
+		else {
+			self.getIterator = function () {
+				return new PairIterator(index.getIterator(), new ArrayIterator(values));
+			};			
+		}
 	}
-
-	assert.isFunction(values);
-	assert.isFunction(index);
-
-	self._iterable = function () {
-		return new MultiIterator([index(), values()]);
-	};
 };
 
 /**
  * Get an iterator for the iterating the values of the series.
  */
 Series.prototype.getIterator = function () {
-	var self = this;
-	return self._iterable();
+	return new EmptyIterator(); // This is redefined by the constructor.
 };
 
 /**
@@ -27675,18 +29138,12 @@ Series.prototype.getIterator = function () {
 Series.prototype.getIndex = function () {
 	var self = this;
 	return new Index(function () {		
-		var iterator = self.getIterator();
-		var i = -1;
-		return { //todo: can just use a select iterator here.
-			moveNext: function () {
-				++i;
-				return iterator.moveNext();
-			},
-
-			getCurrent: function () {
-				return iterator.getCurrent()[0];
-			},
-		};
+		return new SelectIterator(
+			self.getIterator(),
+			function (pair) {
+				return pair[0]; // Extract index.
+			}
+		);
 	});
 };
 
@@ -27836,7 +29293,7 @@ Series.prototype.select = function (selector) {
  * @param {function} selector - Selector function that transforms each value to a different data structure.
  */
 Series.prototype.selectMany = function (selector) {
-	assert.isFunction(selector, "Expected 'selector' parameter to 'selectMany' function to be a function.");
+	assert.isFunction(selector, "Expected 'selector' parameter to 'Series.selectMany' function to be a function.");
 
 	var self = this;
 
@@ -27844,11 +29301,17 @@ Series.prototype.selectMany = function (selector) {
 		iterable: function () {
 			return new SelectManyIterator(self.getIterator(), 
 				function (pair) {
-					return E.from(selector(pair[1]))
-						.select(function (newValue) {
-							return [pair[0], newValue];
-						})
-						.toArray();
+					var newValues = selector(pair[1]);
+					if (!Object.isArray(newValues)) {
+						throw new Error("Expected return value from 'Series.selectMany' selector to be an array, each item in the array represents a new value in the resulting series.");
+					}
+
+					var newPairs = [];
+					for (var newValueIndex = 0; newValueIndex < newValues.length; ++newValueIndex) {
+						newPairs.push([pair[0], newValues[newValueIndex]]);
+					}
+
+					return newPairs;
 				}
 			);
 		},
@@ -28075,41 +29538,31 @@ Series.prototype.window = function (period, selector) {
 
 	var self = this;
 
-	//todo: make this properly lazy
-
-	var index = self.getIndex().toValues();
-	var values = self.toValues();
-
-	if (values.length == 0) {
-		return new Series();
-	}
-
-	var numWindows = Math.ceil(values.length/period);
-	if (numWindows == 0) {
-		return new Series();
-	}
-	
-	var newIndexAndValues = E.range(0, numWindows)
-		.select(function (windowIndex) {
-			var _window = new Series({
-					iterable: function () {
-						return new TakeIterator(
-							new SkipIterator(
-								self.getIterator(), 
-								windowIndex*period
-							), 
-							period
-						);
-					},
-				});			
-			return selector(_window, windowIndex);
-		})
-		.toArray();
-
 	return new Series({
 		iterable: function () {
-			return new ArrayIterator(newIndexAndValues);
-		},
+
+			var curOutput = undefined;
+			var done = false;
+			var windowIndex = 0;
+
+			return {
+				moveNext: function () {
+					var window = self.skip(windowIndex*period).take(period);
+					if (window.count() === 0) {
+						return false; //todo: should use .any() function.
+					}
+
+					curOutput = selector(window, windowIndex);
+					++windowIndex;
+					return true;
+				},
+
+				getCurrent: function () {
+					return curOutput;
+				},
+			};
+
+		}
 	});	
 };
 
@@ -28131,30 +29584,31 @@ Series.prototype.rollingWindow = function (period, selector) {
 
 	var self = this;
 
-	//todo: make this properly lazy
-
-	var index = self.getIndex().toValues();
-	var values = self.toValues();
-
-	if (values.length == 0) {
-		return new Series();
-	}
-
-	var newIndexAndValues = E.range(0, values.length-period+1)
-		.select(function (windowIndex) {
-			var _window = new Series({
-					iterable: function () {
-						return new TakeIterator(new SkipIterator(self.getIterator(), windowIndex), period);
-					},
-				});			
-			return selector(_window, windowIndex);
-		})
-		.toArray();
-
 	return new Series({
 		iterable: function () {
-			return new ArrayIterator(newIndexAndValues);
-		},
+
+			var curOutput = undefined;
+			var done = false;
+			var windowIndex = 0;
+
+			return {
+				moveNext: function () {
+					var window = self.skip(windowIndex).take(period);
+					if (window.count() < period) {
+						return false;
+					}
+
+					curOutput = selector(window, windowIndex);
+					++windowIndex;
+					return true;
+				},
+
+				getCurrent: function () {
+					return curOutput;
+				},
+			};
+
+		}
 	});
 };
 
@@ -28495,10 +29949,11 @@ Series.prototype.toValues = function () {
 Series.prototype.bake = function () {
 
 	var self = this;
-
-	return new Series({ 
-		values: self.toValues(), 
-		index: self.getIndex().bake(),
+	var pairs = self.toPairs();
+	return new Series({
+		iterable: function () {
+			return new ArrayIterator(pairs);
+		},
 	});
 };
 
@@ -28563,13 +30018,11 @@ Series.prototype.last = function () {
 		throw new Error("No rows in series.");
 	}
 
-	var last = iterator.getCurrent();
-
 	while (iterator.moveNext()) {
-		last = iterator.getCurrent();
+		; // Don't evaluate each item, it's too expensive.
 	}
 
-	return last[1];
+	return iterator.getCurrent()[1]; // Just evaluate the last item of the iterator.
 };
 
 /** 
@@ -28643,7 +30096,6 @@ Series.prototype.tail = function (values) {
 Series.prototype.sum = function () {
 
 	var self = this;
-	var self = this;
 	return self.aggregate(
 		function (prev, value) {
 			return prev + value;
@@ -28697,15 +30149,19 @@ Series.prototype.aggregate = function (seedOrSelector, selector) {
 	var self = this;
 
 	if (Object.isFunction(seedOrSelector) && !selector) {
-
-		return E.from(self.skip(1).toValues())
-			.aggregate(self.first(), seedOrSelector);
+		return self.skip(1).aggregate(self.first(), seedOrSelector);
 	}
 	else {
 		assert.isFunction(selector, "Expected 'selector' parameter to aggregate to be a function.");
 
-		return E.from(self.toValues())
-			.aggregate(seedOrSelector, selector);
+		var working = seedOrSelector;
+		var it = self.getIterator();
+		while (it.moveNext()) {
+			var curValue = it.getCurrent()[1];
+			working = selector(working, curValue); //todo: should pass index in here as well.
+		}
+
+		return working;
 	}
 };
 
@@ -28757,8 +30213,106 @@ Series.prototype.zip = function () {
 		});
 };
 
+/**
+ * Invoke a callback function for each value in the series.
+ *
+ * @param {function} callback - The calback to invoke for each value.
+ */
+Series.prototype.forEach = function (callback) {
+	assert.isFunction(callback, "Expected 'callback' parameter to 'forEach' function to be a function.");
+
+	var self = this;
+	var iterator = self.getIterator();
+	validateIterator(iterator);
+
+	while (iterator.moveNext()) {
+		var pair = iterator.getCurrent();
+		callback(pair[1], pair[0]);
+	}
+
+	return self;
+};/**
+ * Determine if the predicate returns truthy for all values.
+ * Returns false as soon as the predicate evaluates to falsy.
+ * Returns true if the predicate returns truthy for all values in the Series.
+ * Returns false if the series is empty.
+ *
+ * @param {function} predicate - Predicate function that receives each value in turn and returns truthy for a match, otherwise falsy.
+ */
+Series.prototype.all = function (predicate) {
+	assert.isFunction(predicate, "Expected 'predicate' parameter to 'all' to be a function.")
+
+	var self = this;
+	var iterator = self.getIterator();
+	validateIterator(iterator);
+
+	var count = 0;
+
+	while (iterator.moveNext()) {
+		var pair = iterator.getCurrent();
+		if (!predicate(pair[1], pair[0])) {
+			return false;
+		}
+
+		++count;
+	}
+
+	return count > 0;
+};
+
+/**
+ * Determine if the predicate returns truthy for any of the values.
+ * Returns true as soon as the predicate returns truthy.
+ * Returns false if the predicate never returns truthy.
+ *
+ * @param {function} predicate - Predicate function that receives each value in turn and returns truthy for a match, otherwise falsy.
+ */
+Series.prototype.any = function (predicate) {
+	assert.isFunction(predicate, "Expected 'predicate' parameter to 'all' to be a function.")
+
+	var self = this;
+	var iterator = self.getIterator();
+	validateIterator(iterator);
+
+	while (iterator.moveNext()) {
+		var pair = iterator.getCurrent();
+		if (predicate(pair[1], pair[0])) {
+			return true;
+		}
+	}
+
+	return false;
+};
+
+/**
+ * Determine if the predicate returns truthy for none of the values.
+ * Returns true for an empty Series.
+ * Returns true if the predicate always returns falsy.
+ * Otherwise returns false.
+ *
+ * @param {function} predicate - Predicate function that receives each value in turn and returns truthy for a match, otherwise falsy.
+ */
+Series.prototype.none = function (predicate) {
+	assert.isFunction(predicate, "Expected 'predicate' parameter to 'all' to be a function.")
+
+	var self = this;
+	var iterator = self.getIterator();
+	validateIterator(iterator);
+
+	while (iterator.moveNext()) {
+		var pair = iterator.getCurrent();
+		if (predicate(pair[1], pair[0])) {
+			return false;
+		}
+	}
+
+	return true;
+};
+
+
+
 module.exports = Series;
-},{"../index.js":6,"../src/iterators/count":53,"../src/iterators/empty":54,"../src/iterators/multi":55,"../src/iterators/select":57,"../src/iterators/select-many":56,"../src/iterators/take":61,"../src/iterators/take-while":60,"../src/iterators/where":63,"./dataframe":49,"./index":50,"./iterators/array":51,"./iterators/skip":59,"./iterators/skip-while":58,"./iterators/validate":62,"chai":8,"easy-table":44,"linq":46,"moment":47}],65:[function(require,module,exports){
+},{"../index.js":7,"../src/iterators/count":54,"../src/iterators/empty":55,"../src/iterators/pair":57,"../src/iterators/select":59,"../src/iterators/select-many":58,"../src/iterators/take":63,"../src/iterators/take-while":62,"../src/iterators/where":65,"./dataframe":50,"./index":51,"./iterators/array":52,"./iterators/skip":61,"./iterators/skip-while":60,"./iterators/validate":64,"chai":10,"easy-table":43,"linq":45,"moment":46}],67:[function(require,module,exports){
 'use strict';
 
 var E = require('linq');
@@ -28776,4 +30330,4 @@ module.exports = {
 	},
 
 };
-},{"linq":46}]},{},[5]);
+},{"linq":45}]},{},[6]);

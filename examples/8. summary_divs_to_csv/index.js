@@ -2,15 +2,17 @@
 
 var fs = require('fs');
 var dataForge = require("../../index.js");
+var moment = require('moment');
+var E = require('linq');
 
 //
 // Summarise dividends by year.
 //
 var summarizeDividends = function (dataFrame) {
 
-	return dataFrame
+	var grouped = dataFrame
 		.groupBy(function (row) {
-			return row.exDate.getYear(); // Group by year.
+			return moment(row['Ex Date'], 'dd-mmm-YYYY').toDate().getYear(); // Group by year.
 		})
 		.select(function (dividendsByYear) {
 			return dividendsByYear

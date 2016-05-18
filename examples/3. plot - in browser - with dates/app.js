@@ -7,7 +7,7 @@ $(function() {
 	//
 	var plot = function (id, indexColumnName, dataFrame) {
 
-		var remainingColumnNames = dataFrame.dropColumn(indexColumnName).getColumnNames();
+		var remainingColumnNames = dataFrame.dropSeries(indexColumnName).getColumnNames();
 		var flotSeries = E.from(remainingColumnNames)
 			.select(function (columnName) {
 				var seriesData = dataFrame
