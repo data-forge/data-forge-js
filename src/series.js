@@ -253,7 +253,7 @@ Series.prototype.select = function (selector) {
 		iterable: function () {
 			return new SelectIterator(self.getIterator(), 
 				function (pair) {
-					return [pair[0], selector(pair[1])];
+					return [pair[0], selector(pair[1], pair[0])];
 				}
 			);
 		},		
