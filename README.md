@@ -596,7 +596,7 @@ There is a [Code Project article](http://www.codeproject.com/Articles/1069489/Hi
 An data-frame can be transformed using the [LINQ](https://en.wikipedia.org/wiki/Language_Integrated_Query)-style [`select`](http://www.dotnetperls.com/select) function:
 
 	var transformedDataFrame = sourceDataFrame
-		.select(function (row) {
+		.select(function (row, index) {
 			return {
 				NewColumn: row.OldColumn * 2,	// <-- Transform existing column to create a new column.
 				AnotherNewColumn: rand(0, 100)	// <-- Create a new column (in this cause just use random data).
@@ -609,6 +609,8 @@ This produces an entirely new data-frame. However the new data-frame has the sam
 
 The more advanced [`selectMany`](http://www.dotnetperls.com/selectmany) function is also available.
 
+Note: `select` and `selectMany` are also passed the index for each row.
+
 Note: Data-frames are immutable, the source data-frame remains unmodified.
 
 ## Series transformation
@@ -617,7 +619,7 @@ Series can be transformed using `select`:
 
 	var oldSeries = df.getSeries("Some-Column");
 	var newSeries = oldSeries
-		.select(function (value) {
+		.select(function (value, index) {
 			// Apply a transformation to each value in the column.
 			return transform(value); 	
 		});	
@@ -626,12 +628,14 @@ Series can be transformed using `select`:
 
 The source index is preserved to the transformed series.
 
+Note: `select` and `selectMany` are also passed the index for each value.
+
 Note: Series are immutable, the original series is unmodified.
 
 Data-Frame offers a convenience function `transformSeries` for when you want to extract, transform and plug back in one or more series at once. For example to simplify the previous code example:
 
 	var newDf = df.transformSeries({
-		Some-Column: function (value) {
+		Some-Column: function (value, index) {
 			// Apply a transformation to each value in the column.
 			return transform(value); 	
 		},
