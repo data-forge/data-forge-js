@@ -1241,7 +1241,7 @@ Series.prototype.all = function (predicate) {
  * @param {function} predicate - Predicate function that receives each value in turn and returns truthy for a match, otherwise falsy.
  */
 Series.prototype.any = function (predicate) {
-	assert.isFunction(predicate, "Expected 'predicate' parameter to 'all' to be a function.")
+	assert.isFunction(predicate, "Expected 'predicate' parameter to 'any' to be a function.")
 
 	var self = this;
 	var iterator = self.getIterator();
@@ -1266,7 +1266,7 @@ Series.prototype.any = function (predicate) {
  * @param {function} predicate - Predicate function that receives each value in turn and returns truthy for a match, otherwise falsy.
  */
 Series.prototype.none = function (predicate) {
-	assert.isFunction(predicate, "Expected 'predicate' parameter to 'all' to be a function.")
+	assert.isFunction(predicate, "Expected 'predicate' parameter to 'none' to be a function.")
 
 	var self = this;
 	var iterator = self.getIterator();
@@ -1282,6 +1282,76 @@ Series.prototype.none = function (predicate) {
 	return true;
 };
 
+/**
+ * Collapse a group of sequential values and produce a new series where duplicates are eliminated.
+ * The selector function must return the index to use in the new series.
+ *
+ * @param {function} indexSelector - Selects the index for a collapsed group of values.
+ */
+Series.prototype.collapseSequentialDuplicates = function (outputSelector) {
+	assert.isFunction(outputSelector, "Expected 'outputSelector' parameter to 'collapseSequentialDuplicates' to be a function.")
 
+	var self = this;
+
+	//todo: make this lazy.
+
+	/* todo: Want to zip here, when zip can specify the index. 
+
+	series.zip(series.skip(1), function (prev, next) { 
+		});
+
+	*/
+
+	var input = self.toPairs();
+
+	var output = [];
+
+	if (input.length > 0) {
+
+		var startIndex = 0;
+		var takeAmount = 1;
+
+		var prevPair = input[0]; // 1st pair.
+
+		for (var i = 1; i < input.length; ++i) {
+
+			var curPair = input[i];
+			
+			if (curPair[1] !== prevPair[1]) {
+				// Flush.
+				var outputPair = outputSelector(self.skip(startIndex).take(takeAmount));
+				output.push(outputPair);
+
+				startIndex = i;
+				takeAmount = 1;
+			}
+			else {
+				++takeAmount;
+			}
+
+			prevPair = curPair;
+		}
+
+		if (takeAmount > 0) {
+			var outputPair = outputSelector(self.skip(startIndex).take(takeAmount));
+			output.push(outputPair);			
+		}
+	}
+
+	return new Series({
+			values: E.from(output)
+				.select(function (pair) {
+					return pair[1];
+				})
+				.toArray(),
+			index: new Index(
+				E.from(output)
+					.select(function (pair) {
+						return pair[0];
+					})
+					.toArray()
+			)
+	});
+};
 
 module.exports = Series;
