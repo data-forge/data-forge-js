@@ -1222,5 +1222,43 @@ describe('Series', function () {
 			[9, 7],
 		]);
 	});
+
+	it('can collapse duplicate items and take first index', function () {
+
+		var series = new Series({ 
+			index:  [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+			values: [1, 1, 2, 1, 1, 2, 3, 4, 3, 3],
+		});
+
+		var collapsed = series.distinct(function (window) {
+				return [window.getIndex().first(), window.first()];
+			});
+
+		expect(collapsed.toPairs()).to.eql([
+			[0, 1],
+			[2, 2],
+			[6, 3],
+			[7, 4],
+		]);
+	});
+
+	it('can collapse duplicate items and take last index', function () {
+
+		var series = new Series({ 
+			index:  [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+			values: [1, 1, 2, 1, 1, 2, 3, 4, 3, 3],
+		});
+
+		var collapsed = series.distinct(function (window) {
+				return [window.getIndex().last(), window.first()];
+			});
+
+		expect(collapsed.toPairs()).to.eql([
+			[4, 1],
+			[5, 2],
+			[9, 3],
+			[7, 4],
+		]);
+	});
 });
 
