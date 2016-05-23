@@ -1288,8 +1288,8 @@ Series.prototype.none = function (predicate) {
  *
  * @param {function} indexSelector - Selects the index for a collapsed group of values.
  */
-Series.prototype.collapseSequentialDuplicates = function (outputSelector) {
-	assert.isFunction(outputSelector, "Expected 'outputSelector' parameter to 'collapseSequentialDuplicates' to be a function.")
+Series.prototype.sequentialDistinct = function (outputSelector) {
+	assert.isFunction(outputSelector, "Expected 'outputSelector' parameter to 'sequentialDistinct' to be a function.")
 
 	var self = this;
 

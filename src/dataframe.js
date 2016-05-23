@@ -2060,9 +2060,9 @@ DataFrame.prototype.none = function (predicate) {
  * @param {function} valueSelector - Selects the value used to compare for duplicates.
  * @param {function} outputSelector - Selects the index and value for a collapsed group of rows.
  */
-DataFrame.prototype.collapseSequentialDuplicates = function (valueSelector, outputSelector) {
-	assert.isFunction(valueSelector, "Expected 'valueSelector' parameter to 'collapseSequentialDuplicates' to be a function.")
-	assert.isFunction(outputSelector, "Expected 'outputSelector' parameter to 'collapseSequentialDuplicates' to be a function.")
+DataFrame.prototype.sequentialDistinct = function (valueSelector, outputSelector) {
+	assert.isFunction(valueSelector, "Expected 'valueSelector' parameter to 'sequentialDistinct' to be a function.")
+	assert.isFunction(outputSelector, "Expected 'outputSelector' parameter to 'sequentialDistinct' to be a function.")
 
 	var self = this;
 

@@ -2872,7 +2872,7 @@ describe('DataFrame', function () {
 			index: [0, 1, 2, 3, 4, 5, 6, 7],
 		});
 
-		var collapsed = df.collapseSequentialDuplicates(
+		var collapsed = df.sequentialDistinct(
 			function (row, index) {
 				return row.c2;
 			},
@@ -2911,7 +2911,7 @@ describe('DataFrame', function () {
 			index: [0, 1, 2, 3, 4, 5, 6, 7],
 		});
 
-		var collapsed = df.collapseSequentialDuplicates(
+		var collapsed = df.sequentialDistinct(
 			function (row, index) {
 				return row.c2;
 			},
