@@ -2066,69 +2066,12 @@ DataFrame.prototype.sequentialDistinct = function (valueSelector, outputSelector
 
 	var self = this;
 
-	//todo: make this lazy.
-
-	/* todo: Want to zip here, when zip can specify the index. 
-
-	series.zip(series.skip(1), function (prev, next) { 
-		});
-
-	*/
-
-	var input = self.toPairs();
-
-	var output = [];
-
-	if (input.length > 0) {
-
-		var startIndex = 0;
-		var takeAmount = 1;
-
-		var prevPair = input[0]; // 1st pair.
-		var prevValue = valueSelector(prevPair[1], prevPair[0]);
-
-		for (var i = 1; i < input.length; ++i) {
-
-			var curPair = input[i];
-			var curValue = valueSelector(curPair[1], curPair[0]);
-			
-			if (curValue !== prevValue) {
-
-				// Flush.
-				var outputPair = outputSelector(self.skip(startIndex).take(takeAmount));
-				output.push(outputPair);
-
-				startIndex = i;
-				takeAmount = 1;
-			}
-			else {
-				++takeAmount;
-			}
-
-			prevPair = curPair;
-			prevValue = curValue;
-		}
-
-		if (takeAmount > 0) {
-			var outputPair = outputSelector(self.skip(startIndex).take(takeAmount));
-			output.push(outputPair);			
-		}
-	}
-
-	return new DataFrame({
-			rows: E.from(output)
-				.select(function (pair) {
-					return pair[1];
-				})
-				.toArray(),
-			index: new Index(
-				E.from(output)
-					.select(function (pair) {
-						return pair[0];
-					})
-					.toArray()
-			)
-	});
+	return self.variableWindow(
+		function (a, b) {
+			return valueSelector(a) === valueSelector(b);
+		},
+		outputSelector
+	);
 };
 
 /**
