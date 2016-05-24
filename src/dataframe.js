@@ -2086,13 +2086,11 @@ DataFrame.prototype.sequentialDistinct = function (valueSelector, outputSelector
 
 		var prevPair = input[0]; // 1st pair.
 		var prevValue = valueSelector(prevPair[1], prevPair[0]);
-		console.log('first value: ' + prevValue);
 
 		for (var i = 1; i < input.length; ++i) {
 
 			var curPair = input[i];
 			var curValue = valueSelector(curPair[1], curPair[0]);
-			console.log('cur value: ' + curValue);
 			
 			if (curValue !== prevValue) {
 
@@ -2218,6 +2216,81 @@ DataFrame.prototype.distinct = function (valueSelector, outputSelector) {
 				return pair[0];
 			})
 			.toArray(),
+	});
+};
+
+/**
+ * Groups sequential values into windows. The windows can then be collapsed.
+ * The output selector function must return the index and value to use in the new series.
+ *
+ * @param {function} comparer - Predicate that compares two rows and returns true if they should be in the same window.
+ * @param {function} outputSelector - Selects the index and row to represent a collapsed group of rows.
+ */
+DataFrame.prototype.variableWindow = function (comparer, outputSelector) {
+	assert.isFunction(comparer, "Expected 'comparer' parameter to 'variableWindow' to be a function.")
+	assert.isFunction(outputSelector, "Expected 'outputSelector' parameter to 'variableWindow' to be a function.")
+
+	var self = this;
+
+	//todo: make this lazy.
+
+	/* todo: Want to zip here, when zip can specify the index. 
+
+	series.zip(series.skip(1), function (prev, next) { 
+		});
+
+	*/
+
+	var input = self.toPairs();
+
+	var output = [];
+
+	if (input.length > 0) {
+
+		var startIndex = 0;
+		var takeAmount = 1;
+
+		var prevPair = input[0]; // 1st pair.
+
+		for (var i = 1; i < input.length; ++i) {
+
+			var curPair = input[i];
+			
+			if (!comparer(prevPair[1], curPair[1])) {
+
+				// Flush.
+				var outputPair = outputSelector(self.skip(startIndex).take(takeAmount));
+				output.push(outputPair);
+
+				startIndex = i;
+				takeAmount = 1;
+			}
+			else {
+				++takeAmount;
+			}
+
+			prevPair = curPair;
+		}
+
+		if (takeAmount > 0) {
+			var outputPair = outputSelector(self.skip(startIndex).take(takeAmount));
+			output.push(outputPair);			
+		}
+	}
+
+	return new DataFrame({
+			rows: E.from(output)
+				.select(function (pair) {
+					return pair[1];
+				})
+				.toArray(),
+			index: new Index(
+				E.from(output)
+					.select(function (pair) {
+						return pair[0];
+					})
+					.toArray()
+			)
 	});
 };
 

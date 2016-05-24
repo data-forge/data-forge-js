@@ -40,11 +40,11 @@ describe('performance', function () {
 				},
 			});
 
-		console.log(series.last());
+		//console.log(series.last());
 
 		stopwatch.stop();
 		var time = stopwatch.read();
-		console.log('t ' + time);
+		//console.log('t ' + time);
 		expect(time).to.be.at.most(3);
 	});
 
@@ -78,11 +78,11 @@ describe('performance', function () {
 				},
 			});
 
-		console.log(df.last());
+		//console.log(df.last());
 
 		stopwatch.stop();
 		var time = stopwatch.read();
-		console.log('t ' + time);
+		//console.log('t ' + time);
 		expect(time).to.be.at.most(3);
 	});
 });
