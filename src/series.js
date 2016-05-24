@@ -1293,65 +1293,12 @@ Series.prototype.sequentialDistinct = function (outputSelector) {
 
 	var self = this;
 
-	//todo: make this lazy.
-
-	/* todo: Want to zip here, when zip can specify the index. 
-
-	series.zip(series.skip(1), function (prev, next) { 
-		});
-
-	*/
-
-	var input = self.toPairs();
-
-	var output = [];
-
-	if (input.length > 0) {
-
-		var startIndex = 0;
-		var takeAmount = 1;
-
-		var prevPair = input[0]; // 1st pair.
-
-		for (var i = 1; i < input.length; ++i) {
-
-			var curPair = input[i];
-			
-			if (curPair[1] !== prevPair[1]) {
-				// Flush.
-				var outputPair = outputSelector(self.skip(startIndex).take(takeAmount));
-				output.push(outputPair);
-
-				startIndex = i;
-				takeAmount = 1;
-			}
-			else {
-				++takeAmount;
-			}
-
-			prevPair = curPair;
-		}
-
-		if (takeAmount > 0) {
-			var outputPair = outputSelector(self.skip(startIndex).take(takeAmount));
-			output.push(outputPair);			
-		}
-	}
-
-	return new Series({
-			values: E.from(output)
-				.select(function (pair) {
-					return pair[1];
-				})
-				.toArray(),
-			index: new Index(
-				E.from(output)
-					.select(function (pair) {
-						return pair[0];
-					})
-					.toArray()
-			)
-	});
+	return self.variableWindow(
+		function (a, b) {
+			return a === b;
+		},
+		outputSelector
+	);
 };
 
 /**
