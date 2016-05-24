@@ -1260,5 +1260,32 @@ describe('Series', function () {
 			[7, 4],
 		]);
 	});
+
+	it('variable window', function () {
+
+		var series = new Series({ 
+			index:  [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+			values: [1, 1, 2, 1, 1, 2, 3, 4, 3, 3],
+		});
+
+		var aggregated = series.variableWindow(
+			function (a, b) {
+				return a === b;
+			},
+			function (window) {
+				return [window.getIndex().first(), window.count()];
+			}
+		);
+
+		expect(aggregated.toPairs()).to.eql([
+			[0, 2],
+			[2, 1],
+			[3, 2],
+			[5, 1],
+			[6, 1],
+			[7, 1],
+			[8, 2]
+		]);
+	});
 });
 
