@@ -518,10 +518,10 @@ DataFrame.prototype.where = function (filterSelectorPredicate) {
 /**
  * Generate a new data frame based on the results of the selector function.
  *
- * @param {function} selector - Selector function that transforms each row to a different data structure.
+ * @param {function} selector - Selector function that transforms each row to generate a transformed data-frame.
  */
 DataFrame.prototype.select = function (selector) {
-	assert.isFunction(selector, "Expected 'selector' parameter to 'select' function to be a function.");
+	assert.isFunction(selector, "Expected 'selector' parameter to 'DataFrame.select' to be a selector functions.");
 
 	var self = this;
 	return new DataFrame({
@@ -535,6 +535,28 @@ DataFrame.prototype.select = function (selector) {
 						pair[0],
 						newValue,
 					];
+				});
+		},
+	}); 	
+};
+
+/**
+ * Generate a new data frame based on the results of the selector function.
+ *
+ * @param {function} selector - Selector function that transforms each index and row pair to generate a transformed data-frame.
+ */
+DataFrame.prototype.selectPairs = function (selector) {
+	assert.isFunction(selector, "Expected 'selector' parameter to 'DataFrame.selectPairs' to be a selector functions.");
+
+	var self = this;
+	return new DataFrame({
+		iterable: function () {
+			return new SelectIterator(self.getIterator(), function (pair) {
+					var newPair = selector(pair[1], pair[0]);
+					if (!Object.isArray(newPair) || newPair.length !== 2 || !Object.isObject(newPair[1])) {
+						throw new Error("Expected return value from 'DataFrame.selectPairs' selector to be a pair, that is an array with two items: [index, object].");
+					}
+					return newPair;
 				});
 		},
 	}); 	

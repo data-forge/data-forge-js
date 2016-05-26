@@ -196,6 +196,35 @@ describe('DataFrame', function () {
 		]);
 	});
 
+	it('can select pairs', function () {
+		var dataFrame = initDataFrame(
+			[ "V" ],
+			[
+				[1],
+				[2],
+				[3],
+				[4],
+			],
+			[5, 6, 7, 8]
+		);
+
+		var modified = dataFrame.selectPairs(function (row, index) {
+				return [
+					index + 1,
+					{
+						C: index
+					},
+				];
+			});		
+
+		expect(modified.toPairs()).to.eql([
+			[6, { C: 5 }],
+			[7, { C: 6 }],
+			[8, { C: 7 }],
+			[9, { C: 8 }],
+		]);
+	});
+
 	it('can select many', function () {
 		var dataFrame = initDataFrame(
 			[ "Date", "Value1", "Value2", "Value3" ],
