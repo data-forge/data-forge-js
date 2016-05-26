@@ -243,7 +243,7 @@ Series.prototype.where = function (filterSelectorPredicate) {
 /**
  * Generate a new series based on the results of the selector function.
  *
- * @param {function} selector - Selector function that transforms each value to a different data structure.
+ * @param {function} selector - Selector function that transforms each value to create a new series.
  */
 Series.prototype.select = function (selector) {
 	assert.isFunction(selector, "Expected 'selector' parameter to 'select' function to be a function.");
@@ -254,6 +254,26 @@ Series.prototype.select = function (selector) {
 			return new SelectIterator(self.getIterator(), 
 				function (pair) {
 					return [pair[0], selector(pair[1], pair[0])];
+				}
+			);
+		},		
+	}); 	
+};
+
+/**
+ * Generate a new series based on the results of the selector function.
+ *
+ * @param {function} selector - Selector function that transforms each index/value to a create a new series.
+ */
+Series.prototype.selectPairs = function (selector) {
+	assert.isFunction(selector, "Expected 'selector' parameter to 'selectPairs' function to be a function.");
+
+	var self = this;
+	return new Series({
+		iterable: function () {
+			return new SelectIterator(self.getIterator(), 
+				function (pair) {
+					return selector(pair[1], pair[0]);
 				}
 			);
 		},		

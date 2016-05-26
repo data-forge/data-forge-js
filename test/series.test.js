@@ -108,6 +108,15 @@ describe('Series', function () {
 		expect(modified.toValues()).to.eql([0, 1, 2, 3]);		
 	});
 
+	it('can select pairs', function () {
+		var series = initSeries([0, 1, 2, 3], [100, 300, 200, 5]);
+		var modified = series.selectPairs(function (value, index) {
+				return [index+1, value + 10];
+			});
+		expect(modified.getIndex().toValues()).to.eql([1, 2, 3, 4]);
+		expect(modified.toValues()).to.eql([110, 310, 210, 15]);		
+	});
+
 	it('can select many', function () {
 		var series = initSeries([0, 1, 2, 3], [100, 300, 200, 5]);
 		var modified = series.selectMany(function (value) {
