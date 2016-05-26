@@ -273,7 +273,11 @@ Series.prototype.selectPairs = function (selector) {
 		iterable: function () {
 			return new SelectIterator(self.getIterator(), 
 				function (pair) {
-					return selector(pair[1], pair[0]);
+					var newPair = selector(pair[1], pair[0]);
+					if (!Object.isArray(newPair) || newPair.length !== 2) {
+						throw new Error("Expected return value from 'Series.selectPairs' selector to be a pair, that is an array with two items: [index, value].");
+					}
+					return newPair;
 				}
 			);
 		},		
@@ -327,7 +331,14 @@ Series.prototype.selectManyPairs = function (selector) {
 				function (pair) {
 					var newPairs = selector(pair[1], pair[0]);
 					if (!Object.isArray(newPairs)) {
-						throw new Error("Expected return value from 'Series.selectManyPairs' selector to be an array, each item in the array represents a new value in the resulting series.");
+						throw new Error("Expected return value from 'Series.selectManyPairs' selector to be an array of pairs, each item in the array represents a new pair in the resulting series.");
+					}
+
+					for (var pairIndex = 0; pairIndex < newPairs.length; ++pairIndex) {
+						var newPair = newPairs[pairIndex];
+						if (!Object.isArray(newPair) || newPair.length !== 2) {
+							throw new Error("Expected return value from 'Series.selectManyPairs' selector to be am array of pairs, but item at index " + pairIndex + " is not an array with two items: [index, value].");
+						}
 					}
 
 					return newPairs;
