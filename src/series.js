@@ -1389,7 +1389,7 @@ Series.prototype.distinct = function (outputSelector) {
  * Groups sequential values into windows. The windows can then be collapsed.
  * The output selector function must return the index and value to use in the new series.
  *
- * @param {function} comparer - Predicate that compares to rows and returns true if they should be in the same window.
+ * @param {function} comparer - Predicate that compares two values and returns true if they should be in the same window.
  * @param {function} outputSelector - Selects the index and value to represent a collapsed group of values.
  */
 Series.prototype.variableWindow = function (comparer, outputSelector) {
