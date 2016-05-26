@@ -140,6 +140,18 @@ describe('Series', function () {
 		expect(modified.toValues()).to.eql([0, 0, 1, 1, 2, 2, 3, 3]);
 	});
 
+	it('can select many pairs', function () {
+		var series = initSeries([0, 1, 2, 3], [100, 300, 200, 5]);
+		var modified = series.selectManyPairs(function (value, index) {
+				return [
+					[index, value],
+					[index, value],
+				];
+			});
+		expect(modified.getIndex().toValues()).to.eql([0, 0, 1, 1, 2, 2, 3, 3]);
+		expect(modified.toValues()).to.eql([100, 100, 300, 300, 200, 200, 5, 5]);		
+	});
+
 	it('responds gracefully to non-list returned from selectMany selector', function () {
 		var series = initSeries([0], [100]);
 		var modified = series.selectMany(function (value) {

@@ -311,6 +311,32 @@ Series.prototype.selectMany = function (selector) {
 	}); 	
 };
 
+/**
+ * Generate a new series based on the results of the selector function.
+ *
+ * @param {function} selector - Selector function that transforms each value to a different data structure.
+ */
+Series.prototype.selectManyPairs = function (selector) {
+	assert.isFunction(selector, "Expected 'selector' parameter to 'Series.selectManyPairs' function to be a function.");
+
+	var self = this;
+
+	return new Series({
+		iterable: function () {
+			return new SelectManyIterator(self.getIterator(), 
+				function (pair) {
+					var newPairs = selector(pair[1], pair[0]);
+					if (!Object.isArray(newPairs)) {
+						throw new Error("Expected return value from 'Series.selectManyPairs' selector to be an array, each item in the array represents a new value in the resulting series.");
+					}
+
+					return newPairs;
+				}
+			);
+		},
+	}); 	
+};
+
 //
 // Throw an exception if the sort method doesn't make sense.
 //
