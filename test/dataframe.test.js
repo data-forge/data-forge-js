@@ -294,6 +294,34 @@ describe('DataFrame', function () {
 		]);
 	});		
 
+	it('can select many pairs', function () {
+		var dataFrame = initDataFrame(
+			[ "c1", "c2" ],
+			[
+				[300, 'c'],
+				[200, 'b'],
+				[20, 'c'],
+			],
+			[5, 6, 7]
+		);
+		var modified = dataFrame.selectManyPairs(function (row, index) {
+			return [
+				[index, row],
+				[index, row],
+			];
+			});		
+		expect(modified.getIndex().toValues()).to.eql([5, 5, 6, 6, 7, 7]);
+		expect(modified.getColumnNames()).to.eql(["c1", "c2"]);
+		expect(modified.toValues()).to.eql([
+			[300, 'c'],
+			[300, 'c'],
+			[200, 'b'],
+			[200, 'b'],
+			[20, 'c'],
+			[20, 'c'],
+		]);		
+	});
+	
 	it('responds gracefully to null return from select', function () {
 
 		var dataFrame = initDataFrame(

@@ -565,7 +565,7 @@ DataFrame.prototype.selectPairs = function (selector) {
 /**
  * Generate a new data frame based on the results of the selector function.
  *
- * @param {function} selector - Selector function that transforms each row to a different data structure.
+ * @param {function} selector - Selector function that transforms each row to create a new data-frame.
  */
 DataFrame.prototype.selectMany = function (selector) {
 	assert.isFunction(selector, "Expected 'selector' parameter to 'DataFrame.selectMany' function to be a function.");
@@ -590,6 +590,36 @@ DataFrame.prototype.selectMany = function (selector) {
 						pair[0], 
 						newRow,
 					]);
+				}
+
+				return newPairs;
+			})
+		},
+	}); 	
+};
+
+/**
+ * Generate a new data frame based on the results of the selector function.
+ *
+ * @param {function} selector - Selector function that transforms each index/row pair to create a new data-frame.
+ */
+DataFrame.prototype.selectManyPairs = function (selector) {
+	assert.isFunction(selector, "Expected 'selector' parameter to 'DataFrame.selectManyPairs' function to be a function.");
+
+	var self = this;
+	return new DataFrame({
+		iterable: function () {
+			return new SelectManyIterator(self.getIterator(), function (pair) {
+				var newPairs = selector(pair[1], pair[0]);
+				if (!Object.isArray(newPairs)) {
+					throw new Error("Expected return value from 'DataFrame.selectManyPairs' selector to be an array of pairs, each item in the array represents a new pair in the resulting DataFrame.");
+				}
+
+				for (var pairIndex = 0; pairIndex < newPairs.length; ++pairIndex) {
+					var newPair = newPairs[pairIndex];
+					if (!Object.isArray(newPair) || newPair.length !== 2 || !Object.isObject(newPair[1])) {
+						throw new Error("Expected return value from 'DataFrame.selectManyPairs' selector to be am array of pairs, but item at index " + pairIndex + " is not an array with two items: [index, object].");
+					}
 				}
 
 				return newPairs;
