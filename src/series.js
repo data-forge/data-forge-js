@@ -294,7 +294,7 @@ Series.prototype.selectMany = function (selector) {
 		iterable: function () {
 			return new SelectManyIterator(self.getIterator(), 
 				function (pair) {
-					var newValues = selector(pair[1]);
+					var newValues = selector(pair[1], pair[0]);
 					if (!Object.isArray(newValues)) {
 						throw new Error("Expected return value from 'Series.selectMany' selector to be an array, each item in the array represents a new value in the resulting series.");
 					}

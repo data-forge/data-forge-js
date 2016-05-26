@@ -130,6 +130,16 @@ describe('Series', function () {
 		expect(modified.toValues()).to.eql([101, 102, 301, 302, 201, 202, 6, 7]);		
 	});
 
+	it('can select many with index', function () {
+		var series = initSeries([0, 1, 2, 3], [100, 300, 200, 5]);
+		var modified = series.selectMany(function (value, index) {
+			return [index, index];
+		});
+
+		expect(modified.getIndex().toValues()).to.eql([0, 0, 1, 1, 2, 2, 3, 3]);
+		expect(modified.toValues()).to.eql([0, 0, 1, 1, 2, 2, 3, 3]);
+	});
+
 	it('responds gracefully to non-list returned from selectMany selector', function () {
 		var series = initSeries([0], [100]);
 		var modified = series.selectMany(function (value) {
