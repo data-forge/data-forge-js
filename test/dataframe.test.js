@@ -1603,12 +1603,47 @@ describe('DataFrame', function () {
 		return initDataFrame(columnNames, rows, index);
 	};
 
+	it('window returns a Series', function () {
+
+		var dataFrame = new DataFrame({ 
+			columnNames: ["c1", "c2"],
+			rows: [
+				[1, 2],
+				[3, 4],
+				[5, 6],
+				[7, 8],
+			],
+		});
+		var windowed = dataFrame.window(2);
+
+		expect(windowed).to.be.an.instanceof(dataForge.Series);
+		expect(windowed.count()).to.eql(2);
+
+		var windowedPairs = windowed.toPairs();
+		expect(windowedPairs.length).to.eql(2);
+		expect(windowedPairs[0][0]).to.eql(0);
+		expect(windowedPairs[0][1]).to.be.an.instanceof(DataFrame);
+		expect(windowedPairs[0][1].toPairs()).to.eql([
+			[0, { c1: 1, c2: 2 }],
+			[1, { c1: 3, c2: 4 }],
+		]);
+		expect(windowedPairs[1][0]).to.eql(1);
+		expect(windowedPairs[1][1]).to.be.an.instanceof(DataFrame);
+		expect(windowedPairs[1][1].toPairs()).to.eql([
+			[2, { c1: 5, c2: 6 }],
+			[3, { c1: 7, c2: 8 }],
+		]);
+	});
+
+
 	it('can compute window - creates an empty series from an empty data set', function () {
 
 		var dataFrame = new DataFrame();
-		var windowed = dataFrame.window(2, function (window, windowIndex) {
-			return [windowIndex, window.sum()];
-		});
+		var windowed = dataFrame
+			.window(2) 
+			.selectPairs(function (window, windowIndex) {
+				return [windowIndex, window.sum()];
+			});
 
 		expect(windowed.count()).to.eql(0);
 	});
@@ -1624,9 +1659,11 @@ describe('DataFrame', function () {
 				[7, 8],
 			],
 		});
-		var windowed = dataFrame.window(2, function (window, windowIndex) {
-			return [windowIndex, window.toValues()];
-		});
+		var windowed = dataFrame
+			.window(2)
+			.selectPairs(function (window, windowIndex) {
+				return [windowIndex, window.toValues()];
+			});
 
 		expect(windowed.toPairs()).to.eql([
 			[0, [[1, 2], [3, 4]]],
@@ -1646,9 +1683,12 @@ describe('DataFrame', function () {
 				[9, 10],
 			],
 		});
-		var windowed = dataFrame.window(2, function (window, windowIndex) {
-			return [windowIndex, window.toValues()];
-		});
+
+		var windowed = dataFrame
+			.window(2)
+			.selectPairs(function (window, windowIndex) {
+				return [windowIndex, window.toValues()];
+			});
 
 		expect(windowed.toPairs()).to.eql([
 			[0, [[1, 2], [3, 4]]],
@@ -1670,9 +1710,11 @@ describe('DataFrame', function () {
 				[11, 12],
 			],
 		});
-		var windowed = dataFrame.window(3, function (window, windowIndex) {
-			return [windowIndex, window.toValues()];
-		});
+		var windowed = dataFrame
+			.window(3)
+			.selectPairs(function (window, windowIndex) {
+				return [windowIndex, window.toValues()];
+			});
 
 		expect(windowed.toPairs()).to.eql([
 			[0, [[1, 2], [3, 4], [5, 6]]],
@@ -1693,9 +1735,11 @@ describe('DataFrame', function () {
 				[9, 10],
 			],
 		});
-		var windowed = dataFrame.window(3, function (window, windowIndex) {
-			return [windowIndex, window.toValues()];
-		});
+		var windowed = dataFrame
+			.window(3)
+			.selectPairs(function (window, windowIndex) {
+				return [windowIndex, window.toValues()];
+			});
 
 		expect(windowed.toPairs()).to.eql([
 			[0, [[1, 2], [3, 4], [5, 6]]],

@@ -56,7 +56,8 @@ describe('window performance', function () {
 		stopwatch1.start();
 
 		var newSeries = dataFrame
-			.window(windowSize, function (window, windowIndex) {
+			.window(windowSize)
+			.selectPairs(function (window, windowIndex) {
 				return [windowIndex, windowIndex];
 			});
 

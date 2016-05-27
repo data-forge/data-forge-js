@@ -1583,10 +1583,10 @@ DataFrame.prototype.transformSeries = function (columnSelectors) {
  *		window - Data-frame that represents the rolling window.
  *		windowIndex - The 0-based index of the window.
  */
-DataFrame.prototype.window = function (period, selector) {
+DataFrame.prototype.window = function (period, obsoleteSelector) {
 
 	assert.isNumber(period, "Expected 'period' parameter to 'window' to be a number.");
-	assert.isFunction(selector, "Expected 'selector' parameter to 'window' to be a function.");
+	assert(!obsoleteSelector, "Selector parameter is obsolete and no longer required.");
 
 	var self = this;
 
@@ -1594,17 +1594,19 @@ DataFrame.prototype.window = function (period, selector) {
 		iterable: function () {
 
 			var curOutput = undefined;
-			var done = false;
 			var windowIndex = 0;
 
 			return {
 				moveNext: function () {
 					var window = self.skip(windowIndex*period).take(period);
-					if (window.count() === 0) {
-						return false; //todo: should use .any() function.
+					if (window.none(function () { return true; })) { //todo: Shouldn't have to pass a predicate.
+						return false; // Nothing left.
 					}
 
-					curOutput = selector(window, windowIndex);
+					curOutput = [
+						windowIndex, 
+						window,						
+					];
 					++windowIndex;
 					return true;
 				},

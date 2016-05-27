@@ -98,7 +98,9 @@ describe('rolling window integration', function () {
 	it('can use window and selectMany to generate multiple elements', function () {
 
 		var dataFrame = genDataFrame(2, 4);
-		var series = dataFrame.window(2, function (window, windowIndex) {
+		var series = dataFrame
+			.window(2)
+			.selectPairs(function (window, windowIndex) {
 				return [windowIndex, [window.getSeries("1").sum(), window.getSeries("2").sum()]];
 			})
 			.selectMany(function (value) {
