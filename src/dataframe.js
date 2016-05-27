@@ -2002,6 +2002,7 @@ DataFrame.prototype.forEach = function (callback) {
 
 /**
  * Group the data-frame into multiple data-frames on the value defined by the selector.
+ * A series is returned that indexed by group key. Each value in the series is a Data-frame containing the group.
  *
  * @param {function} selector - Function that selects the value to group by.
  */
@@ -2011,21 +2012,27 @@ DataFrame.prototype.groupBy = function (selector) {
 	//todo: make this lazy.
 
 	var self = this;
-	return E.from(self.toPairs())
+	var groupedPairs = E.from(self.toPairs())
 		.groupBy(function (pair) {
 			return selector(pair[1], pair[0]);
 		})
 		.select(function (group) {
-			return {
-				key: group.key(),
-				data: new DataFrame({
+			return [
+				group.key(),
+				new DataFrame({
 					iterable: function () {
 						return new ArrayIterator(group.getSource());
 					},
 				}),
-			};
+			];
 		})
 		.toArray();
+
+	return new Series({
+		iterable: function () {
+			return new ArrayIterator(groupedPairs);
+		},
+	});
 };
 
 /**
