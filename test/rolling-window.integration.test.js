@@ -21,7 +21,8 @@ describe('rolling window integration', function () {
 		});
 
 		var newSeries = dataFrame.getSeries('Value')
-			.rollingWindow(5, function (window, windowIndex) {
+			.rollingWindow(5)
+			.selectPairs(function (window, windowIndex) {
 				return [window.getIndex().last(), window.last()];
 			});
 

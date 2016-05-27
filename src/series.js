@@ -594,20 +594,15 @@ Series.prototype.window = function (period, obsoleteSelector) {
 };
 
 /** 
- * Move a rolling window over the series (row by row), invoke a selector for each window that builds a new series.
+ * Segment a Series into 'rolling windows'. Returns a new Series. Each value in the new Series contains a 'window' (or segment) of the original Series.
+ * Use select or selectPairs to aggregate.
  *
- * @param {integer} period - The number of rows in the window.
- * @param {function} selector - The selector function invoked per row that builds the output series.
- *
- * The selector has the following parameters: 
- *
- *		window - Series that represents the rolling window.
- *		windowIndex - The 0-based index of the window.
+ * @param {integer} period - The number of values in the window.
  */
-Series.prototype.rollingWindow = function (period, selector) {
+Series.prototype.rollingWindow = function (period, obsoleteSelector) {
 
 	assert.isNumber(period, "Expected 'period' parameter to 'rollingWindow' to be a number.");
-	assert.isFunction(selector, "Expected 'selector' parameter to 'rollingWindow' to be a function.");
+	assert(!obsoleteSelector, "Selector parameter is obsolete and no longer required.");
 
 	var self = this;
 
@@ -625,7 +620,10 @@ Series.prototype.rollingWindow = function (period, selector) {
 						return false;
 					}
 
-					curOutput = selector(window, windowIndex);
+					curOutput = [
+						windowIndex, 
+						window,						
+					];
 					++windowIndex;
 					return true;
 				},
@@ -723,13 +721,14 @@ Series.prototype.toString = function () {
 Series.prototype.percentChange = function () {
 
 	var self = this;
-	return self.rollingWindow(2, function (window) {
-		var index = window.getIndex().skip(1).first();
-		var values = window.toValues();
-		var amountChange = values[1] - values[0]; // Compute amount of change.
-		var pctChange = amountChange / values[0]; // Compute % change.
-		return [index, pctChange]; // Return new index and value.
-	});
+	return self
+		.rollingWindow(2)
+		.selectPairs(function (window) {
+			var values = window.toValues();
+			var amountChange = values[1] - values[0]; // Compute amount of change.
+			var pctChange = amountChange / values[0]; // Compute % change.
+			return [window.getIndex().last(), pctChange]; // Return new index and value.
+		});
 };
 
 /**

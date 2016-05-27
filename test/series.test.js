@@ -421,9 +421,11 @@ describe('Series', function () {
 	it('can compute rolling window - from empty data set', function () {
 
 		var series = initSeries([], []);
-		var newSeries = series.rollingWindow(2, function (window, windowIndex) {
-			return [windowIndex, window.toValues()];
-		});
+		var newSeries = series
+			.rollingWindow(2)
+			.selectPairs(function (window, windowIndex) {
+				return [windowIndex, window.toValues()];
+			});
 
 		expect(newSeries.toValues().length).to.eql(0);
 	});
@@ -431,9 +433,11 @@ describe('Series', function () {
 	it('rolling window returns 0 values when there are not enough values in the data set', function () {
 
 		var series = initSeries([0, 1], [1, 2]);
-		var newSeries = series.rollingWindow(3, function (window, windowIndex) {
-			return [windowIndex, window.toValues()];
-		});
+		var newSeries = series
+			.rollingWindow(3)
+			.selectPairs(function (window, windowIndex) {
+				return [windowIndex, window.toValues()];
+			});
 
 		expect(newSeries.toValues().length).to.eql(0);
 	});
@@ -441,9 +445,11 @@ describe('Series', function () {
 	it('can compute rolling window - odd data set with even period', function () {
 
 		var series = initSeries(E.range(0, 5).toArray(), E.range(0, 5).toArray());
-		var newSeries = series.rollingWindow(2, function (window, windowIndex) {
-			return [windowIndex, window.toValues()];
-		});
+		var newSeries = series
+			.rollingWindow(2)
+			.selectPairs(function (window, windowIndex) {
+				return [windowIndex, window.toValues()];
+			});
 
 		var index = newSeries.getIndex().toValues();
 		expect(index).to.eql([0, 1, 2, 3]);
@@ -459,9 +465,11 @@ describe('Series', function () {
 	it('can compute rolling window - odd data set with odd period', function () {
 
 		var series = initSeries(E.range(0, 5).toArray(), E.range(0, 5).toArray());
-		var newSeries = series.rollingWindow(3, function (window, windowIndex) {
-			return [windowIndex, window.toValues()];
-		});
+		var newSeries = series
+			.rollingWindow(3)
+			.selectPairs(function (window, windowIndex) {
+				return [windowIndex, window.toValues()];
+			});
 
 		var index = newSeries.getIndex().toValues();
 		expect(index).to.eql([0, 1, 2]);
@@ -476,9 +484,11 @@ describe('Series', function () {
 	it('can compute rolling window - even data set with even period', function () {
 
 		var series = initSeries(E.range(0, 6).toArray(), E.range(0, 6).toArray());
-		var newSeries = series.rollingWindow(2, function (window, windowIndex) {
-			return [windowIndex+10, window.toValues()];
-		});
+		var newSeries = series
+			.rollingWindow(2)
+			.selectPairs(function (window, windowIndex) {
+				return [windowIndex+10, window.toValues()];
+			});
 
 		var index = newSeries.getIndex().toValues();
 		expect(index).to.eql([10, 11, 12, 13, 14]);
@@ -495,9 +505,11 @@ describe('Series', function () {
 	it('can compute rolling window - even data set with odd period', function () {
 
 		var series = initSeries(E.range(0, 6).toArray(), E.range(0, 6).toArray());
-		var newSeries = series.rollingWindow(3, function (window, windowIndex) {
-			return [windowIndex, window.toValues()];
-		});
+		var newSeries = series
+			.rollingWindow(3)
+			.selectPairs(function (window, windowIndex) {
+				return [windowIndex, window.toValues()];
+			});
 
 		var index = newSeries.getIndex().toValues();
 		expect(index).to.eql([0, 1, 2, 3]);
@@ -513,11 +525,13 @@ describe('Series', function () {
 	it('can compute rolling window - can take last index and value from each window', function () {
 
 		var series = initSeries(E.range(0, 6).toArray(), E.range(0, 6).toArray());
-		var newSeries = series.rollingWindow(3, function (window, windowIndex) {
-			var index = window.getIndex().toValues();
-			var values = window.toValues();
-			return [index[index.length-1], values[values.length-1]];
-		});
+		var newSeries = series
+			.rollingWindow(3)
+			.selectPairs(function (window, windowIndex) {
+				var index = window.getIndex().toValues();
+				var values = window.toValues();
+				return [index[index.length-1], values[values.length-1]];
+			});
 
 		var index = newSeries.getIndex().toValues();
 		expect(index).to.eql([2, 3, 4, 5]);
