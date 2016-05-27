@@ -551,20 +551,15 @@ Series.prototype.slice = function (startIndexOrStartPredicate, endIndexOrEndPred
 };
 
 /**
- * Move a window over the series (batch by batch), invoke a selector for each window that builds a new series.
+ * Segment a Series into 'windows'. Returns a new Series. Each value in the new Series contains a 'window' (or segment) of the original Series.
+ * Use select or selectPairs to aggregate.
  *
- * @param {integer} period - The number of rows in the window.
- * @param {function} selector - The selector function invoked per row that builds the output series.
- *
- * The selector has the following parameters: 
- *
- *		window - Data-frame that represents the rolling window.
- *		windowIndex - The 0-based index of the window.
+ * @param {integer} period - The number of values in the window.
  */
-Series.prototype.window = function (period, selector) {
+Series.prototype.window = function (period, obsoleteSelector) {
 
 	assert.isNumber(period, "Expected 'period' parameter to 'window' to be a number.");
-	assert.isFunction(selector, "Expected 'selector' parameter to 'window' to be a function.");
+	assert(!obsoleteSelector, "Selector parameter is obsolete and no longer required.");
 
 	var self = this;
 
@@ -572,17 +567,19 @@ Series.prototype.window = function (period, selector) {
 		iterable: function () {
 
 			var curOutput = undefined;
-			var done = false;
 			var windowIndex = 0;
 
 			return {
 				moveNext: function () {
 					var window = self.skip(windowIndex*period).take(period);
-					if (window.count() === 0) {
-						return false; //todo: should use .any() function.
+					if (window.none(function () { return true; })) { //todo: Shouldn't have to pass a predicate.
+						return false; // Nothing left.
 					}
 
-					curOutput = selector(window, windowIndex);
+					curOutput = [
+						windowIndex, 
+						window,						
+					];
 					++windowIndex;
 					return true;
 				},

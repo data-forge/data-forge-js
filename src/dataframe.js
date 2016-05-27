@@ -1573,7 +1573,7 @@ DataFrame.prototype.transformSeries = function (columnSelectors) {
 };
 
 /**
- * Segment a DataFrame into 'windows'. Returns a new series. Each value in the Series contains a 'window' (or segment) of the DataFrame.
+ * Segment a DataFrame into 'windows'. Returns a new Series. Each value in the new Series contains a 'window' (or segment) of the original DataFrame.
  * Use select or selectPairs to aggregate.
  *
  * @param {integer} period - The number of rows in the window.
@@ -1616,7 +1616,7 @@ DataFrame.prototype.window = function (period, obsoleteSelector) {
 };
 
 /** 
- * Segment a DataFrame into 'rolling windows'. Returns a new Series. Each value in the Series contains a 'rolling window' (or segment) of the DataFrame.
+ * Segment a DataFrame into 'rolling windows'. Returns a new Series. Each value in the new Series contains a 'rolling window' (or segment) of the original DataFrame.
  * Use select or selectPairs to aggregate.
 
  * @param {integer} period - The number of rows in the window.

@@ -22,7 +22,8 @@ describe('window performance', function () {
 		stopwatch1.start();
 
 		var newSeries = series
-			.window(windowSize, function (window, windowIndex) {
+			.window(windowSize)
+			.selectPairs(function (window, windowIndex) {
 				return [windowIndex, windowIndex];
 			});
 
