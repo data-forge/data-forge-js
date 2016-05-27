@@ -22,11 +22,7 @@ describe('rolling window integration', function () {
 
 		var newSeries = dataFrame.getSeries('Value')
 			.rollingWindow(5, function (window, windowIndex) {
-				//todo: var index = window.getIndex().last();
-				//todo: var value = window.last();
-				var index = window.getIndex().toValues();
-				var values = window.toValues();
-				return [index[index.length-1], values[values.length-1]];
+				return [window.getIndex().last(), window.last()];
 			});
 
 		expect(newSeries.getIndex().toValues()).to.eql([14, 15, 16, 17, 18, 19, 20, 21]);
@@ -119,7 +115,9 @@ describe('rolling window integration', function () {
 	it('can use rollingWindow and selectMany to generate multiple elements', function () {
 
 		var dataFrame = genDataFrame(2, 4);
-		var series = dataFrame.rollingWindow(2, function (window, windowIndex) {
+		var series = dataFrame
+			.rollingWindow(2)
+			.selectPairs(function (window, windowIndex) {
 				return [windowIndex, [window.getSeries("1").sum(), window.getSeries("2").sum()]];
 			})
 			.selectMany(function (value) {

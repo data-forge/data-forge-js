@@ -1573,15 +1573,10 @@ DataFrame.prototype.transformSeries = function (columnSelectors) {
 };
 
 /**
- * Move a window over the data-frame (batch by batch), invoke a selector for each window that builds a new series.
+ * Segment a DataFrame into 'windows'. Returns a new series. Each value in the Series contains a 'window' (or segment) of the DataFrame.
+ * Use select or selectPairs to aggregate.
  *
  * @param {integer} period - The number of rows in the window.
- * @param {function} selector - The selector function invoked per row that builds the output series.
- *
- * The selector has the following parameters: 
- *
- *		window - Data-frame that represents the rolling window.
- *		windowIndex - The 0-based index of the window.
  */
 DataFrame.prototype.window = function (period, obsoleteSelector) {
 
@@ -1621,20 +1616,15 @@ DataFrame.prototype.window = function (period, obsoleteSelector) {
 };
 
 /** 
- * Move a window over the data-frame (row by row), invoke a selector for each window that builds a new series.
- *
+ * Segment a DataFrame into 'rolling windows'. Returns a new Series. Each value in the Series contains a 'rolling window' (or segment) of the DataFrame.
+ * Use select or selectPairs to aggregate.
+
  * @param {integer} period - The number of rows in the window.
- * @param {function} selector - The selector function invoked per row that builds the output series.
- *
- * The selector has the following parameters: 
- *
- *		window - Data-frame that represents the rolling window.
- *		windowIndex - The 0-based index of the window.
  */
-DataFrame.prototype.rollingWindow = function (period, selector) {
+DataFrame.prototype.rollingWindow = function (period, obsoleteSelector) {
 
 	assert.isNumber(period, "Expected 'period' parameter to 'rollingWindow' to be a number.");
-	assert.isFunction(selector, "Expected 'selector' parameter to 'rollingWindow' to be a function.");
+	assert(!obsoleteSelector, "Selector parameter is obsolete and no longer required.");
 
 	var self = this;
 
@@ -1642,17 +1632,19 @@ DataFrame.prototype.rollingWindow = function (period, selector) {
 		iterable: function () {
 
 			var curOutput = undefined;
-			var done = false;
 			var windowIndex = 0;
 
 			return {
 				moveNext: function () {
 					var window = self.skip(windowIndex).take(period);
-					if (window.count() < period) {
+					if (window.count() < period) { //todo: should haven't to count the entire window here.
 						return false;
 					}
-
-					curOutput = selector(window, windowIndex);
+					
+					curOutput = [
+						windowIndex, 
+						window,						
+					];
 					++windowIndex;
 					return true;
 				},

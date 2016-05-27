@@ -1751,9 +1751,11 @@ describe('DataFrame', function () {
 	it('can compute rolling window - from empty data set', function () {
 
 		var dataFrame = genDataFrame(0, 0);
-		var newDataFrame = dataFrame.rollingWindow(2, function (window, windowIndex) {
-			return [windowIndex, window.toValues()];
-		});
+		var newDataFrame = dataFrame
+			.rollingWindow(2)
+			.selectPairs(function (window, windowIndex) {
+				return [windowIndex, window.toValues()];
+			});
 
 		expect(newDataFrame.toValues().length).to.eql(0);
 	});
@@ -1761,19 +1763,51 @@ describe('DataFrame', function () {
 	it('rolling window returns 0 values when there are not enough values in the data set', function () {
 
 		var dataFrame = genDataFrame(2, 2);
-		var newDataFrame = dataFrame.rollingWindow(3, function (window, windowIndex) {
-			return [windowIndex, window.toValues()];
-		});
+		var newDataFrame = dataFrame
+			.rollingWindow(3)
+			.selectPairs(function (window, windowIndex) {
+				return [windowIndex, window.toValues()];
+			});
 
 		expect(newDataFrame.toValues().length).to.eql(0);
+	});
+
+	it('rolling window produces a Series', function () {
+
+		var dataFrame = genDataFrame(2, 5);
+		var windowed = dataFrame.rollingWindow(2);
+
+		expect(windowed).to.be.an.instanceof(dataForge.Series);
+		expect(windowed.count()).to.eql(4);
+
+		var windowedPairs = windowed.toPairs();
+		expect(windowedPairs.length).to.eql(4);
+
+		expect(windowedPairs[0][0]).to.eql(0);
+		expect(windowedPairs[0][1]).to.be.an.instanceof(DataFrame);
+		expect(windowedPairs[0][1].toValues()).to.eql([[1, 2], [2, 4]]);
+
+		expect(windowedPairs[1][0]).to.eql(1);
+		expect(windowedPairs[1][1]).to.be.an.instanceof(DataFrame);
+		expect(windowedPairs[1][1].toValues()).to.eql([[2, 4], [3, 6]]);
+
+		expect(windowedPairs[2][0]).to.eql(2);
+		expect(windowedPairs[2][1]).to.be.an.instanceof(DataFrame);
+		expect(windowedPairs[2][1].toValues()).to.eql([[3, 6], [4, 8]]);
+
+		expect(windowedPairs[3][0]).to.eql(3);
+		expect(windowedPairs[3][1]).to.be.an.instanceof(DataFrame);
+		expect(windowedPairs[3][1].toValues()).to.eql([[4, 8], [5, 10]]);
 	});
 
 	it('can compute rolling window - odd data set with even period', function () {
 
 		var dataFrame = genDataFrame(2, 5);
-		var newDataFrame = dataFrame.rollingWindow(2, function (window, windowIndex) {
-			return [windowIndex, window.toValues()];
-		});
+		var newDataFrame = dataFrame
+			.rollingWindow(2)
+			.selectPairs(function (window, windowIndex) {
+				return [windowIndex, window.toValues()];
+			});
 
 		var index = newDataFrame.getIndex().toValues();
 		expect(index).to.eql([0, 1, 2, 3]);
@@ -1791,9 +1825,11 @@ describe('DataFrame', function () {
 	it('can compute rolling window - odd data set with odd period', function () {
 
 		var dataFrame = genDataFrame(2, 5);
-		var newDataFrame = dataFrame.rollingWindow(3, function (window, windowIndex) {
-			return [windowIndex, window.toValues()];
-		});
+		var newDataFrame = dataFrame
+			.rollingWindow(3)
+			.selectPairs(function (window, windowIndex) {
+				return [windowIndex, window.toValues()];
+			});
 
 		var index = newDataFrame.getIndex().toValues();
 		expect(index).to.eql([0, 1, 2]);
@@ -1810,9 +1846,11 @@ describe('DataFrame', function () {
 	it('can compute rolling window - even data set with even period', function () {
 
 		var dataFrame = genDataFrame(2, 6);
-		var newDataFrame = dataFrame.rollingWindow(2, function (window, windowIndex) {
-			return [windowIndex+10, window.toValues()];
-		});
+		var newDataFrame = dataFrame
+			.rollingWindow(2)
+			.selectPairs(function (window, windowIndex) {
+				return [windowIndex+10, window.toValues()];
+			});
 
 		var index = newDataFrame.getIndex().toValues();
 		expect(index).to.eql([10, 11, 12, 13, 14]);
@@ -1831,9 +1869,11 @@ describe('DataFrame', function () {
 	it('can compute rolling window - even data set with odd period', function () {
 
 		var dataFrame = genDataFrame(2, 6);
-		var newDataFrame = dataFrame.rollingWindow(3, function (window, windowIndex) {
-			return [windowIndex, window.toValues()];
-		});
+		var newDataFrame = dataFrame
+			.rollingWindow(3)
+			.selectPairs(function (window, windowIndex) {
+				return [windowIndex, window.toValues()];
+			});
 
 		var index = newDataFrame.getIndex().toValues();
 		expect(index).to.eql([0, 1, 2, 3]);
@@ -1851,11 +1891,13 @@ describe('DataFrame', function () {
 	it('can compute rolling window - can take last index and value from each window', function () {
 
 		var dataFrame = genDataFrame(2, 6);
-		var newDataFrame = dataFrame.rollingWindow(3, function (window, windowIndex) {
-			var index = window.getIndex().toValues();
-			var values = window.toValues();
-			return [index[index.length-1], values[values.length-1]];
-		});
+		var newDataFrame = dataFrame
+			.rollingWindow(3)
+			.selectPairs(function (window, windowIndex) {
+				var index = window.getIndex().toValues();
+				var values = window.toValues();
+				return [index[index.length-1], values[values.length-1]];
+			});
 
 		var index = newDataFrame.getIndex().toValues();
 		expect(index).to.eql([2, 3, 4, 5]);

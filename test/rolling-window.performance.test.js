@@ -56,7 +56,8 @@ describe('rolling window performance', function () {
 		stopwatch1.start();
 
 		var newSeries = dataFrame
-			.rollingWindow(windowSize, function (window, windowIndex) {
+			.rollingWindow(windowSize)
+			.select(function (window, windowIndex) {
 				return [windowIndex, windowIndex];
 			});
 
