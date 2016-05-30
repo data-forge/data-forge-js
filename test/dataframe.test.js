@@ -2947,6 +2947,27 @@ describe('DataFrame', function () {
 			})).to.eql(true);
 	});	
 
+	it('any - with no predicate - zero elements', function () {
+
+		var df = new DataFrame();
+
+		expect(df.any()).to.eql(false);
+	});
+
+	it('any - with no predicate - has existing elements', function () {
+
+		var df = new DataFrame({
+				columnNames: ["a", "b"],
+				rows: [
+					[5, "hello"],
+					[5, "computer"],
+					[5, "yo"],
+				],
+			});
+
+		expect(df.any()).to.eql(true);
+	});	
+
 	it('none - zero elements', function () {
 
 		var df = new DataFrame();
