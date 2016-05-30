@@ -1358,12 +1358,11 @@ Series.prototype.sequentialDistinct = function (outputSelector) {
 
 	var self = this;
 
-	return self.variableWindow(
-		function (a, b) {
+	return self
+		.variableWindow(function (a, b) {
 			return a === b;
-		},
-		outputSelector
-	);
+		})
+		.selectPairs(outputSelector);
 };
 
 /**
@@ -1451,26 +1450,18 @@ Series.prototype.distinct = function (outputSelector) {
 };
 
 /**
- * Groups sequential values into windows. The windows can then be collapsed.
- * The output selector function must return the index and value to use in the new series.
+ * Groups sequential values into variable length 'windows'. The windows can then be transformed/transformed using selectPairs or selectManyPairs.
  *
  * @param {function} comparer - Predicate that compares two values and returns true if they should be in the same window.
- * @param {function} outputSelector - Selects the index and value to represent a collapsed group of values.
  */
-Series.prototype.variableWindow = function (comparer, outputSelector) {
-	assert.isFunction(comparer, "Expected 'comparer' parameter to 'variableWindow' to be a function.")
-	assert.isFunction(outputSelector, "Expected 'outputSelector' parameter to 'variableWindow' to be a function.")
+Series.prototype.variableWindow = function (comparer, obsoleteSelector) {
+	
+	assert.isFunction(comparer, "Expected 'comparer' parameter to 'Series.variableWindow' to be a function.")
+	assert(!obsoleteSelector, "Selector parameter is obsolete and no longer required.");
 
 	var self = this;
 
 	//todo: make this lazy.
-
-	/* todo: Want to zip here, when zip can specify the index. 
-
-	series.zip(series.skip(1), function (prev, next) { 
-		});
-
-	*/
 
 	var input = self.toPairs();
 
@@ -1480,6 +1471,7 @@ Series.prototype.variableWindow = function (comparer, outputSelector) {
 
 		var startIndex = 0;
 		var takeAmount = 1;
+		var windowIndex = 0;
 
 		var prevPair = input[0]; // 1st pair.
 
@@ -1489,8 +1481,8 @@ Series.prototype.variableWindow = function (comparer, outputSelector) {
 			
 			if (!comparer(curPair[1], prevPair[1])) {
 				// Flush.
-				var outputPair = outputSelector(self.skip(startIndex).take(takeAmount));
-				output.push(outputPair);
+				output.push([windowIndex, self.skip(startIndex).take(takeAmount)]);
+				++windowIndex;
 
 				startIndex = i;
 				takeAmount = 1;
@@ -1503,8 +1495,7 @@ Series.prototype.variableWindow = function (comparer, outputSelector) {
 		}
 
 		if (takeAmount > 0) {
-			var outputPair = outputSelector(self.skip(startIndex).take(takeAmount));
-			output.push(outputPair);			
+			output.push([windowIndex, self.skip(startIndex).take(takeAmount)]);
 		}
 	}
 

@@ -1374,14 +1374,13 @@ describe('Series', function () {
 			values: [1, 1, 2, 1, 1, 2, 3, 4, 3, 3],
 		});
 
-		var aggregated = series.variableWindow(
-			function (a, b) {
+		var aggregated = series
+			.variableWindow(function (a, b) {
 				return a === b;
-			},
-			function (window) {
+			})
+			.selectPairs(function (window, windowIndex) {
 				return [window.getIndex().first(), window.count()];
-			}
-		);
+			});
 
 		expect(aggregated.toPairs()).to.eql([
 			[0, 2],
