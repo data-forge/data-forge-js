@@ -2137,15 +2137,14 @@ DataFrame.prototype.sequentialDistinct = function (valueSelector, obsoleteSelect
 };
 
 /**
- * Collapse distinct rows in the dataframe.
- * The selector function must return the index and row to use in the new series.
+ * Collapse distinct rows in the dataframe based on the output of 'valueSelector'.
  *
  * @param {function} valueSelector - Selects the value used to compare for duplicates.
- * @param {function} outputSelector - Selects the index and row to represent a collapsed group of rows.
  */
-DataFrame.prototype.distinct = function (valueSelector, outputSelector) {
-	assert.isFunction(valueSelector, "Expected 'valueSelector' parameter to 'distinct' to be a function.")
-	assert.isFunction(outputSelector, "Expected 'outputSelector' parameter to 'distinct' to be a function.")
+DataFrame.prototype.distinct = function (valueSelector, obsoleteSelector) {
+	
+	assert.isFunction(valueSelector, "Expected 'valueSelector' parameter to 'DataFrame.distinct' to be a function.")
+	assert(!obsoleteSelector, "Selector parameter is obsolete and no longer required.");
 
 	var self = this;
 
@@ -2168,6 +2167,7 @@ DataFrame.prototype.distinct = function (valueSelector, outputSelector) {
 		.toArray();
 
 	var output = [];
+	var windowIndex = 0;
 
 	for (var i = 0; i < input.length; ++i) {
 		var underConsideration = input[i];
@@ -2207,7 +2207,9 @@ DataFrame.prototype.distinct = function (valueSelector, outputSelector) {
 				})
 				.toArray()
 		});
-		output.push(outputSelector(window));
+
+		output.push([windowIndex, window]);
+		++windowIndex;
 	}
 
 	return new DataFrame({
