@@ -1362,13 +1362,11 @@ Series.prototype.sequentialDistinct = function (obsoleteSelector) {
 };
 
 /**
- * Collapse distinct values in the series.
- * The selector function must return the index and value to use in the new series.
- *
- * @param {function} outputSelector - Selects the index and value to represent a collapsed group of values.
+ * Group distinct values in the Series into a Series of windows.
  */
-Series.prototype.distinct = function (outputSelector) {
-	assert.isFunction(outputSelector, "Expected 'outputSelector' parameter to 'sequentialDistinct' to be a function.")
+Series.prototype.distinct = function (obsoleteSelector) {
+	
+	assert(!obsoleteSelector, "Selector parameter is obsolete and no longer required.");
 
 	var self = this;
 
@@ -1391,6 +1389,7 @@ Series.prototype.distinct = function (outputSelector) {
 		.toArray();
 
 	var output = [];
+	var windowIndex = 0;
 
 	for (var i = 0; i < input.length; ++i) {
 		var underConsideration = input[i];
@@ -1428,7 +1427,9 @@ Series.prototype.distinct = function (outputSelector) {
 				})
 				.toArray()
 		});
-		output.push(outputSelector(window));
+		
+		output.push([windowIndex, window]);
+		++windowIndex;
 	}
 
 	return new Series({

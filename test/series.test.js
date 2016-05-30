@@ -1340,7 +1340,9 @@ describe('Series', function () {
 			values: [1, 1, 2, 1, 1, 2, 3, 4, 3, 3],
 		});
 
-		var collapsed = series.distinct(function (window) {
+		var collapsed = series
+			.distinct()
+			.selectPairs(function (window) {
 				return [window.getIndex().first(), window.first()];
 			});
 
@@ -1359,7 +1361,9 @@ describe('Series', function () {
 			values: [1, 1, 2, 1, 1, 2, 3, 4, 3, 3],
 		});
 
-		var collapsed = series.distinct(function (window) {
+		var collapsed = series
+			.distinct()
+			.selectPairs(function (window) {
 				return [window.getIndex().last(), window.first()];
 			});
 
