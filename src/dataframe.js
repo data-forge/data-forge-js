@@ -2131,12 +2131,11 @@ DataFrame.prototype.sequentialDistinct = function (valueSelector, outputSelector
 
 	var self = this;
 
-	return self.variableWindow(
-		function (a, b) {
+	return self
+		.variableWindow(function (a, b) {
 			return valueSelector(a) === valueSelector(b);
-		},
-		outputSelector
-	);
+		})
+		.selectPairs(outputSelector);
 };
 
 /**
@@ -2228,15 +2227,14 @@ DataFrame.prototype.distinct = function (valueSelector, outputSelector) {
 };
 
 /**
- * Groups sequential values into windows. The windows can then be collapsed.
- * The output selector function must return the index and value to use in the new series.
+ * Groups sequential values into variable length 'windows'. The windows can then be transformed/transformed using selectPairs or selectManyPairs.
  *
  * @param {function} comparer - Predicate that compares two rows and returns true if they should be in the same window.
- * @param {function} outputSelector - Selects the index and row to represent a collapsed group of rows.
  */
-DataFrame.prototype.variableWindow = function (comparer, outputSelector) {
+DataFrame.prototype.variableWindow = function (comparer, obsoleteSelector) {
+
 	assert.isFunction(comparer, "Expected 'comparer' parameter to 'variableWindow' to be a function.")
-	assert.isFunction(outputSelector, "Expected 'outputSelector' parameter to 'variableWindow' to be a function.")
+	assert(!obsoleteSelector, "Selector parameter is obsolete and no longer required.");
 
 	var self = this;
 
@@ -2257,6 +2255,7 @@ DataFrame.prototype.variableWindow = function (comparer, outputSelector) {
 
 		var startIndex = 0;
 		var takeAmount = 1;
+		var windowIndex = 0;
 
 		var prevPair = input[0]; // 1st pair.
 
@@ -2267,8 +2266,8 @@ DataFrame.prototype.variableWindow = function (comparer, outputSelector) {
 			if (!comparer(prevPair[1], curPair[1])) {
 
 				// Flush.
-				var outputPair = outputSelector(self.skip(startIndex).take(takeAmount));
-				output.push(outputPair);
+				output.push([windowIndex, self.skip(startIndex).take(takeAmount)]);
+				++windowIndex;
 
 				startIndex = i;
 				takeAmount = 1;
@@ -2281,8 +2280,7 @@ DataFrame.prototype.variableWindow = function (comparer, outputSelector) {
 		}
 
 		if (takeAmount > 0) {
-			var outputPair = outputSelector(self.skip(startIndex).take(takeAmount));
-			output.push(outputPair);			
+			output.push([windowIndex, self.skip(startIndex).take(takeAmount)]);
 		}
 	}
 

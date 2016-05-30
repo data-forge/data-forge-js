@@ -3203,14 +3203,13 @@ describe('DataFrame', function () {
 			index: [0, 1, 2, 3, 4, 5, 6, 7],
 		});
 
-		var collapsed = df.variableWindow(
-			function (row1, row2) {
+		var collapsed = df
+			.variableWindow(function (row1, row2) {
 				return row1.c2 === row2.c2;
-			},
-			function (window) {
+			})
+			.selectPairs(function (window) {
 				return [window.getIndex().first(), window.first()];
-			}
-		);
+			});
 
 		expect(collapsed.toPairs()).to.eql([
 			[0, { c1: 1, c2: 15 } ],
