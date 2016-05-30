@@ -1273,6 +1273,20 @@ describe('Series', function () {
 			})).to.eql(false);
 	});	
 
+	it('none - with no predicate - zero elements', function () {
+
+		var series = new Series({ values: [] });
+
+		expect(series.none()).to.eql(true);
+	});
+
+	it('none - with no predicate - has existing elements', function () {
+
+		var series = new Series({ values: [5, 5, 5, 5] });
+
+		expect(series.none()).to.eql(false);
+	});	
+
 	it('can collapse sequential duplicates and take first index', function () {
 
 		var series = new Series({ 
