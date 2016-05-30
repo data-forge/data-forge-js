@@ -3025,6 +3025,28 @@ describe('DataFrame', function () {
 			})).to.eql(false);
 	});	
 
+
+	it('none - with no predicate - zero elements', function () {
+
+		var df = new DataFrame();
+
+		expect(df.none()).to.eql(true);
+	});
+
+	it('none - with no predicate - has existing elements', function () {
+
+		var df = new DataFrame({
+				columnNames: ["a", "b"],
+				rows: [
+					[5, "hello"],
+					[5, "computer"],
+					[5, "yo"],
+				],
+			});
+
+		expect(df.none()).to.eql(false);
+	});	
+
 	it('can remove sequential duplicates and take first in window', function () {
 
 		var df = new DataFrame({
