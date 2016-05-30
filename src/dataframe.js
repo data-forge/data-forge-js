@@ -2123,7 +2123,7 @@ DataFrame.prototype.none = function (predicate) {
  * Collapse a group of sequential rows with duplicate column values into a Series of windows.
  *
  * @param {function} valueSelector - Selects the value used to compare for duplicates.
- */
+ */	
 DataFrame.prototype.sequentialDistinct = function (valueSelector, obsoleteSelector) {
 
 	assert.isFunction(valueSelector, "Expected 'valueSelector' parameter to 'sequentialDistinct' to be a function.")

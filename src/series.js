@@ -1348,21 +1348,17 @@ Series.prototype.none = function (predicate) {
 };
 
 /**
- * Collapse a group of sequential values and produce a new series where duplicates are eliminated.
- * The selector function must return the index and value to use in the new series.
- *
- * @param {function} outputSelector - Selects the index and value to represent a collapsed group of values.
+ * Group sequential duplicate values into a Series of windows.
  */
-Series.prototype.sequentialDistinct = function (outputSelector) {
-	assert.isFunction(outputSelector, "Expected 'outputSelector' parameter to 'sequentialDistinct' to be a function.")
+Series.prototype.sequentialDistinct = function (obsoleteSelector) {
+	
+	assert(!obsoleteSelector, "Selector parameter is obsolete and no longer required.");
 
 	var self = this;
 
-	return self
-		.variableWindow(function (a, b) {
+	return self.variableWindow(function (a, b) {
 			return a === b;
-		})
-		.selectPairs(outputSelector);
+		});
 };
 
 /**

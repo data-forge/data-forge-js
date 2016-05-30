@@ -1294,7 +1294,9 @@ describe('Series', function () {
 			values: [1, 1, 2, 3, 3, 3, 5, 6, 6, 7],
 		});
 
-		var collapsed = series.sequentialDistinct(function (window) {
+		var collapsed = series
+			.sequentialDistinct()
+			.selectPairs(function (window) {
 				return [window.getIndex().first(), window.first()];
 			});
 
@@ -1315,7 +1317,9 @@ describe('Series', function () {
 			values: [1, 1, 2, 3, 3, 3, 5, 6, 6, 7],
 		});
 
-		var collapsed = series.sequentialDistinct(function (window) {
+		var collapsed = series
+			.sequentialDistinct()
+			.selectPairs(function (window) {
 				return [window.getIndex().last(), window.last()];
 			});
 
