@@ -1291,14 +1291,20 @@ Series.prototype.all = function (predicate) {
  * Returns true as soon as the predicate returns truthy.
  * Returns false if the predicate never returns truthy.
  *
- * @param {function} predicate - Predicate function that receives each value in turn and returns truthy for a match, otherwise falsy.
+ * @param {function} [predicate] - Optional predicate function that receives each value in turn and returns truthy for a match, otherwise falsy.
  */
 Series.prototype.any = function (predicate) {
-	assert.isFunction(predicate, "Expected 'predicate' parameter to 'any' to be a function.")
+	if (predicate) {
+		assert.isFunction(predicate, "Expected 'predicate' parameter to 'any' to be a function.")
+	}
 
 	var self = this;
 	var iterator = self.getIterator();
 	validateIterator(iterator);
+
+	if (!predicate) {
+		return iterator.moveNext();
+	}
 
 	while (iterator.moveNext()) {
 		var pair = iterator.getCurrent();

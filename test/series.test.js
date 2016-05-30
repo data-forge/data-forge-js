@@ -1223,6 +1223,20 @@ describe('Series', function () {
 			})).to.eql(true);
 	});	
 
+	it('any - with no predicate - no elements', function () {
+
+		var series = new Series({ values: [] });
+
+		expect(series.any()).to.eql(false);
+	});
+
+	it('any - with no predicate - elements exist', function () {
+
+		var series = new Series({ values: [5, 5, 5, 5] });
+
+		expect(series.any()).to.eql(true);
+	});	
+
 	it('none - zero elements', function () {
 
 		var series = new Series({ values: [] });
