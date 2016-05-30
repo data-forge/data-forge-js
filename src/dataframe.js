@@ -2120,22 +2120,20 @@ DataFrame.prototype.none = function (predicate) {
 };
 
 /**
- * Collapse a group of sequential rows and produce a new DataFrame where duplicate rows are eliminated.
+ * Collapse a group of sequential rows with duplicate column values into a Series of windows.
  *
  * @param {function} valueSelector - Selects the value used to compare for duplicates.
- * @param {function} outputSelector - Selects the index and value for a collapsed group of rows.
  */
-DataFrame.prototype.sequentialDistinct = function (valueSelector, outputSelector) {
+DataFrame.prototype.sequentialDistinct = function (valueSelector, obsoleteSelector) {
+
 	assert.isFunction(valueSelector, "Expected 'valueSelector' parameter to 'sequentialDistinct' to be a function.")
-	assert.isFunction(outputSelector, "Expected 'outputSelector' parameter to 'sequentialDistinct' to be a function.")
+	assert(!obsoleteSelector, "Selector parameter is obsolete and no longer required.");
 
 	var self = this;
 
-	return self
-		.variableWindow(function (a, b) {
+	return self.variableWindow(function (a, b) {
 			return valueSelector(a) === valueSelector(b);
-		})
-		.selectPairs(outputSelector);
+		});
 };
 
 /**
