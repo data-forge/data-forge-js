@@ -1659,7 +1659,7 @@ DataFrame.prototype.rollingWindow = function (period, obsoleteSelector) {
 };
 
 /**
- * Get the first row of the data frame.
+ * Get the first row of the DataFrame.
  */
 DataFrame.prototype.first = function () {
 
@@ -1668,14 +1668,14 @@ DataFrame.prototype.first = function () {
 	var iterator = self.getIterator();
 
 	if (!iterator.moveNext()) {
-		throw new Error("No rows in data-frame.");
+		throw new Error("No rows in DataFrame.");
 	}
 
 	return iterator.getCurrent()[1];
 };
 
 /**
- * Get the last row of the data frame.
+ * Get the last row of the DataFrame.
  */
 DataFrame.prototype.last = function () {
 
@@ -1684,7 +1684,7 @@ DataFrame.prototype.last = function () {
 	var iterator = self.getIterator();
 
 	if (!iterator.moveNext()) {
-		throw new Error("No rows in data-frame.");
+		throw new Error("No rows in DataFrame.");
 	}
 
 	while (iterator.moveNext()) {
@@ -1694,8 +1694,44 @@ DataFrame.prototype.last = function () {
 	return iterator.getCurrent()[1]; // Return the last item.
 };
 
+/**
+ * Get the first index/row pair of the DataFrame.
+ */
+DataFrame.prototype.firstPair = function () {
+
+	var self = this;
+
+	var iterator = self.getIterator();
+
+	if (!iterator.moveNext()) {
+		throw new Error("No rows in DataFrame.");
+	}
+
+	return iterator.getCurrent();
+};
+
+/**
+ * Get the last index/row pair of the DataFrame.
+ */
+DataFrame.prototype.lastPair = function () {
+
+	var self = this;
+
+	var iterator = self.getIterator();
+
+	if (!iterator.moveNext()) {
+		throw new Error("No rows in DataFrame.");
+	}
+
+	while (iterator.moveNext()) {
+		; // Don't evaluate current item, it's too expensive.
+	}
+
+	return iterator.getCurrent();
+};
+
 /** 
- * Reverse the data-frame.
+ * Reverse the DataFrame.
  */
 DataFrame.prototype.reverse = function () {
 
