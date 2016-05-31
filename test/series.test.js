@@ -1346,7 +1346,7 @@ describe('Series', function () {
 		var collapsed = series
 			.sequentialDistinct()
 			.selectPairs(function (window) {
-				return [window.getIndex().last(), window.last()];
+				return [window.lastPair()[0], window.last()];
 			});
 
 		expect(collapsed.toPairs()).to.eql([
@@ -1390,7 +1390,7 @@ describe('Series', function () {
 		var collapsed = series
 			.distinct()
 			.selectPairs(function (window) {
-				return [window.getIndex().last(), window.first()];
+				return [window.lastPair()[0], window.first()];
 			});
 
 		expect(collapsed.toPairs()).to.eql([

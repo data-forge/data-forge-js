@@ -3150,7 +3150,7 @@ describe('DataFrame', function () {
 				return row.c2;
 			})
 			.selectPairs(function (window) {
-				return [window.getIndex().last(), window.last()];
+				return [window.lastPair()[0], window.last()];
 			});
 
 		expect(collapsed.toPairs()).to.eql([
@@ -3217,7 +3217,7 @@ describe('DataFrame', function () {
 				return row.c2;
 			})
 			.selectPairs(function (window) {
-				return [window.getIndex().last(), window.last()];
+				return [window.lastPair()[0], window.last()];
 			});
 
 		expect(collapsed.toPairs()).to.eql([
