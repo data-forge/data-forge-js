@@ -1018,7 +1018,7 @@ Series.prototype.count = function () {
 };
 
 /**
- * Get the first row of the series.
+ * Get the first value of the Series.
  */
 Series.prototype.first = function () {
 
@@ -1026,14 +1026,14 @@ Series.prototype.first = function () {
 	var iterator = self.getIterator();
 
 	if (!iterator.moveNext()) {
-		throw new Error("No rows in series.");
+		throw new Error("No values in Series.");
 	}
 
 	return iterator.getCurrent()[1];
 };
 
 /**
- * Get the last row of the series.
+ * Get the last value of the Series.
  */
 Series.prototype.last = function () {
 
@@ -1041,7 +1041,7 @@ Series.prototype.last = function () {
 	var iterator = self.getIterator();
 
 	if (!iterator.moveNext()) {
-		throw new Error("No rows in series.");
+		throw new Error("No values in Series.");
 	}
 
 	while (iterator.moveNext()) {
@@ -1049,6 +1049,40 @@ Series.prototype.last = function () {
 	}
 
 	return iterator.getCurrent()[1]; // Just evaluate the last item of the iterator.
+};
+
+/**
+ * Get the first index/value pair of the Series.
+ */
+Series.prototype.firstPair = function () {
+
+	var self = this;
+	var iterator = self.getIterator();
+
+	if (!iterator.moveNext()) {
+		throw new Error("No values in Series.");
+	}
+
+	return iterator.getCurrent();
+};
+
+/**
+ * Get the last index/value pair of the Series.
+ */
+Series.prototype.lastPair = function () {
+
+	var self = this;
+	var iterator = self.getIterator();
+
+	if (!iterator.moveNext()) {
+		throw new Error("No values in Series.");
+	}
+
+	while (iterator.moveNext()) {
+		; // Don't evaluate each item, it's too expensive.
+	}
+
+	return iterator.getCurrent();
 };
 
 /** 

@@ -833,7 +833,7 @@ describe('Series', function () {
 		expect(series.count()).to.eql(values.length);
 	})
 
-	it('getting first row of empty series throws exception', function () {
+	it('getting first value of empty series throws exception', function () {
 
 		var series = initSeries([], []);
 
@@ -842,7 +842,7 @@ describe('Series', function () {
 		}).to.throw();
 	});
 
-	it('getting last row of empty series throws exception', function () {
+	it('getting last value of empty series throws exception', function () {
 
 		var series = initSeries([], []);
 
@@ -851,12 +851,38 @@ describe('Series', function () {
 		}).to.throw();
 	});
 
-	it('can get first and last rows', function () {
+	it('can get first and last values', function () {
 
 		var series = initSeries([0, 1, 2], ['A', 'B', 'C']);
 
 		expect(series.first()).to.eql('A');
 		expect(series.last()).to.eql('C');
+	});
+
+	it('getting first pair of empty series throws exception', function () {
+
+		var series = initSeries([], []);
+
+		expect(function () {
+			series.firstPair();
+		}).to.throw();
+	});
+
+	it('getting last pair of empty series throws exception', function () {
+
+		var series = initSeries([], []);
+
+		expect(function () {
+			series.lastPair();
+		}).to.throw();
+	});
+
+	it('can get first and last pairs', function () {
+
+		var series = initSeries([0, 1, 2], ['A', 'B', 'C']);
+
+		expect(series.firstPair()).to.eql([0, 'A']);
+		expect(series.lastPair()).to.eql([2, 'C']);
 	});
 
 	it('can reverse', function () {
