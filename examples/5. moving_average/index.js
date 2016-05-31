@@ -10,11 +10,10 @@ var E = require('linq');
 var computeSimpleMovingAverage = function (dataFrame, period) {
 
 	var movingAvg = dataFrame.getSeries('Close')
-		.rollingWindow(period, 
-			function (window) {
-				return [window.getIndex().last(), window.average()];
-			}
-		);
+		.rollingWindow(period)
+		.selectPairs(function (window) {
+			return [window.lastPair()[0], window.average()];
+		});
 
 	// Create a new data frame with the new column, doesn't modify original data frame.
 	//console.log(movingAvg.getIndex().toValues());
