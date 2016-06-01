@@ -9,6 +9,7 @@ var SelectIterator = require('./src/iterators/select');
 var MultiIterator = require('./src/iterators/multi');
 require('sugar');
 var BabyParse = require('babyparse');
+var extend = require('extend');
 
 var DataFrame = require('./src/dataframe');
 var Series = require('./src/series');
@@ -60,14 +61,25 @@ var dataForge = {
 
 
 	/**
-	 * Deserialize a data frame from a JSON text string.
+	 * Deserialize a DataFrame from a JSON text string.
+	 *
+	 * @param {string} jsonTextString - The JSON text to deserialize.
+	 * @param {config} [config] - Optional configuration option to pass to the DataFrame.
 	 */
-	fromJSON: function (jsonTextString) {
+	fromJSON: function (jsonTextString, config) {
+		
 		assert.isString(jsonTextString, "Expected 'jsonTextString' parameter to 'dataForge.fromJSON' to be a string containing data encoded in the JSON format.");
 
-		return new DataFrame({
-				rows: JSON.parse(jsonTextString)
-			});
+		if (config) {
+			assert.isObject(config, "Expected 'config' parameter to 'dataForge.fromJSON' to be an object with configuration to pass to the DataFrame.");
+		}
+
+		var baseConfig = {
+			rows: JSON.parse(jsonTextString)
+		};
+
+		var dataFrameConfig = extend({}, config || {}, baseConfig);
+		return new DataFrame(dataFrameConfig);
 	},
 
 	//
@@ -76,7 +88,12 @@ var dataForge = {
 	fromCSV: function (csvTextString, config) {
 		assert.isString(csvTextString, "Expected 'csvTextString' parameter to 'dataForge.fromCSV' to be a string containing data encoded in the CSV format.");
 
-		var parsed = BabyParse.parse(csvTextString, config);
+		if (config) {
+			assert.isObject(config, "Expected 'config' parameter to 'dataForge.fromJSON' to be an object with configuration to pass to the DataFrame.");
+		}
+
+		var csvConfig = extend({}, config);
+		var parsed = BabyParse.parse(csvTextString, csvConfig);
 		var rows = parsed.data;
 		
 		/* Old csv parsing.
@@ -125,10 +142,13 @@ var dataForge = {
 					.toArray()
 			})
 			.toArray();
-		return new dataForge.DataFrame({
-				columnNames: columnNames, 
-				rows: remaining
-			});
+
+		var baseConfig = {
+			columnNames: columnNames, 
+			rows: remaining,
+		};
+		var dataFrameConfig = extend({}, config || {}, baseConfig);
+		return new dataForge.DataFrame(dataFrameConfig);
 	},
 
 	/**
