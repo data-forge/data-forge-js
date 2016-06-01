@@ -1993,6 +1993,40 @@ describe('DataFrame', function () {
 		]);
 	});
 
+	it('getting first index of empty data-frame throws exception', function () {
+
+		var dataFrame = initDataFrame([], [], []);
+
+		expect(function () {
+			dataFrame.firstIndex();
+		}).to.throw();
+	});
+
+	it('getting last index of empty data-frame throws exception', function () {
+
+		var dataFrame = initDataFrame([], [], []);
+
+		expect(function () {
+			dataFrame.lastIndex();
+		}).to.throw();
+	});
+
+	it('can get first and last indicies in data frame', function () {
+
+		var dataFrame = initDataFrame(
+				["Column1", "Column2"], 
+				[
+					['A', 1],
+					['B', 2],
+					['C', 3],
+				],
+				[10, 11, 12]
+			);
+
+		expect(dataFrame.firstIndex()).to.eql(10);
+		expect(dataFrame.lastIndex()).to.eql(12);
+	});
+
 	it('can reverse', function () {
 
 		var dataFrame = initDataFrame(

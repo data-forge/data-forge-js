@@ -885,6 +885,32 @@ describe('Series', function () {
 		expect(series.lastPair()).to.eql([2, 'C']);
 	});
 
+	it('getting first index of empty series throws exception', function () {
+
+		var series = initSeries([], []);
+
+		expect(function () {
+			series.firstPair();
+		}).to.throw();
+	});
+
+	it('getting last index of empty series throws exception', function () {
+
+		var series = initSeries([], []);
+
+		expect(function () {
+			series.lastPair();
+		}).to.throw();
+	});
+
+	it('can get first and last indicies', function () {
+
+		var series = initSeries([0, 1, 2], ['A', 'B', 'C']);
+
+		expect(series.firstIndex()).to.eql(0);
+		expect(series.lastIndex()).to.eql(2);
+	});
+
 	it('can reverse', function () {
 
 		var series = initSeries([0, 1, 2], ['A', 'B', 'C']);

@@ -1085,6 +1085,40 @@ Series.prototype.lastPair = function () {
 	return iterator.getCurrent();
 };
 
+/**
+ * Get the first index of the Series.
+ */
+Series.prototype.firstIndex = function () {
+
+	var self = this;
+	var iterator = self.getIterator();
+
+	if (!iterator.moveNext()) {
+		throw new Error("No values in Series.");
+	}
+
+	return iterator.getCurrent()[0];
+};
+
+/**
+ * Get the last index of the Series.
+ */
+Series.prototype.lastIndex = function () {
+
+	var self = this;
+	var iterator = self.getIterator();
+
+	if (!iterator.moveNext()) {
+		throw new Error("No values in Series.");
+	}
+
+	while (iterator.moveNext()) {
+		; // Don't evaluate each item, it's too expensive.
+	}
+
+	return iterator.getCurrent()[0];
+};
+
 /** 
  * Reverse the series.
  */
