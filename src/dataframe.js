@@ -57,7 +57,100 @@ var convertRowsToObjects = function (columnNames, rowsIterator) {
 				);							
 		}
 	);
-}
+};
+
+//
+// Determine column names from an array of rows. Column names are take from the fields in each JavaScript object.
+//
+var determineColumnNamesFromObjectRows = function (rows, considerAllRows)  {
+
+	assert.isArray(rows);
+
+	if (considerAllRows) {
+		return E.from(rows)
+			.selectMany(function (row) {
+				return Object.keys(row);
+			})
+			.distinct()
+			.toArray();
+	}
+	else {
+		if (rows.length > 0) {
+			// Just consider the first row.
+			return Object.keys(rows[0]);
+		}
+		else {
+			// Can't do this, there are no rows.
+			return [];
+		}
+	}
+};
+
+//
+// Evaluate an iterable of JavaScript objects, look at the fields and figure out column names from that.
+//
+var determineColumnNamesFromObjectsIterable = function (iterable, considerAllRows) {
+
+	assert.isFunction(iterable);
+
+	var iterator = iterable();
+
+	if (considerAllRows) {
+		// Consider all rows, this expensive, so it is optional.
+		var rows = [];
+		while (iterator.moveNext()) {
+			rows.push(iterator.getCurrent());
+		}
+		
+		return E.from(rows)
+			.selectMany(function (row) {
+				return Object.keys(row);
+			})
+			.distinct()
+			.toArray();
+	}
+	else {
+		// Just consider the first row.		
+		if (!iterator.moveNext()) {
+			return []; // Nothing in the iterable.
+		}
+
+		return Object.keys(iterator.getCurrent());
+	}
+};
+
+//
+// Evaluate an iterable of index/value pairs, look at the fields in the vlaues and figure out column names from that.
+//
+var determineColumnNamesFromPairsIterable = function (iterable, considerAllRows) {
+
+	assert.isFunction(iterable);
+
+	var iterator = iterable();
+
+	if (considerAllRows) {
+		// Consider all rows, this expensive, so it is optional.
+		var rows = [];
+		while (iterator.moveNext()) {
+			rows.push(iterator.getCurrent()[1]);
+		}
+		
+		return E.from(rows)
+			.selectMany(function (row) {
+				return Object.keys(row);
+			})
+			.distinct()
+			.toArray();
+	}
+	else {
+		// Just consider the first row.
+		if (!iterator.moveNext()) {
+			return []; // Nothing in the iterable.
+		}
+
+		return Object.keys(iterator.getCurrent()[1]);
+	}
+};
 
 /**
  * Constructor for DataFrame.
@@ -90,13 +183,9 @@ var DataFrame = function (config) {
 			self._columnNames = config.columnNames;
 		}
 		else {
-			self._columnNames = function () { //todo: could just make this the default behavior if no columns are specified ?!
-				var iterator = iterable();
-				if (!iterator.moveNext()) {
-					return [];
-				}
-
-				return Object.keys(iterator.getCurrent()[1]);
+			var considerAllRows = config.considerAllRows;
+			self._columnNames = function () {
+				return determineColumnNamesFromPairsIterable(iterable, considerAllRows);
 			};
 		}
 		self.getIterator = iterable;
@@ -207,25 +296,14 @@ var DataFrame = function (config) {
 	else {
 		if (rows) {
 			if (Object.isFunction(rows)) {
-
+				var considerAllRows = config.considerAllRows;
 				self._columnNames = function () {
-					var iterator = config.rows();
-					if (!iterator.moveNext()) {
-						return [];
-					}
-
-					return Object.keys(iterator.getCurrent());
+					return determineColumnNamesFromObjectsIterable(rows, considerAllRows);
 				};				
 			}
 			else {
-				if (config.rows.length > 0) {
-
-					// Derive column names from object fields.
-					self._columnNames = Object.keys(config.rows[0]);
-				}
-				else {
-					self._columnNames = [];
-				}
+				// Derive column names from object fields.
+				self._columnNames = determineColumnNamesFromObjectRows(rows, config.considerAllRows);
 			}
 		}
 		else {

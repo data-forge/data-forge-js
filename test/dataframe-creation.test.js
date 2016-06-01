@@ -101,6 +101,81 @@ describe('dataframe creation', function () {
 		]);
 	});
 
+	it('creating from objects with variable fields - by default just uses first row to determine column names', function () {
+		
+		var dataFrame = new DataFrame({
+			rows: [
+				{ c1: 1, c2: 2 },
+				{ c3: 3, c4: 4 },
+			],
+		});
+
+		var columnNames = ["c1", "c2"];
+		expect(dataFrame.getColumnNames()).to.eql(columnNames);
+		expect(dataFrame.toPairs()).to.eql([
+			[0, { c1: 1, c2: 2 }],
+			[1, { c3: 3, c4: 4 }],
+		]);
+	});
+
+	it('creating from objects with variable fields - can force all rows to be considered to determine column names', function () {
+		
+		var dataFrame = new DataFrame({
+			rows: [
+				{ c1: 1, c2: 2 },
+				{ c3: 3, c4: 4 },
+			],
+			considerAllRows: true,
+		});
+
+		var columnNames = ["c1", "c2", "c3", "c4"];
+		expect(dataFrame.getColumnNames()).to.eql(columnNames);
+		expect(dataFrame.toPairs()).to.eql([
+			[0, { c1: 1, c2: 2 }],
+			[1, { c3: 3, c4: 4 }],
+		]);
+	});
+
+	it('creating from objects with variable fields - can force all rows to be considered to determine column names - rows come from function', function () {
+		
+		var dataFrame = new DataFrame({
+			rows: function () {
+				return new ArrayIterator([
+					{ c1: 1, c2: 2 },
+					{ c3: 3, c4: 4 },
+				]);
+			},
+			considerAllRows: true,
+		});
+
+		var columnNames = ["c1", "c2", "c3", "c4"];
+		expect(dataFrame.getColumnNames()).to.eql(columnNames);
+		expect(dataFrame.toPairs()).to.eql([
+			[0, { c1: 1, c2: 2 }],
+			[1, { c3: 3, c4: 4 }],
+		]);
+	});
+
+	it('creating from objects with variable fields - can force all rows to be considered to determine column names - rows come from iterable', function () {
+		
+		var dataFrame = new DataFrame({
+			iterable: function () {
+				return new ArrayIterator([
+					[0, { c1: 1, c2: 2 }],
+					[1, { c3: 3, c4: 4 }],
+				]);
+			},
+			considerAllRows: true,
+		});
+
+		var columnNames = ["c1", "c2", "c3", "c4"];
+		expect(dataFrame.getColumnNames()).to.eql(columnNames);
+		expect(dataFrame.toPairs()).to.eql([
+			[0, { c1: 1, c2: 2 }],
+			[1, { c3: 3, c4: 4 }],
+		]);
+	});
+
 	it('can create from objects with index', function () {
 		
 		var dataFrame = new DataFrame({
