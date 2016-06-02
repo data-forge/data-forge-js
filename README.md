@@ -16,6 +16,10 @@ Note that some features described in this README are not yet implemented, althou
 
 See here for [generated API docs](./docs/api.md) that are taking shape.
 
+# Examples
+
+Examples and some tests have been removed to a [separate repository](https://github.com/data-forge/data-forge-js-examples-and-tests).
+
 # Contents
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
