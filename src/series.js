@@ -233,7 +233,7 @@ Series.prototype.where = function (filterSelectorPredicate) {
 		iterable: function () {
 			return new WhereIterator(self.getIterator(), 
 				function (pair) {
-					return filterSelectorPredicate(pair[1]);
+					return filterSelectorPredicate(pair[1], pair[0]);
 				}
 			);
 		},

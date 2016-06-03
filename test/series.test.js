@@ -83,7 +83,8 @@ describe('Series', function () {
 
 	it('can filter', function () {
 		var series = initSeries([0, 1, 2, 3], [100, 300, 200, 5]);
-		var filtered = series.where(function (value) {
+		var filtered = series.where(function (value, index) {
+				expect(index).to.be.a('number');
 				return value >= 100 && value < 300;
 			});
 		expect(filtered.getIndex().toValues()).to.eql([0, 2]);
