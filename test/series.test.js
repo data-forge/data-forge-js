@@ -1005,7 +1005,10 @@ describe('Series', function () {
 	it('can take while', function () {
 
 		var series = initSeries([0, 1, 2, 3], [true, true, false, true]);
-		var skipped = series.takeWhile(function (value) { return value; });
+		var skipped = series.takeWhile(function (value, index) { 
+			expect(index).to.be.a("number");
+			return value; 
+		});
 		expect(skipped.toPairs()).to.eql([
 			[0, true],
 			[1, true],

@@ -199,7 +199,7 @@ Series.prototype.takeWhile = function (predicate) {
 		iterable: function () {
 			return new TakeWhileIterator(self.getIterator(), 
 				function (pair) {
-					return predicate(pair[1]);
+					return predicate(pair[1], pair[0]);
 				}
 			);
 		},
