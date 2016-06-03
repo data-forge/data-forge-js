@@ -1018,7 +1018,10 @@ describe('Series', function () {
 	it('can take until', function () {
 
 		var series = initSeries([0, 1, 2, 3], [false, false, true, false]);		
-		var skipped = series.takeUntil(function (value) { return value; });
+		var skipped = series.takeUntil(function (value, index) { 
+			expect(index).to.be.a("number");
+			return value; 
+		});
 		expect(skipped.toPairs()).to.eql([
 			[0, false],
 			[1, false],

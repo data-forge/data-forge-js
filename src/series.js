@@ -215,8 +215,8 @@ Series.prototype.takeUntil = function (predicate) {
 	assert.isFunction(predicate, "Expected 'predicate' parameter to 'takeUntil' function to be a predicate function that returns true/false.");
 
 	var self = this;
-	return self.takeWhile(function (value) { 
-		return !predicate(value); 
+	return self.takeWhile(function (value, index) { 
+		return !predicate(value, index); 
 	});
 };
 
