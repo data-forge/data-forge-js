@@ -93,7 +93,7 @@ describe('Series', function () {
 
 	it('can select', function () {
 		var series = initSeries([0, 1, 2, 3], [100, 300, 200, 5]);
-		var modified = series.select(function (value) {
+		var modified = series.select(function (value, index) {
 				return value + 10;
 			});
 		expect(modified.getIndex().toValues()).to.eql([0, 1, 2, 3]);
@@ -103,6 +103,7 @@ describe('Series', function () {
 	it('can select with index', function () {
 		var series = initSeries([0, 1, 2, 3], [100, 300, 200, 5]);
 		var modified = series.select(function (value, index) {
+				expect(index).to.be.a('number');
 				return index;
 			});
 		expect(modified.getIndex().toValues()).to.eql([0, 1, 2, 3]);
@@ -112,6 +113,7 @@ describe('Series', function () {
 	it('can select pairs', function () {
 		var series = initSeries([0, 1, 2, 3], [100, 300, 200, 5]);
 		var modified = series.selectPairs(function (value, index) {
+				expect(index).to.be.a('number');
 				return [index+1, value + 10];
 			});
 		expect(modified.getIndex().toValues()).to.eql([1, 2, 3, 4]);
@@ -134,6 +136,7 @@ describe('Series', function () {
 	it('can select many with index', function () {
 		var series = initSeries([0, 1, 2, 3], [100, 300, 200, 5]);
 		var modified = series.selectMany(function (value, index) {
+			expect(index).to.be.a('number');
 			return [index, index];
 		});
 
