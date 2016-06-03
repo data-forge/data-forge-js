@@ -423,7 +423,7 @@ Data-Forge has built-in support for serializing and deserializing common data fo
 
 ## Reading and writing files in Node.js
 
-The *from* / *to* functions can be used in combination with Node.js `fs` functions for reading and writing files, eg:
+The *from* and *to* functions can be used in combination with Node.js `fs` functions for reading and writing files, eg:
 
 	var fs = require('fs');
 
