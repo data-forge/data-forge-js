@@ -451,7 +451,7 @@ DataFrame.prototype.getColumnIndex = function (columnName) {
  *
  * @returns {string} Returns the name of the column or undefined if the requested column was not found.
  */
-DataFrame.prototype.getColumnName = function (columnIndex) { //todo: test
+DataFrame.prototype.getColumnName = function (columnIndex) {
 	assert.isNumber(columnIndex, "Expected 'columnIndex' parameter to getColumnIndex to be a non-empty string.");
 
 	var self = this;	
