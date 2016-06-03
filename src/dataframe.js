@@ -850,7 +850,12 @@ var executeOrderBy = function (self, batch) {
 			validateSortMethod(orderCmd.sortMethod);
 		});
 
-		var pairs = self.getIterator().realize();
+		var pairs = [];
+
+		var iterator = self.getIterator();
+		while (iterator.moveNext()) {
+			pairs.push(iterator.getCurrent());
+		}
 
 		return E.from(batch)
 			.aggregate(E.from(pairs), function (unsorted, orderCmd) {
@@ -1855,11 +1860,14 @@ DataFrame.prototype.reverse = function () {
 			return self.getColumnNames();
 		},
 		iterable: function () {
-			return new ArrayIterator(
-				E.from(self.getIterator().realize())
-					.reverse()
-					.toArray()
-			);
+			var pairs = [];
+			var iterator = self.getIterator();
+
+			while (iterator.moveNext()) {
+				pairs.push(iterator.getCurrent());
+			}
+
+			return new ArrayIterator(pairs.reverse());
 		},
 	});
 };
