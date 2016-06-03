@@ -241,6 +241,49 @@ A data-frame, series or index can be forcibly evaluated by calling the `bake` fu
 
 Iterates the rows of a data-frame, series or index. Iterators allow lazy evaluation (row by row evaluation) of data frames, series and index. This is the same concept as an [iterator in JavaScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Iterators_and_Generators) or an [enumerator in C#](https://msdn.microsoft.com/en-us/library/system.collections.ienumerator(v=vs.110).aspx).
 
+## Selector
+
+A selector is a user-defined function (usually anonymous) that is passed to Data-Forge functions to select values per row or per value. Selectors are used to instruct Data-Forge on which part of the data they should work with.
+
+For example say you have a row that looks as follows:
+
+	{
+		Column1: "some data",
+		Column2: 42,
+	},
+
+Here is an example a *selector* that identifies *Column2*:
+
+	var mySelector = function (row) {
+		return row.Column2;
+	};
+
+Selectors are usually passed each row in the Data-Frame or each value in the Series. 
+
+Selectors are usually also passed the *index* for the row or value (although you can ignore this as demonstrated in the previous snippet).
+
+An example of a selector that works with index rather than row: 
+
+	var mySelector = function (row, index) {
+		return index;
+	};
+
+## Predicate
+
+Predicate functions are similar to *selectors*, but they return a boolean value (technically you can return any value that can be considered *truthy* or *falsey*.
+
+An example predicate function:
+
+	var myPredicate = function (row) {
+		return row.Column2 >= 42;	
+	};
+
+Predicates can also take the index: 
+
+	var myPredicate = function (row, index) {
+		return index > 20;
+	};
+
 # Basic Usage 
 
 ## Getting data in
