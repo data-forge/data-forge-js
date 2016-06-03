@@ -683,15 +683,21 @@ An data-frame can be transformed using the [LINQ](https://en.wikipedia.org/wiki/
 			};
 		});
 
-This produces an entirely new data-frame. However the new data-frame has the same index as the source data-frame, so both can be merged back together, if required: 
+This produces an entirely new immutable data-frame. However the new data-frame has the same index as the source data-frame, so both can be merged back together, if required: 
 
 	var mergedDataFrame = dataForge.merge(sourceDataFrame, transformedDataFrame);
 
-The more advanced [`selectMany`](http://www.dotnetperls.com/selectmany) function is also available.
+Note that `select` only transforms the value. The index for each row is preserved in the new DataFrame. To completely transform a DataFrame, both value and index, you must use `selectPairs`:
 
-Note: `select` and `selectMany` are also passed the index for each row.
+	var transformedDataFrame = sourceDataFrame
+		.selectPairs(function (row, index) {
+			return [ // Returns a pair.
+				... some new index ...,
+				... some new row ...
+			];
+		});
 
-Note: Data-frames are immutable, the source data-frame remains unmodified.
+Note that `selectMany` and `selectManyPairs` functions are also available and work the same as LINQ SelectMany.
 
 ## Series transformation
 
@@ -703,14 +709,23 @@ Series can be transformed using `select`:
 			// Apply a transformation to each value in the column.
 			return transform(value); 	
 		});	
+
 	// Plug the modified series back into the data-frame.
 	var newDf = df.setSeries("Some-Column", newSeries);
 
 The source index is preserved to the transformed series.
 
-Note: `select` and `selectMany` are also passed the index for each value.
+Use `selectPairs` to transform both value and index:  
 
-Note: Series are immutable, the original series is unmodified.
+	var newSeries = oldSeries
+		.selectPairs(function (value, index) {
+			return [ // Returns a pair.
+				... some new index ...,
+				... some new value ...
+			];
+		});	
+
+The result of `select` and `selectPairs` is a completely new immutable Series.
 
 Data-Frame offers a convenience function `transformSeries` for when you want to extract, transform and plug back in one or more series at once. For example to simplify the previous code example:
 
@@ -720,6 +735,8 @@ Data-Frame offers a convenience function `transformSeries` for when you want to 
 			return transform(value); 	
 		},
 	);
+
+Note that `selectMany` and `selectManyPairs` functions are also available and work the same as LINQ SelectMany.
 
 ## Data-frame and series filtering
 
