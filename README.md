@@ -323,6 +323,31 @@ A data frame can also be created from an array of JavaScript objects:
 			]
 		});
 
+In this case column names are automatically generated form the fields in the objects. For performance reasons only the fields of the first objects are considered.  
+
+If you have irregular data you can enable *considerAllRows*, but be warned that this can be expensive as every row must be examined to determine column names:
+
+	var dataFrame = new dataForge.DataFrame({
+			rows: [
+				{
+					Col1: 1,
+					Col2: 'hello',
+					Col3: new Date(....)
+				},
+				{
+					Col1: 5,
+					Col5: 'these are irregular columns',
+					Col6: new Date(....)
+				},
+				{
+					Col5: 10,
+					Col7: 'another irregular column',
+					Col10: new Date(....)
+				}
+			],
+			considerAllRows: true, // Examine all rows to determine column names.
+		});
+ 
 
 ## Getting data out
 
