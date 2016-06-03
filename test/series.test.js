@@ -992,7 +992,10 @@ describe('Series', function () {
 	it('can skip until', function () {
 
 		var series = initSeries([0, 1, 2, 3], [false, false, true, false]);
-		var skipped = series.skipUntil(function (value) { return value; });
+		var skipped = series.skipUntil(function (value, index) { 
+			expect(index).to.be.a("number");
+			return value; 
+		});
 		expect(skipped.toPairs()).to.eql([
 			[2, true],
 			[3, false],

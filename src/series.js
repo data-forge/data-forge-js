@@ -165,8 +165,8 @@ Series.prototype.skipUntil = function (predicate) {
 	assert.isFunction(predicate, "Expected 'predicate' parameter to 'skipUntil' function to be a predicate function that returns true/false.");
 
 	var self = this;
-	return self.skipWhile(function (value) { 
-		return !predicate(value); 
+	return self.skipWhile(function (value, index) { 
+		return !predicate(value, index); 
 	});
 };
 
