@@ -149,7 +149,7 @@ Series.prototype.skipWhile = function (predicate) {
 		iterable: function () {
 			return new SkipWhileIterator(self.getIterator(), 
 				function (pair) {
-					return predicate(pair[1]);
+					return predicate(pair[1], pair[0]);
 				}
 			);
 		},
