@@ -2331,7 +2331,7 @@ DataFrame.prototype.distinct = function (valueSelector, obsoleteSelector) {
 		underConsideration.considered = true; // Don't really need to do this, because we never backtrack, but it feels like it makes the code 'complete'.
 		curWindow.push(underConsideration.pair);
 
-		var firstValue = valueSelector(underConsideration.pair[1]);
+		var firstValue = valueSelector(underConsideration.pair[1], underConsideration.pair[0]);
 
 		for (var j = i+1; j < input.length; ++j) {
 			var underComparison = input[j];
@@ -2339,7 +2339,7 @@ DataFrame.prototype.distinct = function (valueSelector, obsoleteSelector) {
 				continue;
 			}
 
-			if (valueSelector(underComparison.pair[1]) === firstValue) {
+			if (valueSelector(underComparison.pair[1], underComparison.pair[0]) === firstValue) {
 				underComparison.considered = true;
 				curWindow.push(underComparison.pair);
 			}

@@ -3215,6 +3215,7 @@ describe('DataFrame', function () {
 
 		var collapsed = df
 			.distinct(function (row, index) {
+				expect(index).to.be.a('number');
 				return row.c2;
 			})
 			.selectPairs(function (window) {
@@ -3248,6 +3249,7 @@ describe('DataFrame', function () {
 
 		var collapsed = df
 			.distinct(function (row, index) {
+				expect(index).to.be.a('number');
 				return row.c2;
 			})
 			.selectPairs(function (window) {
