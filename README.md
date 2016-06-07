@@ -243,7 +243,7 @@ Iterates the rows of a data-frame, series or index. Iterators allow lazy evaluat
 
 ## Selector
 
-A selector is a user-defined function (usually anonymous) that is passed to Data-Forge functions to select values per row or per value. Selectors are used to instruct Data-Forge on which part of the data they should work with.
+A *selector* is a user-defined function (usually anonymous) that is passed to Data-Forge functions to select values per row or per value. Selectors are used to instruct Data-Forge on which part of the data to work on.
 
 For example say you have a row that looks as follows:
 
@@ -270,7 +270,7 @@ An example of a selector that works with index rather than row:
 
 ## Predicate
 
-Predicate functions are similar to *selectors*, but they return a boolean value (technically you can return any value that can be considered *truthy* or *falsey*.
+A *predicate* function is similar to a *selector*, but returns a boolean value (technically you can return any value that can be considered *truthy* or *falsey*.
 
 An example predicate function:
 
@@ -283,6 +283,17 @@ Predicates can also take the index:
 	var myPredicate = function (row, index) {
 		return index > 20;
 	};
+
+## Comparer
+
+A *comparer* method is used to compare to values or rows for equality. It returns true (or *truthy*) to indicate equality or false (or *falsey*) to indicate inequality. 
+
+An example:
+
+	var myComparer = function (row1, row2) {
+		return row1.ClientName === row.ClientName; // Row comparison based on client name.
+	}; 
+
 
 # Basic Usage 
 
@@ -747,44 +758,167 @@ Data-frames and series can be filtered using the [LINQ](https://en.wikipedia.org
 			// ... return true to include the row in the new data frame, return false to exclude it ...
 		});
 
-## LINQ functions
+# LINQ functions
 
 Most of the other [LINQ functions](https://code.msdn.microsoft.com/101-LINQ-Samples-3fb9811b) are or will be available. 
 
 More documentation will be here soon on supported LINQ functions.
 
-## Summarization and Aggregation
+todo: any, all, none
+
+# Collapsing unique values
+
+## Distinct values  
+
+The `distinct` function for `Series` and `DataFrame` works very much like [LINQ Distinct](http://www.dotnetperls.com/distinct).
+
+The `DataFrame` version must be supplied a *selector* that selects which column to use for comparison:
+
+	var distinctDataFrame = someDataFrame.distinct(function (row) {
+			reutrn row.SomeColumn; // Compare 'SomeColumn' for unique values.
+		});
+
+The result is a `DataFrame` with duplicate rows removed. The first index for each group of duplicates is preserved. 
+
+The `Series` version takes no parameters:
+
+	var distinctSeries = someSeries.distinct();
+
+The result is a `Series` with duplicate values removed. The first index for each group of duplicates is preserved.
+
+## Sequential distinct values
+
+The `sequentialDistinct` function for `Series` and `DataFrame` is similar to `distinct`, but only operates on sequentially distinct values.
+
+The resulting `Series` or `DataFrame` has duplicate values or rows removed, but only where the duplicates where adjacent to each other in the data sequence. The first index for each group of sequential duplicates is preserved.
+
+# Groups and windows
+
+Data-Forge provides various methods for grouping data. All of these methods return a `Series` of *buckets*. Each bucket is a `Series` or `DataFrame` containing grouped data. 
+
+Use any of the [data transformation](#data-transformation) or [aggregation](#summarization-and-aggregation) functions to transform a `Series` of buckets into something else.
 
 ## Group
 
-Data in one data-frame can be grouped into multiple data-frames on values selected from the data-frame.
+The `groupBy` function groups `Series` or `DataFrame` based on the output of the user-defined *selector*. This works in very much the same way as [LINQ GroupBy](http://www.dotnetperls.com/groupby). 
 
-For example, grouping raw sales data by client:
+For example, grouping a `DataFrame` with sales data by client:
 
 	var salesByClient = salesData.groupBy(function (row, index) {
 			return row.ClientName;
 		});
 
-This returns an array of objects with the following format:
+This returns a `Series` of data buckets. Each group contains a separate `DataFrame` with only those rows that are part of the group as specified by the *selector*.
 
-	[
-		{
-			key:	<group-by-value>, 
-			data:	<data-frame-containing-grouped-data>,
-		},
-	
-		...
-	]
+This can also be done with `Series`:
 
-todo: have a proper example here with data.
+	var outputSeries = someSeries.groupBy(function (value, index) {
+			return index;
+		});
+
+The output is still a `Series` of data buckets. Each group contains a separate `Series` with only those values that are part of the group as specified by *selector*.
+
+Note that in this example we are grouping by *index* as an alternative to grouping by *value*.
+
+## Group Sequential
+
+The `groupBySequential` function for `Series` and `DataFrame` is similar to `groupBy`, except that it only groups values or rows that adjacent in the data sequence.
+
+	var outputSeries = someSeriesOrDataFrame.groupBySequential(function (valueOrRow, index) {
+			return ... grouping criteria ...
+		});
+
+
+## Window 
+
+The `window` function groups a `Series` or `DataFrame` into equally sized batches. The *window* passes over the data-frame or series *batch-by-batch*, taking the first N rows for the first window, then the second N rows for the next window and so on. 
+
+The output is a `Series` of buckets. Each data bucket contains the values or rows for that *window*.  
+
+	var windowSize = 5; // Looking at 5 rows at a times.
+	var newSeries = seriesOrDataFrame.window(windowSize);
+
+Use any of the [data transformation](#data-transformation) functions to transform the `Series` of *window* into something else.
+
+An example that summarizes weekly sales data:
+
+	var salesData = ... series containing amount sales for each business day ...
+
+	var weeklySales = salesData.window(7)
+			.selectPairs(function (window, windowIndex) {
+				// Return new index and value.
+				return [
+					window.lastIndex(), 	// Week ending.
+					window.sum()			// Total the amount sold during the week.
+				]; 
+			});
+
+## Rolling window
+
+The `rollingWindow` function groups a `Series` or `DataFrame` into batches, this function however differs from `window` in that it *rolls* the *window* across data set *row-by-row* rather than batch-by-batch. 
+
+The `percentChange` function that is included in Data-Forge is probably the simplest example use of `rollingWindow`. It computes a new series with the percentage increase of each value in the source series.
+
+The implementation of `percentChange` looks a bit like this:
+    
+	var pctChangeSeries = sourceSeries.rollingWindow(2)
+		.selectPairs(function (window, windowIndex) {
+				var values = window.toValues();
+				var amountChange = values[1] - values[0]; // Compute amount of change.
+				var pctChange = amountChange / values[0]; // Compute % change.
+
+				// Return new index and value.
+				return [
+					window.lastIndex(), 
+					pctChange
+				]; 
+			});
+   
+`percentChange` is simple because it only considers a window size of 2 (eg it considers each adjacent pair of values).
+
+Now consider an example that requires a configurable window size. Here is some code that computes a *simple moving average* (derived from *[data-forge-indicators](https://github.com/data-forge/data-forge-indicators)*):
+
+	var Enumerable = require('linq');
+
+	var smaPeriod = ... configurable moving average period ...
+ 	var smSeries = someSeries.rollingWindow(smaPeriod)
+		.selectPairs(function (window, windowIndex) {
+    		return [
+				window.lastIndex(),
+				window.sum() / smaPeriod,
+    	});
+
+## Variable window
+
+The `variableWindow` function groups a `Series` or `DataFrame` into buckets that have a variable amount of values or rows. Adjacent values and rows are compared using a user-defined [*comparer*](#comparer). When the *comparer* returns `true` (or *truthy*) adjacent data items are combined into the same group.
+
+An example:
+
+	var outputSeries = someSeriesOrDataFrame.variableWindow(function (a, b) {
+			return ... compare a and b for equality, return true if they are equal ...
+		}; 
+
+The [`sequentialDistinct` function](#sequential-distinct-values) is actually implemented using `variableWindow` so it is a good example:
+
+	var sequentialDistinct = function (valueSelector, obsoleteSelector) {
+
+		var self = this;	
+		return self.variableWindow(function (a, b) {
+				return valueSelector(a) === valueSelector(b);
+			});
+	};
+
+# Summarization and Aggregation
 
 ## Aggregate
 
 todo
 
-### Merge
+## Merge
 
 todo
+
+## Zip
 
 ## Group, Aggregate and Combine
 
@@ -807,68 +941,7 @@ todo
 	var combined = dataForge.concat(aggregated);
 	console.log(combined.toString());
 
-### Window 
 
-The `window` function allows you to produce a new series for a data-frame or series by considering only a window of rows at a time. The *window* passes over the data-frame or series *batch-by-batch*, taking the first N rows for the first window, then the second N rows for the next window and so on.
-
-	var windowSize = 5; // Looking at 5 rows at a times.
-	var newSeries = sourceSeriesOrDataFrame.window(windowSize,
-			function (window, windowIndex) {
-				var index = ... compute index for row ...
-				var value = ... compute value for row ...
-				return [index, value]; // Generate a row in the new series.			
-			}
-		);
-
-Each invocation of the selector function is passed a data-frame or series that represents the window of time requested. The return value of the selector produces a row in the new series: an array is returned that contains a pair of values. The pair specifies the index and value for the row.
-	   
-The window function can be used for summarization and aggregation of data.
-
-As an example consider computing the weekly totals for daily sales data:
-
-	var salesData = ... series containing amount sold on each day ...
-
-	var weeklySales = salesData.window(7, 
-			function (window, windowIndex) {
-				return [
-					window.getIndex().last(), // Week ending.
-					window.sum(),			  // Total the amount sold during the week.
-				]; 
-			},
-		);
-
-## Rolling window
-
-Like the window function, `rollingWindow` considers a window of rows at a time. This function however *rolls* across the data-frame or series *row-by-row* rather than batch-by-batch. The selector function produces a new series with summarized or aggregated data. 
-
-The `percentChange` function that is included is probably the simplest example use of `rollingWindow`. It computes a new series with the percentage increase of each value in the source series.
-
-The implementation of `percentChange` looks a bit like this:
-    
-	var windowSize = 2;
-	var pctChangeSeries = sourceSeries.rollingWindow(windowSize, 
-			function (window, windowIndex) {
-				var values = window.toValues();
-				var amountChange = values[1] - values[0]; // Compute amount of change.
-				var pctChange = amountChange / values[0]; // Compute % change.
-				return [window.getIndex().last(), pctChange]; // Return new index and value.
-			}
-		);
-   
-`percentChange` is simple because it only considers a window size of 2.
-
-Now consider an example that requires a variable window size. Here is some code that computes a *simple moving average* (derived from *[data-forge-indicators](https://github.com/data-forge/data-forge-indicators)*):
-
-	var Enumerable = require('linq');
-
-	var smaPeriod = ... variable window size ...
- 	var smSeries = sourceSeries.rollingWindow(smaPeriod, 
-			function (window, windowIndex) {
-	    		return [
-					window.getIndex().last(),
-					window.sum() / period,
-	    	}
-		);	
 
 # Node.js examples
 
