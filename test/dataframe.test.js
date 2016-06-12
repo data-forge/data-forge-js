@@ -3196,7 +3196,7 @@ describe('DataFrame', function () {
 		]);
 	});
 
-	it('can remove duplicates and take first in window', function () {
+	it('can get distinct rows', function () {
 
 		var df = new DataFrame({
 			columnNames: ['c1', 'c2'],
@@ -3213,13 +3213,9 @@ describe('DataFrame', function () {
 			index: [0, 1, 2, 3, 4, 5, 6, 7],
 		});
 
-		var collapsed = df
-			.distinct(function (row, index) {
+		var collapsed = df.distinct(function (row, index) {
 				expect(index).to.be.a('number');
 				return row.c2;
-			})
-			.selectPairs(function (window) {
-				return [window.getIndex().first(), window.first()];
 			});
 
 		expect(collapsed.toPairs()).to.eql([
@@ -3228,41 +3224,6 @@ describe('DataFrame', function () {
 			[3, { c1: -3, c2: 112 } ],
 			[6, { c1: 8, c2: 333 } ],
 		]);
-	});
-
-	it('can remove duplicates and take last in window', function () {
-
-		var df = new DataFrame({
-			columnNames: ['c1', 'c2'],
-			rows: [
-				[1, 15], // 0
-				[1, 35], // 1
-				[3, 35], // 2
-				[-3, 112], // 3
-				[-3, 35], // 4
-				[8, 15], // 5
-				[8, 333], // 6
-				[-15, 15], // 7
-			],
-			index: [0, 1, 2, 3, 4, 5, 6, 7],
-		});
-
-		var collapsed = df
-			.distinct(function (row, index) {
-				expect(index).to.be.a('number');
-				return row.c2;
-			})
-			.selectPairs(function (window) {
-				return [window.lastPair()[0], window.last()];
-			});
-
-		expect(collapsed.toPairs()).to.eql([
-			[7, { c1: -15, c2: 15 } ],
-			[4, { c1: -3, c2: 35 } ],
-			[3, { c1: -3, c2: 112 } ],
-			[6, { c1: 8, c2: 333 } ],
-		]);
-
 	});
 
 	it('can use variableWindow to remove sequential duplicates and take first in window', function () {

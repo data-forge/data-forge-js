@@ -2332,7 +2332,6 @@ DataFrame.prototype.distinct = function (valueSelector, obsoleteSelector) {
 		.toArray();
 
 	var output = [];
-	var windowIndex = 0;
 
 	for (var i = 0; i < input.length; ++i) {
 		var underConsideration = input[i];
@@ -2341,10 +2340,8 @@ DataFrame.prototype.distinct = function (valueSelector, obsoleteSelector) {
 			continue;
 		}
 
-		var curWindow = [];
-
+		var curPair = underConsideration.pair;
 		underConsideration.considered = true; // Don't really need to do this, because we never backtrack, but it feels like it makes the code 'complete'.
-		curWindow.push(underConsideration.pair);
 
 		var firstValue = valueSelector(underConsideration.pair[1], underConsideration.pair[0]);
 
@@ -2356,38 +2353,16 @@ DataFrame.prototype.distinct = function (valueSelector, obsoleteSelector) {
 
 			if (valueSelector(underComparison.pair[1], underComparison.pair[0]) === firstValue) {
 				underComparison.considered = true;
-				curWindow.push(underComparison.pair);
 			}
 		}
 
-		var window = new DataFrame({
-			rows: E.from(curWindow)	
-				.select(function (pair) {
-					return pair[1];
-				})
-				.toArray(),
-			index: E.from(curWindow)
-				.select(function (pair) {
-					return pair[0];
-				})
-				.toArray()
-		});
-
-		output.push([windowIndex, window]);
-		++windowIndex;
+		output.push(curPair);
 	}
 
 	return new DataFrame({
-		rows: E.from(output)
-			.select(function (pair) {
-				return pair[1];
-			})
-			.toArray(),
-		index: E.from(output)
-			.select(function (pair) {
-				return pair[0];
-			})
-			.toArray(),
+		iterable: function () {
+			return new ArrayIterator(output);
+		},
 	});
 };
 
