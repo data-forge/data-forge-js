@@ -1401,44 +1401,19 @@ describe('Series', function () {
 		]);
 	});
 
-	it('can collapse duplicate items and take first index', function () {
+	it('can distinct items', function () {
 
 		var series = new Series({ 
 			index:  [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
 			values: [1, 1, 2, 1, 1, 2, 3, 4, 3, 3],
 		});
 
-		var collapsed = series
-			.distinct()
-			.selectPairs(function (window) {
-				return [window.getIndex().first(), window.first()];
-			});
+		var collapsed = series.distinct();
 
 		expect(collapsed.toPairs()).to.eql([
 			[0, 1],
 			[2, 2],
 			[6, 3],
-			[7, 4],
-		]);
-	});
-
-	it('can collapse duplicate items and take last index', function () {
-
-		var series = new Series({ 
-			index:  [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-			values: [1, 1, 2, 1, 1, 2, 3, 4, 3, 3],
-		});
-
-		var collapsed = series
-			.distinct()
-			.selectPairs(function (window) {
-				return [window.lastPair()[0], window.first()];
-			});
-
-		expect(collapsed.toPairs()).to.eql([
-			[4, 1],
-			[5, 2],
-			[9, 3],
 			[7, 4],
 		]);
 	});

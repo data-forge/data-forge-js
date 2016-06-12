@@ -1464,7 +1464,6 @@ Series.prototype.distinct = function (obsoleteSelector) {
 		.toArray();
 
 	var output = [];
-	var windowIndex = 0;
 
 	for (var i = 0; i < input.length; ++i) {
 		var underConsideration = input[i];
@@ -1473,10 +1472,8 @@ Series.prototype.distinct = function (obsoleteSelector) {
 			continue;
 		}
 
-		var curWindow = [];
-
+		var curPair = underConsideration.pair;
 		underConsideration.considered = true; // Don't really need to do this, because we never backtrack, but it feels like it makes the code 'complete'.
-		curWindow.push(underConsideration.pair);
 
 		for (var j = i+1; j < input.length; ++j) {
 			var underComparison = input[j];
@@ -1486,38 +1483,16 @@ Series.prototype.distinct = function (obsoleteSelector) {
 
 			if (underComparison.pair[1] === underConsideration.pair[1]) {
 				underComparison.considered = true;
-				curWindow.push(underComparison.pair);
 			}
 		}
 
-		var window = new Series({
-			values: E.from(curWindow)	
-				.select(function (pair) {
-					return pair[1];
-				})
-				.toArray(),
-			index: E.from(curWindow)
-				.select(function (pair) {
-					return pair[0];
-				})
-				.toArray()
-		});
-		
-		output.push([windowIndex, window]);
-		++windowIndex;
+		output.push(curPair);
 	}
 
 	return new Series({
-		values: E.from(output)
-			.select(function (pair) {
-				return pair[1];
-			})
-			.toArray(),
-		index: E.from(output)
-			.select(function (pair) {
-				return pair[0];
-			})
-			.toArray(),
+		iterable: function () {
+			return new ArrayIterator(output);
+		},
 	});
 };
 
