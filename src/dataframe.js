@@ -2440,4 +2440,44 @@ DataFrame.prototype.variableWindow = function (comparer, obsoleteSelector) {
 	});
 };
 
+/**
+ * Reshape (or pivot) a table based on column values.
+ *
+ * @param {string} column - Column name whose values make the new DataFrame's columns.
+ * @param {string} value - Column name whose values populate the new DataFrame's values.
+
+DataFrame.prototype.pivot = function (column, value) {
+	var self = this;
+
+	assert.isString(column, "Expected 'column' parameter to DataFrame.pivot to be a string that identifies the column whose values make the new DataFrame's columns.");
+	assert.isString(value, "Expected 'value' parameter to DataFrame.pivot to be a string that identifies the column whose values make the new DataFrame's values.");
+
+	if (!self.hasSeries(column)) {
+		throw new Error("Expected to find a column with name '" + column + "'.");
+	}
+
+	if (!self.hasSeries(value)) {
+		throw new Error("Expected to find a column with name '" + value + "'.");
+	}
+
+	var newColumnNames = self.getSeries(column).distinct().toValues();
+	console.log(newColumnNames);
+
+	var newSeries = E.from(newColumnNames) // Create a series for each column
+		.select(function (columnName) {
+			return self
+				.where(function (row) {
+					return row[column] === columnName;
+				})
+				.deflate(function (row) {
+					return row[value];
+				});
+		})
+		.toArray();
+
+	var dataForge = require('../index');
+	return dataForge.mergeSeries(newColumnNames, newSeries);
+};
+*/
+
 module.exports = DataFrame;
