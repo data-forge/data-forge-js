@@ -62,6 +62,53 @@ describe('data-forge', function () {
 		]);
 	});
 
+	it('can merge on index', function () {
+
+		var left = initDataFrame(
+				[
+					'merge-key',
+					'left-val',
+				],
+				[
+					['foo', 1],
+					['foo', 2],
+				]
+			)
+			.setIndex('merge-key')
+			;
+
+		var right = initDataFrame(
+				[
+					'merge-key',
+					'right-val',
+					'other-right-value'
+				],
+				[
+					['foo', 4, 100],
+					['foo', 5, 200],
+				]
+			)
+			.setIndex('merge-key')
+			;
+
+		var merged = dataForge.merge(left, right);
+		console.log(merged.getColumnNames()); //fio:
+		expect(merged.getColumnNames()).to.eql([
+			'merge-key',
+			'left-val',
+			'merge-key',
+			'right-val',
+			'other-right-value',
+		]);
+		console.log(merged.toValues()); //fio:
+		expect(merged.toValues()).to.eql([
+			['foo', 1, 'foo', 4, 100],
+			['foo', 1, 'foo', 5, 200],
+			['foo', 2, 'foo', 4, 100],
+			['foo', 2, 'foo', 5, 200],
+		]);
+	});
+
 	it('can merge on columns that have different indices', function () {
 
 		var left = initDataFrame(
