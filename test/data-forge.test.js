@@ -551,4 +551,16 @@ describe('data-forge', function () {
 			})
 			.to.throw();
 	});
+
+	it('exception is thrown on series merge when there are duplicate column names', function () {
+
+		var series1 = new dataForge.Series({ values: [1] });
+		var series2 = new dataForge.Series({ values: [10] });
+
+		var columnNames = ["Column1", "Column1"];
+		expect(function () {
+				dataForge.mergeSeries(columnNames, [series1, series2]);
+			})
+			.to.throw();
+	});
 });

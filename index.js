@@ -303,6 +303,9 @@ var dataForge = {
 
 		assert(columnNames.length === series.length, "Expect 'columnNames' and 'series' parameters to dataForge.mergeSeries to be arrays with the same length. columnNames has length " + columnNames.length + ", series has length " + series.length);
 
+		var distinctColumnNames = E.from(columnNames).distinct().toArray();
+		assert(distinctColumnNames.length === columnNames.length, "Only distinct column names are allowed, please remove duplicates from: " + columnNames.join(', ') + ".");
+
 		//todo: check that the column names are all distinct.
 
 		return E.from(columnNames)
