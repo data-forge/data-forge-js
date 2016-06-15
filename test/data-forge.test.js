@@ -494,4 +494,21 @@ describe('data-forge', function () {
 		expect(called).to.equal(1);
 
 	});
+
+	it('can merge series to create dataframe', function () {
+
+		var series1 = new dataForge.Series({ values: [1, 2, 3] });
+		var series2 = new dataForge.Series({ values: [10, 12, 13] });
+
+		var columnNames = ["Column1", "Column2"];
+		var merged = dataForge.mergeSeries(columnNames, [series1, series2]);
+
+		expect(merged.getColumnNames()).to.eql(columnNames);
+		expect(merged.getIndex().toValues()).to.eql([0, 1, 2]);
+		expect(merged.toValues()).to.eql([
+			[1, 10],
+			[2, 12],
+			[3, 13],
+		]);
+	});
 });

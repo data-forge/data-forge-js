@@ -282,6 +282,44 @@ var dataForge = {
 	},
 
 	/**
+	 * Merge multiple series into a new DataFrame.
+	 * 
+	 * @param {array} columnNames - Array of strings that defines the column names for the resulting DataFrame. Must have the same number of elements as the 'series' parameter.
+	 * @param {array} series - Array of series that defined the values for the columns. Must have the same number of elements as the 'columnNames' parameter.
+	 */
+	mergeSeries: function (columnNames, series) {
+		assert.isArray(columnNames, "Expected 'columnNames' parameter of dataForge.mergeSeries to be an array of strings that specify column names in the resulting DataFrame.");
+		assert.isArray(series, "Expected 'series' parameter of dataForge.mergeSeries to be an array of Series objects that specify the values for the columns in the resulting DataFrame.");
+
+		columnNames.forEach(function (columnName) {
+			//todo: specify bad index.
+			assert.isString(columnName, "Expected 'columnNames' parameter of dataForge.mergeSeries to be an array of strings that specify column names in the resulting DataFrame.");
+		});
+
+		series.forEach(function (series) {
+			//todo: specify bad index.
+			assert.instanceOf(series, Series, "Expected 'series' parameter of dataForge.mergeSeries to be an array of Series objects that specify the values for the columns in the resulting DataFrame.");
+		});
+
+		//todo: make use of columnName.
+
+		//todo: check that the arrays are the same size
+		//todo: check that the column names are all distinct.
+
+		return E.from(columnNames)
+			.zip(series, function (columnName, series) {
+				return series.inflate(function (value) {
+					var output = {};
+					output[columnName] = value;
+					return output;
+				});
+			})
+			.aggregate(function (mergedDataFrame, toMerge) { //todo: just call the function that will merge multiple DFs
+				return mergedDataFrame.merge(toMerge);
+			});
+	},
+
+	/**
 	 * Concatenate multiple data frames into a single.
 	 *
 	 * @param {array} dataFrames - Array of data frames to concatenate.
