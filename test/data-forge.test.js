@@ -493,7 +493,7 @@ describe('data-forge', function () {
 
 	});
 
-	it('can merge series to create dataframe', function () {
+	it('can merge 2 series to create dataframe', function () {
 
 		var series1 = new dataForge.Series({ values: [1, 2, 3] });
 		var series2 = new dataForge.Series({ values: [10, 12, 13] });
@@ -508,5 +508,47 @@ describe('data-forge', function () {
 			[2, 12],
 			[3, 13],
 		]);
+	});
+
+	it('can merge 3 series to create dataframe', function () {
+
+		var series1 = new dataForge.Series({ values: [1, 2, 3] });
+		var series2 = new dataForge.Series({ values: [10, 12, 13] });
+		var series3 = new dataForge.Series({ values: [30, 40, 50] });
+
+		var columnNames = ["Column1", "Column2", "Column3"];
+		var merged = dataForge.mergeSeries(columnNames, [series1, series2, series3]);
+
+		expect(merged.getColumnNames()).to.eql(columnNames);
+		expect(merged.getIndex().toValues()).to.eql([0, 1, 2]);
+		expect(merged.toValues()).to.eql([
+			[1, 10, 30],
+			[2, 12, 40],
+			[3, 13, 50],
+		]);
+	});
+
+	it('exception is thrown on series merge when more columns are specified than series', function () {
+
+		var series1 = new dataForge.Series({ values: [1] });
+		var series2 = new dataForge.Series({ values: [10] });
+
+		var columnNames = ["Column1", "Column2", "Column3"];
+		expect(function () {
+				dataForge.mergeSeries(columnNames, [series1, series2]);
+			})
+			.to.throw();
+	});
+
+	it('exception is thrown on series merge when more series are specified than columns', function () {
+
+		var series1 = new dataForge.Series({ values: [1] });
+		var series2 = new dataForge.Series({ values: [10] });
+
+		var columnNames = ["Column1"];
+		expect(function () {
+				dataForge.mergeSeries(columnNames, [series1, series2]);
+			})
+			.to.throw();
 	});
 });

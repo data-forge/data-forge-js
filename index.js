@@ -301,9 +301,8 @@ var dataForge = {
 			assert.instanceOf(series, Series, "Expected 'series' parameter of dataForge.mergeSeries to be an array of Series objects that specify the values for the columns in the resulting DataFrame.");
 		});
 
-		//todo: make use of columnName.
+		assert(columnNames.length === series.length, "Expect 'columnNames' and 'series' parameters to dataForge.mergeSeries to be arrays with the same length. columnNames has length " + columnNames.length + ", series has length " + series.length);
 
-		//todo: check that the arrays are the same size
 		//todo: check that the column names are all distinct.
 
 		return E.from(columnNames)
