@@ -92,7 +92,6 @@ describe('data-forge', function () {
 			;
 
 		var merged = dataForge.merge(left, right);
-		console.log(merged.getColumnNames()); //fio:
 		expect(merged.getColumnNames()).to.eql([
 			'merge-key',
 			'left-val',
@@ -100,7 +99,6 @@ describe('data-forge', function () {
 			'right-val',
 			'other-right-value',
 		]);
-		console.log(merged.toValues()); //fio:
 		expect(merged.toValues()).to.eql([
 			['foo', 1, 'foo', 4, 100],
 			['foo', 1, 'foo', 5, 200],
