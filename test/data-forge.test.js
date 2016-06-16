@@ -200,6 +200,89 @@ describe('data-forge', function () {
 		}).to.throw(Error);
 	});
 
+	it('can merge data-frames with mismatched values', function () {
+
+		var left = initDataFrame(
+				[
+					'merge-key',
+					'left-val',
+				],
+				[
+					['foo', 1],
+					['fee', 2],
+				]
+			);
+
+		var right = initDataFrame(
+				[
+					'merge-key',
+					'right-val',
+					'other-right-value'
+				],
+				[
+					['far', 4, 100],
+					['foo', 5, 200],
+				]
+			);
+
+		var merged = dataForge.merge(left, right, 'merge-key');
+		expect(merged.getColumnNames()).to.eql([
+			'merge-key',
+			'left-val',
+			'right-val',
+			'other-right-value',
+		]);
+		expect(merged.toValues()).to.eql([
+			['foo', 1, 5, 200],
+			['fee', 2, undefined, undefined],
+			['far', undefined, 4, 100],
+		]);
+	});
+
+	it('can merge data-frames with mismatched indicies', function () {
+
+		var left = initDataFrame(
+				[
+					'merge-key',
+					'left-val',
+				],
+				[
+					['foo', 1],
+					['fee', 2],
+				]
+			)
+			.setIndex('merge-key')
+			.dropSeries('merge-key')
+			;
+
+		var right = initDataFrame(
+				[
+					'merge-key',
+					'right-val',
+					'other-right-value'
+				],
+				[
+					['far', 4, 100],
+					['foo', 5, 200],
+				]
+			)
+			.setIndex('merge-key')
+			.dropSeries('merge-key')
+			;
+
+		var merged = dataForge.merge(left, right);
+		expect(merged.getColumnNames()).to.eql([
+			'left-val',
+			'right-val',
+			'other-right-value',
+		]);
+		expect(merged.toValues()).to.eql([
+			[1, 5, 200],
+			[2, undefined, undefined],
+			[undefined, 4, 100],
+		]);
+	});
+
 	it('can concat data frames', function () { //todo: also when columns are unevan or at different indices
 
 	 	var df1 = initDataFrame(["1", "2"], [[1, 2], [3, 4]]);

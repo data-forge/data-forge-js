@@ -160,7 +160,8 @@ var dataForge = {
 	 */
 	merge: function (leftDataFrame, rightDataFrame, columnName) {
 
-		//todo: refactory and DRY the two code paths here.
+		//todo: refactor and DRY the two code paths here.
+		//todo: this probably just needs a rewrite so that multiple dataframes can be merged.
 
 		assert.isObject(leftDataFrame, "Expected 'leftDataFrame' parameter to 'merge' to be an object.");
 		assert.isObject(rightDataFrame, "Expected 'rightDataFrame' parameter to 'merge' to be an object.");
@@ -185,6 +186,35 @@ var dataForge = {
 				.concat(dropElement(leftDataFrame.getColumnNames(), leftColumnIndex))
 				.concat(dropElement(rightDataFrame.getColumnNames(), rightColumnIndex));
 
+			var leftIndices = E.from(leftRows)
+				.select(function (leftRow) {
+					return leftRow[leftColumnIndex];
+				})
+				.toArray();
+			var rightIndices = E.from(rightRows)
+				.select(function (rightRow) {
+					return rightRow[rightColumnIndex];
+				})
+				.toArray();
+
+			var leftColumns = leftDataFrame.getColumnNames();
+			var rightColumns = rightDataFrame.getColumnNames();
+
+			var distinctIndices = E.from(leftIndices.concat(rightIndices)).distinct().toArray();
+
+			var leftMap = E.from(leftRows)
+				.groupBy(function (leftRow) {
+					return leftRow[leftColumnIndex];
+				})
+				.toObject(
+					function (group) {
+						return group.key();
+					},
+					function (group) {
+						return group.getSource();
+					}
+				);
+
 			var rightMap = E.from(rightRows)
 				.groupBy(function (rightRow) {
 					return rightRow[rightColumnIndex];
@@ -198,27 +228,83 @@ var dataForge = {
 					}
 				);
 
-			var mergedValues = E.from(leftRows) // Merge values, drop index.
-				.selectMany(function (leftRow) {
-					var rightRows = rightMap[leftRow[leftColumnIndex]] || [];
-					return E.from(rightRows)
-						.select(function (rightRow) {
-							var combined = [leftRow[leftColumnIndex]];
-							
-							for (var i = 0; i < leftRow.length; ++i) {
+			var mergedValues = E.from(distinctIndices) // Merge values, drop index.
+				.selectMany(function (index) {
+					var leftRows = leftMap[index] || [];
+					var rightRows = rightMap[index] || [];
+					var outputRows = [];
+
+					if (leftRows.length > 0) {
+						leftRows.forEach(function (leftRow) {
+							assert.isArray(leftRow);
+
+							if (rightRows.length > 0) {
+								
+								rightRows.forEach(function (rightRow) {
+									assert.isArray(rightRow);
+
+									var outputRow = [];
+									outputRow.push(index);
+
+									for (var i = 0; i < leftRow.length; ++i) {
+										if (i !== leftColumnIndex) {
+											outputRow.push(leftRow[i]);
+										}
+									}
+
+									for (var i = 0; i < rightRow.length; ++i) {
+										if (i !== rightColumnIndex) {
+											outputRow.push(rightRow[i]);
+										}
+									}
+
+									outputRows.push(outputRow);
+								});
+							}
+							else {
+								var outputRow = [];
+								outputRow.push(index);
+
+								for (var i = 0; i < leftRow.length; ++i) {
+									if (i !== leftColumnIndex) {
+										outputRow.push(leftRow[i]);
+									}
+								}
+
+								for (var i = 0; i < rightColumns.length; ++i) {
+									if (i !== rightColumnIndex) {
+										outputRow.push(undefined);
+									}
+								}
+
+								outputRows.push(outputRow);
+							}
+						});						
+					}
+					else {
+						rightRows.forEach(function (rightRow) {
+							assert.isArray(rightRow);
+
+							var outputRow = [];
+							outputRow.push(index);
+
+							for (var i = 0; i < leftColumns.length; ++i) {
 								if (i !== leftColumnIndex) {
-									combined.push(leftRow[i]);
+									outputRow.push(undefined);
 								}
 							}
 
 							for (var i = 0; i < rightRow.length; ++i) {
 								if (i !== rightColumnIndex) {
-									combined.push(rightRow[i]);
+									outputRow.push(rightRow[i]);
 								}
 							}
 
-							return combined;
+							outputRows.push(outputRow);
 						});
+					}
+
+					return outputRows;
 				})
 				.toArray();
 
@@ -237,6 +323,23 @@ var dataForge = {
 			var rightColumns = rightDataFrame.getColumnNames();
 			var mergedColumnNames = leftColumns.concat(rightColumns);
 
+			var leftIndices = leftDataFrame.getIndex().toValues();
+			var rightIndices = rightDataFrame.getIndex().toValues();
+			var distinctIndices = E.from(leftIndices.concat(rightIndices)).distinct().toArray();
+
+			var leftMap = E.from(leftPairs)
+				.groupBy(function (leftPair) {
+					return leftPair[0];
+				})
+				.toObject(
+					function (group) {
+						return group.key();
+					},
+					function (group) {
+						return group.getSource();
+					}
+				);
+
 			var rightMap = E.from(rightPairs)
 				.groupBy(function (rightPair) {
 					return rightPair[0];
@@ -250,24 +353,76 @@ var dataForge = {
 					}
 				);
 
-			var mergedValues = E.from(leftPairs) 
-				.selectMany(function (leftPair) {
-					var rightPairs = rightMap[leftPair[0]] || [];
-					return E.from(rightPairs)
-						.select(function (rightPair) {
-							return E.from(leftColumns)
-								.select(function (leftColumnName) {
-									return leftPair[1][leftColumnName];
-								})
-								.toArray()
-								.concat(
-									E.from(rightColumns)
-										.select(function (rightColumnName) {
-											return rightPair[1][rightColumnName];
-										})
-										.toArray()
-								);
+			var outputIndices = [];
+
+			var mergedValues = E.from(distinctIndices) 
+				.selectMany(function (index) {
+					var leftPairs = leftMap[index] || [];
+					var rightPairs = rightMap[index] || [];
+					var outputRows = [];
+
+					if (leftPairs.length > 0) {
+						leftPairs.forEach(function (leftPair) {
+							assert.isArray(leftPair);
+
+							if (rightPairs.length > 0) {
+								
+								rightPairs.forEach(function (rightPair) {
+									assert.isArray(rightPair);
+
+									outputIndices.push(index);
+
+									var outputRow = [];
+
+									leftColumns.forEach(function (leftColumnName) {
+										outputRow.push(leftPair[1][leftColumnName]);
+									});
+
+									rightColumns.forEach(function (rightColumnName) {
+										outputRow.push(rightPair[1][rightColumnName]);
+									});
+
+									outputRows.push(outputRow);
+								});
+							}
+							else {
+								outputIndices.push(index);
+
+								var outputRow = [];
+
+								leftColumns.forEach(function (leftColumnName) {
+									outputRow.push(leftPair[1][leftColumnName]);
+								});
+
+								for (var i = 0; i < rightColumns.length; ++i) {
+									outputRow.push(undefined);
+								}
+
+								outputRows.push(outputRow);
+							}
 						});
+					}
+					else {
+						rightPairs.forEach(function (rightPair) {
+							assert.isArray(rightPair);
+
+							outputIndices.push(index);
+
+							var outputRow = [];
+
+							for (var i = 0; i < leftColumns.length; ++i) {
+								outputRow.push(undefined);
+							}
+
+							rightColumns.forEach(function (rightColumnName) {
+								outputRow.push(rightPair[1][rightColumnName]);
+							});
+
+							outputRows.push(outputRow);
+						});
+					}
+
+					return outputRows;
 				})
 				.toArray();
 
@@ -305,8 +460,6 @@ var dataForge = {
 
 		var distinctColumnNames = E.from(columnNames).distinct().toArray();
 		assert(distinctColumnNames.length === columnNames.length, "Only distinct column names are allowed, please remove duplicates from: " + columnNames.join(', ') + ".");
-
-		//todo: check that the column names are all distinct.
 
 		return E.from(columnNames)
 			.zip(series, function (columnName, series) {
