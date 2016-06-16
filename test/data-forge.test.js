@@ -11,7 +11,7 @@ describe('data-forge', function () {
 	var expect = require('chai').expect;
 	var assert = require('chai').assert;
 
-	var initDataFrame = function (columns, values) {
+	var initDataFrame = function (columns, values, index) {
 		assert.isArray(columns);
 		assert.isArray(values);
 
@@ -20,6 +20,7 @@ describe('data-forge', function () {
 			rows: function () {
 				return new ArrayIterator(values);
 			},
+			index: index,
 		});
 	};
 
@@ -237,6 +238,37 @@ describe('data-forge', function () {
 			['fee', 2, undefined, undefined],
 			['far', undefined, 4, 100],
 		]);
+	});
+
+	it('merging data-frames with mismatched values preserves index', function () {
+
+		var left = initDataFrame(
+				[
+					'merge-key',
+					'left-val',
+				],
+				[
+					['foo', 1],
+					['fee', 2],
+				],
+				[ 10, 20 ]
+			);
+
+		var right = initDataFrame(
+				[
+					'merge-key',
+					'right-val',
+					'other-right-value'
+				],
+				[
+					['far', 4, 100],
+					['foo', 5, 200],
+				],
+				[ 100, 200 ]
+			);
+
+		var merged = dataForge.merge(left, right, 'merge-key');
+		expect(merged.getIndex().toValues()).to.eql([ 10, 20, 100 ]);
 	});
 
 	it('can merge data-frames with mismatched indicies', function () {
@@ -645,5 +677,24 @@ describe('data-forge', function () {
 				dataForge.mergeSeries(columnNames, [series1, series2]);
 			})
 			.to.throw();
+	});
+
+	it('can merge series with mismatched indices', function () {
+
+		var series1 = new dataForge.Series({ values: [11, 12, 13], index: [0, 1, 5] });
+		var series2 = new dataForge.Series({ values: [10, 20, 30, 40], index: [1, 2, 5, 8] });
+
+		var columnNames = ["Column1", "Column2"];
+		var merged = dataForge.mergeSeries(columnNames, [series1, series2]);
+
+		expect(merged.getColumnNames()).to.eql(columnNames);
+		expect(merged.getIndex().toValues()).to.eql([0, 1, 5, 2, 8]);
+		expect(merged.toValues()).to.eql([
+			[11, undefined],
+			[12, 10],
+			[13, 30],
+			[undefined, 20],
+			[undefined, 40],
+		]);
 	});
 });
