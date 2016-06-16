@@ -3300,27 +3300,26 @@ describe('DataFrame', function () {
 			.to.throw();
 	});
 
-	/*
 	it('can pivot table', function () {
 
 		var df = new DataFrame({
 			columnNames: ["Date", "Ticker", "Close"],
 			rows: [
-				["2016-06-01", "1PG", 5.2],
-				["2016-06-01", "ABC", 5.2],
-				["2016-06-01", "MPL", 1.2],
+				["2016-06-02", "1PG", 5.2],
+				["2016-06-02", "ABC", 5.2],
+				["2016-06-02", "MPL", 1.2],
 
-				["2016-06-02", "1PG", 5.3],
-				["2016-06-02", "ABC", 4.2],
-				["2016-06-02", "MPL", 2.2],
+				["2016-06-03", "1PG", 5.3],
+				["2016-06-03", "ABC", 4.2],
+				["2016-06-03", "MPL", 2.2],
 
-				["2016-06-03", "1PG", 5.4],
-				["2016-06-02", "ABC", 3.2],
-				["2016-06-03", "MPL", 3.2],
+				["2016-06-04", "1PG", 5.4],
+				["2016-06-04", "ABC", 3.2],
+				["2016-06-04", "MPL", 3.2],
 			],
 		});
 
-		var pivoted = df.parseDates("Date")
+		var pivoted = df //todo: .parseDates("Date") -- Want to get this working with proper dates.
 			.setIndex("Date")
 			.pivot("Ticker", "Close")
 			;
@@ -3332,6 +3331,5 @@ describe('DataFrame', function () {
 			[5.4, 3.2, 3.2],
 		]);
 	});
-	*/
 
 });

@@ -2445,7 +2445,7 @@ DataFrame.prototype.variableWindow = function (comparer, obsoleteSelector) {
  *
  * @param {string} column - Column name whose values make the new DataFrame's columns.
  * @param {string} value - Column name whose values populate the new DataFrame's values.
-
+ */
 DataFrame.prototype.pivot = function (column, value) {
 	var self = this;
 
@@ -2461,7 +2461,6 @@ DataFrame.prototype.pivot = function (column, value) {
 	}
 
 	var newColumnNames = self.getSeries(column).distinct().toValues();
-	console.log(newColumnNames);
 
 	var newSeries = E.from(newColumnNames) // Create a series for each column
 		.select(function (columnName) {
@@ -2478,7 +2477,6 @@ DataFrame.prototype.pivot = function (column, value) {
 	var dataForge = require('../index');
 	return dataForge.mergeSeries(newColumnNames, newSeries);
 };
-*/
 
 /**
  * Merge this DataFrame with another.
