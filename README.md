@@ -69,7 +69,7 @@ Examples and some tests have been removed to a [separate repository](https://git
   - [Data frame transformation](#data-frame-transformation)
   - [Series transformation](#series-transformation)
   - [Data frame and series filtering](#data-frame-and-series-filtering)
-  - [LINQ functions](#linq-functions)
+  - [LINQ/PANDAS-style functions](#linq-pandas-style-functions)
   - [Aggregation](#aggregation)
   - [Rolling window](#rolling-window)
 - [Node.js examples](#nodejs-examples)
@@ -758,13 +758,42 @@ Data-frames and series can be filtered using the [LINQ](https://en.wikipedia.org
 			// ... return true to include the row in the new data frame, return false to exclude it ...
 		});
 
-# LINQ functions
+# LINQ/PANDAS-style functions
 
 Most of the other [LINQ functions](https://code.msdn.microsoft.com/101-LINQ-Samples-3fb9811b) are or will be available. 
 
-More documentation will be here soon on supported LINQ functions.
+LINQ-style functions that are currently available (or close equivalents):
 
-todo: any, all, none
+- select/selectMany
+- selectPairs/selectManyPairs
+- skip/skipWhile/skipUntil
+- take/takeWhile/takeUntil
+- where
+- any
+- all
+- none
+- subset
+- slice
+- orderBy/orderByDescending/thenBy/thenByDescending
+- groupBy
+- distinct
+- toValues/toObjects
+- count
+- head/tail
+- first/last
+- firstPair/lastPair
+- firstIndex/lastIndex
+- reverse
+- aggregate
+- average/min/max/sum
+- zip
+
+Pandas-style functions that are currently available: 
+
+- pivot
+- merge/mergeSeries
+- getSeries/setSeries
+- window/rollingWindow/variableWindow
 
 # Collapsing unique values
 
