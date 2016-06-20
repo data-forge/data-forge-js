@@ -3332,4 +3332,29 @@ describe('DataFrame', function () {
 		]);
 	});
 
+	it('can append pairs to empty dataframe', function () {
+
+		var dataFrame = new DataFrame();
+		var appended = dataFrame.append([10, 100]);
+		expect(appended.toPairs()).to.eql([
+			[10, 100]
+		]);
+	});
+
+	it('can append pairs to dataframe with existing items', function () {
+
+		var dataFrame = new DataFrame({
+			columnNames: ["Column1"],
+			index:  [1,  2],
+			rows: [[10], [11]],
+		});
+
+		var appended = dataFrame.append([20, { Column1: 100 }]);
+		expect(appended.toPairs()).to.eql([
+			[1, { Column1: 10 }],
+			[2, { Column1: 11 }],
+			[20, { Column1: 100 }],
+		]);
+	});
+
 });
