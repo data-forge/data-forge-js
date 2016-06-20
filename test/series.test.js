@@ -1446,6 +1446,15 @@ describe('Series', function () {
 
 	it('can append pairs to empty series', function () {
 
+		var series = new Series();
+		var appended = series.append([10, 100]);
+		expect(appended.toPairs()).to.eql([
+			[10, 100]
+		]);
+	});
+
+	it('can append pairs to series with existing items', function () {
+
 		var series = new Series({
 			index:  [1,  2],
 			values: [10, 11],
@@ -1455,15 +1464,6 @@ describe('Series', function () {
 			[1, 10],
 			[2, 11],
 			[20, 100],
-		]);
-	});
-
-	it('can append pairs to series with existing items', function () {
-
-		var series = new Series();
-		var appended = series.append([10, 100]);
-		expect(appended.toPairs()).to.eql([
-			[10, 100]
 		]);
 	});
 
