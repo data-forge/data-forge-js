@@ -1562,4 +1562,55 @@ Series.prototype.variableWindow = function (comparer, obsoleteSelector) {
 	});
 };
 
+/**
+ * Append a pair to a series.
+ *
+ * @param {pair} pair - The pair to append.
+ */
+Series.prototype.append = function (pair) {
+	assert.isArray(pair, "Expected 'pair' parameter to 'Series.append' to be an array.");
+	assert(pair.length === 2, "Expected 'pair' parameter to 'Series.append' to be an array with two elements. The first element is the index, the second is the value.");
+
+	//todo: make this lazy.
+
+	var self = this;
+	var pairs = self.toPairs();
+	pairs.push(pair);
+	return new Series({
+		iterable: function () {
+			return new ArrayIterator(pairs);
+		},
+	});
+};
+
+
+/**
+ * Fill gaps in a series.
+ *
+ * @param {function} predicate - Predicate that is passed pairA and pairB, two consecutive rows, return truthy if there is a gap between the rows, or falsey if there is no gap.
+ * @param {function} generator - Generator that is passed pairA and pairB, two consecutive rows, returns an array of pairs that fills the gap between the rows.
+ */
+Series.prototype.fillGaps = function (predicate, generator) {
+	assert.isFunction(predicate, "Expected 'predicate' parameter to 'Series.fillGaps' to be a predicate function that returns a boolean.")
+	assert.isFunction(generator, "Expected 'generator' parameter to 'Series.fillGaps' to be a generator function that returns an array of generated pairs.")
+
+	var self = this;
+
+	return self.rollingWindow(2)
+		.selectManyPairs(function (window) {
+			var pairA = window.firstPair();
+			var pairB = window.lastPair();
+			if (!predicate(pairA, pairB)) {
+				return [pairA];
+			}
+
+			var generatedRows = generator(pairA, pairB);
+			assert.isArray(generatedRows, "Expected return from 'generator' parameter to 'Series.fillGaps' to be an array of pairs, instead got a " + typeof(generatedRows));
+
+			return [pairA].concat(generatedRows);
+		})
+		.append(self.lastPair())
+		;
+};
+
 module.exports = Series;

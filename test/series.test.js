@@ -1443,5 +1443,67 @@ describe('Series', function () {
 			[8, 2]
 		]);
 	});
+
+	it('can append pairs to empty series', function () {
+
+		var series = new Series({
+			index:  [1,  2],
+			values: [10, 11],
+		});
+		var appended = series.append([20, 100]);
+		expect(appended.toPairs()).to.eql([
+			[1, 10],
+			[2, 11],
+			[20, 100],
+		]);
+	});
+
+	it('can append pairs to series with existing items', function () {
+
+		var series = new Series();
+		var appended = series.append([10, 100]);
+		expect(appended.toPairs()).to.eql([
+			[10, 100]
+		]);
+	});
+
+
+	it('can fill gaps in series - fill forward', function () {
+
+		var seriesWithGaps = new Series({
+			index:  [1,  2,  6,  7,  10, 11],
+			values: [10, 11, 12, 13, 14, 15],
+		});
+
+		var seriesWithoutGaps = seriesWithGaps.fillGaps(
+			function (pairA, pairB) {
+				return pairB[0] - pairA[0] > 1;
+			},
+			function (pairA, pairB) {
+				var gapSize = pairB[0] - pairA[0];
+				var numEntries = gapSize - 1;
+				return E.range(0, numEntries)
+					.select(i => [
+						pairA[0] + i + 1,
+						pairA[1], 
+					])
+					.toArray();
+			}
+		);
+
+		expect(seriesWithoutGaps.toPairs()).to.eql([
+			[1, 10],
+			[2, 11],
+			[3, 11],
+			[4, 11],
+			[5, 11],
+			[6, 12],
+			[7, 13],
+			[8, 13],
+			[9, 13],
+			[10, 14],
+			[11, 15],
+		]);
+	});
 });
 
