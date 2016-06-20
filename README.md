@@ -241,6 +241,34 @@ A data-frame, series or index can be forcibly evaluated by calling the `bake` fu
 
 Iterates the rows of a data-frame, series or index. Iterators allow lazy evaluation (row by row evaluation) of data frames, series and index. This is the same concept as an [iterator in JavaScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Iterators_and_Generators) or an [enumerator in C#](https://msdn.microsoft.com/en-us/library/system.collections.ienumerator(v=vs.110).aspx).
 
+The specification for an iterator is simple:
+
+	var anIterator = {
+
+		moveNext: function () {
+			// Move to the next element in the sequence.
+			// Return true if the sequence contains more elements.
+			// Return false when the sequence is exhausted.
+		},
+
+		getCurrent: function () {
+			// Return the current element in the sequence. 
+		},
+
+	};
+
+## Iterable
+
+An *iterable* is an anonymous function that instantiates and returns an *iterator*. A iterable conceptually represents *a sequence that can be iterated*.
+
+An example iterable:
+
+	var myIterable = function () {
+		var myIterator = ... create an iterator for the sequence ...
+		return myIterator;
+	};
+
+
 ## Selector
 
 A *selector* is a user-defined function (usually anonymous) that is passed to Data-Forge functions to select values per row or per value. Selectors are used to instruct Data-Forge on which part of the data to work on.
@@ -293,6 +321,30 @@ An example:
 	var myComparer = function (row1, row2) {
 		return row1.ClientName === row.ClientName; // Row comparison based on client name.
 	}; 
+
+## Generator
+
+A generator is a function that produces values or rows to be inserted into a Series or DataFrame.
+
+A generator may take arguments and it can return an array of values or rows:
+
+	function myGenerator = function (... appropriate arguments ...) {
+		return [
+			[ .. generated row 1 .. ],
+			[ .. row 2 .. ],
+			[ .. row 3 .. ],
+			[ .. etc .. ]
+		];	
+	};
+
+Alternatively (to support lazy evaluation) a generator may return a lazily evaluated *iterable*, that is a function that returns an iterator for a sequence of values or rows:
+
+	function myGenerator = function (... appropriate arguments ...) {
+		return function () {
+			var myIterator = ... some iterator for a sequence of values or rows ...
+			return myIterator;
+		};
+	};
 
 
 # Basic Usage 
@@ -949,6 +1001,8 @@ todo
 
 ## Zip
 
+todo:
+
 ## Group, Aggregate and Combine
 
 	// Group by client.
@@ -970,7 +1024,65 @@ todo
 	var combined = dataForge.concat(aggregated);
 	console.log(combined.toString());
 
+# Filling gaps and missing data
 
+The function `fillGaps` works the same for both Series and DataFrame:
+
+	var sequenceWithGaps = ...
+
+	// Predicate that determines if there is a gap.
+	var gapExists = function (pairA, pairB) {
+		// Returns true if there is a gap.
+		return true;
+	};
+
+	// Generator function that produces new rows to fill the game.
+	var gapFiller = function (pairA, pairB) {
+		return [
+			newPair1,
+			newPair2,
+			newPair3,
+		];
+	}
+
+	var sequenceWithoutGaps = sequenceWithGaps.fillGaps(gapExists, gapFiller);
+
+For a more concrete example, let's fill gaps in daily share data:
+
+	var moment = require('moment');
+
+	var dailyShareDataWithGaps = ...
+
+	var gapExists = function (pairA, pairB) {
+		// Return true if there is a gap longer than a day.
+		var startDate = pairA[0];
+		var endDate = pairB[0];
+		var gapSize = moment(endDate).diff(moment(startDate), 'days');
+		return gapSize > 1;
+	};
+
+	var gapFiller = function (pairA, pairB) {
+		// Fill values forward.
+		var startDate = pairA[0];
+		var endDate = pairB[0];
+		var gapSize = moment(endDate).diff(moment(startDate), 'days');
+		var numEntries = gapSize - 1;
+
+		var startValue = pairA[1];
+		var newEntries = [];
+
+		for (var entryIndex = 0; entryIndex < numEntries; ++entryIndex) {
+			newEntries.push([
+				moment(pairA[0]).add(entryIndex + 1, 'days').toDate(), // New index
+				startValue // New value, copy the start value forward to fill the gaps. 
+			]);
+		}	
+
+		return newEntries;
+	}
+
+	var dailyShareValueWithoutGaps = sequenceWithGaps.fillGaps(gapExists, gapFiller);
+	
 
 # Node.js examples
 
