@@ -2195,6 +2195,22 @@ DataFrame.prototype.groupBy = function (selector) {
 };
 
 /**
+ * Collapse a group of sequential rows with duplicate column values into a Series of windows.
+ *
+ * @param {function} valueSelector - Selects the value used to compare for duplicates.
+ */	
+DataFrame.prototype.groupSequential = function (valueSelector) {
+
+	assert.isFunction(valueSelector, "Expected 'valueSelector' parameter to 'sequentialDistinct' to be a function.")
+
+	var self = this;
+
+	return self.variableWindow(function (a, b) {
+			return valueSelector(a) === valueSelector(b);
+		});
+};
+
+/**
  * Determine if the predicate returns truthy for all values.
  * Returns false as soon as the predicate evaluates to falsy.
  * Returns true if the predicate returns truthy for all values in the DataFrame.

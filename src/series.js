@@ -1616,4 +1616,16 @@ Series.prototype.fillGaps = function (predicate, generator) {
 		;
 };
 
+/**
+ * Group sequential duplicate values into a Series of windows.
+ */
+Series.prototype.groupSequential = function () {
+	
+	var self = this;
+
+	return self.variableWindow(function (a, b) {
+			return a === b;
+		});
+};
+
 module.exports = Series;
