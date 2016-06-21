@@ -1566,7 +1566,27 @@ Series.prototype.variableWindow = function (comparer, obsoleteSelector) {
 };
 
 /**
- * Append a pair to a series.
+ * Insert a pair at the start of a Series.
+ *
+ * @param {pair} pair - The pair to insert.
+ */
+Series.prototype.insert = function (pair) {
+	assert.isArray(pair, "Expected 'pair' parameter to 'Series.insert' to be an array.");
+	assert(pair.length === 2, "Expected 'pair' parameter to 'Series.insert' to be an array with two elements. The first element is the index, the second is the value.");
+
+	//todo: make this lazy.
+
+	var self = this;
+	var pairs = [pair].concat(self.toPairs());
+	return new Series({
+		iterable: function () {
+			return new ArrayIterator(pairs);
+		},
+	});
+};
+
+/**
+ * Append a pair to the end of a Series.
  *
  * @param {pair} pair - The pair to append.
  */

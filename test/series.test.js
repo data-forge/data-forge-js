@@ -1461,6 +1461,30 @@ describe('Series', function () {
 		]);
 	});
 
+	it('can insert at start of empty series', function () {
+
+		var series = new Series();
+		var modified = series.insert([10, 100]);
+		expect(modified.toPairs()).to.eql([
+			[10, 100]
+		]);
+	});
+
+	it('can insert at start of series with existing items', function () {
+
+		var series = new Series({
+			index:  [1,  2],
+			values: [10, 11],
+		});
+		var modified = series.insert([20, 100]);
+		expect(modified.toPairs()).to.eql([
+			[20, 100],
+			[1, 10],
+			[2, 11],
+		]);
+	});
+
+
 	it('can append pairs to empty series', function () {
 
 		var series = new Series();
@@ -1596,6 +1620,8 @@ describe('Series', function () {
 			[5, 6],
 		]);
 	});
+
+
 
 });
 
