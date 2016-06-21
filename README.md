@@ -205,7 +205,7 @@ This section explains the key concepts of *Data-Forge*.
 
 ## Data Frame
 
-This is the *main* concept. A matrix of data structured as rows and columns. Can be considered a sequence of rows. Has an implicit or explicit index. Think of it as a spreadsheet in memory.
+DataFrame is the *main* concept. It is a sequence of rows. It can also be considered a matrix (rows and columns) of structured started. Can be considered a sequence of rows. Has an implicit or explicit index. Think of it as a spreadsheet in memory.
 
 A *data-frame* can be easily constructed from various formats and it can be exported to various formats. 
 
@@ -215,13 +215,13 @@ A single row of data in a *data-frame*. Contains a slice of data across columns.
 
 ## Series
 
-A sequence of indexed values. These are often, but not always, time-series, where the values are indexed by date/time.
+Series is a sequence of values. A series is indexed. By default a Series has an integer index starting at 0 and couting up (just like arrays). Series will often be used with a date-time index, this is usually known as a [time series](https://en.wikipedia.org/wiki/Time_series).
 
 All values in a series are generally expected to have the same type, although this is not a requirement of *data-forge-js*.
 
 ## Column
 
-A single *named* series of data in a data-frame. Each column is simply a series with a name, the values of the series are the values of the column. A column is a slice of data through all rows. 
+A column is a single *named* series of data in a data-frame. Each column is simply a series with a name, the values of the series are the values of the column. A column is a slice of data through all rows.
 
 ## Index 
 
@@ -230,6 +230,10 @@ A sequence of values that is used to index a data-frame or series. When the data
 Used for operations that search and merge data-farmes and series. 
 
 If not specified an integer index (starting at 0) is generated based on row position. An index can be explicitly by specifying a column by name.
+
+## Pair
+
+Through this documentation and the Data-Forge code you will occasionally see a reference to a *pair* or *pairs*. Series and DataFrames are actually sequences of *pairs*, where each pair contains a index and a value or row.  
 
 ## Lazy Evaluation
 
