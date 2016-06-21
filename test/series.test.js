@@ -1362,11 +1362,7 @@ describe('Series', function () {
 			values: [1, 1, 2, 3, 3, 3, 5, 6, 6, 7],
 		});
 
-		var collapsed = series
-			.sequentialDistinct()
-			.selectPairs(function (window) {
-				return [window.getIndex().first(), window.first()];
-			});
+		var collapsed = series.sequentialDistinct();
 
 		expect(collapsed.toPairs()).to.eql([
 			[0, 1],
@@ -1374,29 +1370,6 @@ describe('Series', function () {
 			[3, 3],
 			[6, 5],
 			[7, 6],
-			[9, 7],
-		]);
-	});
-
-	it('can collapse sequential duplicates and take last index', function () {
-
-		var series = new Series({ 
-			index:  [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-			values: [1, 1, 2, 3, 3, 3, 5, 6, 6, 7],
-		});
-
-		var collapsed = series
-			.sequentialDistinct()
-			.selectPairs(function (window) {
-				return [window.lastPair()[0], window.last()];
-			});
-
-		expect(collapsed.toPairs()).to.eql([
-			[1, 1],
-			[2, 2],
-			[5, 3],
-			[6, 5],
-			[8, 6],
 			[9, 7],
 		]);
 	});

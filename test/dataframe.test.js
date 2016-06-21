@@ -3148,9 +3148,6 @@ describe('DataFrame', function () {
 		var collapsed = df
 			.sequentialDistinct(function (row, index) {
 				return row.c2;
-			})
-			.selectPairs(function (window) {
-				return [window.getIndex().first(), window.first()];
 			});
 
 		expect(collapsed.toPairs()).to.eql([
@@ -3158,40 +3155,6 @@ describe('DataFrame', function () {
 			[1, { c1: 1, c2: 35 } ],
 			[3, { c1: -3, c2: 112 } ],
 			[4, { c1: -3, c2: 333 } ],
-			[7, { c1: -15, c2: -10 } ],
-		]);
-	});
-
-	it('can remove sequential duplicates and take last in window', function () {
-
-		var df = new DataFrame({
-			columnNames: ['c1', 'c2'],
-			rows: [
-				[1, 15], // 0
-				[1, 35], // 1
-				[3, 35], // 2
-				[-3, 112], // 3
-				[-3, 333], // 4
-				[8, 333], // 5
-				[8, 333], // 6
-				[-15, -10], // 7
-			],
-			index: [0, 1, 2, 3, 4, 5, 6, 7],
-		});
-
-		var collapsed = df
-			.sequentialDistinct(function (row, index) {
-				return row.c2;
-			})
-			.selectPairs(function (window) {
-				return [window.lastPair()[0], window.last()];
-			});
-
-		expect(collapsed.toPairs()).to.eql([
-			[0, { c1: 1, c2: 15 } ],
-			[2, { c1: 3, c2: 35 } ],
-			[3, { c1: -3, c2: 112 } ],
-			[6, { c1: 8, c2: 333 } ],
 			[7, { c1: -15, c2: -10 } ],
 		]);
 	});

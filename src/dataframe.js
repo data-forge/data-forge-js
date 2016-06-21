@@ -2298,6 +2298,9 @@ DataFrame.prototype.sequentialDistinct = function (valueSelector, obsoleteSelect
 
 	return self.variableWindow(function (a, b) {
 			return valueSelector(a) === valueSelector(b);
+		})
+		.selectPairs(function (window) {
+			return [window.getIndex().first(), window.first()];
 		});
 };
 

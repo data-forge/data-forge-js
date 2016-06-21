@@ -1433,6 +1433,9 @@ Series.prototype.sequentialDistinct = function (obsoleteSelector) {
 
 	return self.variableWindow(function (a, b) {
 			return a === b;
+		})
+		.selectPairs(function (window) {
+			return [window.getIndex().first(), window.first()];
 		});
 };
 
