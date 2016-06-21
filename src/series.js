@@ -1617,6 +1617,39 @@ Series.prototype.fillGaps = function (predicate, generator) {
 };
 
 /**
+ * Group the series according to the selector.
+ */
+Series.prototype.groupBy = function (selector) {
+
+	assert.isFunction(selector, "Expected 'selector' parameter to 'Series.groupBy' to be a selector function that determines the value to group the series by.")
+	
+	var self = this;
+	var groupedPairs = E.from(self.toPairs())
+		.groupBy(function (pair) {
+			return selector(pair[1], pair[0]);
+		})
+		.select(function (group) {
+			return [
+				group.key(),
+				new Series({
+					iterable: function () {
+						return new ArrayIterator(group.getSource());
+					},
+				}),
+			];
+		})
+		.toArray();
+
+	return new Series({
+		iterable: function () {
+			return new ArrayIterator(groupedPairs);
+		},
+	});
+
+
+};
+
+/**
  * Group sequential duplicate values into a Series of windows.
  */
 Series.prototype.groupSequential = function () {
