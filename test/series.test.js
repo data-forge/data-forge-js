@@ -1032,6 +1032,12 @@ describe('Series', function () {
 		]);
 	});
 
+	it('sum of empty series is zero', function () {
+
+		var series = new Series();
+		expect(series.sum()).to.eql(0);
+	});
+
 	it('can sum series', function () {
 
 		var series = initSeries([0, 1, 2], [1, 2, 3]);		

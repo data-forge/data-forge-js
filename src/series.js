@@ -1197,6 +1197,10 @@ Series.prototype.tail = function (values) {
 Series.prototype.sum = function () {
 
 	var self = this;
+	if (self.none()) {
+		return 0;
+	}
+
 	return self.aggregate(
 		function (prev, value) {
 			return prev + value;
