@@ -1706,4 +1706,17 @@ Series.prototype.at = function (index) {
 	return search.first();
 };
 
+/**
+ * Returns true if the Series contains the specified value.
+ *
+ * @param {function} value - The value to check for in the Series.
+ */
+Series.prototype.contains = function (value) {
+
+	var self = this;
+	return self.any(function (searchValue) {
+			return searchValue === value;
+		});
+};
+
 module.exports = Series;

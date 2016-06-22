@@ -2248,7 +2248,7 @@ DataFrame.prototype.all = function (predicate) {
  */
 DataFrame.prototype.any = function (predicate) {
 	if (predicate) {
-		assert.isFunction(predicate, "Expected 'predicate' parameter to 'all' to be a function.")
+		assert.isFunction(predicate, "Expected 'predicate' parameter to 'DataFrame.any' to be a function.")
 	}
 
 	var self = this;
@@ -2584,5 +2584,19 @@ DataFrame.prototype.at = function (index) {
 	return search.first();
 };
 
+/**
+ * Returns true if the DataFrame contains the specified row.
+ *
+ * @param {function} row - The row to check for in the DataFrame.
+ */
+DataFrame.prototype.contains = function (row) {
+
+	var self = this;
+	var json = JSON.stringify(row); //todo: This feels somewhat dodgey.
+
+	return self.any(function (searchRow) {
+			return JSON.stringify(searchRow) === json;
+		});
+};
 
 module.exports = DataFrame;

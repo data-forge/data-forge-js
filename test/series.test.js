@@ -1647,5 +1647,37 @@ describe('Series', function () {
 		expect(series.at(200)).to.eql(undefined);
 	});
 
+	it('getting by index returns undefined when the series is empty', function () {
+
+		var series = new Series();
+		expect(series.at(200)).to.eql(undefined);
+	});
+
+	it('checking if an empty series contains a value returns false', function () {
+
+		var series = new Series();
+		expect(series.contains(10)).to.eql(false);
+	});
+
+	it('can check if series contains a particular value', function () {
+
+		var series = new Series({ 
+			index:  [100, 200, 300],
+			values: [10, 20, 30],
+		});
+
+		expect(series.contains(20)).to.eql(true);
+	});
+
+	it('can check if series does not contain a particular value', function () {
+
+		var series = new Series({ 
+			index:  [100, 200, 300],
+			values: [10, 20, 30],
+		});
+
+		expect(series.contains(3000)).to.eql(false);
+	});
+
 });
 
