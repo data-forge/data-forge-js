@@ -1642,6 +1642,8 @@ Series.prototype.fillGaps = function (predicate, generator) {
 
 /**
  * Group the series according to the selector.
+ *
+ * @param {function} selector - Selector that defines the value to group by.
  */
 Series.prototype.groupBy = function (selector) {
 
@@ -1683,6 +1685,25 @@ Series.prototype.groupSequential = function () {
 	return self.variableWindow(function (a, b) {
 			return a === b;
 		});
+};
+
+/**
+ * Get the value at a specified index.
+ *
+ * @param {function} index - Index to for which to retreive the value.
+ */
+Series.prototype.at = function (index) {
+
+	var self = this;
+	var search = self.skipWhile(function (value, searchIndex) { //todo: This could be optimized by using a type-specific index.
+			return searchIndex !== index;
+		});
+
+	if (search.none()) {
+		return undefined;
+	}
+
+	return search.first();
 };
 
 module.exports = Series;

@@ -3424,4 +3424,28 @@ describe('DataFrame', function () {
 			[11, { Column1: 15 }],
 		]);
 	});
+
+	it('can get row by index', function () {
+
+		var dataFrame = new DataFrame({ 
+			columnNames: ["Column1"],
+			index:  [100, 200, 300],
+			rows:   [[10], [20], [30]],
+		});
+
+		expect(dataFrame.at(200)).to.eql({
+			Column1: 20,
+		});
+	});
+
+	it('getting by index returns undefined when the requested index does not exist', function () {
+
+		var dataFrame = new DataFrame({ 
+			columnNames: ["Column1"],
+			index:  [100, 300],
+			rows:   [[10], [30]],
+		});
+
+		expect(dataFrame.at(200)).to.eql(undefined);
+	});
 });

@@ -2565,4 +2565,24 @@ DataFrame.prototype.fillGaps = function (predicate, generator) {
 		;
 };
 
+/**
+ * Get the row at a specified index.
+ *
+ * @param {function} index - Index to for which to retreive the row.
+ */
+DataFrame.prototype.at = function (index) {
+
+	var self = this;
+	var search = self.skipWhile(function (value, searchIndex) { //todo: This could be optimized by using a type-specific index.
+			return searchIndex !== index;
+		});
+
+	if (search.none()) {
+		return undefined;
+	}
+
+	return search.first();
+};
+
+
 module.exports = DataFrame;

@@ -581,11 +581,11 @@ Invoke a callback for each value in the series using `forEach`:
 
 ## Extract values from an index
 
-Retreive the index from a data-frame:
+Retrieve the index from a data-frame:
 
 	var index = dataFrame.getIndex();
 
-Retreive the index from a series:
+Retrieve the index from a series:
 
 	var index = someSeries.getIndex();
 
@@ -626,6 +626,32 @@ One or more columns can easily be removed:
 Also works for single columns:
 
 	var newDf = df.dropSeries('Column-to-be-dropped');
+
+## Getting a row or value by index
+
+A particular value of a Series or a row of a DataFrame can be retrieved by specifying the index using the `at` function:
+
+	var dataFrame = ...
+
+	// Get a row at index 10.
+	var row = dataFrame.at(10);
+
+	// Also works when the index is a different type, eg a time-series index.
+	var row = dataFrame.at(new Date(2016, 5, 22));
+
+This works in the same way for a series. 
+
+## Setting a row of value by index
+ 
+A particular value of a Series or a row of DataFrame can be set by specifying the index using the `set` function:
+
+	var dataFrame = ...
+	var newRow = ...
+
+	// Set the row and produce a new DataFrame.
+	var newDataFrame = dataFrame.set(10, newRow);
+
+Series and DataFrame are immutable, so the set operation does not modify in place, it returns a new Series or DataFrame.
 
 # Immutability and Chained Functions
 

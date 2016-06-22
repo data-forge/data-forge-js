@@ -1627,7 +1627,25 @@ describe('Series', function () {
 		]);
 	});
 
+	it('can get value by index', function () {
 
+		var series = new Series({ 
+			index:  [100, 200, 300],
+			values: [10, 20, 30],
+		});
+
+		expect(series.at(200)).to.eql(20);
+	});
+
+	it('getting by index returns undefined when the requested index does not exist', function () {
+
+		var series = new Series({ 
+			index:  [100, 300],
+			values: [10, 30],
+		});
+
+		expect(series.at(200)).to.eql(undefined);
+	});
 
 });
 
