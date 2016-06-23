@@ -2515,7 +2515,27 @@ DataFrame.prototype.merge = function (otherDataFrame, columnName) {
 };
 
 /**
- * Append a pair to a DataFrame.
+ * Inesrt a pair to the start of a DataFrame.
+ *
+ * @param {pair} pair - The pair to insert.
+ */
+DataFrame.prototype.insert = function (pair) {
+	assert.isArray(pair, "Expected 'pair' parameter to 'DataFrame.insert' to be an array.");
+	assert(pair.length === 2, "Expected 'pair' parameter to 'DataFrame.insert' to be an array with two elements. The first element is the index, the second is the row.");
+
+	//todo: make this lazy.
+
+	var self = this;
+	var pairs = [pair].concat(self.toPairs());
+	return new DataFrame({
+		iterable: function () {
+			return new ArrayIterator(pairs);
+		},
+	});
+};
+
+/**
+ * Append a pair to the end of a DataFrame.
  *
  * @param {pair} pair - The pair to append.
  */
