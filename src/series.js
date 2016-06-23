@@ -1719,4 +1719,24 @@ Series.prototype.contains = function (value) {
 		});
 };
 
+/**
+ * Concatenate a series on the end of this one and return the concatenated series.
+ *
+ * @param {Series} otherSeries - The series to concatenate to the end of this one.
+ */
+Series.prototype.concat = function (otherSeries) {
+
+	assert.instanceOf(otherSeries, Series, "Expected 'otherSeries' parameter to 'Series.concat' to be an instance of Series.");
+
+	//todo: make this lazy.
+
+	var self = this;
+
+	return new Series({
+		iterable: function () {
+			return new ArrayIterator(self.toPairs().concat(otherSeries.toPairs()))
+		},
+	})
+};
+
 module.exports = Series;
