@@ -120,7 +120,7 @@ describe('Series', function () {
 		expect(modified.toValues()).to.eql([110, 310, 210, 15]);		
 	});
 
-	it('can select many', function () {
+	it('can select many - with array', function () {
 		var series = initSeries([0, 1, 2, 3], [100, 300, 200, 5]);
 		var modified = series.selectMany(function (value) {
 				return E.range(0, 2)
@@ -131,6 +131,28 @@ describe('Series', function () {
 			});
 		expect(modified.getIndex().toValues()).to.eql([0, 0, 1, 1, 2, 2, 3, 3]);
 		expect(modified.toValues()).to.eql([101, 102, 301, 302, 201, 202, 6, 7]);		
+	});
+
+	it('can select many - with series', function () {
+		var series = initSeries([0, 1], [100, 300]);
+		var modified = series.selectMany(function (value) {
+				return dataForge.range(0, 2)
+					.select(i => i + value);
+			});
+		expect(modified.getIndex().toValues()).to.eql([0, 0, 1, 1]);
+		expect(modified.toValues()).to.eql([100, 101, 300, 301]);
+	});
+
+	it('can select many - with data-frame', function () {
+		var series = initSeries([0, 1], [100, 300]);
+		var modified = series.selectMany(function (value) {
+				return dataForge.range(0, 2)
+					.select(i => i + value)
+					.inflate(v => { return { Value: v }; })
+					;
+			});
+		expect(modified.getIndex().toValues()).to.eql([0, 0, 1, 1]);
+		expect(modified.toValues()).to.eql([{ Value: 100 }, { Value: 101 }, { Value: 300 }, { Value: 301 }]);
 	});
 
 	it('can select many with index', function () {

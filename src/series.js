@@ -294,13 +294,25 @@ Series.prototype.selectMany = function (selector) {
 
 	var self = this;
 
+	var DataFrame = require('./dataframe');
+
 	return new Series({
 		iterable: function () {
 			return new SelectManyIterator(self.getIterator(), 
 				function (pair) {
 					var newValues = selector(pair[1], pair[0]);
-					if (!Object.isArray(newValues)) {
-						throw new Error("Expected return value from 'Series.selectMany' selector to be an array, each item in the array represents a new value in the resulting series.");
+					if (!Object.isArray(newValues) &&
+						!(newValues instanceof Series) &&
+						!(newValues instanceof DataFrame)) {
+						throw new Error("Expected return value from 'Series.selectMany' selector to be an array, a Series or a DataFrame, each item in the data sequence represents a new value in the resulting series.");
+					}
+
+					if (newValues instanceof Series)
+					{
+						newValues = newValues.toValues();
+					}
+					else if (newValues instanceof DataFrame) {
+						newValues = newValues.toObjects();
 					}
 
 					var newPairs = [];
