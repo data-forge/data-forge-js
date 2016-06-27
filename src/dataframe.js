@@ -653,8 +653,19 @@ DataFrame.prototype.selectMany = function (selector) {
 		iterable: function () {
 			return new SelectManyIterator(self.getIterator(), function (pair) {
 				var newRows = selector(pair[1], pair[0]);
-				if (!Object.isArray(newRows)) {
-					throw new Error("Expected return value from 'DataFrame.selectMany' selector to be an array of objects, each object represents a new row in the resulting data-frame.");
+
+				if (!Object.isArray(newRows) &&
+					!(newRows instanceof Series) &&
+					!(newRows instanceof DataFrame)) {
+					throw new Error("Expected return value from 'DataFrame.selectMany' selector to be an array of objects, a Series or a DataFrame, each object represents a new row in the resulting data-frame.");
+				}
+
+				if (newRows instanceof Series)
+				{
+					newRows = newRows.toValues();
+				}
+				else if (newRows instanceof DataFrame) {
+					newRows = newRows.toObjects();
 				}
 
 				var newPairs = [];

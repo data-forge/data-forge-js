@@ -225,7 +225,7 @@ describe('DataFrame', function () {
 		]);
 	});
 
-	it('can select many', function () {
+	it('can select many - with array', function () {
 		var dataFrame = initDataFrame(
 			[ "Date", "Value1", "Value2", "Value3" ],
 			[
@@ -257,6 +257,66 @@ describe('DataFrame', function () {
 				[22, 'c'],
 				[101, 'd'],
 				[102, 'd'],
+		]);		
+	});
+
+	it('can select many - with Series', function () {
+		var dataFrame = initDataFrame(
+			[ "Value1", "Value2", ],
+			[
+				[300, 'c'],
+				[200, 'b'],
+			],
+			[5, 6]
+		);
+		var modified = dataFrame.selectMany(function (row) {
+				return dataForge.range(0, 2)
+					.select(function (i) {
+						return {
+							TestA: row.Value1 + i + 1,
+							TestB: row.Value2,
+						};					
+					})
+					;
+			});		
+
+		expect(modified.getIndex().toValues()).to.eql([5, 5, 6, 6]);
+		expect(modified.getColumnNames()).to.eql(["TestA", "TestB"]);
+		expect(modified.toValues()).to.eql([
+				[301, 'c'],
+				[302, 'c'],
+				[201, 'b'],
+				[202, 'b'],
+		]);		
+	});
+
+	it('can select many - with DataFrame', function () {
+		var dataFrame = initDataFrame(
+			[ "Value1", "Value2", ],
+			[
+				[300, 'c'],
+				[200, 'b'],
+			],
+			[5, 6]
+		);
+		var modified = dataFrame.selectMany(function (row) {
+				return dataForge.range(0, 2)
+					.inflate(function (i) {
+						return {
+							TestA: row.Value1 + i + 1,
+							TestB: row.Value2,
+						};					
+					})
+					;
+			});		
+
+		expect(modified.getIndex().toValues()).to.eql([5, 5, 6, 6]);
+		expect(modified.getColumnNames()).to.eql(["TestA", "TestB"]);
+		expect(modified.toValues()).to.eql([
+				[301, 'c'],
+				[302, 'c'],
+				[201, 'b'],
+				[202, 'b'],
 		]);		
 	});
 
