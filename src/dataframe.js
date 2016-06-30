@@ -393,6 +393,7 @@ var Series = require('./series');
 var Index = require('./index');
 var concatDataFrames = require('./concat-dataframes');
 var zipDataFrames = require('./zip-dataframes');
+var mergeSeries = require('./merge-series');
 
 /**
  * Get the index of the data frame.
@@ -2504,8 +2505,7 @@ DataFrame.prototype.pivot = function (column, value) {
 		})
 		.toArray();
 
-	var dataForge = require('../index');
-	return dataForge.mergeSeries(newColumnNames, newSeries);
+	return mergeSeries(newColumnNames, newSeries);
 };
 
 /**
