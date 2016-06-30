@@ -933,9 +933,9 @@ Note that in this example we are grouping by *index* as an alternative to groupi
 
 ## Group Sequential
 
-The `groupBySequential` function for `Series` and `DataFrame` is similar to `groupBy`, except that it only groups values or rows that adjacent in the data sequence.
+The `groupSequentialBy` function for `Series` and `DataFrame` is similar to `groupBy`, except that it only groups adjacent values or rows in the data sequence.
 
-	var outputSeries = someSeriesOrDataFrame.groupBySequential(function (valueOrRow, index) {
+	var outputSeries = someSeriesOrDataFrame.groupSequentialBy(function (valueOrRow, index) {
 			return ... grouping criteria ...
 		});
 
@@ -1023,7 +1023,7 @@ The [`sequentialDistinct` function](#sequential-distinct-values) is actually imp
 
 ## Aggregate
 
-todo
+todo the two types of aggregation.
 
 ## Merge
 
@@ -1034,6 +1034,8 @@ todo
 todo:
 
 ## Group, Aggregate and Combine
+
+todo: should be able to do this without LINQ now.
 
 	// Group by client.
 	var groups = salesData.groupBy(function (row) { 
