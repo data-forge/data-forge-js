@@ -391,6 +391,7 @@ module.exports = DataFrame;
 
 var Series = require('./series');
 var Index = require('./index');
+var concatDataFrames = require('./concat-dataframes');
 
 /**
  * Get the index of the data frame.
@@ -1340,8 +1341,7 @@ DataFrame.prototype.detectTypes = function () {
 				.setSeries('Column', newSeries);
 		})
 		.toArray();
-	var dataForge = require('../index');
-	return dataForge.concat(dataFrames).resetIndex();
+	return concatDataFrames(dataFrames).resetIndex();
 };
 
 /**
@@ -1365,8 +1365,7 @@ DataFrame.prototype.detectValues = function () {
 			return column.series.detectValues().setSeries('Column', newSeries);
 		})
 		.toArray();
-	var dataForge = require('../index');
-	return dataForge.concat(dataFrames).resetIndex();
+	return concatDataFrames(dataFrames).resetIndex();
 };
 /**
  * Produces a new data frame with all string values truncated to the requested maximum length.
