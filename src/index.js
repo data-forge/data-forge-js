@@ -32,6 +32,8 @@ var Index = function (values) {
 	assert.isFunction(self._iterable);
 };
 
+module.exports = Index;
+
 /**
  * Get an iterator to iterate the values of the index.
  */
@@ -47,8 +49,6 @@ Index.prototype.getIterator = function () {
  */
 Index.prototype.skip = function (numRows) {
 	assert.isNumber(numRows, "Expected 'numRows' parameter to 'skip' function to be a number.");	
-
-	var Index = require('./index');
 
 	var self = this;
 	return new Index(function () {
@@ -235,4 +235,3 @@ Index.prototype.tail = function (values) {
 	return self.skip(self.count() - values);
 };
 
-module.exports = Index;

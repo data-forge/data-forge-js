@@ -4,8 +4,6 @@
 // Base class for data frame classes.
 //
 
-var Series = require('./series');
-var Index = require('./index');
 var ArrayIterator = require('./iterators/array');
 var MultiIterator = require('./iterators/multi');
 var PairIterator = require('./iterators/pair');
@@ -388,6 +386,11 @@ var DataFrame = function (config) {
 		}
 	}
 };
+
+module.exports = DataFrame;
+
+var Series = require('./series');
+var Index = require('./index');
 
 /**
  * Get the index of the data frame.
@@ -2649,5 +2652,3 @@ DataFrame.prototype.concat = function (otherDataFrame) {
 		},
 	})
 };
-
-module.exports = DataFrame;

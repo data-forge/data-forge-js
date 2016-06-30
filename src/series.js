@@ -9,7 +9,6 @@ var E = require('linq');
 var moment = require('moment');
 var ArrayIterator = require('./iterators/array');
 var validateIterator = require('./iterators/validate');
-var Index = require('./index');
 var SkipIterator = require('./iterators/skip');
 var SkipWhileIterator = require('./iterators/skip-while');
 var TakeIterator = require('../src/iterators/take');
@@ -97,6 +96,12 @@ var Series = function (config) {
 		}
 	}
 };
+
+module.exports = Series;
+
+var Index = require('./index');
+var DataFrame = require('./dataframe');
+
 
 /**
  * Get an iterator for the iterating the values of the series.
@@ -293,8 +298,6 @@ Series.prototype.selectMany = function (selector) {
 	assert.isFunction(selector, "Expected 'selector' parameter to 'Series.selectMany' function to be a function.");
 
 	var self = this;
-
-	var DataFrame = require('./dataframe');
 
 	return new Series({
 		iterable: function () {
@@ -854,7 +857,6 @@ Series.prototype.detectTypes = function () {
 
 	var self = this;
 
-	var DataFrame = require('./dataframe');
 	return new DataFrame({
 		columnNames: ["Type", "Frequency"],
 		rows: function () { //todo: make this properly lazy.
@@ -905,7 +907,6 @@ Series.prototype.detectValues = function () {
 
 	var self = this;
 
-	var DataFrame = require('./dataframe');
 	return new DataFrame({
 		columnNames: ["Value", "Frequency"],
 		rows: function () {
@@ -1169,7 +1170,6 @@ Series.prototype.inflate = function (selector) {
 		}
 	}
 
-	var DataFrame = require('./dataframe');
 	return new DataFrame({
 		iterable: function () {
 			return self.select(selector).getIterator();
@@ -1751,4 +1751,4 @@ Series.prototype.concat = function (otherSeries) {
 	})
 };
 
-module.exports = Series;
+
