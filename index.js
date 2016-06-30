@@ -260,7 +260,7 @@ var dataForge = {
 	 * @param {array} dataFrames - Array of data-frames to zip together.
 	 * @param {function} selector - Selector function that produces a new data-frame based on the input data-frames.
 	 */
-	zipDataFrames: require('./src/zip-dataframes'),	
+	zip: require('./src/zip-dataframes'),	
 };
 
 module.exports = dataForge;

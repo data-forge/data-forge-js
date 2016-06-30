@@ -521,7 +521,7 @@ describe('data-forge', function () {
 	 	var df2 = initDataFrame(["c", "d"], [[6, 5], [8, 7]]);
 	 	var df3 = initDataFrame(["e", "f"], [[9, 10], [11, 12]]);
 
-		var zipped = dataForge.zipDataFrames([df1, df2, df3],
+		var zipped = dataForge.zip([df1, df2, df3],
 			function (rows) {
 				return extend({}, rows[0], rows[1], rows[2]);
 			}
@@ -557,7 +557,7 @@ describe('data-forge', function () {
 	 	var df2 = initDataFrame(["c", "d"], [[6, 5], ]);
 	 	var df3 = initDataFrame(["e", "f"], [[9, 10], [11, 12]]);
 
-		var zipped = dataForge.zipDataFrames([df1, df2, df3],
+		var zipped = dataForge.zip([df1, df2, df3],
 			function (rows) {
 				return extend({}, rows[0], rows[1], rows[2]);
 			}
