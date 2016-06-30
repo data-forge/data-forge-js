@@ -1409,7 +1409,7 @@ describe('Series', function () {
 			values: [1, 1, 2, 3, 3, 3, 5, 6, 6, 7],
 		});
 
-		var collapsed = series.groupSequential()
+		var collapsed = series.groupSequentialBy()
 			.selectPairs(function (window) {
 				return [window.getIndex().first(), window.first()];
 			});
@@ -1431,7 +1431,7 @@ describe('Series', function () {
 			values: [1, 1, 2, 3, 3, 3, 5, 6, 6, 7],
 		});
 
-		var collapsed = series.groupSequential()
+		var collapsed = series.groupSequentialBy()
 			.selectPairs(function (window) {
 				return [window.lastPair()[0], window.last()];
 			});

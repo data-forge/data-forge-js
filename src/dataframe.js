@@ -2212,9 +2212,9 @@ DataFrame.prototype.groupBy = function (selector) {
  *
  * @param {function} valueSelector - Selects the value used to compare for duplicates.
  */	
-DataFrame.prototype.groupSequential = function (valueSelector) {
+DataFrame.prototype.groupSequentialBy = function (valueSelector) {
 
-	assert.isFunction(valueSelector, "Expected 'valueSelector' parameter to 'sequentialDistinct' to be a function.")
+	assert.isFunction(valueSelector, "Expected 'valueSelector' parameter to 'DataFrame.groupSequentialBy' to be a function.")
 
 	var self = this;
 

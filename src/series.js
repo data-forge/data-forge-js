@@ -1690,7 +1690,7 @@ Series.prototype.groupBy = function (selector) {
 /**
  * Group sequential duplicate values into a Series of windows.
  */
-Series.prototype.groupSequential = function () {
+Series.prototype.groupSequentialBy = function () {
 	
 	var self = this;
 

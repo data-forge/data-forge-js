@@ -3236,7 +3236,7 @@ describe('DataFrame', function () {
 			index: [0, 1, 2, 3, 4, 5, 6, 7],
 		});
 
-		var collapsed = df.groupSequential(function (row, index) {
+		var collapsed = df.groupSequentialBy(function (row, index) {
 				return row.c2;
 			})
 			.selectPairs(function (window) {
@@ -3269,7 +3269,7 @@ describe('DataFrame', function () {
 			index: [0, 1, 2, 3, 4, 5, 6, 7],
 		});
 
-		var collapsed = df.groupSequential(function (row, index) {
+		var collapsed = df.groupSequentialBy(function (row, index) {
 				return row.c2;
 			})
 			.selectPairs(function (window) {
