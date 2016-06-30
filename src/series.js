@@ -101,6 +101,7 @@ module.exports = Series;
 
 var Index = require('./index');
 var DataFrame = require('./dataframe');
+var zipSeries = require('./zip-series');
 
 
 /**
@@ -1324,8 +1325,7 @@ Series.prototype.zip = function () {
 
 	assert.isFunction(selector, "Expect 'selector' parameter to zip to be a function.");
 
-	var dataForge = require('../index.js');
-	return dataForge.zipSeries(inputSeries, function (values) {
+	return zipSeries(inputSeries, function (values) {
 			return selector.apply(undefined, values);
 		});
 };
