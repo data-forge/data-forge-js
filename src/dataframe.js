@@ -392,6 +392,7 @@ module.exports = DataFrame;
 var Series = require('./series');
 var Index = require('./index');
 var concatDataFrames = require('./concat-dataframes');
+var zipDataFrames = require('./zip-dataframes');
 
 /**
  * Get the index of the data frame.
@@ -1951,8 +1952,6 @@ DataFrame.prototype.deflate = function (selector) {
 DataFrame.prototype.inflateColumn = function (columnNameOrIndex, selector) {
 
 	var self = this;
-	var dataForge = require('../index');
-
 	return self.zip(
 		self.getSeries(columnNameOrIndex).inflate(selector),
 		function (row1, row2) {
@@ -2074,8 +2073,7 @@ DataFrame.prototype.zip = function () {
 
 	assert.isFunction(selector, "Expect 'selector' parameter to zip to be a function.");
 
-	var dataForge = require('../index.js');
-	return dataForge.zipDataFrames(dataFrames, function (rows) {
+	return zipDataFrames(dataFrames, function (rows) {
 			return selector.apply(undefined, rows);
 		});
 };
