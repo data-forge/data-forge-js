@@ -1489,22 +1489,22 @@ describe('Series', function () {
 		]);
 	});
 
-	it('can insert at start of empty series', function () {
+	it('can insert pair at start of empty series', function () {
 
 		var series = new Series();
-		var modified = series.insert([10, 100]);
+		var modified = series.insertPair([10, 100]);
 		expect(modified.toPairs()).to.eql([
 			[10, 100]
 		]);
 	});
 
-	it('can insert at start of series with existing items', function () {
+	it('can insert pair at start of series with existing items', function () {
 
 		var series = new Series({
 			index:  [1,  2],
 			values: [10, 11],
 		});
-		var modified = series.insert([20, 100]);
+		var modified = series.insertPair([20, 100]);
 		expect(modified.toPairs()).to.eql([
 			[20, 100],
 			[1, 10],
@@ -1513,22 +1513,22 @@ describe('Series', function () {
 	});
 
 
-	it('can append pairs to empty series', function () {
+	it('can append pair to empty series', function () {
 
 		var series = new Series();
-		var appended = series.append([10, 100]);
+		var appended = series.appendPair([10, 100]);
 		expect(appended.toPairs()).to.eql([
 			[10, 100]
 		]);
 	});
 
-	it('can append pairs to series with existing items', function () {
+	it('can append pair to series with existing items', function () {
 
 		var series = new Series({
 			index:  [1,  2],
 			values: [10, 11],
 		});
-		var appended = series.append([20, 100]);
+		var appended = series.appendPair([20, 100]);
 		expect(appended.toPairs()).to.eql([
 			[1, 10],
 			[2, 11],

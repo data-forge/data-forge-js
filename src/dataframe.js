@@ -2530,9 +2530,9 @@ DataFrame.prototype.merge = function (otherDataFrame, columnName) {
  *
  * @param {pair} pair - The pair to insert.
  */
-DataFrame.prototype.insert = function (pair) {
-	assert.isArray(pair, "Expected 'pair' parameter to 'DataFrame.insert' to be an array.");
-	assert(pair.length === 2, "Expected 'pair' parameter to 'DataFrame.insert' to be an array with two elements. The first element is the index, the second is the row.");
+DataFrame.prototype.insertPair = function (pair) {
+	assert.isArray(pair, "Expected 'pair' parameter to 'DataFrame.insertPair' to be an array.");
+	assert(pair.length === 2, "Expected 'pair' parameter to 'DataFrame.insertPair' to be an array with two elements. The first element is the index, the second is the row.");
 
 	//todo: make this lazy.
 
@@ -2550,9 +2550,9 @@ DataFrame.prototype.insert = function (pair) {
  *
  * @param {pair} pair - The pair to append.
  */
-DataFrame.prototype.append = function (pair) {
-	assert.isArray(pair, "Expected 'pair' parameter to 'DataFrame.append' to be an array.");
-	assert(pair.length === 2, "Expected 'pair' parameter to 'DataFrame.append' to be an array with two elements. The first element is the index, the second is the row.");
+DataFrame.prototype.appendPair = function (pair) {
+	assert.isArray(pair, "Expected 'pair' parameter to 'DataFrame.appendPair' to be an array.");
+	assert(pair.length === 2, "Expected 'pair' parameter to 'DataFrame.appendPair' to be an array with two elements. The first element is the index, the second is the row.");
 
 	//todo: make this lazy.
 
@@ -2592,7 +2592,7 @@ DataFrame.prototype.fillGaps = function (predicate, generator) {
 			return [pairA].concat(generatedRows);
 		})
 		.inflate()
-		.append(self.lastPair())
+		.appendPair(self.lastPair())
 		;
 };
 

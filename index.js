@@ -2,7 +2,6 @@
 
 var assert = require('chai').assert;
 var E = require('linq');
-var ArrayIterator = require('./src/iterators/array');
 var SelectIterator = require('./src/iterators/select');
 var MultiIterator = require('./src/iterators/multi');
 require('sugar');
@@ -13,29 +12,6 @@ var DataFrame = require('./src/dataframe');
 var Series = require('./src/series');
 var Index = require('./src/index');
 var E = require('linq');
-
-//
-// Helper function to replicate a value.
-//
-var relicate = function (value, count) {
-	var output = [];
-	for (var i = 0; i < count; ++i) {
-		output.push(value);
-	}
-	return output;
-};
-
-//
-// Convert an object row to an array.
-// todo: Feels like a bit of a hack to use this.
-//
-var toRow = function (row, columnNames) {
-	return E.from(columnNames)
-		.select(function (columnName) {
-			return row[columnName];
-		})
-		.toArray();
-};
 
 //
 // Records plugins that have been registered.

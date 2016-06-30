@@ -1586,9 +1586,9 @@ Series.prototype.variableWindow = function (comparer, obsoleteSelector) {
  *
  * @param {pair} pair - The pair to insert.
  */
-Series.prototype.insert = function (pair) {
-	assert.isArray(pair, "Expected 'pair' parameter to 'Series.insert' to be an array.");
-	assert(pair.length === 2, "Expected 'pair' parameter to 'Series.insert' to be an array with two elements. The first element is the index, the second is the value.");
+Series.prototype.insertPair = function (pair) {
+	assert.isArray(pair, "Expected 'pair' parameter to 'Series.insertPair' to be an array.");
+	assert(pair.length === 2, "Expected 'pair' parameter to 'Series.insertPair' to be an array with two elements. The first element is the index, the second is the value.");
 
 	//todo: make this lazy.
 
@@ -1606,9 +1606,9 @@ Series.prototype.insert = function (pair) {
  *
  * @param {pair} pair - The pair to append.
  */
-Series.prototype.append = function (pair) {
-	assert.isArray(pair, "Expected 'pair' parameter to 'Series.append' to be an array.");
-	assert(pair.length === 2, "Expected 'pair' parameter to 'Series.append' to be an array with two elements. The first element is the index, the second is the value.");
+Series.prototype.appendPair = function (pair) {
+	assert.isArray(pair, "Expected 'pair' parameter to 'Series.appendPair' to be an array.");
+	assert(pair.length === 2, "Expected 'pair' parameter to 'Series.appendPair' to be an array with two elements. The first element is the index, the second is the value.");
 
 	//todo: make this lazy.
 
@@ -1648,7 +1648,7 @@ Series.prototype.fillGaps = function (predicate, generator) {
 
 			return [pairA].concat(generatedRows);
 		})
-		.append(self.lastPair())
+		.appendPair(self.lastPair())
 		;
 };
 
