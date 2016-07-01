@@ -11,9 +11,9 @@ var E = require('linq');
 
 var validateIterator = require('./iterators/validate');
 
-/**
- * Implements an index for a data frame or column.
- */
+//
+// Implements an index for a data frame or column.
+//
 var Index = function (values) {
 
 	var self = this;

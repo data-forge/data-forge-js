@@ -150,11 +150,9 @@ var determineColumnNamesFromPairsIterable = function (iterable, considerAllRows)
 	}
 };
 
-/**
- * Constructor for DataFrame.
- *
- * @param {object} config - Specifies content and configuration for the data frame.
- */
+//
+// Constuctor.
+//
 var DataFrame = function (config) {
 
 	var self = this;

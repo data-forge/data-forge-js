@@ -20,9 +20,9 @@ var WhereIterator = require('../src/iterators/where');
 var CountIterator = require('../src/iterators/count');
 var EmptyIterator = require('../src/iterators/empty');
 
-/**
- * Represents a time series.
- */
+//
+// Represents a time series.
+//
 var Series = function (config) {
 
 	var self = this;

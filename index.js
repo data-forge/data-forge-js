@@ -35,8 +35,25 @@ var registeredPlugins = {};
  */
 var dataForge = {
 	
+	/**
+	 * Constructor for DataFrame.
+	 *
+	 * @param {object} config - Specifies content and configuration for the DataFrame.
+	 */
 	DataFrame: DataFrame,
+
+	/**
+	 * Constructor for Series.
+	 *
+	 * @param {object} config - Specifies content and configuration for the Series.
+	 */
 	Series: Series,
+
+	/**
+	 * Constructor for Index.
+	 *
+	 * @param {array} values - Array of values to include in the index.
+	 */
 	Index: Index,
 
 	/**
@@ -80,7 +97,7 @@ var dataForge = {
 	},
 
 	//
-	// Deserialize a data from a CSV text string.
+	// Deserialize a DataFrame from a CSV text string.
 	//
 	fromCSV: function (csvTextString, config) {
 		assert.isString(csvTextString, "Expected 'csvTextString' parameter to 'dataForge.fromCSV' to be a string containing data encoded in the CSV format.");
@@ -246,7 +263,7 @@ var dataForge = {
 		})
 	},
 
-	/*
+	/**
 	 * Zip together multiple series to create a new series.
 	 *
 	 * @param {array} series - Array of series to zip together.
@@ -254,7 +271,7 @@ var dataForge = {
 	 */
 	zipSeries: require('./src/zip-series'),
 
-	/*
+	/**
 	 * Zip together multiple data-frames to create a new data-frame.
 	 *
 	 * @param {array} dataFrames - Array of data-frames to zip together.
