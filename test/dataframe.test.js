@@ -3668,4 +3668,74 @@ describe('DataFrame', function () {
 			[4, { Column1: 40 } ],
 		]);
 	});
+
+	it('can parse single columns', function () {
+
+		var df = new DataFrame({
+			columnNames: ["V1", "V2"],
+			rows: [
+				['1', '2'],
+				['10', '11'],
+			],
+		});
+
+		var parsed = df.parseInts("V1");
+		expect(parsed.toValues()).to.eql([
+			[1, '2'],
+			[10, '11'],
+		]);
+	});
+
+	it('can parse multiple columns', function () {
+
+		var df = new DataFrame({
+			columnNames: ["V1", "V2"],
+			rows: [
+				['1', '2'],
+				['10', '11'],
+			],
+		});
+
+		var parsed = df.parseInts(["V1", "V2"]);
+		expect(parsed.toValues()).to.eql([
+			[1, 2],
+			[10, 11],
+		]);
+	});
+
+	it('can convert single series to strings', function () {
+
+		var df = new DataFrame({
+			columnNames: ["V1", "V2"],
+			rows: [
+				[1, 2],
+				[10, 11],
+			],
+		});
+
+		var converted = df.toStrings("V1");
+		expect(converted.toValues()).to.eql([
+			['1', 2],
+			['10', 11],
+		]);
+
+	});
+
+	it('can convert multiple series to strings', function () {
+
+		var df = new DataFrame({
+			columnNames: ["V1", "V2"],
+			rows: [
+				[1, 2],
+				[10, 11],
+			],
+		});
+
+		var converted = df.toStrings(["V1", "V2"]);
+		expect(converted.toValues()).to.eql([
+			['1', '2'],
+			['10', '11'],
+		]);
+
+	});
 });

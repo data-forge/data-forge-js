@@ -1305,55 +1305,87 @@ DataFrame.prototype.toString = function () {
 /**
  * Parse a column with string values to a column with int values.
  *
- * @param {string|int} columnName - Specifies the column to parse.
+ * @param {string|array} columnNameOrNames - Specifies the column name or array of column names to parse.
  */
-DataFrame.prototype.parseInts = function (columnName) {
+DataFrame.prototype.parseInts = function (columnNameOrNames) {
 
 	var self = this;
-	return self.setSeries(columnName, self.getSeries(columnName).parseInts());
+	if (Object.isArray(columnNameOrNames)) {
+		return E.from(columnNameOrNames)
+			.aggregate(self, function (self, columnName) {
+				return self.setSeries(columnName, self.getSeries(columnName).parseInts());
+			});
+	}
+	else {
+		return self.setSeries(columnNameOrNames, self.getSeries(columnNameOrNames).parseInts());
+	}
 };
 
 /**
  * Parse a column with string values to a column with float values.
  *
- * @param {string|int} columnName - Specifies the column to parse.
+ * @param {string|array} columnNameOrNames - Specifies the column name or array of column names to parse.
  */
-DataFrame.prototype.parseFloats = function (columnName) {
+DataFrame.prototype.parseFloats = function (columnNameOrNames) {
 
 	var self = this;
-	return self.setSeries(columnName, self.getSeries(columnName).parseFloats());
+	if (Object.isArray(columnNameOrNames)) {
+		return E.from(columnNameOrNames)
+			.aggregate(self, function (self, columnName) {
+				return self.setSeries(columnName, self.getSeries(columnName).parseFloats());
+			});
+	}
+	else {
+		return self.setSeries(columnNameOrNames, self.getSeries(columnNameOrNames).parseFloats());
+	}
 };
 
 /**
  * Parse a column with string values to a column with date values.
  *
- * @param {string|int} columnName - Specifies the column to parse.
+ * @param {string|array} columnNameOrNames - Specifies the column name or array of column names to parse.
  * @param {string} [formatString] - Optional formatting string for dates.
  */
-DataFrame.prototype.parseDates = function (columnName, formatString) {
+DataFrame.prototype.parseDates = function (columnNameOrNames, formatString) {
 
 	if (formatString) {
 		assert.isString(formatString, "Expected optional 'formatString' parameter to parseDates to be a string (if specified).");
 	}
 
 	var self = this;
-	return self.setSeries(columnName, self.getSeries(columnName).parseDates(formatString));
+	if (Object.isArray(columnNameOrNames)) {
+		return E.from(columnNameOrNames)
+			.aggregate(self, function (self, columnName) {
+				return self.setSeries(columnName, self.getSeries(columnName).parseDates(formatString));
+			});
+	}
+	else {
+		return self.setSeries(columnNameOrNames, self.getSeries(columnNameOrNames).parseDates(formatString));
+	}
 };
 
 /**
  * Convert a column of values of different types to a column of string values.
  *
- * @param {string|int} columnName - Specifies the column to parse.
+ * @param {string|array} columnNameOrNames - Specifies the column name or array of column names to convert to strings.
  * @param {string} [formatString] - Optional formatting string for dates.
  */
-DataFrame.prototype.toStrings = function (columnName, formatString) {
+DataFrame.prototype.toStrings = function (columnNameOrNames, formatString) {
 
 	if (formatString) {
 		assert.isString(formatString, "Expected optional 'formatString' parameter to parseDates to be a string (if specified).");
 	}
 
 	var self = this;
-	return self.setSeries(columnName, self.getSeries(columnName).toStrings(formatString));
+	if (Object.isArray(columnNameOrNames)) {
+		return E.from(columnNameOrNames)
+			.aggregate(self, function (self, columnName) {
+				return self.setSeries(columnName, self.getSeries(columnName).toStrings(formatString));
+			});
+	}
+	else {
+		return self.setSeries(columnNameOrNames, self.getSeries(columnNameOrNames).toStrings(formatString));
+	}
 };
 
 /**
