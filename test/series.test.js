@@ -1485,6 +1485,26 @@ describe('Series', function () {
 		]);
 	});
 
+	it('can distinct items with custom selector', function () {
+
+		var series = new Series({ 
+			index:  [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+			values: [{ A: 1 }, { A: 1 }, { A: 2 }, { A: 1 }, { A: 1 }, { A: 2 }, { A: 3 }, { A: 4 }, { A: 3 }, { A: 3 }],
+		});
+
+		var collapsed = series
+			.distinct(value => value.A)
+			.select(value => value.A)
+			;
+
+		expect(collapsed.toPairs()).to.eql([
+			[0, 1],
+			[2, 2],
+			[6, 3],
+			[7, 4],
+		]);
+	});
+
 	it('variable window', function () {
 
 		var series = new Series({ 

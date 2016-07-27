@@ -1416,6 +1416,7 @@ Series.prototype.any = function (predicate) {
  * @param {function} [predicate] - Optional predicate function that receives each value in turn and returns truthy for a match, otherwise falsy.
  */
 Series.prototype.none = function (predicate) {
+
 	if (predicate) {
 		assert.isFunction(predicate, "Expected 'predicate' parameter to 'none' to be a function.")
 	}
@@ -1457,10 +1458,20 @@ Series.prototype.sequentialDistinct = function (obsoleteSelector) {
 
 /**
  * Group distinct values in the Series into a Series of windows.
+ *
+ * @param {function} selector - Selects the value used to compare for duplicates.
+
  */
-Series.prototype.distinct = function (obsoleteSelector) {
+Series.prototype.distinct = function (selector) {
 	
-	assert(!obsoleteSelector, "Selector parameter is obsolete and no longer required.");
+	if (selector) {
+		assert.isFunction(selector, "Expected 'selector' parameter to 'Series.distinct' to be a selector function that determines the value to compare for duplicates.")
+	}
+	else {
+		selector = function (value) {
+			return value;
+		};
+	}
 
 	var self = this;
 
@@ -1500,7 +1511,7 @@ Series.prototype.distinct = function (obsoleteSelector) {
 				continue;
 			}
 
-			if (underComparison.pair[1] === underConsideration.pair[1]) {
+			if (selector(underComparison.pair[1]) === selector(underConsideration.pair[1])) {
 				underComparison.considered = true;
 			}
 		}
