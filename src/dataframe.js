@@ -1305,55 +1305,55 @@ DataFrame.prototype.toString = function () {
 /**
  * Parse a column with string values to a column with int values.
  *
- * @param {string|int} columnNameOrIndex - Specifies the column to parse.
+ * @param {string|int} columnName - Specifies the column to parse.
  */
-DataFrame.prototype.parseInts = function (columnNameOrIndex) {
+DataFrame.prototype.parseInts = function (columnName) {
 
 	var self = this;
-	return self.setSeries(columnNameOrIndex, self.getSeries(columnNameOrIndex).parseInts());
+	return self.setSeries(columnName, self.getSeries(columnName).parseInts());
 };
 
 /**
  * Parse a column with string values to a column with float values.
  *
- * @param {string|int} columnNameOrIndex - Specifies the column to parse.
+ * @param {string|int} columnName - Specifies the column to parse.
  */
-DataFrame.prototype.parseFloats = function (columnNameOrIndex) {
+DataFrame.prototype.parseFloats = function (columnName) {
 
 	var self = this;
-	return self.setSeries(columnNameOrIndex, self.getSeries(columnNameOrIndex).parseFloats());
+	return self.setSeries(columnName, self.getSeries(columnName).parseFloats());
 };
 
 /**
  * Parse a column with string values to a column with date values.
  *
- * @param {string|int} columnNameOrIndex - Specifies the column to parse.
+ * @param {string|int} columnName - Specifies the column to parse.
  * @param {string} [formatString] - Optional formatting string for dates.
  */
-DataFrame.prototype.parseDates = function (columnNameOrIndex, formatString) {
+DataFrame.prototype.parseDates = function (columnName, formatString) {
 
 	if (formatString) {
 		assert.isString(formatString, "Expected optional 'formatString' parameter to parseDates to be a string (if specified).");
 	}
 
 	var self = this;
-	return self.setSeries(columnNameOrIndex, self.getSeries(columnNameOrIndex).parseDates(formatString));
+	return self.setSeries(columnName, self.getSeries(columnName).parseDates(formatString));
 };
 
 /**
  * Convert a column of values of different types to a column of string values.
  *
- * @param {string|int} columnNameOrIndex - Specifies the column to convert.
+ * @param {string|int} columnName - Specifies the column to parse.
  * @param {string} [formatString] - Optional formatting string for dates.
  */
-DataFrame.prototype.toStrings = function (columnNameOrIndex, formatString) {
+DataFrame.prototype.toStrings = function (columnName, formatString) {
 
 	if (formatString) {
 		assert.isString(formatString, "Expected optional 'formatString' parameter to parseDates to be a string (if specified).");
 	}
 
 	var self = this;
-	return self.setSeries(columnNameOrIndex, self.getSeries(columnNameOrIndex).toStrings(formatString));
+	return self.setSeries(columnName, self.getSeries(columnName).toStrings(formatString));
 };
 
 /**
