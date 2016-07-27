@@ -1227,7 +1227,13 @@ Series.prototype.sum = function () {
 Series.prototype.average = function () {
 
 	var self = this;
-	return self.sum() / self.count();
+	var count = self.count();
+	if (count > 0) {
+		return self.sum() / count;
+	}
+	else {
+		return 0;
+	}
 };
 
 /**

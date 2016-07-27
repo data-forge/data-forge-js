@@ -1072,6 +1072,12 @@ describe('Series', function () {
 		expect(series.average()).to.eql(2);
 	});
 
+	it('average of an empty series is zero', function () {
+
+		var series = initSeries([], []);
+		expect(series.average()).to.eql(0);
+	});
+
 	it('can get series minimum', function () {
 
 		var series = initSeries([0, 1, 2], [5, 2.5, 3]);		
