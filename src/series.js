@@ -1689,13 +1689,24 @@ Series.prototype.groupBy = function (selector) {
 
 /**
  * Group sequential duplicate values into a Series of windows.
+ *
+ * @param {function} selector - Selector that defines the value to group by.
  */
-Series.prototype.groupSequentialBy = function () {
+Series.prototype.groupSequentialBy = function (selector) {
+
+	if (selector) {
+		assert.isFunction(selector, "Expected 'selector' parameter to 'Series.groupSequentialBy' to be a selector function that determines the value to group the series by.")
+	}
+	else {
+		selector = function (value) {
+			return value;
+		};
+	}
 	
 	var self = this;
 
 	return self.variableWindow(function (a, b) {
-			return a === b;
+			return selector(a) === selector(b);
 		});
 };
 

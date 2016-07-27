@@ -1446,6 +1446,28 @@ describe('Series', function () {
 		]);
 	});
 
+	it('can group sequential with custom selector', function () {
+
+		var series = new Series({ 
+			index:  [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+			values: [{ A: 1 }, { A: 1 }, { A: 2 }, { A: 3 }, { A: 3 }, { A: 3 }, { A: 5 }, { A: 6 }, { A: 6 }, { A: 7 }],
+		});
+
+		var collapsed = series.groupSequentialBy(value => value.A)
+			.selectPairs(function (window) {
+				return [window.lastIndex(), window.last().A];
+			});
+
+		expect(collapsed.toPairs()).to.eql([
+			[1, 1],
+			[2, 2],
+			[5, 3],
+			[6, 5],
+			[8, 6],
+			[9, 7],
+		]);
+	});
+
 	it('can distinct items', function () {
 
 		var series = new Series({ 
