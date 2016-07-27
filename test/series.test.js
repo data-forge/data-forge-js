@@ -1402,6 +1402,28 @@ describe('Series', function () {
 		]);
 	});
 
+	it('can collapse sequential duplicates with custom selector', function () {
+
+		var series = new Series({ 
+			index:  [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+			values: [{ A: 1 }, { A: 1 }, { A: 2 }, { A: 3 }, { A: 3 }, { A: 3 }, { A: 5 }, { A: 6 }, { A: 6 }, { A: 7 }],
+		});
+
+		var collapsed = series
+			.sequentialDistinct(value => value.A)
+			.select(value => value.A)
+			;
+
+		expect(collapsed.toPairs()).to.eql([
+			[0, 1],
+			[2, 2],
+			[3, 3],
+			[6, 5],
+			[7, 6],
+			[9, 7],
+		]);
+	});
+
 	it('can group sequential duplicates and take first index', function () {
 
 		var series = new Series({ 

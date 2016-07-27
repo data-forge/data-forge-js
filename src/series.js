@@ -1441,15 +1441,24 @@ Series.prototype.none = function (predicate) {
 
 /**
  * Group sequential duplicate values into a Series of windows.
+ *
+ * @param {function} selector - Selects the value used to compare for duplicates.
  */
-Series.prototype.sequentialDistinct = function (obsoleteSelector) {
+Series.prototype.sequentialDistinct = function (selector) {
 	
-	assert(!obsoleteSelector, "Selector parameter is obsolete and no longer required.");
+	if (selector) {
+		assert.isFunction(selector, "Expected 'selector' parameter to 'Series.sequentialDistinct' to be a selector function that determines the value to compare for duplicates.")
+	}
+	else {
+		selector = function (value) {
+			return value;
+		};
+	}
 
 	var self = this;
 
 	return self.variableWindow(function (a, b) {
-			return a === b;
+			return selector(a) === selector(b);
 		})
 		.selectPairs(function (window) {
 			return [window.getIndex().first(), window.first()];
@@ -1460,7 +1469,6 @@ Series.prototype.sequentialDistinct = function (obsoleteSelector) {
  * Group distinct values in the Series into a Series of windows.
  *
  * @param {function} selector - Selects the value used to compare for duplicates.
-
  */
 Series.prototype.distinct = function (selector) {
 	
