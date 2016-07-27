@@ -946,6 +946,52 @@ describe('DataFrame', function () {
 		]);
 	});
 
+	it('can keep column', function () {
+		
+		var dataFrame = initDataFrame(
+			[ "Value1", "Value2", "Value3" ],
+			[
+				[300, 'c', 3],
+				[200, 'b', 1],
+				[20, 'c', 22],
+				[100, 'd', 4],
+			],
+			[5, 6, 7, 8]
+		);
+		var modified = dataFrame.keepSeries('Value1');
+		expect(modified.getColumnNames()).to.eql(['Value1']);
+		expect(modified.getIndex().toValues()).to.eql([5, 6, 7, 8]);
+		expect(modified.toValues()).to.eql([
+			[300],
+			[200],
+			[20],
+			[100],
+		]);
+	});
+
+	it('can keep multiple columns', function () {
+		
+		var dataFrame = initDataFrame(
+			[ "Value1", "Value2", "Value3" ],
+			[
+				[300, 'c', 3],
+				[200, 'b', 1],
+				[20, 'c', 22],
+				[100, 'd', 4],
+			],
+			[5, 6, 7, 8]
+		);
+		var modified = dataFrame.keepSeries(['Value1', 'Value3']);
+		expect(modified.getColumnNames()).to.eql(['Value1', 'Value3']);
+		expect(modified.getIndex().toValues()).to.eql([5, 6, 7, 8]);
+		expect(modified.toValues()).to.eql([
+			[300, 3],
+			[200, 1],
+			[20, 22],
+			[100, 4],
+		]);
+	});
+
 	it('dropping non-existing column has no effect', function () {
 		
 		var columnNames = [ "Date", "Value1", "Value2", "Value3" ];

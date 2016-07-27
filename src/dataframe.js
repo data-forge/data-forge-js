@@ -1011,7 +1011,7 @@ DataFrame.prototype.dropSeries = function (columnOrColumns) {
 	var self = this;
 
 	if (!Object.isArray(columnOrColumns)) {
-		assert.isString(columnOrColumns, "'dropSeries' expected either a string or an array or strings.");
+		assert.isString(columnOrColumns, "'DataFrame.dropSeries' expected either a string or an array or strings.");
 
 		columnOrColumns = [columnOrColumns]; // Convert to array for coding convenience.
 	}
@@ -1044,12 +1044,50 @@ DataFrame.prototype.dropSeries = function (columnOrColumns) {
 };
 
 /**
+ * Create a new data frame with only the requested column or columns dropped, other columns are dropped.
+ *
+ * @param {string|array} columnOrColumns - Specifies the column name (a string) or columns (array of column names) to keep.
+ */
+DataFrame.prototype.keepSeries = function (columnOrColumns) {
+
+	var self = this;
+
+	if (!Object.isArray(columnOrColumns)) {
+		assert.isString(columnOrColumns, "'DataFrame.keepSeries' expected either a string or an array or strings.");
+
+		columnOrColumns = [columnOrColumns]; // Convert to array for coding convenience.
+	}
+
+	return new DataFrame({
+		columnNames: function () {
+			return columnOrColumns;
+		},
+		iterable: function () {
+			return new SelectIterator(
+				self.getIterator(),
+				function (pair) {
+					var row = extend({}, pair[1]);
+					Object.keys(row).forEach(function (fieldName) {
+						if (!E.from(columnOrColumns).contains(fieldName)) {
+							delete row[fieldName];
+						}
+					});
+					return [
+						pair[0],
+						row
+					];					
+				}
+			);
+		},
+	});
+};
+/**
  * Create a new data frame with an additional column specified by the passed-in series.
  *
  * @param {string} columnName - The name of the column to add or replace.
  * @param {array|column} data - Array of data or column that contains data.
  */
-DataFrame.prototype.setSeries = function (columnName, data) { //todo
+DataFrame.prototype.setSeries = function (columnName, data) {
 
 	assert.isString(columnName, "Expected 'columnName' parameter to 'setSeries' function to be a string that specifies the column to set or replace.");
 
