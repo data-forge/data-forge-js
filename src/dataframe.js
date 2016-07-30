@@ -1978,7 +1978,9 @@ DataFrame.prototype.generateSeries = function (selector) {
 	//todo: this should merge on index.
 	//todo: need to be able to override columns on 1 data frame with columns from another.
 
-	var newColumns = self.select(selector);
+	var newColumns = self.select(selector)
+		.bake()
+		;
 
 	return E.from(newColumns.getColumnNames())
 		.aggregate(self, function (prevDataFrame, newColumnName) {
