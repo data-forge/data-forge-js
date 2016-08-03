@@ -2160,7 +2160,7 @@ describe('DataFrame', function () {
 		expect(reversed.getIndex().toValues()).to.eql([12, 11, 10]);
 	})
 
-	it('can generate series', function () {
+	it('can generate series - function version', function () {
 
 		var initialColumns = ["Column1", "Column2"];
 		var dataFrame = initDataFrame(
@@ -2179,6 +2179,33 @@ describe('DataFrame', function () {
 				};
 			});
 
+		var newColumnName = "NewColumn";
+		var newColumnNames = initialColumns.concat([newColumnName]);
+
+		expect(dataFrame.getColumnNames()).to.eql(initialColumns);
+		expect(modified.getColumnNames()).to.eql(newColumnNames);
+		expect(modified.getSeries(newColumnName).toValues()).to.eql([11, 22, 33]);
+	});
+
+	it('can generate series - object version', function () {
+
+		var initialColumns = ["Column1", "Column2"];
+		var dataFrame = initDataFrame(
+				initialColumns, 
+				[
+					[1, 10],
+					[2, 20],
+					[3, 30],
+				],
+				[10, 11, 12]
+			);
+
+		var modified = dataFrame.generateSeries({
+				NewColumn: function (row) {
+					return row.Column1 + row.Column2;
+				},
+			});
+			
 		var newColumnName = "NewColumn";
 		var newColumnNames = initialColumns.concat([newColumnName]);
 

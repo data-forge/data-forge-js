@@ -1966,11 +1966,9 @@ DataFrame.prototype.reverse = function () {
 /** 
  * Generate new columns based on existing rows.
  *
- * @param {function} selector - Selector function that transforms each row to a new set of columns.
+ * @param {function|object} generator - Generator function that transforms each row to a new set of columns.
  */
-DataFrame.prototype.generateSeries = function (selector) {
-
-	assert.isFunction(selector, "Expected 'selector' parameter to 'generateSeries' function to be a function.");
+DataFrame.prototype.generateSeries = function (generator) {
 
 	var self = this;
 
@@ -1978,13 +1976,24 @@ DataFrame.prototype.generateSeries = function (selector) {
 	//todo: this should merge on index.
 	//todo: need to be able to override columns on 1 data frame with columns from another.
 
-	var newColumns = self.select(selector)
-		.bake();
+	if (!Object.isObject(generator)) {
+		assert.isFunction(generator, "Expected 'generator' parameter to 'DataFrame.generateSeries' function to be a function or an object.");
 
-	return E.from(newColumns.getColumnNames())
-		.aggregate(self, function (prevDataFrame, newColumnName) {
-			return prevDataFrame.setSeries(newColumnName, newColumns.getSeries(newColumnName).bake()).bake();
-		});
+		var newColumns = self.select(generator)
+			.bake();
+
+		return E.from(newColumns.getColumnNames())
+			.aggregate(self, function (prevDataFrame, newColumnName) {
+				return prevDataFrame.setSeries(newColumnName, newColumns.getSeries(newColumnName).bake()).bake();
+			});
+	}
+	else {
+		var newColumnNames = Object.keys(generator);
+		return E.from(newColumnNames)
+			.aggregate(self, function (prevDataFrame, newColumnName) {
+				return prevDataFrame.setSeries(newColumnName, prevDataFrame.deflate(generator[newColumnName]).bake()).bake();
+			});
+	}
 };
 
 /** 
