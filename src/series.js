@@ -758,7 +758,7 @@ Series.prototype.parseInts = function () {
 			return undefined;
 		}
 		else {
-			assert.isString(value, "Called parseInt on series, expected all values in the series to be strings, instead found a '" + typeof(value) + "' at index " + valueIndex);
+			assert.isString(value, "Called parseInts on series, expected all values in the series to be strings, instead found a '" + typeof(value) + "' at index " + valueIndex);
 
 			if (value.length === 0) {
 				return undefined;
@@ -780,7 +780,7 @@ Series.prototype.parseFloats = function () {
 			return undefined;
 		}
 		else {
-			assert.isString(value, "Called parseInt on series, expected all values in the series to be strings, instead found a '" + typeof(value) + "' at index " + valueIndex);
+			assert.isString(value, "Called parseFloats on series, expected all values in the series to be strings, instead found a '" + typeof(value) + "' at index " + valueIndex);
 
 			if (value.length === 0) {
 				return undefined;
@@ -808,7 +808,7 @@ Series.prototype.parseDates = function (formatString) {
 			return undefined;
 		}
 		else {
-			assert.isString(value, "Called parseInt on series, expected all values in the series to be strings, instead found a '" + typeof(value) + "' at index " + valueIndex);
+			assert.isString(value, "Called parseDates on series, expected all values in the series to be strings, instead found a '" + typeof(value) + "' at index " + valueIndex);
 
 			if (value.length === 0) {
 				return undefined;
