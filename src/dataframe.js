@@ -1557,23 +1557,25 @@ DataFrame.prototype.renameColumns = function (newColumnNames) {
 };
 
 /*
- * Create a new data frame with a single column renamed.
+ * Create a new data-frame with one or more columns renamed.
  * 
- * @param {string} columnName - Specifies the column to rename.
- * @param {string} newColumnName - The new name for the specified column.
+ * @param {object} columnDefs - hash that specifies new names for existing columns.
  */
-DataFrame.prototype.renameColumn = function (columnName, newColumnName) {
+DataFrame.prototype.renameColumn = function (columnDefs) {
+
+	assert.isObject(columnDefs, "Expected 'columnDefs' parameter to 'DataFrame.renameColumn' to be an object that specifies the mapping between old and new column names.");
 
 	var self = this;
-	var columnIndex = self.getColumnIndex(columnName);
-	if (columnIndex === -1) {
-		return self; // No column to be renamed.
-	}
-
-	assert.isString(newColumnName, "Expected 'newColumnName' parameter to 'renameColumn' to be a string.");
-
 	var newColumnNames = self.getColumnNames().slice(0); // Clone array.
-	newColumnNames[columnIndex] = newColumnName;
+
+	Object.keys(columnDefs).forEach(function (existingColumnName, columnIndex) {
+		var columnIndex = self.getColumnIndex(existingColumnName);
+		if (columnIndex === -1) {
+			return; // No column to be renamed.
+		}
+
+		newColumnNames[columnIndex] = columnDefs[existingColumnName];
+	})
 
 	return self.renameColumns(newColumnNames);
 };
