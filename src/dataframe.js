@@ -1513,71 +1513,64 @@ DataFrame.prototype.remapColumns = function (columnNames) {
 };
 
 /**
- * Create a new data frame with different column names.
+ * Create a new data-frame with renamed series.
  *
- * @param {array} newColumnNames - Array of strings, with an element for each existing column that specifies the new name of that column.
+ * @param {array|object} newColumnNames|columnsMap - Array of strings, with an element for each existing column that specifies the new name of that column. Or, a hash that maps old column name to new column name.
  */
-DataFrame.prototype.renameColumns = function (newColumnNames) {
+DataFrame.prototype.renameSeries = function (newColumnNames) {
 
 	var self = this;
 
-	var existingColumns = self.getColumnNames();
-	var numExistingColumns = existingColumns.length;
+	if (Object.isObject(newColumnNames)) {
+		var self = this;
+		var renamedColumns = self.getColumnNames().slice(0); // Clone array.
 
-	assert.isArray(newColumnNames, "Expected parameter 'newColumnNames' to renameColumns to be an array with column names.");
-	assert(newColumnNames.length === numExistingColumns, "Expected 'newColumnNames' array to have an element for each existing column. There are " + numExistingColumns + "existing columns.");
+		Object.keys(newColumnNames).forEach(function (existingColumnName, columnIndex) {
+			var columnIndex = self.getColumnIndex(existingColumnName);
+			if (columnIndex === -1) {
+				return; // No column to be renamed.
+			}
 
-	return new DataFrame({
-		columnNames: newColumnNames,
-		iterable: function () {
-			var columnMap = E.from(existingColumns)
-				.zip(newColumnNames, function (oldName, newName) {
-					return [oldName, newName];
-				})
-				.toArray();
+			renamedColumns[columnIndex] = newColumnNames[existingColumnName];
+		});
 
-			return new SelectIterator(
-				self.getIterator(),
-				function (pair) {
-					return [
-						pair[0],
-						E.from(columnMap).toObject(
-							function (remap) {
-								return remap[1];
-							},
-							function (remap) {
-								return pair[1][remap[0]];								
-							}
-						)
-					];
-				}
-			);
-		},
-	});
-};
+		return self.renameSeries(renamedColumns);
+	}
+	else {
+		var existingColumns = self.getColumnNames();
+		var numExistingColumns = existingColumns.length;
 
-/*
- * Create a new data-frame with one or more columns renamed.
- * 
- * @param {object} columnDefs - hash that specifies new names for existing columns.
- */
-DataFrame.prototype.renameColumn = function (columnDefs) {
+		assert.isArray(newColumnNames, "Expected parameter 'newColumnNames' to renameColumns to be an array with column names.");
+		assert(newColumnNames.length === numExistingColumns, "Expected 'newColumnNames' array to have an element for each existing column. There are " + numExistingColumns + "existing columns.");
 
-	assert.isObject(columnDefs, "Expected 'columnDefs' parameter to 'DataFrame.renameColumn' to be an object that specifies the mapping between old and new column names.");
+		return new DataFrame({
+			columnNames: newColumnNames,
+			iterable: function () {
+				var columnMap = E.from(existingColumns)
+					.zip(newColumnNames, function (oldName, newName) {
+						return [oldName, newName];
+					})
+					.toArray();
 
-	var self = this;
-	var newColumnNames = self.getColumnNames().slice(0); // Clone array.
-
-	Object.keys(columnDefs).forEach(function (existingColumnName, columnIndex) {
-		var columnIndex = self.getColumnIndex(existingColumnName);
-		if (columnIndex === -1) {
-			return; // No column to be renamed.
-		}
-
-		newColumnNames[columnIndex] = columnDefs[existingColumnName];
-	})
-
-	return self.renameColumns(newColumnNames);
+				return new SelectIterator(
+					self.getIterator(),
+					function (pair) {
+						return [
+							pair[0],
+							E.from(columnMap).toObject(
+								function (remap) {
+									return remap[1];
+								},
+								function (remap) {
+									return pair[1][remap[0]];								
+								}
+							)
+						];
+					}
+				);
+			},
+		});
+	}
 };
 
 /**

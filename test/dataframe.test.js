@@ -1432,7 +1432,7 @@ describe('DataFrame', function () {
 		);
 
 		var newColumnNames = ["Val1", "Val2", "Val3"];
-		var renamed = dataFrame.renameColumns(newColumnNames);
+		var renamed = dataFrame.renameSeries(newColumnNames);
 		expect(renamed.getColumnNames()).to.eql(newColumnNames);
 		var columns = renamed.getColumns();
 		expect(columns.length).to.eql(3);
@@ -1564,7 +1564,7 @@ describe('DataFrame', function () {
 		var newColumnName = "NewColumnName";
 		var columnDef = {};
 		columnDef[oldColumnName] = newColumnName;
-		var renamed = dataFrame.renameColumn(columnDef);
+		var renamed = dataFrame.renameSeries(columnDef);
 
 		expect(dataFrame.getColumnNames()[1]).to.eql(oldColumnName);
 
@@ -1586,7 +1586,7 @@ describe('DataFrame', function () {
 
 		var columnDef = {};
 		columnDef["some-column-that-doesnt-exist"] = "new-column-name";
-		var renamed = dataFrame.renameColumn(columnDef);
+		var renamed = dataFrame.renameSeries(columnDef);
 
 		expect(dataFrame.getColumnNames()).to.eql(columnNames);
 		expect(dataFrame.getIndex().toValues()).to.eql([10, 11]);
