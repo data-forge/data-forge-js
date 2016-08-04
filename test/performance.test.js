@@ -72,13 +72,16 @@ describe('performance', function () {
 								}())
 							}
 
-							return total;
+							return [
+								i,
+								{ Total: total },
+							];
 						},
 					};
 				},
 			});
 
-		//console.log(df.last());
+		var lastValue = df.last();
 
 		stopwatch.stop();
 		var time = stopwatch.read();

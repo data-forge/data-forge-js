@@ -390,11 +390,11 @@ describe('DataFrame', function () {
 				[300],
 			]
 		);
-		var modified = dataFrame.select(function (row) {
-				return null;
-			});		
+
 		expect(function () {
-				modified.toValues();
+				dataFrame.select(function (row) {
+						return null;
+					})
 			})
 			.to.throw();
 	});
@@ -407,11 +407,11 @@ describe('DataFrame', function () {
 				[300],
 			]
 		);
-		var modified = dataFrame.selectMany(function (row) {
-				return null;
-			});		
+
 		expect(function () {
-				modified.toValues();
+				dataFrame.selectMany(function (row) {
+					return null;
+				});
 			})
 			.to.throw();			
 	});
@@ -424,11 +424,11 @@ describe('DataFrame', function () {
 				[300],
 			]
 		);
-		var modified = dataFrame.select(function (row) {
-				// Undefined
-			});		
+
 		expect(function () {
-				modified.toValues();
+				dataFrame.select(function (row) {
+					// Undefined
+				});
 			})
 			.to.throw();
 	});
@@ -441,11 +441,11 @@ describe('DataFrame', function () {
 				[300],
 			]
 		);
-		var modified = dataFrame.selectMany(function (row) {
-				// Undefined
-			});		
+
 		expect(function () {
-				modified.toValues();
+				dataFrame.selectMany(function (row) {
+					// Undefined
+				});		
 			})
 			.to.throw();			
 	});
@@ -458,13 +458,13 @@ describe('DataFrame', function () {
 				[300],
 			]
 		);
-		var modified = dataFrame.selectMany(function (row) {
-				return { // Return an object, not a list!
-					Blah: 1
-				};
-			});		
+
 		expect(function () {
-				modified.toValues();
+				dataFrame.selectMany(function (row) {
+					return { // Return an object, not a list!
+						Blah: 1
+					};
+				})
 			})
 			.to.throw();			
 	});
@@ -477,11 +477,11 @@ describe('DataFrame', function () {
 				[300],
 			]
 		);
-		var modified = dataFrame.selectMany(function (row) {
-				return [ null ];
-			});		
+
 		expect(function () {
-				modified.toValues();
+				dataFrame.selectMany(function (row) {
+					return [ null ];
+				});
 			})
 			.to.throw();			
 	});
@@ -494,11 +494,11 @@ describe('DataFrame', function () {
 				[300],
 			]
 		);
-		var modified = dataFrame.selectMany(function (row) {
-				return [ undefined ];
-			});		
+
 		expect(function () {
-				modified.toValues();
+				dataFrame.selectMany(function (row) {
+					return [ undefined ];
+				})
 			})
 			.to.throw();			
 	});
@@ -511,11 +511,11 @@ describe('DataFrame', function () {
 				[300],
 			]
 		);
-		var modified = dataFrame.selectMany(function (row) {
-				return [ 5.0 ];
-			});		
+
 		expect(function () {
-				modified.toValues();
+				dataFrame.selectMany(function (row) {
+					return [ 5.0 ];
+				})
 			})
 			.to.throw();			
 	});
@@ -981,6 +981,7 @@ describe('DataFrame', function () {
 			],
 			[5, 6, 7, 8]
 		);
+
 		var modified = dataFrame.keepSeries(['Value1', 'Value3']);
 		expect(modified.getColumnNames()).to.eql(['Value1', 'Value3']);
 		expect(modified.getIndex().toValues()).to.eql([5, 6, 7, 8]);
