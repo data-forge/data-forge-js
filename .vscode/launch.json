@@ -8,8 +8,8 @@
             "program": "C:\\Users\\AshleyDavis\\AppData\\Roaming\\npm\\node_modules\\mocha\\bin\\_mocha",
             "stopOnEntry": false,
             "args": [
-                "-g",
-                "concat-dataframes"               
+                //"-g",
+                //"concat-dataframes"               
             ],
             "cwd": "${workspaceRoot}",
             "preLaunchTask": null,
