@@ -1979,19 +1979,22 @@ DataFrame.prototype.generateSeries = function (generator) {
 		assert.isFunction(generator, "Expected 'generator' parameter to 'DataFrame.generateSeries' function to be a function or an object.");
 
 		var newColumns = self.select(generator)
-			.bake();
+			.bake()
+			;
 
 		return E.from(newColumns.getColumnNames())
 			.aggregate(self, function (prevDataFrame, newColumnName) {
 				return prevDataFrame.setSeries(newColumnName, newColumns.getSeries(newColumnName).bake()).bake();
-			});
+			})
+			;
 	}
 	else {
 		var newColumnNames = Object.keys(generator);
 		return E.from(newColumnNames)
 			.aggregate(self, function (prevDataFrame, newColumnName) {
 				return prevDataFrame.setSeries(newColumnName, prevDataFrame.deflate(generator[newColumnName]).bake()).bake();
-			});
+			})
+			;
 	}
 };
 
