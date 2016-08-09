@@ -17,7 +17,7 @@ describe('rolling window integration', function () {
 					return [i];
 				})
 				.toArray(),
-			index: new dataForge.Index(E.range(10, 12).toArray())
+			index: E.range(10, 12).toArray()
 		});
 
 		var newSeries = dataFrame.getSeries('Value')
@@ -60,7 +60,7 @@ describe('rolling window integration', function () {
 		};
 
 		if (index) {
-			config.index = new dataForge.Index(index);
+			config.index = index;
 		}
 
 		return new dataForge.DataFrame(config);

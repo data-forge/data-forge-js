@@ -87,11 +87,27 @@ var Series = function (config) {
 	}
 	else {
 		if (Object.isFunction(values)) {
-			return new PairIterator(index.getIterator(), values());
+			return new PairIterator(
+				new SelectIterator(
+					index.getIterator(),
+					function (pair) {
+						return pair[1];
+					}
+				), 
+				values()
+			);
 		}
 		else {
 			self.getIterator = function () {
-				return new PairIterator(index.getIterator(), new ArrayIterator(values));
+				return new PairIterator(
+					new SelectIterator(
+						index.getIterator(),
+						function (pair) {
+							return pair[1];
+						}
+					),
+					new ArrayIterator(values)
+				);
 			};			
 		}
 	}
@@ -99,10 +115,8 @@ var Series = function (config) {
 
 module.exports = Series;
 
-var Index = require('./index');
 var DataFrame = require('./dataframe');
 var zipSeries = require('./zip-series');
-
 
 /**
  * Get an iterator for the iterating the values of the series.
@@ -116,13 +130,15 @@ Series.prototype.getIterator = function () {
  */
 Series.prototype.getIndex = function () {
 	var self = this;
-	return new Index(function () {		
-		return new SelectIterator(
-			self.getIterator(),
-			function (pair) {
-				return pair[0]; // Extract index.
-			}
-		);
+	return new Series({
+		iterable: function () {		
+			return new SelectIterator(
+				self.getIterator(),
+				function (pair, index) {
+					return [index, pair[0]]; // Extract index.
+				}
+			);
+		},
 	});
 };
 
@@ -1146,11 +1162,18 @@ Series.prototype.lastIndex = function () {
 Series.prototype.reverse = function () {
 
 	var self = this;
-
 	return new Series({
-			values: E.from(self.toValues()).reverse().toArray(),
-			index: self.getIndex().reverse(),
-		});
+		iterable: function () {
+			var pairs = [];
+			var iterator = self.getIterator();
+
+			while (iterator.moveNext()) {
+				pairs.push(iterator.getCurrent());
+			}
+
+			return new ArrayIterator(pairs.reverse());
+		},
+	});
 };
 
 /** 
@@ -1596,13 +1619,13 @@ Series.prototype.variableWindow = function (comparer, obsoleteSelector) {
 					return pair[1];
 				})
 				.toArray(),
-			index: new Index(
-				E.from(output)
+			index: new Series({ 
+				values: E.from(output)
 					.select(function (pair) {
 						return pair[0];
 					})
 					.toArray()
-			)
+			})
 	});
 };
 

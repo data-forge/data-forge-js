@@ -259,12 +259,28 @@ var DataFrame = function (config) {
 			else {
 				if (Object.isFunction(rows)) {
 					this.getIterator = function () {
-						return new PairIterator(index.getIterator(), convertRowsToObjects(self._columnNames, rows()));
+						return new PairIterator(
+							new SelectIterator(
+								index.getIterator(),
+								function (pair) {
+									return pair[1];
+								} 
+							),	
+							convertRowsToObjects(self._columnNames, rows())
+						);
 					};
 				}
 				else {
 					this.getIterator = function () {
-						return new PairIterator(index.getIterator(), convertRowsToObjects(self._columnNames, new ArrayIterator(rows)));
+						return new PairIterator(
+							new SelectIterator(
+								index.getIterator(),
+								function (pair) {
+									return pair[1];
+								}
+							),
+							convertRowsToObjects(self._columnNames, new ArrayIterator(rows))
+						);
 					};				
 				}
 			}
@@ -327,12 +343,28 @@ var DataFrame = function (config) {
 				if (rows) {
 					if (Object.isFunction(rows)) {
 						this.getIterator = function () {
-							return new PairIterator(index.getIterator(), rows());
+							return new PairIterator(
+								new SelectIterator(
+									index.getIterator(),
+									function (pair) {
+										return pair[1];
+									}	
+								), 
+								rows()
+							);
 						};
 					}
 					else {
 						this.getIterator = function () {
-							return new PairIterator(index.getIterator(), new ArrayIterator(rows));
+							return new PairIterator(
+								new SelectIterator(
+									index.getIterator(),
+									function (pair) {
+										return pair[1];
+									}
+								), 
+								new ArrayIterator(rows)
+							);
 						};				
 					}
 				}
@@ -343,7 +375,15 @@ var DataFrame = function (config) {
 								return new ArrayIterator(columns[columnName]);
 							})
 							.toArray();
-						return new PairIterator(index.getIterator(), convertRowsToObjects(self._columnNames, new MultiIterator(columnIterators)));
+						return new PairIterator(
+							new SelectIterator(
+								index.getIterator(),
+								function (pair) {
+									return pair[1];
+								}
+							), 
+							convertRowsToObjects(self._columnNames, new MultiIterator(columnIterators)))
+						;
 					};
 				}
 			}
@@ -378,7 +418,6 @@ var DataFrame = function (config) {
 module.exports = DataFrame;
 
 var Series = require('./series');
-var Index = require('./index');
 var concatDataFrames = require('./concat-dataframes');
 var zipDataFrames = require('./zip-dataframes');
 var mergeSeries = require('./merge-series');
@@ -389,13 +428,15 @@ var mergeDataFrames = require('./merge-dataframes');
  */
 DataFrame.prototype.getIndex = function () {
 	var self = this;
-	return new Index(function () {		
-		return new SelectIterator(
-			self.getIterator(),
-			function (pair) {
-				return pair[0]; // Extract index.
-			}
-		);
+	return new Series({
+		iterable: function () {		
+			return new SelectIterator(
+				self.getIterator(),
+				function (pair, index) {
+					return [index, pair[0]]; // Extract index.
+				}
+			);
+		},
 	});
 };
 
@@ -2498,13 +2539,13 @@ DataFrame.prototype.variableWindow = function (comparer, obsoleteSelector) {
 					return pair[1];
 				})
 				.toArray(),
-			index: new Index(
-				E.from(output)
+			index: new Series({
+				values: E.from(output)
 					.select(function (pair) {
 						return pair[0];
 					})
 					.toArray()
-			)
+			})
 	});
 };
 

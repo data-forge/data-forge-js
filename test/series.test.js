@@ -1,6 +1,5 @@
 'use strict';
 
-
 describe('Series', function () {
 	
 	var dataForge = require('../index');
@@ -18,7 +17,7 @@ describe('Series', function () {
 
 		return new Series({
 			values: values,
-			index: new dataForge.Index(index),
+			index: index,
 		});
 	};
 
@@ -33,7 +32,7 @@ describe('Series', function () {
 
 	it('can get index', function () {
 		
-		var column = new dataForge.Series({ values: [100, 200], index: new dataForge.Index([5, 6]) });
+		var column = new dataForge.Series({ values: [100, 200], index: [5, 6] });
 		expect(column.getIndex().toValues()).to.eql([
 			5,
 			6
@@ -569,7 +568,7 @@ describe('Series', function () {
 	it('can reindex series', function () {
 
 		var series = initSeries([0, 1, 2, 3], [100, 300, 200, 5]);
-		var newIndex = new dataForge.Index([3, 10, 1, 32])
+		var newIndex = new Series({ values: [3, 10, 1, 32] });
 
 		var reindexed = series.reindex(newIndex);
 		expect(reindexed.getIndex().toValues()).to.eql([3, 10, 1, 32]);
@@ -579,7 +578,7 @@ describe('Series', function () {
 	it('reindexing a series with duplicate indicies throws', function () {
 
 		var series = initSeries([0, 1, 1, 3], [100, 300, 200, 5]);
-		var newIndex = new dataForge.Index([3, 10, 1, 32])
+		var newIndex = new Series({ values: [3, 10, 1, 32] });
 
 		var reindexed = series.reindex(newIndex);
 
@@ -835,7 +834,7 @@ describe('Series', function () {
 
 		expect(baked).not.to.equal(series);
 		expect(baked).to.be.an.instanceOf(dataForge.Series);
-		expect(baked.getIndex()).to.be.an.instanceOf(dataForge.Index);
+		expect(baked.getIndex()).to.be.an.instanceOf(dataForge.Series);
 		expect(baked.getIndex().toValues()).to.eql(indicies);
 		expect(baked.toValues()).to.eql(values);
 	});

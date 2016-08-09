@@ -5,7 +5,6 @@ describe('series creation', function () {
 	var expect = require('chai').expect;
 
 	var Series = require('../src/series');
-	var Index = require('../src/index');
 	var ArrayIterator = require('../src/iterators/array');
 
 	it('can create from values', function () {
@@ -25,7 +24,7 @@ describe('series creation', function () {
 
 		var series = new Series({
 			values: [1, 2, 3],
-			index: new Index([10, 11, 22]),
+			index: new Series({ values: [10, 11, 22] }),
 		});
 
 		expect(series.toPairs()).to.eql([

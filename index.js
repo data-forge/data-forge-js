@@ -10,7 +10,6 @@ var extend = require('extend');
 
 var DataFrame = require('./src/dataframe');
 var Series = require('./src/series');
-var Index = require('./src/index');
 var E = require('linq');
 
 //
@@ -48,13 +47,6 @@ var dataForge = {
 	 * @param {object} config - Specifies content and configuration for the Series.
 	 */
 	Series: Series,
-
-	/**
-	 * Constructor for Index.
-	 *
-	 * @param {array} values - Array of values to include in the index.
-	 */
-	Index: Index,
 
 	/**
 	 * Install a plugin in the dataForge namespace.

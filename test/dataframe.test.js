@@ -23,7 +23,7 @@ describe('DataFrame', function () {
 		};
 
 		if (index) {
-			config.index = new dataForge.Index(index);
+			config.index = index;
 		}
 
 		return new DataFrame(config);
@@ -1118,7 +1118,7 @@ describe('DataFrame', function () {
 		);
 		
 		var newColumnName = "new column";
-		var newIndex = new dataForge.Index([0, 5, 2, 7]);
+		var newIndex = [0, 5, 2, 7];
 		var newSeries = new dataForge.Series({ values: [4, 3, 2, 1], index: newIndex });
 		var modified = dataFrame.setSeries(newColumnName, newSeries);
 		var mergedSeries = modified.getSeries(newColumnName);
@@ -1541,7 +1541,7 @@ describe('DataFrame', function () {
 		expect(baked).not.to.equal(dataFrame);
 		expect(baked).to.be.an.instanceOf(dataForge.DataFrame);
 		expect(baked.getIndex()).not.to.equal(dataFrame.getIndex());
-		expect(baked.getIndex()).to.be.an.instanceOf(dataForge.Index);
+		expect(baked.getIndex()).to.be.an.instanceOf(dataForge.Series);
 		expect(baked.getIndex().toValues()).to.eql([10, 11]);
 		expect(baked.getColumnNames()).to.eql(["Column1", "Column2"]);
 		expect(baked.toValues()).to.eql([

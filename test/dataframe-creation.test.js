@@ -5,7 +5,7 @@ describe('dataframe creation', function () {
 	var expect = require('chai').expect;
 
 	var DataFrame = require('../src/dataframe');
-	var Index = require('../src/index');
+	var Series = require('../src/series');
 	var ArrayIterator = require('../src/iterators/array');
 
 	it('can create from rows', function () {
@@ -35,7 +35,7 @@ describe('dataframe creation', function () {
 				[1, 2],
 				[3, 4],
 			],
-			index: new Index([10, 11]),
+			index: new Series({ values: [10, 11] }),
 		});
 
 		expect(dataFrame.getColumnNames()).to.eql(columnNames);
@@ -163,7 +163,7 @@ describe('dataframe creation', function () {
 				{ c1: 1, c2: 2 },
 				{ c1: 3, c2: 4 },
 			],
-			index: new Index([10, 11]),
+			index: new Series({ values: [10, 11] }),
 		});
 
 		var columnNames = ["c1", "c2"];
@@ -263,7 +263,7 @@ describe('dataframe creation', function () {
 					[3, 4],
 				]);
 			},
-			index: new Index([10, 11])
+			index: new Series({ values: [10, 11] })
 		});
 
 		expect(dataFrame.getColumnNames()).to.eql(columnNames);
@@ -301,7 +301,7 @@ describe('dataframe creation', function () {
 					{ c1: 3, c2: 4 },
 				]);
 			},
-			index: new Index([10, 11])
+			index: new Series({ values: [10, 11] })
 		});
 
 		var columnNames = ["c1", "c2"];
@@ -384,7 +384,7 @@ describe('dataframe creation', function () {
 				B: ['a', 'b', 'c', 'd'],
 			},
 
-			index: new Index([10, 20, 30, 40]),
+			index: new Series({ values: [10, 20, 30, 40] }),
 		});
 
 		expect(df.toPairs()).to.eql([

@@ -439,14 +439,6 @@ An index can also be set explicitly when creating a data frame:
 	var dataFrame = new dataForge.DataFrame({
 			columnNames: <column-names>,
 			rows: <rows>,
-			index: new dataForge.Index([5, 10, 100])
-		});
-
-If your index is a simple array, this can be simplified: 
-
-	var dataFrame = new dataForge.DataFrame({
-			columnNames: <column-names>,
-			rows: <rows>,
 			index: [5, 10, 100]
 		});
 
