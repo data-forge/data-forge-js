@@ -19,6 +19,7 @@ var CountIterator = require('../src/iterators/count');
 var EmptyIterator = require('../src/iterators/empty');
 var utils = require('./utils');
 var extend = require('extend');
+var inherit = require('./inherit');
 
 var assert = require('chai').assert; 
 var E = require('linq');
@@ -418,6 +419,8 @@ var DataFrame = function (config) {
 module.exports = DataFrame;
 
 var Series = require('./series');
+var parent = inherit(DataFrame, Series);
+
 var concatDataFrames = require('./concat-dataframes');
 var zipDataFrames = require('./zip-dataframes');
 var mergeSeries = require('./merge-series');
@@ -683,12 +686,12 @@ DataFrame.prototype.selectMany = function (selector) {
 					throw new Error("Expected return value from 'DataFrame.selectMany' selector to be an array of objects, a Series or a DataFrame, each object represents a new row in the resulting data-frame.");
 				}
 
-				if (newRows instanceof Series)
+				if (newRows instanceof DataFrame) {
+					newRows = newRows.toObjects();
+				}
+				else if (newRows instanceof Series)
 				{
 					newRows = newRows.toValues();
-				}
-				else if (newRows instanceof DataFrame) {
-					newRows = newRows.toObjects();
 				}
 
 				var newPairs = [];

@@ -327,12 +327,12 @@ Series.prototype.selectMany = function (selector) {
 						throw new Error("Expected return value from 'Series.selectMany' selector to be an array, a Series or a DataFrame, each item in the data sequence represents a new value in the resulting series.");
 					}
 
-					if (newValues instanceof Series)
+					if (newValues instanceof DataFrame) {
+						newValues = newValues.toObjects();
+					}
+					else if (newValues instanceof Series)
 					{
 						newValues = newValues.toValues();
-					}
-					else if (newValues instanceof DataFrame) {
-						newValues = newValues.toObjects();
 					}
 
 					var newPairs = [];
