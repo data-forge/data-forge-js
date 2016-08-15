@@ -1573,36 +1573,6 @@ describe('DataFrame', function () {
 		]);
 	});
 
-	it('can get distinct rows', function () {
-
-		var df = new DataFrame({
-			columnNames: ['c1', 'c2'],
-			rows: [
-				[1, 15], // 0
-				[1, 35], // 1
-				[3, 35], // 2
-				[-3, 112], // 3
-				[-3, 35], // 4
-				[8, 15], // 5
-				[8, 333], // 6
-				[-15, 15] // 7
-			],
-			index: [0, 1, 2, 3, 4, 5, 6, 7],
-		});
-
-		var collapsed = df.distinct(function (row, index) {
-				expect(index).to.be.a('number');
-				return row.c2;
-			});
-
-		expect(collapsed.toPairs()).to.eql([
-			[0, { c1: 1, c2: 15 } ],
-			[1, { c1: 1, c2: 35 } ],
-			[3, { c1: -3, c2: 112 } ],
-			[6, { c1: 8, c2: 333 } ],
-		]);
-	});
-
 	it('can use variableWindow to remove sequential duplicates and take first in window', function () {
 
 		var df = new DataFrame({

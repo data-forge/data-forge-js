@@ -1535,7 +1535,7 @@ Series.prototype.distinct = function (selector) {
 		output.push(curPair);
 	}
 
-	return new Series({
+	return new self.Constructor({
 		iterable: function () {
 			return new ArrayIterator(output);
 		},
