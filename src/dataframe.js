@@ -1706,24 +1706,6 @@ DataFrame.prototype.bake = function () {
 };
 
 /**
- * Count the number of rows in the data frame.
- */
-DataFrame.prototype.count = function () {
-
-	var self = this;
-
-	var total = 0;
-
-	var iterator = self.getIterator();
-
-	while (iterator.moveNext()) {
-		++total;
-	}
-
-	return total;
-};
-
-/**
  * Transform one or more columns. This is equivalent to extracting a column, calling 'select' on it,
  * then plugging it back in as the same column.
  *
