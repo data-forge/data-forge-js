@@ -2104,24 +2104,6 @@ describe('DataFrame', function () {
 		]);
 	});
 
-	it('getting first index of empty data-frame throws exception', function () {
-
-		var dataFrame = initDataFrame([], [], []);
-
-		expect(function () {
-			dataFrame.firstIndex();
-		}).to.throw();
-	});
-
-	it('getting last index of empty data-frame throws exception', function () {
-
-		var dataFrame = initDataFrame([], [], []);
-
-		expect(function () {
-			dataFrame.lastIndex();
-		}).to.throw();
-	});
-
 	it('can get first and last indicies in data frame', function () {
 
 		var dataFrame = initDataFrame(

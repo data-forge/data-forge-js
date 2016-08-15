@@ -1908,42 +1908,6 @@ DataFrame.prototype.lastPair = function () {
 	return iterator.getCurrent();
 };
 
-/**
- * Get the first index of the DataFrame.
- */
-DataFrame.prototype.firstIndex = function () {
-
-	var self = this;
-
-	var iterator = self.getIterator();
-
-	if (!iterator.moveNext()) {
-		throw new Error("No rows in DataFrame.");
-	}
-
-	return iterator.getCurrent()[0];
-};
-
-/**
- * Get the last index of the DataFrame.
- */
-DataFrame.prototype.lastIndex = function () {
-
-	var self = this;
-
-	var iterator = self.getIterator();
-
-	if (!iterator.moveNext()) {
-		throw new Error("No rows in DataFrame.");
-	}
-
-	while (iterator.moveNext()) {
-		; // Don't evaluate current item, it's too expensive.
-	}
-
-	return iterator.getCurrent()[0];
-};
-
 /** 
  * Reverse the DataFrame.
  */
