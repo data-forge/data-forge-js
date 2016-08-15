@@ -1544,25 +1544,6 @@ DataFrame.prototype.toRows = function () {
 };
 
 /**
- * Bake the data frame to an array of JavaScript objects.
- */
-DataFrame.prototype.toValues = function () {
-
-	var self = this;
-
-	var iterator = self.getIterator();
-	validateIterator(iterator);
-
-	var objects = [];
-
-	while (iterator.moveNext()) {
-		objects.push(iterator.getCurrent()[1]); // Extract values.
-	}
-
-	return objects;
-};
-
-/**
  * Serialize the data frame to JSON.
  */
 DataFrame.prototype.toJSON = function () {
