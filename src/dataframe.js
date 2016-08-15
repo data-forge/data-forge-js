@@ -1350,22 +1350,6 @@ DataFrame.prototype.aggregate = function (seedOrSelector, selector) {
 };
 
 /**
- * Convert the data-frame to a JavaScript object.
- *
- * @param {function} keySelector - Function that selects keys for the resulting object.
- * @param {valueSelector} keySelector - Function that selects values for the resulting object.
- */
-DataFrame.prototype.toObject = function (keySelector, valueSelector) {
-
-	var self = this;
-
-	assert.isFunction(keySelector, "Expected 'keySelector' parameter to toObject to be a function.");
-	assert.isFunction(valueSelector, "Expected 'valueSelector' parameter to toObject to be a function.");
-
-	return E.from(self.toValues()).toObject(keySelector, valueSelector);
-};
-
-/**
  * Zip together multiple data-frames to produce a new data-frame.
  *
  * @param {...object} dataFrames - Each data-frame that is to be zipped.

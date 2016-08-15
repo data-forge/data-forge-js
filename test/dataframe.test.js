@@ -1394,57 +1394,6 @@ describe('DataFrame', function () {
 		expect(dataFrame.toRows()).to.eql([[], []]);
 	});	
 
-	it('can convert to javascript object', function () {
-
-		var dataFrame = initDataFrame(
-			["Key", "Value"],
-			[
-				['A', 100],
-				['B', 200],
-			],
-			[5, 6]
-		);
-
-		var obj = dataFrame.toObject(
-			function (row) {
-				return row.Key;
-			},
-			function (row) {
-				return row.Value;
-			}
-		);
-		expect(obj).to.eql({
-			A: 100,
-			B: 200,
-		});
-	});
-
-	it('can convert to javascript object - with duplicate keys', function () {
-
-		var dataFrame = initDataFrame(
-			["Key", "Value"],
-			[
-				['A', 100],
-				['B', 200],
-				['A', 3],
-			],
-			[5, 6, 7]
-		);
-
-		var obj = dataFrame.toObject(
-			function (row) {
-				return row.Key;
-			},
-			function (row) {
-				return row.Value;
-			}
-		);
-		expect(obj).to.eql({
-			A: 3,
-			B: 200,
-		});
-	});
-
 	it('can zip multiple data-frames', function () {
 
 	 	var df1 = initDataFrame(["a", "b"], [[1, 2], [3, 4]]);
