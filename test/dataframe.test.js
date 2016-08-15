@@ -2057,69 +2057,6 @@ describe('DataFrame', function () {
 		});
 	});
 
-	it('getting first pair of empty data-frame throws exception', function () {
-
-		var dataFrame = initDataFrame([], [], []);
-
-		expect(function () {
-			dataFrame.firstPair();
-		}).to.throw();
-	});
-
-	it('getting last pair of empty data-frame throws exception', function () {
-
-		var dataFrame = initDataFrame([], [], []);
-
-		expect(function () {
-			dataFrame.lastPair();
-		}).to.throw();
-	});
-
-	it('can get first and last pairs in data frame', function () {
-
-		var dataFrame = initDataFrame(
-				["Column1", "Column2"], 
-				[
-					['A', 1],
-					['B', 2],
-					['C', 3],
-				],
-				[10, 11, 12]
-			);
-
-		expect(dataFrame.firstPair()).to.eql([
-			10,
-			{
-				Column1: 'A',
-				Column2: 1,
-			}
-		]);
-
-		expect(dataFrame.lastPair()).to.eql([
-			12,
-			{
-				Column1: 'C',
-				Column2: 3,
-			}
-		]);
-	});
-
-	it('can get first and last indicies in data frame', function () {
-
-		var dataFrame = initDataFrame(
-				["Column1", "Column2"], 
-				[
-					['A', 1],
-					['B', 2],
-					['C', 3],
-				],
-				[10, 11, 12]
-			);
-
-		expect(dataFrame.firstIndex()).to.eql(10);
-		expect(dataFrame.lastIndex()).to.eql(12);
-	});
-
 	it('can reverse', function () {
 
 		var dataFrame = initDataFrame(

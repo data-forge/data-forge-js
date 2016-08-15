@@ -1872,42 +1872,6 @@ DataFrame.prototype.last = function () {
 	return iterator.getCurrent()[1]; // Return the last item.
 };
 
-/**
- * Get the first index/row pair of the DataFrame.
- */
-DataFrame.prototype.firstPair = function () {
-
-	var self = this;
-
-	var iterator = self.getIterator();
-
-	if (!iterator.moveNext()) {
-		throw new Error("No rows in DataFrame.");
-	}
-
-	return iterator.getCurrent();
-};
-
-/**
- * Get the last index/row pair of the DataFrame.
- */
-DataFrame.prototype.lastPair = function () {
-
-	var self = this;
-
-	var iterator = self.getIterator();
-
-	if (!iterator.moveNext()) {
-		throw new Error("No rows in DataFrame.");
-	}
-
-	while (iterator.moveNext()) {
-		; // Don't evaluate current item, it's too expensive.
-	}
-
-	return iterator.getCurrent();
-};
-
 /** 
  * Reverse the DataFrame.
  */
