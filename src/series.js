@@ -480,28 +480,6 @@ var orderThenBy = function (self, batch, nextSortMethod) {
 };
 
 /**
- * Sorts the series by value (ascending). 
- */
-Series.prototype.order = function () {
-
-	var self = this;
-	return orderBy(self, 'orderBy', function (value) { 
-		return value; 
-	});
-};
-
-/**
- * Sorts the series by value (descending). 
- */
-Series.prototype.orderDescending = function (optionalSortSelector) {
-
-	var self = this;
-	return orderBy(self, 'orderByDescending', function (value) {
-		return value;
-	});
-};
-
-/**
  * Sorts the series by sort selector (ascending). 
  * 
  * @param {function} sortSelector - An function to select a value to sort by.

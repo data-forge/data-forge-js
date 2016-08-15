@@ -188,20 +188,6 @@ describe('Series', function () {
 			.to.throw();
 	});
 
-	it('can sort values ascending', function () {		
-		var series = initSeries([0, 1, 2, 3], [100, 300, 200, 5]);
-		var sorted = series.order();
-		expect(sorted.getIndex().toValues()).to.eql([3, 0, 2, 1]);
-		expect(sorted.toValues()).to.eql([5, 100, 200, 300]);
-	});
-	
-	it('can sort values descending', function () {		
-		var series = initSeries([0, 1, 2, 3], [100, 300, 200, 5]);
-		var sorted = series.orderDescending();
-		expect(sorted.getIndex().toValues()).to.eql([1, 2, 0, 3]);
-		expect(sorted.toValues()).to.eql([300, 200, 100, 5]);
-	});
-
 	it('can sort nested objects using selector - ascending', function () {
 		var series = initSeries(
 			[0, 1, 2, 3], 
