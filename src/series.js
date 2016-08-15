@@ -544,7 +544,7 @@ Series.prototype.slice = function (startIndexOrStartPredicate, endIndexOrEndPred
 			};
 	}
 
-	return new Series({
+	return new self.Constructor({
 		iterable: function () {
 			return new TakeWhileIterator(
 				new SkipWhileIterator(
