@@ -1008,33 +1008,6 @@ describe('DataFrame', function () {
 		return initDataFrame(columnNames, rows, index);
 	};
 
-	it('can reverse', function () {
-
-		var dataFrame = initDataFrame(
-				["Column1", "Column2"], 
-				[
-					['A', 1],
-					['B', 2],
-					['C', 3],
-				],
-				[10, 11, 12]
-			);
-
-		var reversed = dataFrame.reverse();
-		expect(dataFrame.toRows()).to.eql([
-			['A', 1],
-			['B', 2],
-			['C', 3],
-		]);
-		expect(dataFrame.getIndex().toValues()).to.eql([10, 11, 12]);
-		expect(reversed.toRows()).to.eql([
-			['C', 3],
-			['B', 2],
-			['A', 1],
-		]);
-		expect(reversed.getIndex().toValues()).to.eql([12, 11, 10]);
-	})
-
 	it('can generate series - function version', function () {
 
 		var initialColumns = ["Column1", "Column2"];

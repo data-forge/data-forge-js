@@ -1141,7 +1141,7 @@ Series.prototype.lastIndex = function () {
 Series.prototype.reverse = function () {
 
 	var self = this;
-	return new Series({
+	return new self.Constructor({
 		iterable: function () {
 			var pairs = [];
 			var iterator = self.getIterator();

@@ -1225,27 +1225,6 @@ DataFrame.prototype.transformSeries = function (columnSelectors) {
 };
 
 /** 
- * Reverse the DataFrame.
- */
-DataFrame.prototype.reverse = function () {
-
-	var self = this;
-	return new DataFrame({
-		columnNames: self.getColumnNames(),
-		iterable: function () {
-			var pairs = [];
-			var iterator = self.getIterator();
-
-			while (iterator.moveNext()) {
-				pairs.push(iterator.getCurrent());
-			}
-
-			return new ArrayIterator(pairs.reverse());
-		},
-	});
-};
-
-/** 
  * Generate new columns based on existing rows.
  *
  * @param {function|object} generator - Generator function that transforms each row to a new set of columns.
