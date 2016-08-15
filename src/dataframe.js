@@ -1665,25 +1665,6 @@ DataFrame.prototype.toCSV = function () {
 };
 
 /**
- * Retreive the data as pairs of [index, objects].
- */
-DataFrame.prototype.toPairs = function () {
-
-	var self = this;
-
-	var iterator = self.getIterator();
-	validateIterator(iterator);
-
-	var pairs = [];
-
-	while (iterator.moveNext()) {
-		pairs.push(iterator.getCurrent());
-	}
-
-	return pairs;
-};
-
-/**
  * Forces lazy evaluation to complete and 'bakes' the data frame into memory.
  */
 DataFrame.prototype.bake = function () {
