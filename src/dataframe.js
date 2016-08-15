@@ -2397,26 +2397,6 @@ DataFrame.prototype.none = function (predicate) {
 };
 
 /**
- * Collapse a group of sequential rows with duplicate column values into a Series of windows.
- *
- * @param {function} valueSelector - Selects the value used to compare for duplicates.
- */	
-DataFrame.prototype.sequentialDistinct = function (valueSelector, obsoleteSelector) {
-
-	assert.isFunction(valueSelector, "Expected 'valueSelector' parameter to 'sequentialDistinct' to be a function.")
-	assert(!obsoleteSelector, "Selector parameter is obsolete and no longer required.");
-
-	var self = this;
-
-	return self.variableWindow(function (a, b) {
-			return valueSelector(a) === valueSelector(b);
-		})
-		.selectPairs(function (window) {
-			return [window.getIndex().first(), window.first()];
-		});
-};
-
-/**
  * Collapse distinct rows in the dataframe based on the output of 'valueSelector'.
  *
  * @param {function} valueSelector - Selects the value used to compare for duplicates.
