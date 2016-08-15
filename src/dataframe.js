@@ -518,39 +518,6 @@ DataFrame.prototype.skip = function (numRows) {
 };
 
 /**
- * Skips rows in the data-frame while a condition is met.
- *
- * @param {function} predicate - Return true to indicate the condition met.
- */
-DataFrame.prototype.skipWhile = function (predicate) {
-	assert.isFunction(predicate, "Expected 'predicate' parameter to 'skipWhile' function to be a predicate function that returns true/false.");
-
-	var self = this;
-	return new DataFrame({
-		columnNames: self.getColumnNames(),
-		iterable: function () {
-			return new SkipWhileIterator(self.getIterator(), function (pair) {
-					return predicate(pair[1], pair[0]);
-				});
-		},
-	}); 	
-};
-
-/**
- * Skips rows in the data-frame until a condition is met.
- *
- * @param {function} predicate - Return true to indicate the condition met.
- */
-DataFrame.prototype.skipUntil = function (predicate) {
-	assert.isFunction(predicate, "Expected 'predicate' parameter to 'skipUntil' function to be a predicate function that returns true/false.");
-
-	var self = this;
-	return self.skipWhile(function (value, index) { 
-		return !predicate(value, index); 
-	});
-};
-
-/**
  * Take a number of rows in the data frame.
  *
  * @param {int} numRows - Number of rows to take.
