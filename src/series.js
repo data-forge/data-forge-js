@@ -26,6 +26,7 @@ var EmptyIterator = require('../src/iterators/empty');
 var Series = function (config) {
 
 	var self = this;
+	self.Constructor = Series;
 
 	if (!config) {
 		self.getIterator = function () {
@@ -425,7 +426,7 @@ var executeOrderBy = function (self, batch) {
 			.toArray();
 	};
 
-	return new Series({
+	return new self.Constructor({
 		iterable: function () {
 			return new ArrayIterator(executeLazySort());
 		},
