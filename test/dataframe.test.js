@@ -3005,53 +3005,6 @@ describe('DataFrame', function () {
 		expect(count).to.eql(3);
 	});
 
-	it('can group by', function () {
-
-		var columnNames = ["a", "b"];
-		var dataFrame = initDataFrame(
-			columnNames, 
-			[
-				["x", 1], 
-				["x", 2],
-				["y", 10],
-				["x", 3], 
-				["y", 11],
-				["x", 4],
-			]
-		);
-
-		var count = 0;
-		var groups = dataFrame.groupBy(function (row, index) {
-				expect(index).to.eql(count);
-				++count;
-				return row.a;
-			});
-
-		expect(count).to.eql(6);
-
-		expect(groups).to.be.an.instanceof(dataForge.Series);
-		expect(groups.count()).to.eql(2);
-		var groupedPairs = groups.toPairs();
-		expect(groupedPairs.length).to.eql(2);
-		var group1 = groupedPairs[0];
-		expect(group1[0]).to.eql("x");
-		expect(group1[1]).to.be.an.instanceof(DataFrame);
-		expect(group1[1].toPairs()).to.eql([
-			[0, { a: "x", b: 1 } ],
-			[1, { a: "x", b: 2 } ],
-			[3, { a: "x", b: 3 } ],
-			[5, { a: "x", b: 4 } ],
-		]);
-
-		var group2 = groupedPairs[1];
-		expect(group2[0]).to.eql("y");
-		expect(group2[1]).to.be.an.instanceof(DataFrame);
-		expect(group2[1].toPairs()).to.eql([
-			[2, { a: "y", b: 10 } ],
-			[4, { a: "y", b: 11 } ],
-		]);
-	});
-
 	it('can get distinct rows', function () {
 
 		var df = new DataFrame({

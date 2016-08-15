@@ -2256,41 +2256,6 @@ DataFrame.prototype.forEach = function (callback) {
 };
 
 /**
- * Group the data-frame into multiple data-frames on the value defined by the selector.
- * A series is returned that indexed by group key. Each value in the series is a Data-frame containing the group.
- *
- * @param {function} selector - Function that selects the value to group by.
- */
-DataFrame.prototype.groupBy = function (selector) {
-	assert.isFunction(selector, "Expected 'selector' parameter to 'groupBy' function to be a function.");
-
-	//todo: make this lazy.
-
-	var self = this;
-	var groupedPairs = E.from(self.toPairs())
-		.groupBy(function (pair) {
-			return selector(pair[1], pair[0]);
-		})
-		.select(function (group) {
-			return [
-				group.key(),
-				new DataFrame({
-					iterable: function () {
-						return new ArrayIterator(group.getSource());
-					},
-				}),
-			];
-		})
-		.toArray();
-
-	return new Series({
-		iterable: function () {
-			return new ArrayIterator(groupedPairs);
-		},
-	});
-};
-
-/**
  * Collapse distinct rows in the dataframe based on the output of 'valueSelector'.
  *
  * @param {function} valueSelector - Selects the value used to compare for duplicates.
