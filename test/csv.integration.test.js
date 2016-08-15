@@ -47,7 +47,7 @@ describe('csv.integration', function () {
 			'Value3',			
 		]);
 		
-		expect(dataFrame.toValues()).to.eql([
+		expect(dataFrame.toRows()).to.eql([
 			['1975-2-24', '100', "foo", '22'],
 			['2015-10-23', '300', "bar", '23'],
 		]);
@@ -59,7 +59,7 @@ describe('csv.integration', function () {
 			'Value3',			
 		]);
 		
-		expect(dataFrame2.toValues()).to.eql([
+		expect(dataFrame2.toRows()).to.eql([
 			['100', '22'],
 			['300', '23'],			
 		]);

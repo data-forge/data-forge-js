@@ -33,7 +33,7 @@ describe('rolling window integration', function () {
 
 		expect(newDataFrame.getIndex().toValues()).to.eql([10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]);
 
-		expect(newDataFrame.toValues()).to.eql([
+		expect(newDataFrame.toRows()).to.eql([
 			[1, undefined],
 			[2, undefined],
 			[3, undefined],

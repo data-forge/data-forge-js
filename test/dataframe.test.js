@@ -54,7 +54,7 @@ describe('DataFrame', function () {
 				],
 				[5, 6, 7, 8]
 			);
-		expect(dataFrame.toValues()).to.eql([
+		expect(dataFrame.toRows()).to.eql([
 			[new Date(2011, 24, 2), 300, 'c', 3],
 			[new Date(1975, 24, 2), 200, 'b', 1],
 			[new Date(2013, 24, 2), 20, 'c', 22],
@@ -77,7 +77,7 @@ describe('DataFrame', function () {
 		var skipped = dataFrame.skip(2);		
 		expect(skipped.getColumnNames()).to.eql(columnNames);
 		expect(skipped.getIndex().toValues()).to.eql([7, 8]);
-		expect(skipped.toValues()).to.eql([
+		expect(skipped.toRows()).to.eql([
 			[new Date(2013, 24, 2), 20, 'c', 22],
 			[new Date(2015, 24, 2), 100, 'd', 4],
 		]);		
@@ -96,7 +96,7 @@ describe('DataFrame', function () {
 		);
 		var skipped = dataFrame.take(2);		
 		expect(skipped.getIndex().toValues()).to.eql([5, 6]);
-		expect(skipped.toValues()).to.eql([
+		expect(skipped.toRows()).to.eql([
 			[new Date(2011, 24, 2), 300, 'c', 3],
 			[new Date(1975, 24, 2), 200, 'b', 1],
 		]);		
@@ -117,7 +117,7 @@ describe('DataFrame', function () {
 				return row.Value1 >= 100 && row.Value1 < 300;
 			});		
 		expect(filtered.getIndex().toValues()).to.eql([6, 8]);
-		expect(filtered.toValues()).to.eql([
+		expect(filtered.toRows()).to.eql([
 				[new Date(1975, 24, 2), 200, 'b', 1],
 				[new Date(2015, 24, 2), 100, 'd', 4],
 		]);		
@@ -162,7 +162,7 @@ describe('DataFrame', function () {
 			});		
 		expect(modified.getIndex().toValues()).to.eql([5, 6, 7, 8]);
 		expect(modified.getColumnNames()).to.eql(["Test1", "Test2"]);
-		expect(modified.toValues()).to.eql([
+		expect(modified.toRows()).to.eql([
 				[310, 'c'],
 				[210, 'b'],
 				[30, 'c'],
@@ -248,7 +248,7 @@ describe('DataFrame', function () {
 			});		
 		expect(modified.getIndex().toValues()).to.eql([5, 5, 6, 6, 7, 7, 8, 8]);
 		expect(modified.getColumnNames()).to.eql(["TestA", "TestB"]);
-		expect(modified.toValues()).to.eql([
+		expect(modified.toRows()).to.eql([
 				[301, 'c'],
 				[302, 'c'],
 				[201, 'b'],
@@ -282,7 +282,7 @@ describe('DataFrame', function () {
 
 		expect(modified.getIndex().toValues()).to.eql([5, 5, 6, 6]);
 		expect(modified.getColumnNames()).to.eql(["TestA", "TestB"]);
-		expect(modified.toValues()).to.eql([
+		expect(modified.toRows()).to.eql([
 				[301, 'c'],
 				[302, 'c'],
 				[201, 'b'],
@@ -312,7 +312,7 @@ describe('DataFrame', function () {
 
 		expect(modified.getIndex().toValues()).to.eql([5, 5, 6, 6]);
 		expect(modified.getColumnNames()).to.eql(["TestA", "TestB"]);
-		expect(modified.toValues()).to.eql([
+		expect(modified.toRows()).to.eql([
 				[301, 'c'],
 				[302, 'c'],
 				[201, 'b'],
@@ -372,7 +372,7 @@ describe('DataFrame', function () {
 			});		
 		expect(modified.getIndex().toValues()).to.eql([5, 5, 6, 6, 7, 7]);
 		expect(modified.getColumnNames()).to.eql(["c1", "c2"]);
-		expect(modified.toValues()).to.eql([
+		expect(modified.toRows()).to.eql([
 			[300, 'c'],
 			[300, 'c'],
 			[200, 'b'],
@@ -660,7 +660,7 @@ describe('DataFrame', function () {
 		var subset = dataFrame.subset(['Value3', 'Value1']);
 		expect(dataFrame).not.to.equal(subset); 
 		expect(subset.getIndex().toValues()).to.eql([5, 6]);
-		expect(subset.toValues()).to.eql([
+		expect(subset.toRows()).to.eql([
 			[11, 100],
 			[22, 200],
 		]);
@@ -680,7 +680,7 @@ describe('DataFrame', function () {
 		);
 		var sorted = dataFrame.orderBy('Value1');
 		expect(sorted.getIndex().toValues()).to.eql([7, 8, 6, 5]);
-		expect(sorted.toValues()).to.eql([
+		expect(sorted.toRows()).to.eql([
 			[new Date(2013, 24, 2), 20, 'c', 22],
 			[new Date(2015, 24, 2), 100, 'd', 4],
 			[new Date(1975, 24, 2), 200, 'b', 1],
@@ -702,7 +702,7 @@ describe('DataFrame', function () {
 		);
 		var sorted = dataFrame.orderBy('Value2').thenBy('Value1');
 		expect(sorted.getIndex().toValues()).to.eql([6, 7, 5, 8]);
-		expect(sorted.toValues()).to.eql([
+		expect(sorted.toRows()).to.eql([
 			[new Date(1975, 24, 2), 200, 'b', 1],
 			[new Date(2013, 24, 2), 20, 'c', 22],
 			[new Date(2011, 24, 2), 300, 'c', 3],
@@ -724,7 +724,7 @@ describe('DataFrame', function () {
 		);
 		var sorted = dataFrame.orderBy('Value2').thenBy('Value1').thenBy('Value3');
 		expect(sorted.getIndex().toValues()).to.eql([6, 7, 5, 8]);
-		expect(sorted.toValues()).to.eql([
+		expect(sorted.toRows()).to.eql([
 			[new Date(1975, 24, 2), 200, 'b', 1],
 			[new Date(2013, 24, 2), 20, 'c', 22],
 			[new Date(2011, 24, 2), 300, 'c', 3],
@@ -746,7 +746,7 @@ describe('DataFrame', function () {
 		);
 		var sorted = dataFrame.orderByDescending('Value3');
 		expect(sorted.getIndex().toValues()).to.eql([7, 8, 5, 6]);
-		expect(sorted.toValues()).to.eql([
+		expect(sorted.toRows()).to.eql([
 			[new Date(2013, 24, 2), 20, 'c', 22],
 			[new Date(2015, 24, 2), 100, 'd', 4],
 			[new Date(2011, 24, 2), 300, 'c', 3],
@@ -768,7 +768,7 @@ describe('DataFrame', function () {
 		);
 		var sorted = dataFrame.orderByDescending('Value2').thenByDescending('Value3');
 		expect(sorted.getIndex().toValues()).to.eql([8, 7, 5, 6]);
-		expect(sorted.toValues()).to.eql([
+		expect(sorted.toRows()).to.eql([
 			[new Date(2015, 24, 2), 100, 'd', 4],
 			[new Date(2013, 24, 2), 20, 'c', 22],
 			[new Date(2011, 24, 2), 300, 'c', 3],
@@ -790,7 +790,7 @@ describe('DataFrame', function () {
 		);
 		var sorted = dataFrame.orderByDescending('Value2').thenByDescending('Value3').thenByDescending('Value1');
 		expect(sorted.getIndex().toValues()).to.eql([8, 7, 5, 6]);
-		expect(sorted.toValues()).to.eql([
+		expect(sorted.toRows()).to.eql([
 			[new Date(2015, 24, 2), 100, 'd', 4],
 			[new Date(2013, 24, 2), 20, 'c', 22],
 			[new Date(2011, 24, 2), 300, 'c', 3],
@@ -818,7 +818,7 @@ describe('DataFrame', function () {
 				return row.Value1;
 			});
 		expect(sorted.getIndex().toValues()).to.eql([6, 7, 5, 8]);
-		expect(sorted.toValues()).to.eql([
+		expect(sorted.toRows()).to.eql([
 			[new Date(1975, 24, 2), 200, 'b', 1],
 			[new Date(2013, 24, 2), 20, 'c', 22],
 			[new Date(2011, 24, 2), 300, 'c', 3],
@@ -846,7 +846,7 @@ describe('DataFrame', function () {
 				return row.Value1;
 			});
 		expect(sorted.getIndex().toValues()).to.eql([8, 5, 7, 6]);
-		expect(sorted.toValues()).to.eql([
+		expect(sorted.toRows()).to.eql([
 			[new Date(2015, 24, 2), 100, 'd', 4],
 			[new Date(2011, 24, 2), 300, 'c', 3],
 			[new Date(2013, 24, 2), 20, 'c', 22],
@@ -870,7 +870,7 @@ describe('DataFrame', function () {
 			.orderBy(2)
 			.thenBy(1);
 		expect(sorted.getIndex().toValues()).to.eql([6, 7, 5, 8]);
-		expect(sorted.toValues()).to.eql([
+		expect(sorted.toRows()).to.eql([
 			[new Date(1975, 24, 2), 200, 'b', 1],
 			[new Date(2013, 24, 2), 20, 'c', 22],
 			[new Date(2011, 24, 2), 300, 'c', 3],
@@ -894,7 +894,7 @@ describe('DataFrame', function () {
 			.orderByDescending(2)
 			.thenByDescending(1);
 		expect(sorted.getIndex().toValues()).to.eql([8, 5, 7, 6]);
-		expect(sorted.toValues()).to.eql([
+		expect(sorted.toRows()).to.eql([
 			[new Date(2015, 24, 2), 100, 'd', 4],
 			[new Date(2011, 24, 2), 300, 'c', 3],
 			[new Date(2013, 24, 2), 20, 'c', 22],
@@ -916,7 +916,7 @@ describe('DataFrame', function () {
 		);
 		var modified = dataFrame.dropSeries('Date');
 		expect(modified.getIndex().toValues()).to.eql([5, 6, 7, 8]);
-		expect(modified.toValues()).to.eql([
+		expect(modified.toRows()).to.eql([
 			[300, 'c', 3],
 			[200, 'b', 1],
 			[20, 'c', 22],
@@ -938,7 +938,7 @@ describe('DataFrame', function () {
 		);
 		var modified = dataFrame.dropSeries(['Date', 'Value2'])
 		expect(modified.getIndex().toValues()).to.eql([5, 6, 7, 8]);
-		expect(modified.toValues()).to.eql([
+		expect(modified.toRows()).to.eql([
 			[300, 3],
 			[200, 1],
 			[20, 22],
@@ -961,7 +961,7 @@ describe('DataFrame', function () {
 		var modified = dataFrame.keepSeries('Value1');
 		expect(modified.getColumnNames()).to.eql(['Value1']);
 		expect(modified.getIndex().toValues()).to.eql([5, 6, 7, 8]);
-		expect(modified.toValues()).to.eql([
+		expect(modified.toRows()).to.eql([
 			[300],
 			[200],
 			[20],
@@ -985,7 +985,7 @@ describe('DataFrame', function () {
 		var modified = dataFrame.keepSeries(['Value1', 'Value3']);
 		expect(modified.getColumnNames()).to.eql(['Value1', 'Value3']);
 		expect(modified.getIndex().toValues()).to.eql([5, 6, 7, 8]);
-		expect(modified.toValues()).to.eql([
+		expect(modified.toRows()).to.eql([
 			[300, 3],
 			[200, 1],
 			[20, 22],
@@ -1009,7 +1009,7 @@ describe('DataFrame', function () {
 		var modified = dataFrame.dropSeries('non-existing-column');
 		expect(modified.getIndex().toValues()).to.eql([5, 6, 7, 8]);
 		expect(modified.getColumnNames()).to.eql(columnNames);
-		expect(modified.toValues()).to.eql([
+		expect(modified.toRows()).to.eql([
 				[new Date(2011, 24, 2), 300, 'c', 3],
 				[new Date(1975, 24, 2), 200, 'b', 1],
 				[new Date(2013, 24, 2), 20, 'c', 22],
@@ -1038,7 +1038,7 @@ describe('DataFrame', function () {
 			"Value3",
 			"Value4",
 		]);
-		expect(modified.toValues()).to.eql([
+		expect(modified.toRows()).to.eql([
 			[new Date(2011, 24, 2), 300, 'c', 3, 1],
 			[new Date(1975, 24, 2), 200, 'b', 1, 2],
 			[new Date(2013, 24, 2), 20, 'c', 22, 3],
@@ -1060,7 +1060,7 @@ describe('DataFrame', function () {
 		);
 		var modified = dataFrame.setSeries('Value1', [1, 2, 3, 4]);
 		expect(modified.getIndex().toValues()).to.eql([5, 6, 7, 8]);
-		expect(modified.toValues()).to.eql([
+		expect(modified.toRows()).to.eql([
 			[new Date(2011, 24, 2), 1, 'c', 3],
 			[new Date(1975, 24, 2), 2, 'b', 1],
 			[new Date(2013, 24, 2), 3, 'c', 22],
@@ -1096,7 +1096,7 @@ describe('DataFrame', function () {
 			"Value3",
 			"Value4",
 		]);
-		expect(modified.toValues()).to.eql([
+		expect(modified.toRows()).to.eql([
 			[new Date(2011, 24, 2), 300, 'c', 3, 'foo'],
 			[new Date(1975, 24, 2), 200, 'b', 1, 'bar'],
 			[new Date(2013, 24, 2), 20, 'c', 22, undefined],
@@ -1131,7 +1131,7 @@ describe('DataFrame', function () {
 			"Value3",
 			newColumnName,
 		]);
-		expect(modified.toValues()).to.eql([
+		expect(modified.toRows()).to.eql([
 			[new Date(2011, 24, 2), 300, 'c', 3, 3],
 			[new Date(1975, 24, 2), 200, 'b', 1, undefined],
 			[new Date(2013, 24, 2), 20, 'c', 22, 1],
@@ -1272,7 +1272,7 @@ describe('DataFrame', function () {
 			new Date(2015, 24, 2)
 		]);
 
-		expect(indexedDataFrame.toValues()).to.eql([
+		expect(indexedDataFrame.toRows()).to.eql([
 			[new Date(1975, 24, 2), 100, 'foo', 11],
 			[new Date(2015, 24, 2), 200, 'bar', 22],
 		]);
@@ -1295,7 +1295,7 @@ describe('DataFrame', function () {
 			1
 		]);
 
-		expect(dataFrameWithIndexReset.toValues()).to.eql([
+		expect(dataFrameWithIndexReset.toRows()).to.eql([
 			[new Date(1975, 24, 2), 100, 'foo', 11],
 			[new Date(2015, 24, 2), 200, 'bar', 22],
 		]);
@@ -1315,7 +1315,7 @@ describe('DataFrame', function () {
 		var detectedTypes = dataFrame.detectTypes();
 		expect(detectedTypes.getColumnNames()).to.eql(["Type", "Frequency", "Column"]);
 		expect(detectedTypes.getIndex().toValues()).to.eql([0, 1, 2]);
-		expect(detectedTypes.toValues()).to.eql([
+		expect(detectedTypes.toRows()).to.eql([
 			['date', 100, "Date"],
 			['string', 50, "Value1"],
 			['number', 50, "Value1"],
@@ -1336,7 +1336,7 @@ describe('DataFrame', function () {
 		var detectedTypes = dataFrame.detectValues();
 		expect(detectedTypes.getColumnNames()).to.eql(["Value", "Frequency", "Column"]);
 		expect(detectedTypes.getIndex().toValues()).to.eql([0, 1, 2]);
-		expect(detectedTypes.toValues()).to.eql([
+		expect(detectedTypes.toRows()).to.eql([
 			[new Date(1975, 24, 2), 50, "Date"],
 			[new Date(2015, 24, 2), 50, "Date"],
 			['foo', 100, "Value1"],
@@ -1355,7 +1355,7 @@ describe('DataFrame', function () {
 		);
 
 		var truncated = dataFrame.truncateStrings(10);
-		expect(truncated.toValues()).to.eql([
+		expect(truncated.toRows()).to.eql([
 			["Long strin", "Short"],
 			["Small", "Even longe"],
 		]);
@@ -1375,7 +1375,7 @@ describe('DataFrame', function () {
 		var remapped = dataFrame.remapColumns(["Col2", "Col1"]);
 
 		expect(remapped.getColumnNames()).to.eql([ "Col2", "Col1" ]);
-		expect(remapped.toValues()).to.eql([
+		expect(remapped.toRows()).to.eql([
 			[11, 'foo'],
 			[22, 'bar'],
 		]);
@@ -1395,7 +1395,7 @@ describe('DataFrame', function () {
 		var remapped = dataFrame.remapColumns(["Col2"]);
 
 		expect(remapped.getColumnNames()).to.eql([ "Col2" ]);
-		expect(remapped.toValues()).to.eql([
+		expect(remapped.toRows()).to.eql([
 			[11],
 			[22],
 		]);
@@ -1415,7 +1415,7 @@ describe('DataFrame', function () {
 		var remapped = dataFrame.remapColumns(["New Column", "Col2"]);
 
 		expect(remapped.getColumnNames()).to.eql([ "New Column", "Col2" ]);
-		expect(remapped.toValues()).to.eql([
+		expect(remapped.toRows()).to.eql([
 			[undefined, 11],
 			[undefined, 22],
 		]);
@@ -1544,7 +1544,7 @@ describe('DataFrame', function () {
 		expect(baked.getIndex()).to.be.an.instanceOf(dataForge.Series);
 		expect(baked.getIndex().toValues()).to.eql([10, 11]);
 		expect(baked.getColumnNames()).to.eql(["Column1", "Column2"]);
-		expect(baked.toValues()).to.eql([
+		expect(baked.toRows()).to.eql([
 				['A', 1],
 				['B', 2],
 		]);
@@ -1591,7 +1591,7 @@ describe('DataFrame', function () {
 
 		expect(dataFrame.getColumnNames()).to.eql(columnNames);
 		expect(dataFrame.getIndex().toValues()).to.eql([10, 11]);
-		expect(dataFrame.toValues()).to.eql([
+		expect(dataFrame.toRows()).to.eql([
 			['A', 1],
 			['B', 2],
 		]);
@@ -1714,13 +1714,13 @@ describe('DataFrame', function () {
 			);
 
 		var reversed = dataFrame.reverse();
-		expect(dataFrame.toValues()).to.eql([
+		expect(dataFrame.toRows()).to.eql([
 			['A', 1],
 			['B', 2],
 			['C', 3],
 		]);
 		expect(dataFrame.getIndex().toValues()).to.eql([10, 11, 12]);
-		expect(reversed.toValues()).to.eql([
+		expect(reversed.toRows()).to.eql([
 			['C', 3],
 			['B', 2],
 			['A', 1],
@@ -1963,7 +1963,7 @@ describe('DataFrame', function () {
 			[new Date(2015, 24, 2), 200, 'bar', 22],
 		];
 		var dataFrame = new dataForge.DataFrame({ columnNames: columns, rows: rows });
-		expect(dataFrame.toValues()).to.eql(rows);
+		expect(dataFrame.toRows()).to.eql(rows);
 	});
 
 	it('can specify rows as an iterable of arrays', function () {
@@ -1977,7 +1977,7 @@ describe('DataFrame', function () {
 			return new ArrayIterator(rows);
 		};
 		var dataFrame = new dataForge.DataFrame({ columnNames: columns, rows: iterable });
-		expect(dataFrame.toValues()).to.eql(rows);
+		expect(dataFrame.toRows()).to.eql(rows);
 	});
 
 	it('can specify rows as an iterable of objects', function () {
@@ -2017,7 +2017,7 @@ describe('DataFrame', function () {
 		var dataFrame = new dataForge.DataFrame();
 		expect(dataFrame.getColumnNames()).to.eql([]);
 		expect(dataFrame.getColumns()).to.eql([]);
-		expect(dataFrame.toValues()).to.eql([]);
+		expect(dataFrame.toRows()).to.eql([]);
 	})
 
 	it('there are no rows or columns when no columns or rows are specified', function () {
@@ -2025,7 +2025,7 @@ describe('DataFrame', function () {
 		var dataFrame = new dataForge.DataFrame({});
 		expect(dataFrame.getColumnNames()).to.eql([]);
 		expect(dataFrame.getColumns()).to.eql([]);
-		expect(dataFrame.toValues()).to.eql([]);
+		expect(dataFrame.toRows()).to.eql([]);
 	})
 
 	it('can initialize from array of objects', function () {
@@ -2044,7 +2044,7 @@ describe('DataFrame', function () {
 			});
 		
 		expect(dataFrame.getColumnNames()).to.eql(["Col1", "Col2"]);
-		expect(dataFrame.toValues()).to.eql([
+		expect(dataFrame.toRows()).to.eql([
 			[1, 'hello'],
 			[10, 'computer'],
 		])
@@ -2078,7 +2078,7 @@ describe('DataFrame', function () {
 
 		expect(dataFrame.getColumnNames()).to.eql(["Col1", "Col2", "Col3", "Col4"]);
 
-		expect(dataFrame.toValues()).to.eql([
+		expect(dataFrame.toRows()).to.eql([
 			[1, 'hello', undefined, undefined],
 			[undefined, undefined, 10, 'computer'],
 		]);
@@ -2111,7 +2111,7 @@ describe('DataFrame', function () {
 
 		expect(dataFrame.getColumnNames()).to.eql([]);
 		expect(dataFrame.getColumns()).to.eql([]);
-		expect(dataFrame.toValues()).to.eql([[], []]);
+		expect(dataFrame.toRows()).to.eql([[], []]);
 	});	
 
 	it('can convert to javascript object', function () {
@@ -2245,7 +2245,7 @@ describe('DataFrame', function () {
 		var modified = dataFrame.bringToFront("b");
 
 		expect(modified.getColumnNames()).to.eql(["b", "a", "c"]);
-		expect(modified.toValues()).to.eql([
+		expect(modified.toRows()).to.eql([
 			[2, 1, 3],
 			[5, 4, 6],
 		]);
@@ -2260,7 +2260,7 @@ describe('DataFrame', function () {
 		var modified = dataFrame.bringToFront(["b", "c"]);
 
 		expect(modified.getColumnNames()).to.eql(["b", "c", "a"]);
-		expect(modified.toValues()).to.eql([
+		expect(modified.toRows()).to.eql([
 			[2, 3, 1],
 			[5, 6, 4],
 		]);
@@ -2275,7 +2275,7 @@ describe('DataFrame', function () {
 		var modified = dataFrame.bringToFront("non-existing-column");
 
 		expect(modified.getColumnNames()).to.eql(["a", "b", "c"]);
-		expect(modified.toValues()).to.eql([
+		expect(modified.toRows()).to.eql([
 			[1, 2, 3],
 			[4, 5, 6],
 		]);
@@ -2290,7 +2290,7 @@ describe('DataFrame', function () {
 		var modified = dataFrame.bringToBack("b");
 
 		expect(modified.getColumnNames()).to.eql(["a", "c", "b"]);
-		expect(modified.toValues()).to.eql([
+		expect(modified.toRows()).to.eql([
 			[1, 3, 2],
 			[4, 6, 5],
 		]);
@@ -2305,7 +2305,7 @@ describe('DataFrame', function () {
 		var modified = dataFrame.bringToBack(["b", "a"]);
 
 		expect(modified.getColumnNames()).to.eql(["c", "b", "a"]);
-		expect(modified.toValues()).to.eql([
+		expect(modified.toRows()).to.eql([
 			[3, 2, 1],
 			[6, 5, 4],
 		]);
@@ -2320,7 +2320,7 @@ describe('DataFrame', function () {
 		var modified = dataFrame.bringToBack("non-existing-column");
 
 		expect(modified.getColumnNames()).to.eql(["a", "b", "c"]);
-		expect(modified.toValues()).to.eql([
+		expect(modified.toRows()).to.eql([
 			[1, 2, 3],
 			[4, 5, 6],
 		]);
@@ -2338,7 +2338,7 @@ describe('DataFrame', function () {
 
 		var inflated = dataFrame.inflateColumn("b");
 		expect(inflated.getColumnNames()).to.eql(["a", "b", "X", "Y"]);
-		expect(inflated.toValues()).to.eql([
+		expect(inflated.toRows()).to.eql([
 			[1, { X: 2, Y: 3 }, 2, 3],
 			[4, { X: 5, Y: 6 }, 5, 6],
 		]);
@@ -2473,7 +2473,7 @@ describe('DataFrame', function () {
 			;
 
 		expect(pivoted.getColumnNames()).to.eql(["1PG", "ABC", "MPL"]);
-		expect(pivoted.toValues()).to.eql([
+		expect(pivoted.toRows()).to.eql([
 			[5.2, 5.2, 1.2],
 			[5.3, 4.2, 2.2],
 			[5.4, 3.2, 3.2],
@@ -2623,7 +2623,7 @@ describe('DataFrame', function () {
 		});
 
 		var parsed = df.parseInts("V1");
-		expect(parsed.toValues()).to.eql([
+		expect(parsed.toRows()).to.eql([
 			[1, '2'],
 			[10, '11'],
 		]);
@@ -2640,7 +2640,7 @@ describe('DataFrame', function () {
 		});
 
 		var parsed = df.parseInts(["V1", "V2"]);
-		expect(parsed.toValues()).to.eql([
+		expect(parsed.toRows()).to.eql([
 			[1, 2],
 			[10, 11],
 		]);
@@ -2657,7 +2657,7 @@ describe('DataFrame', function () {
 		});
 
 		var converted = df.toStrings("V1");
-		expect(converted.toValues()).to.eql([
+		expect(converted.toRows()).to.eql([
 			['1', 2],
 			['10', 11],
 		]);
@@ -2675,7 +2675,7 @@ describe('DataFrame', function () {
 		});
 
 		var converted = df.toStrings(["V1", "V2"]);
-		expect(converted.toValues()).to.eql([
+		expect(converted.toRows()).to.eql([
 			['1', '2'],
 			['10', '11'],
 		]);

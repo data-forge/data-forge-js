@@ -1067,7 +1067,7 @@ DataFrame.prototype.setSeries = function (columnName, data) {
 			columnNames: self.getColumnNames().concat([columnName]),
 			rows: function () {
 				return new ArrayIterator(
-					E.from(self.toValues())
+					E.from(self.toRows())
 						.select(function (row, rowIndex) {
 							return row.concat([data[rowIndex]]);
 						})
@@ -1092,7 +1092,7 @@ DataFrame.prototype.setSeries = function (columnName, data) {
 				.toArray(),
 			rows: function () {
 				return new ArrayIterator(
-					E.from(self.toValues())
+					E.from(self.toRows())
 						.select(function (row, rowIndex) {
 							return E.from(row)
 								.select(function (column, thisColumnIndex) {
@@ -1230,7 +1230,7 @@ DataFrame.prototype.toString = function () {
 
 	var index = self.getIndex().toValues();
 	var header = ["__index__"].concat(self.getColumnNames());
-	var rows = E.from(self.toValues())
+	var rows = E.from(self.toRows())
 		.select(function (row, rowIndex) { 
 			return [index[rowIndex]].concat(row);
 		})
@@ -1392,7 +1392,7 @@ DataFrame.prototype.truncateStrings = function (maxLength) {
 	assert.isNumber(maxLength, "Expected 'maxLength' parameter to 'truncateStrings' to be an integer.");
 
 	var self = this;
-	var truncatedValues = E.from(self.toValues()) //todo: make this function lazy.
+	var truncatedValues = E.from(self.toRows()) //todo: make this function lazy.
 		.select(function (row) {
 			return E.from(row)
 				.select(function (value) {
@@ -1434,7 +1434,7 @@ DataFrame.prototype.remapColumns = function (columnNames) {
 		columnNames: columnNames,
 		rows: function () { //todo: make this properly lazy.
 			return new ArrayIterator(
-				E.from(self.toValues())
+				E.from(self.toRows())
 					.select(function (row) {
 						return E.from(columnNames)
 							.select(function (columnName) {
@@ -1519,7 +1519,7 @@ DataFrame.prototype.renameSeries = function (newColumnNames) {
 /**
  * Bake the data frame to an array of rows.
  */
-DataFrame.prototype.toValues = function () {
+DataFrame.prototype.toRows = function () {
 
 	var self = this;
 
@@ -1576,12 +1576,12 @@ DataFrame.prototype.toJSON = function () {
 DataFrame.prototype.toCSV = function () {
 
 	var self = this;
-	var data = [self.getColumnNames()].concat(self.toValues());
+	var data = [self.getColumnNames()].concat(self.toRows());
 	return BabyParse.unparse(data);
 
 	/*Old csv stringify.
 	var header = self.getColumnNames().join(',');
-	var rows = E.from(self.toValues())
+	var rows = E.from(self.toRows())
 			.select(function (row) {
 				return row.join(',');
 			})

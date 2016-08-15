@@ -747,7 +747,7 @@ describe('Series', function () {
 		var types = series.detectTypes();
 		expect(types.getColumnNames()).to.eql(['Type', 'Frequency']);
 		expect(types.getIndex().toValues()).to.eql([0]);
-		expect(types.toValues()).to.eql([
+		expect(types.toRows()).to.eql([
 			['number', 100]
 		]);
 	});
@@ -758,7 +758,7 @@ describe('Series', function () {
 		var types = series.detectTypes();
 		expect(types.getColumnNames()).to.eql(['Type', 'Frequency']);
 		expect(types.getIndex().toValues()).to.eql([0]);
-		expect(types.toValues()).to.eql([
+		expect(types.toRows()).to.eql([
 			['date', 100]
 		]);
 	});
@@ -769,7 +769,7 @@ describe('Series', function () {
 		var types = series.detectTypes();
 		expect(types.getColumnNames()).to.eql(['Type', 'Frequency']);
 		expect(types.getIndex().toValues()).to.eql([0, 1]);
-		expect(types.toValues()).to.eql([
+		expect(types.toRows()).to.eql([
 			['number', 50],
 			['string', 50],
 		]);
@@ -780,7 +780,7 @@ describe('Series', function () {
 		var values = series.detectValues();
 		expect(values.getColumnNames()).to.eql(['Value', 'Frequency']);
 		expect(values.getIndex().toValues()).to.eql([0, 1]);
-		expect(values.toValues()).to.eql([
+		expect(values.toRows()).to.eql([
 			[1, 50],
 			['foo', 50],
 		]);
@@ -943,7 +943,7 @@ describe('Series', function () {
 			});
 
 		expect(dataFrame.getColumnNames()).to.eql(["Col1", "Col2"]);
-		expect(dataFrame.toValues()).to.eql([
+		expect(dataFrame.toRows()).to.eql([
 			['A', 'AA'],
 			['B', 'BB'],
 			['C', 'CC'],
@@ -966,7 +966,7 @@ describe('Series', function () {
 		var dataFrame = series.inflate();
 
 		expect(dataFrame.getColumnNames()).to.eql(["A", "B"]);
-		expect(dataFrame.toValues()).to.eql([
+		expect(dataFrame.toRows()).to.eql([
 			[1, 2],
 			[3, 4],
 		]);
