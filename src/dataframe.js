@@ -1580,47 +1580,6 @@ DataFrame.prototype.merge = function (otherDataFrame, columnName) {
 };
 
 /**
- * Inesrt a pair to the start of a DataFrame.
- *
- * @param {pair} pair - The pair to insert.
- */
-DataFrame.prototype.insertPair = function (pair) {
-	assert.isArray(pair, "Expected 'pair' parameter to 'DataFrame.insertPair' to be an array.");
-	assert(pair.length === 2, "Expected 'pair' parameter to 'DataFrame.insertPair' to be an array with two elements. The first element is the index, the second is the row.");
-
-	//todo: make this lazy.
-
-	var self = this;
-	var pairs = [pair].concat(self.toPairs());
-	return new DataFrame({
-		iterable: function () {
-			return new ArrayIterator(pairs);
-		},
-	});
-};
-
-/**
- * Append a pair to the end of a DataFrame.
- *
- * @param {pair} pair - The pair to append.
- */
-DataFrame.prototype.appendPair = function (pair) {
-	assert.isArray(pair, "Expected 'pair' parameter to 'DataFrame.appendPair' to be an array.");
-	assert(pair.length === 2, "Expected 'pair' parameter to 'DataFrame.appendPair' to be an array with two elements. The first element is the index, the second is the row.");
-
-	//todo: make this lazy.
-
-	var self = this;
-	var pairs = self.toPairs();
-	pairs.push(pair);
-	return new DataFrame({
-		iterable: function () {
-			return new ArrayIterator(pairs);
-		},
-	});
-};
-
-/**
  * Returns true if the DataFrame contains the specified row.
  *
  * @param {function} row - The row to check for in the DataFrame.

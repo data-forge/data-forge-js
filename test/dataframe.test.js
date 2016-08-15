@@ -1679,56 +1679,6 @@ describe('DataFrame', function () {
 		]);
 	});
 
-	it('can insert pair to empty dataframe', function () {
-
-		var dataFrame = new DataFrame();
-		var modified = dataFrame.insertPair([10, 100]);
-		expect(modified.toPairs()).to.eql([
-			[10, 100]
-		]);
-	});
-
-	it('can insert pair to dataframe with existing items', function () {
-
-		var dataFrame = new DataFrame({
-			columnNames: ["Column1"],
-			index:  [1,  2],
-			rows: [[10], [11]],
-		});
-
-		var modified = dataFrame.insertPair([20, { Column1: 100 }]);
-		expect(modified.toPairs()).to.eql([
-			[20, { Column1: 100 }],
-			[1, { Column1: 10 }],
-			[2, { Column1: 11 }],
-		]);
-	});
-
-	it('can append pair to empty dataframe', function () {
-
-		var dataFrame = new DataFrame();
-		var appended = dataFrame.appendPair([10, 100]);
-		expect(appended.toPairs()).to.eql([
-			[10, 100]
-		]);
-	});
-
-	it('can append pair to dataframe with existing items', function () {
-
-		var dataFrame = new DataFrame({
-			columnNames: ["Column1"],
-			index:  [1,  2],
-			rows: [[10], [11]],
-		});
-
-		var appended = dataFrame.appendPair([20, { Column1: 100 }]);
-		expect(appended.toPairs()).to.eql([
-			[1, { Column1: 10 }],
-			[2, { Column1: 11 }],
-			[20, { Column1: 100 }],
-		]);
-	});
-
 	it('checking if an empty dataFrame contains a row returns false', function () {
 
 		var dataFrame = new DataFrame();

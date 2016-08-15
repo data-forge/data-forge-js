@@ -1621,7 +1621,7 @@ Series.prototype.insertPair = function (pair) {
 
 	var self = this;
 	var pairs = [pair].concat(self.toPairs());
-	return new Series({
+	return new self.Constructor({
 		iterable: function () {
 			return new ArrayIterator(pairs);
 		},
@@ -1642,7 +1642,7 @@ Series.prototype.appendPair = function (pair) {
 	var self = this;
 	var pairs = self.toPairs();
 	pairs.push(pair);
-	return new Series({
+	return new self.Constructor({
 		iterable: function () {
 			return new ArrayIterator(pairs);
 		},
