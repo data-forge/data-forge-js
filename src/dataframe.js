@@ -1836,42 +1836,6 @@ DataFrame.prototype.rollingWindow = function (period, obsoleteSelector) {
 	});
 };
 
-/**
- * Get the first row of the DataFrame.
- */
-DataFrame.prototype.first = function () {
-
-	var self = this;
-
-	var iterator = self.getIterator();
-
-	if (!iterator.moveNext()) {
-		throw new Error("No rows in DataFrame.");
-	}
-
-	return iterator.getCurrent()[1];
-};
-
-/**
- * Get the last row of the DataFrame.
- */
-DataFrame.prototype.last = function () {
-
-	var self = this;
-
-	var iterator = self.getIterator();
-
-	if (!iterator.moveNext()) {
-		throw new Error("No rows in DataFrame.");
-	}
-
-	while (iterator.moveNext()) {
-		; // Don't evaluate current item, it's too expensive.
-	}
-
-	return iterator.getCurrent()[1]; // Return the last item.
-};
-
 /** 
  * Reverse the DataFrame.
  */
