@@ -2045,32 +2045,6 @@ DataFrame.prototype.inflateColumn = function (columnNameOrIndex, selector) {
 	);
 };
 
-/** 
- * Get X rows from the head of the data frame.
- *
- * @param {int} numRows - Number of rows to take.
- */
-DataFrame.prototype.head = function (numRows) {
-
-	assert.isNumber(numRows, "Expected 'numRows' parameter to 'head' function to be a function.");
-
-	var self = this;
-	return self.take(numRows);
-};
-
-/** 
- * Get X rows from the tail of the data frame.
- *
- * @param {int} numRows - Number of rows to take.
- */
-DataFrame.prototype.tail = function (numRows) {
-
-	assert.isNumber(numRows, "Expected 'numRows' parameter to 'tail' function to be a function.");
-
-	var self = this;
-	return self.skip(self.count() - numRows);
-};
-
 /**
  * Aggregate the rows of the data-frame.
  *
