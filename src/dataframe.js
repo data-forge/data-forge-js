@@ -2291,22 +2291,6 @@ DataFrame.prototype.groupBy = function (selector) {
 };
 
 /**
- * Collapse a group of sequential rows with duplicate column values into a Series of windows.
- *
- * @param {function} valueSelector - Selects the value used to compare for duplicates.
- */	
-DataFrame.prototype.groupSequentialBy = function (valueSelector) {
-
-	assert.isFunction(valueSelector, "Expected 'valueSelector' parameter to 'DataFrame.groupSequentialBy' to be a function.")
-
-	var self = this;
-
-	return self.variableWindow(function (a, b) {
-			return valueSelector(a) === valueSelector(b);
-		});
-};
-
-/**
  * Collapse distinct rows in the dataframe based on the output of 'valueSelector'.
  *
  * @param {function} valueSelector - Selects the value used to compare for duplicates.
