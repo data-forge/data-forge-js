@@ -272,7 +272,7 @@ Series.prototype.select = function (selector) {
 	assert.isFunction(selector, "Expected 'selector' parameter to 'select' function to be a function.");
 
 	var self = this;
-	return new Series({
+	return new self.Constructor({
 		iterable: function () {
 			return new SelectIterator(self.getIterator(), 
 				function (pair) {
@@ -292,7 +292,7 @@ Series.prototype.selectPairs = function (selector) {
 	assert.isFunction(selector, "Expected 'selector' parameter to 'selectPairs' function to be a function.");
 
 	var self = this;
-	return new Series({
+	return new self.Constructor({
 		iterable: function () {
 			return new SelectIterator(self.getIterator(), 
 				function (pair) {
@@ -317,7 +317,7 @@ Series.prototype.selectMany = function (selector) {
 
 	var self = this;
 
-	return new Series({
+	return new self.Constructor({
 		iterable: function () {
 			return new SelectManyIterator(self.getIterator(), 
 				function (pair) {
@@ -358,7 +358,7 @@ Series.prototype.selectManyPairs = function (selector) {
 
 	var self = this;
 
-	return new Series({
+	return new self.Constructor({
 		iterable: function () {
 			return new SelectManyIterator(self.getIterator(), 
 				function (pair) {
