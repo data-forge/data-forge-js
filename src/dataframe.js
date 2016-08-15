@@ -621,7 +621,7 @@ DataFrame.prototype.selectMany = function (selector) {
 				}
 
 				if (newRows instanceof DataFrame) {
-					newRows = newRows.toObjects();
+					newRows = newRows.toValues();
 				}
 				else if (newRows instanceof Series)
 				{
@@ -1546,7 +1546,7 @@ DataFrame.prototype.toRows = function () {
 /**
  * Bake the data frame to an array of JavaScript objects.
  */
-DataFrame.prototype.toObjects = function () {
+DataFrame.prototype.toValues = function () {
 
 	var self = this;
 
@@ -1567,7 +1567,7 @@ DataFrame.prototype.toObjects = function () {
  */
 DataFrame.prototype.toJSON = function () {
 	var self = this;
-	return JSON.stringify(self.toObjects(), null, 4);
+	return JSON.stringify(self.toValues(), null, 4);
 };
 
 /**
@@ -1806,7 +1806,7 @@ DataFrame.prototype.toObject = function (keySelector, valueSelector) {
 	assert.isFunction(keySelector, "Expected 'keySelector' parameter to toObject to be a function.");
 	assert.isFunction(valueSelector, "Expected 'valueSelector' parameter to toObject to be a function.");
 
-	return E.from(self.toObjects()).toObject(keySelector, valueSelector);
+	return E.from(self.toValues()).toObject(keySelector, valueSelector);
 };
 
 /**

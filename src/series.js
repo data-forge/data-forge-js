@@ -328,7 +328,7 @@ Series.prototype.selectMany = function (selector) {
 					}
 
 					if (newValues instanceof DataFrame) {
-						newValues = newValues.toObjects();
+						newValues = newValues.toValues();
 					}
 					else if (newValues instanceof Series)
 					{

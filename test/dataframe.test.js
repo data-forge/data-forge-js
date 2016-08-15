@@ -1453,7 +1453,7 @@ describe('DataFrame', function () {
 			[5, 6]
 		);
 
-		expect(dataFrame.toObjects()).to.eql([
+		expect(dataFrame.toValues()).to.eql([
 			{
 				Col1: 300,
 				Col2: 'c',

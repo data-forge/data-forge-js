@@ -19,7 +19,7 @@ module.exports = function (dataFrames, selector) {
 
 	var dataFrameContents = E.from(dataFrames)
 		.select(function (dataFrame) {
-			return dataFrame.toObjects();
+			return dataFrame.toValues();
 		})
 		.toArray();
 
