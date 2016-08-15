@@ -568,39 +568,6 @@ DataFrame.prototype.take = function (numRows) {
 };
 
 /**
- * Take rows from the data-frame while a condition is met.
- *
- * @param {function} predicate - Return true to indicate the condition met.
- */
-DataFrame.prototype.takeWhile = function (predicate) {
-	assert.isFunction(predicate, "Expected 'predicate' parameter to 'takeWhile' function to be a predicate function that returns true/false.");
-
-	var self = this;
-	return new DataFrame({
-		columnNames: self.getColumnNames(),
-		iterable: function () {
-			return new TakeWhileIterator(self.getIterator(), function (pair) {
-					return predicate(pair[1], pair[0]);
-				});
-		},
-	}); 	
-};
-
-/**
- * Take rows from the data-frame until a condition is met.
- *
- * @param {function} predicate - Return true to indicate the condition met.
- */
-DataFrame.prototype.takeUntil = function (predicate) {
-	assert.isFunction(predicate, "Expected 'predicate' parameter to 'takeUntil' function to be a predicate function that returns true/false.");
-
-	var self = this;
-	return self.takeWhile(function (value, index) { 
-		return !predicate(value, index); 
-	});
-};
-
-/**
  * Filter a data frame by a predicate selector.
  *
  * @param {function} filterSelectorPredicate - Predicte function to filter rows of the data frame.
