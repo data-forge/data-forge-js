@@ -152,7 +152,7 @@ Series.prototype.skip = function (numRows) {
 	assert.isNumber(numRows, "Expected 'numRows' parameter to 'skip' function to be a number.");
 
 	var self = this;
-	return new Series({
+	return new self.Constructor({
 		iterable: function () {
 			return new SkipIterator(self.getIterator(), numRows);
 		},		
@@ -168,7 +168,7 @@ Series.prototype.skipWhile = function (predicate) {
 	assert.isFunction(predicate, "Expected 'predicate' parameter to 'skipWhile' function to be a predicate function that returns true/false.");
 
 	var self = this;
-	return new Series({
+	return new self.Constructor({
 		iterable: function () {
 			return new SkipWhileIterator(self.getIterator(), 
 				function (pair) {
@@ -202,7 +202,7 @@ Series.prototype.take = function (numRows) {
 	assert.isNumber(numRows, "Expected 'numRows' parameter to 'take' function to be a number.");
 
 	var self = this;
-	return new Series({
+	return new self.Constructor({
 		iterable: function () {
 			return new TakeIterator(self.getIterator(), numRows);
 		},
@@ -218,7 +218,7 @@ Series.prototype.takeWhile = function (predicate) {
 	assert.isFunction(predicate, "Expected 'predicate' parameter to 'takeWhile' function to be a predicate function that returns true/false.");
 
 	var self = this;
-	return new Series({
+	return new self.Constructor({
 		iterable: function () {
 			return new TakeWhileIterator(self.getIterator(), 
 				function (pair) {
@@ -252,7 +252,7 @@ Series.prototype.where = function (filterSelectorPredicate) {
 	assert.isFunction(filterSelectorPredicate, "Expected 'filterSelectorPredicate' parameter to 'where' function to be a function.");
 
 	var self = this;
-	return new Series({
+	return new self.Constructor({
 		iterable: function () {
 			return new WhereIterator(self.getIterator(), 
 				function (pair) {

@@ -502,59 +502,6 @@ DataFrame.prototype.getColumnName = function (columnIndex) {
 };
 
 /**
- * Skip a number of rows in the data frame.
- *
- * @param {int} numRows - Number of rows to skip.
- */
-DataFrame.prototype.skip = function (numRows) {
-	assert.isNumber(numRows, "Expected 'numRows' parameter to 'skip' function to be a number.");
-
-	var self = this;
-	return new DataFrame({
-		columnNames: self.getColumnNames(),
-		iterable: function () {
-			return new SkipIterator(self.getIterator(), numRows);
-		},
-	}); 	
-};
-
-/**
- * Take a number of rows in the data frame.
- *
- * @param {int} numRows - Number of rows to take.
- */
-DataFrame.prototype.take = function (numRows) {
-	assert.isNumber(numRows, "Expected 'numRows' parameter to 'take' function to be a number.");
-
-	var self = this;
-	return new DataFrame({
-		columnNames: self.getColumnNames(),
-		iterable: function () {
-			return new TakeIterator(self.getIterator(), numRows);
-		},
-	}); 	
-};
-
-/**
- * Filter a data frame by a predicate selector.
- *
- * @param {function} filterSelectorPredicate - Predicte function to filter rows of the data frame.
- */
-DataFrame.prototype.where = function (filterSelectorPredicate) {
-	assert.isFunction(filterSelectorPredicate, "Expected 'filterSelectorPredicate' parameter to 'where' function to be a function.");
-
-	var self = this;
-	return new DataFrame({
-		columnNames: self.getColumnNames(),
-		iterable: function () {
-			return new WhereIterator(self.getIterator(), function (pair) {
-					return filterSelectorPredicate(pair[1], pair[0]);
-				});
-		},
-	}); 	
-};
-
-/**
  * Generate a new data frame based on the results of the selector function.
  *
  * @param {function} selector - Selector function that transforms each row to generate a transformed data-frame.
