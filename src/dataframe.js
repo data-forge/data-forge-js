@@ -2650,36 +2650,6 @@ DataFrame.prototype.appendPair = function (pair) {
 };
 
 /**
- * Fill gaps in a DataFrame.
- *
- * @param {function} predicate - Predicate that is passed pairA and pairB, two consecutive rows, return truthy if there is a gap between the rows, or falsey if there is no gap.
- * @param {function} generator - Generator that is passed pairA and pairB, two consecutive rows, returns an array of pairs that fills the gap between the rows.
- */
-DataFrame.prototype.fillGaps = function (predicate, generator) {
-	assert.isFunction(predicate, "Expected 'predicate' parameter to 'DataFrame.fillGaps' to be a predicate function that returns a boolean.")
-	assert.isFunction(generator, "Expected 'generator' parameter to 'DataFrame.fillGaps' to be a generator function that returns an array of generated pairs.")
-
-	var self = this;
-
-	return self.rollingWindow(2)
-		.selectManyPairs(function (window) {
-			var pairA = window.firstPair();
-			var pairB = window.lastPair();
-			if (!predicate(pairA, pairB)) {
-				return [pairA];
-			}
-
-			var generatedRows = generator(pairA, pairB);
-			assert.isArray(generatedRows, "Expected return from 'generator' parameter to 'DataFrame.fillGaps' to be an array of pairs, instead got a " + typeof(generatedRows));
-
-			return [pairA].concat(generatedRows);
-		})
-		.inflate()
-		.appendPair(self.lastPair())
-		;
-};
-
-/**
  * Returns true if the DataFrame contains the specified row.
  *
  * @param {function} row - The row to check for in the DataFrame.

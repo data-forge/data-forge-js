@@ -3549,45 +3549,6 @@ describe('DataFrame', function () {
 		]);
 	});
 
-	it('can fill gaps in dataframe - fill forward', function () {
-
-		var dataFrameWithGaps = new DataFrame({
-			columnNames: ["Column1"],
-			index:  [1,  2,  6,  7,  10, 11],
-			rows: [[10], [11], [12], [13], [14], [15]],
-		});
-
-		var dataFrameWithoutGaps = dataFrameWithGaps.fillGaps(
-			function (pairA, pairB) {
-				return pairB[0] - pairA[0] > 1;
-			},
-			function (pairA, pairB) {
-				var gapSize = pairB[0] - pairA[0];
-				var numEntries = gapSize - 1;
-				return E.range(0, numEntries)
-					.select(i => [
-						pairA[0] + i + 1,
-						pairA[1], 
-					])
-					.toArray();
-			}
-		);
-
-		expect(dataFrameWithoutGaps.toPairs()).to.eql([
-			[1, { Column1: 10 }],
-			[2, { Column1: 11 }],
-			[3, { Column1: 11 }],
-			[4, { Column1: 11 }],
-			[5, { Column1: 11 }],
-			[6, { Column1: 12 }],
-			[7, { Column1: 13 }],
-			[8, { Column1: 13 }],
-			[9, { Column1: 13 }],
-			[10, { Column1: 14 }],
-			[11, { Column1: 15 }],
-		]);
-	});
-
 	it('checking if an empty dataFrame contains a row returns false', function () {
 
 		var dataFrame = new DataFrame();
