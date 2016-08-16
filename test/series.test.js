@@ -39,6 +39,16 @@ describe('Series', function () {
 		]);		
 	});
 	
+	it('can reset index', function () {
+
+		var series = new dataForge.Series({ values: [100, 200], index: [5, 6] });
+		var reset = series.resetIndex();
+		expect(reset.getIndex().toValues()).to.eql([
+			0,
+			1
+		]);
+	});
+
 	it('can get column values', function () {
 		
 		var column = new dataForge.Series({ values: [100, 200] });

@@ -144,6 +144,24 @@ Series.prototype.getIndex = function () {
 };
 
 /**
+ * Reset the index of the data frame back to the default sequential integer index.
+ */
+Series.prototype.resetIndex = function () {
+
+	var self = this;
+	return new Series({
+		iterable: function () {
+			return new SelectIterator(
+				self.getIterator(),
+				function (pair, i) {
+					return [i, pair[1]];
+				}
+			);
+		},
+	});
+};
+
+/**
  * Skip a number of rows in the series.
  *
  * @param {int} numRows - Number of rows to skip.

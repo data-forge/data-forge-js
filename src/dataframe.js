@@ -428,23 +428,6 @@ var mergeSeries = require('./merge-series');
 var mergeDataFrames = require('./merge-dataframes');
 
 /**
- * Get the index of the data frame.
- */
-DataFrame.prototype.getIndex = function () {
-	var self = this;
-	return new Series({
-		iterable: function () {		
-			return new SelectIterator(
-				self.getIterator(),
-				function (pair, index) {
-					return [index, pair[0]]; // Extract index.
-				}
-			);
-		},
-	});
-};
-
-/**
  * Get the names of the columns in the data frame.
  */
 DataFrame.prototype.getColumnNames = function () {
