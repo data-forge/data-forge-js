@@ -1558,40 +1558,6 @@ describe('DataFrame', function () {
 		]);
 	});
 
-	it('can use variableWindow to remove sequential duplicates and take first in window', function () {
-
-		var df = new DataFrame({
-			columnNames: ['c1', 'c2'],
-			values: [
-				[1, 15], // 0
-				[1, 35], // 1
-				[3, 35], // 2
-				[-3, 112], // 3
-				[-3, 333], // 4
-				[8, 333], // 5
-				[8, 333], // 6
-				[-15, -10], // 7
-			],
-			index: [0, 1, 2, 3, 4, 5, 6, 7],
-		});
-
-		var collapsed = df
-			.variableWindow(function (row1, row2) {
-				return row1.c2 === row2.c2;
-			})
-			.selectPairs(function (window) {
-				return [window.getIndex().first(), window.first()];
-			});
-
-		expect(collapsed.toPairs()).to.eql([
-			[0, { c1: 1, c2: 15 } ],
-			[1, { c1: 1, c2: 35 } ],
-			[3, { c1: -3, c2: 112 } ],
-			[4, { c1: -3, c2: 333 } ],
-			[7, { c1: -15, c2: -10 } ],
-		]);
-	});
-
 	it('exception is thrown when pivoting table on non-existing columns column', function () {
 
 		var df = new DataFrame({
