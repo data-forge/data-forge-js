@@ -328,20 +328,6 @@ describe('dataframe creation', function () {
 		}).to.throw();
 	});
 
-	it("can handle undefined row - debug mode", function () {
-		expect(function () {
-			new DataFrame({
-				columnNames: ["c1", "c2"],
-				values: [
-					[1, 2],
-					undefined,
-					[5, 2]
-				],
-				debug: true,
-			})
-		}).to.throw();
-	});
-
 	it("test case that was broken due to missing comma", function () {
 		var d = new DataFrame({
 			columnNames: ["c1", "c2"],
@@ -357,22 +343,6 @@ describe('dataframe creation', function () {
 		expect(function () {
 			d.toValues();
 
-		}).to.throw();
-	});
-
-	it("test case that was broken due to missing comma - debug mode", function () {
-		expect(function () {
-			new DataFrame({
-				columnNames: ["c1", "c2"],
-				values: [
-					[1, 2],
-					[1, 3],
-					[5, 2]  // Missing comma here was causing a problem. This entire row goes missing from the data frame.
-					[1, 3], // This test verifies that the issue is handled gracefully.
-					[5, 2]
-				],
-				debug: true,
-			});
 		}).to.throw();
 	});
 

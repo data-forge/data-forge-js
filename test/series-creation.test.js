@@ -67,4 +67,17 @@ describe('series creation', function () {
 		]);
 	});
 
+	it('can create empty series', function () {
+
+		var series = new Series();
+		expect(series.count()).to.eql(0);
+		expect(series.toValues()).to.eql([]);
+	});
+
+	it('can create empty series with empty config', function () {
+
+		var series = new Series({});
+		expect(series.count()).to.eql(0);
+		expect(series.toValues()).to.eql([]);
+	});
 });

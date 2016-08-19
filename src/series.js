@@ -26,7 +26,10 @@ var EmptyIterator = require('../src/iterators/empty');
 var Series = function (config) {
 
 	var self = this;
-	self.Constructor = Series;
+
+	if (!self.Constructor) {
+		self.Constructor = Series;
+	}
 
 	if (!config) {
 		self._indexIterable = function () {
@@ -39,9 +42,11 @@ var Series = function (config) {
 		return;
 	}
 
-	if (config && config.iterable) { //todo: this is expensive.
+	assert.isObject(config, "Expected 'config' parameter to Series constructor to be an object with options for initialisation.");
 
-		assert.isFunction(config.iterable);
+	if (config.iterable) { //todo: this is expensive.
+
+		assert.isFunction(config.iterable, "Expected 'iterable' field of 'config' parameter to Series constructor to be a function that returns an index/value pairs iterator.");
 
 		var iterable = config.iterable;
 
@@ -66,12 +71,10 @@ var Series = function (config) {
 		return;
 	}
 
-	if (!config.values) {
-		throw new Error("Expected 'values' field to be set on 'config' parameter to Series constructor.");
-	}
-
-	if (!Object.isFunction(config.values)) {
-		assert.isArray(config.values, "Expected 'values' field of 'config' parameter to Series constructor be an array of values or a function that returns an iterator.");
+	if (config.values) {
+		if (!Object.isFunction(config.values)) {
+			assert.isArray(config.values, "Expected 'values' field of 'config' parameter to Series constructor be an array of values or a function that returns an iterator.");
+		}
 	}
 
 	if (config.index) {
@@ -101,7 +104,12 @@ var Series = function (config) {
 	}
 
 	var values = config.values;
-	if (Object.isFunction(values)) {
+	if (!values) {
+		self._valuesIterable = function () {
+			return new EmptyIterator();
+		};
+	}
+	else if (Object.isFunction(values)) {
 		self._valuesIterable = values;
 	}
 	else {
