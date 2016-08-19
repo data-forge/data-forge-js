@@ -27,27 +27,10 @@ Examples and some tests have been removed to a [separate repository](https://git
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Project Overview](#project-overview)
-  - [Project Aims](#project-aims)
-  - [Driving Principles](#driving-principles)
-  - [Implementation](#implementation)
 - [Installation](#installation)
   - [NodeJS installation and setup](#nodejs-installation-and-setup)
-    - [Data-Forge plugins under Node.js](#data-forge-plugins-under-nodejs)
-  - [Browser installation and setup](#browser-installation-and-setup)
-    - [Data-Forge plugins under the browser](#data-forge-plugins-under-the-browser)
-  - [Meteor installation and setup](#meteor-installation-and-setup)
-  - [Getting the code](#getting-the-code)
 - [Key Concepts](#key-concepts)
-  - [Data Frame](#data-frame)
-  - [Row](#row)
-  - [Series](#series)
-  - [Column](#column)
-  - [Index](#index)
-  - [Lazy Evaluation](#lazy-evaluation)
-  - [Iterator](#iterator)
 - [Basic Usage](#basic-usage)
-  - [Creating a Data Frame](#creating-a-data-frame)
-  - [Setting an index](#setting-an-index)
 - [Working with data](#working-with-data)
   - [CSV](#csv)
   - [JSON](#json)
@@ -60,11 +43,9 @@ Examples and some tests have been removed to a [separate repository](https://git
   - [Enumerating an index](#enumerating-an-index)
   - [Adding a column](#adding-a-column)
   - [Replacing a column](#replacing-a-column)
-  - [Removing a column](#removing-a-column)
+  - [Removing columns](#removing-columns)
 - [Immutability and Chained Functions](#immutability-and-chained-functions)
 - [Data exploration and visualization](#data-exploration-and-visualization)
-  - [Console output](#console-output)
-  - [Visual output](#visual-output)
 - [Data transformation](#data-transformation)
   - [Data frame transformation](#data-frame-transformation)
   - [Series transformation](#series-transformation)
@@ -98,7 +79,7 @@ The aims of this project:
 - To combine the best aspects of [Pandas](https://en.wikipedia.org/wiki/Pandas_(software)) and [LINQ](https://en.wikipedia.org/wiki/Language_Integrated_Query) and make them available in JavaScript.
 - To be able to load, transform and save data.
 - To be able to prepare data for visualization. 
-- Be able to load massive data files.
+- Be able to work with massive data files.
 
 ## Driving Principles 
 
@@ -203,15 +184,11 @@ Install via NPM and Bower as described in previous sections or clone, fork or do
 
 This section explains the key concepts of *Data-Forge*.
 
-## Data Frame
+## DataFrame
 
 DataFrame is the *main* concept. It is a sequence of rows. It can also be considered a matrix (rows and columns) of structured started. Can be considered a sequence of rows. Has an implicit or explicit index. Think of it as a spreadsheet in memory.
 
 A *data-frame* can be easily constructed from various formats and it can be exported to various formats. 
-
-## Row
-
-A single row of data in a *data-frame*. Contains a slice of data across columns. Has an implicit or explicit index. A row is most commonly represented as a JavaScript object (with column names as fields). A row can also be represented as an array of values.
 
 ## Series
 
@@ -219,13 +196,17 @@ Series is a sequence of values. A series is indexed. By default a Series has an 
 
 All values in a series are generally expected to have the same type, although this is not a requirement of *data-forge-js*.
 
+## Value / Row
+
+A single piece of data in a sequence. For `DataFrame` a value is a JavaScript object, each field of the object represnts a column in the data-frame. For `Series` each value can be any valid JavaScript value. 
+
 ## Column
 
 A column is a single *named* series of data in a data-frame. Each column is simply a series with a name, the values of the series are the values of the column. A column is a slice of data through all rows.
 
 ## Index 
 
-A sequence of values that is used to index a data-frame or series. When the data is a *time-series* the index is expected to contain *Date* values.
+An index sequence of values that is used to index a data-frame or series. When the data is a *time-series* the index is expected to contain *Date* values.
  
 Used for operations that search and merge data-farmes and series. 
 
@@ -237,7 +218,7 @@ Through this documentation and the Data-Forge code you will occasionally see a r
 
 ## Lazy Evaluation
 
-Data-frames, series and index are only fully evaluated when necessary. Operations are queued up and only fully evaluated as needed and when required, for example when serializing to csv or json (`toCSV` or `toJSON`) or when baking to values (`toValues` or `toObjects`). 
+Data-frames, series and index are only fully evaluated when necessary. Operations are queued up and only fully evaluated as needed and when required, for example when serializing to csv or json (`toCSV` or `toJSON`) or when baking to values (`toValues` or `toRows`). 
 
 A data-frame, series or index can be forcibly evaluated by calling the `bake` function. 
 
@@ -275,7 +256,7 @@ An example iterable:
 
 ## Selector
 
-A *selector* is a user-defined function (usually anonymous) that is passed to Data-Forge functions to select values per row or per value. Selectors are used to instruct Data-Forge on which part of the data to work on.
+A *selector* is a user-defined function (usually anonymous) that is passed to Data-Forge functions to process or transform each value in the sequence. Selectors are also used to instruct Data-Forge on which part of the data to work with.
 
 For example say you have a row that looks as follows:
 
@@ -292,7 +273,7 @@ Here is an example a *selector* that identifies *Column2*:
 
 Selectors are usually passed each row in the Data-Frame or each value in the Series. 
 
-Selectors are usually also passed the *index* for the row or value (although you can ignore this as demonstrated in the previous snippet).
+Selectors are usually also passed the *index* for the value (although you can ignore this as demonstrated in the previous snippet).
 
 An example of a selector that works with index rather than row: 
 
@@ -302,7 +283,7 @@ An example of a selector that works with index rather than row:
 
 ## Predicate
 
-A *predicate* function is similar to a *selector*, but returns a boolean value (technically you can return any value that can be considered *truthy* or *falsey*.
+A *predicate* function is similar to a *selector*, but returns a boolean value (technically you can return any value that can be considered *truthy* or *falsey*).
 
 An example predicate function:
 
@@ -318,7 +299,7 @@ Predicates can also take the index:
 
 ## Comparer
 
-A *comparer* method is used to compare to values or rows for equality. It returns true (or *truthy*) to indicate equality or false (or *falsey*) to indicate inequality. 
+A *comparer* method is used to compare to values for equality. It returns true (or *truthy*) to indicate equality or false (or *falsey*) to indicate inequality. 
 
 An example:
 
@@ -328,7 +309,9 @@ An example:
 
 ## Generator
 
-A generator is a function that produces values or rows to be inserted into a Series or DataFrame.
+todo: Review and revise this section.
+
+A generator is a function that produces zero or more values to be inserted into a Series or DataFrame.
 
 A generator may take arguments and it can return an array of values or rows:
 
@@ -342,6 +325,7 @@ A generator may take arguments and it can return an array of values or rows:
 	};
 
 Alternatively (to support lazy evaluation) a generator may return a lazily evaluated *iterable*, that is a function that returns an iterator for a sequence of values or rows:
+
 
 	function myGenerator = function (... appropriate arguments ...) {
 		return function () {
@@ -361,7 +345,7 @@ Create a data frame from column names and rows:
 
 	var dataFrame = new dataForge.DataFrame({
 			columnNames: ["Col1", "Col2", "Col3"],
-			rows: [
+			values: [
 				[1, 'hello', new Date(...)],
 				[5, 'computer', new Date(...)],
 				[10, 'good day', new Date(...)]
@@ -371,7 +355,7 @@ Create a data frame from column names and rows:
 A data frame can also be created from an array of JavaScript objects:
 
 	var dataFrame = new dataForge.DataFrame({
-			rows: [
+			values: [
 				{
 					Col1: 1,
 					Col2: 'hello',
@@ -390,9 +374,9 @@ A data frame can also be created from an array of JavaScript objects:
 			]
 		});
 
-In this case column names are automatically generated form the fields in the objects. For performance reasons only the fields of the first objects are considered.  
+In this case column names are automatically generated form the fields in the objects. For performance reasons only the fields of the first object are considered.  
 
-If you have irregular data you can enable *considerAllRows*, but be warned that this can be expensive as every row must be examined to determine column names:
+If you have irregular data you can enable *considerAllRows*, but be warned that this can be expensive as every value must be examined to determine column names:
 
 	var dataFrame = new dataForge.DataFrame({
 			rows: [
@@ -422,13 +406,13 @@ To get back the names of columns:
 
 	var columnNames = dataFrame.getColumnNames();
 
-To get back an array of rows:
+To get back an array of rows (in column order):
 
-	var rows = dataFrame.toValues();
+	var rows = dataFrame.toRows();
 
 To get back an array of objects (with column names as field names):
 
-	var objects = dataFrame.toObjects();
+	var objects = dataFrame.toValues();
 
 ## Setting an index
 
@@ -438,11 +422,15 @@ An index can also be set explicitly when creating a data frame:
 
 	var dataFrame = new dataForge.DataFrame({
 			columnNames: <column-names>,
-			rows: <rows>,
+			values: <initial-values>,
 			index: [5, 10, 100]
 		});
 
-Or an existing column can be promoted to an index:
+A new index can be wired like so:
+
+	var dataFrameWithIndex = dataFrame.withIndex([1, 2, 3]);
+
+Most likely you will want to promise an existing column to an index:
  
 	var dataFrame = new dataForge.DataFrame(someConfig).setIndex("Col3");
 
@@ -502,12 +490,11 @@ Note: the follow functions cause lazy evaluation to complete (like the *toArray*
 
 To extract rows as arrays of data (ordered by column): 
 
-
-	var arrayOfArrays = dataFrame.toValues();
+	var arrayOfArrays = dataFrame.toRows();
 
 To extract rows as objects (with column names as fields):
 
-	var arrayOfObjects = dataFrame.toObjects();
+	var arrayOfObjects = dataFrame.toValues();
 
 To extracts index + row pairs:
 
@@ -538,7 +525,7 @@ Get an array of all columns:
 	for (var column in columns) {
 		var name = column.name;
 		var series = column.series;
-		// ... so something with the column ...
+		// ... do something with the column ...
 	}
 
 Get the series for a column by name:
@@ -581,7 +568,7 @@ Retrieve the index from a series:
 
 	var index = someSeries.getIndex();
 
-Retrieve values from the index as an array:
+An index is actually just another Series so you can call the `toValues` function or anything else that normally works for a Series:
 
 	var arrayOfValues = index.toValues();
 
@@ -609,7 +596,7 @@ Again note that it is only the new data frame that includes the modified column.
 			return someValue;
 		});
 
-## Removing a column
+## Removing columns
 
 One or more columns can easily be removed:
 
@@ -618,6 +605,10 @@ One or more columns can easily be removed:
 Also works for single columns:
 
 	var newDf = df.dropSeries('Column-to-be-dropped');
+
+Alternatively you can select the columns to keep and drop the rest:
+
+	var newDf = df.keepSeries(["Column-to-keep", "Some-other-column-to-keep"]);
 
 ## Getting a row or value by index
 
@@ -681,16 +672,15 @@ Or
 
 	var iterator = index.getIterator();
 
-An iterator can be used to traverse a sequence and extract each index + value pair in turn.
+An iterator can be used to traverse a sequence and extract each index+value pair in turn.
 
 	var iterator = something.getIterator();
 	while (iterator.moveNext()) {
 		var pair = iterator.getCurrent();
-		var index  
-		// do something with the row/value.
+		// do something with the pair.
 	}
 
-A data-frame can be created from an function that returns an iterator. This is the primary mechanism that supports creation of a pipeline of lazy DataFrames. 
+A data-frame can be created from a function that returns an iterator. This is the primary mechanism that supports creation of a pipeline of lazy DataFrames. 
 
 	var df = new dataForge.DataFrame({ 
 		iterable: function () {
