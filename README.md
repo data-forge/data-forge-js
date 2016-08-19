@@ -848,7 +848,8 @@ LINQ-style functions that are currently available (or close equivalents):
 - firstPair/lastPair
 - firstIndex/lastIndex
 - reverse
-- aggregate
+- 
+- 
 - average/min/max/sum
 - zip
 
@@ -1005,7 +1006,41 @@ The [`sequentialDistinct` function](#sequential-distinct-values) is actually imp
 
 ## Aggregate
 
-todo the two types of aggregation.
+An entire data frame can be aggregated (or summarized) by calling `aggregate` and passing in an object that specifies how to aggregate each column in the data frame.
+
+Here is an example of aggregating the day's sales data to create a summary:
+
+	var dataFrame = ... today's sales, including Price and Revenue ... 
+	var summary = dataFrame.aggregate({
+			TotalSales: function (dataFrame) {
+				return dataFrame.count();
+			},
+			AveragePrice: function (dataFrame) {
+				return dataFrame.getSeries("Price").average();
+			},
+			TotalRevenue: [
+				"Revenue",
+				function (revenueSeries) {
+					return revenueSeries.sum();
+				}
+			],
+		});
+
+Why not just do this??
+Do I even need aggregate.
+The old style aggregate is probably ok, just for LINQ compatibility.
+
+	var summary = {
+		TotalSales: dataFrame.count(),
+		AveragePrice: dataFrame.getSeries("Price").average(),
+		TotalRevenue: dataFrame.getSeries("Revenue").sum(),
+	};
+
+	// Output average price and total revenue.
+	console.log(summary);
+
+
+todo the two types of aggregation ???
 
 ## Merge
 
