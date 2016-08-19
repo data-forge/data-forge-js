@@ -1454,23 +1454,3 @@ DataFrame.prototype.contains = function (row) {
 			return JSON.stringify(searchRow) === json;
 		});
 };
-
-/**
- * Concatenate a data-frame on the end of this one and return the concatenated data-frame.
- *
- * @param {DataFrame} otherDataFrame - The data-frame to concatenate to the end of this one.
- */
-DataFrame.prototype.concat = function (otherDataFrame) {
-
-	assert.instanceOf(otherDataFrame, DataFrame, "Expected 'otherDataFrame' parameter to 'DataFrame.concat' to be an instance of DataFrame.");
-
-	//todo: make this lazy.
-
-	var self = this;
-
-	return new DataFrame({
-		iterable: function () {
-			return new ArrayIterator(self.toPairs().concat(otherDataFrame.toPairs()))
-		},
-	})
-};

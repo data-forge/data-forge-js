@@ -1664,60 +1664,6 @@ describe('DataFrame', function () {
 		expect(dataFrame.contains({ Column1: 3000 })).to.eql(false);
 	});
 
-	it('can concatenate a non-empty data-frame with an empty data-frame', function () {
-
-		var dataFrame1 = new DataFrame({
-			columnNames: ["Column1"],
-			index: [1, 2],
-			values: [[10], [20]],
-		});
-		var dataFrame2 = new DataFrame();
-
-		var output = dataFrame1.concat(dataFrame2); 
-		expect(output.toPairs()).to.eql([
-			[1, { Column1: 10 } ],
-			[2, { Column1: 20 } ],
-		]);
-	});
-
-	it('can concatenate an empty data-frame with a non-empty data-frame', function () {
-
-		var dataFrame1 = new DataFrame();
-		var dataFrame2 = new DataFrame({
-			columnNames: ["Column1"],
-			index: [3, 4],
-			values: [[30], [40]],
-		});
-
-		var output = dataFrame1.concat(dataFrame2); 
-		expect(output.toPairs()).to.eql([
-			[3, { Column1: 30 } ],
-			[4, { Column1: 40 } ],
-		]);
-	});
-
-	it('can concatenate two data-frame with existing values',  function () {
-
-		var dataFrame1 = new DataFrame({
-			columnNames: ["Column1"],
-			index: [1, 2],
-			values: [[10], [20]],
-		});
-		var dataFrame2 = new DataFrame({
-			columnNames: ["Column1"],
-			index: [3, 4],
-			values: [[30], [40]],
-		});
-
-		var output = dataFrame1.concat(dataFrame2); 
-		expect(output.toPairs()).to.eql([
-			[1, { Column1: 10 } ],
-			[2, { Column1: 20 } ],
-			[3, { Column1: 30 } ],
-			[4, { Column1: 40 } ],
-		]);
-	});
-
 	it('can parse single columns', function () {
 
 		var df = new DataFrame({

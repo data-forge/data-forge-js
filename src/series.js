@@ -1762,11 +1762,9 @@ Series.prototype.concat = function (otherSeries) {
 
 	assert.instanceOf(otherSeries, Series, "Expected 'otherSeries' parameter to 'Series.concat' to be an instance of Series.");
 
-	//todo: make this lazy.
-
 	var self = this;
 
-	return new Series({
+	return new self.Constructor({
 		iterable: function () {
 			return new ArrayIterator(self.toPairs().concat(otherSeries.toPairs()))
 		},
