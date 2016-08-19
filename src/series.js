@@ -29,16 +29,40 @@ var Series = function (config) {
 	self.Constructor = Series;
 
 	if (!config) {
-		self.getIterator = function () {
+		self._indexIterable = function () {
+			return new EmptyIterator();
+		};
+		
+		self._valuesIterable = function () {
 			return new EmptyIterator();
 		};
 		return;
 	}
 
-	if (config && config.iterable) {
+	if (config && config.iterable) { //todo: this is expensive.
+
 		assert.isFunction(config.iterable);
 
-		self.getIterator = config.iterable;
+		var iterable = config.iterable;
+
+		self._indexIterable = function () {
+			return new SelectIterator(
+				iterable(),
+				function (pair) {
+					return pair[0];
+				}
+			);
+		};
+		
+		self._valuesIterable = function () {
+			return new SelectIterator(
+				iterable(),
+				function (pair) {
+					return pair[1];
+				}
+			);
+		};
+
 		return;
 	}
 
@@ -56,60 +80,32 @@ var Series = function (config) {
 		}
 	}
 
+	var index = config.index;
 	var values = config.values;
 
-	if (!config.index) {
-		// Index not supplied.
-		// Generate an index.
-		if (Object.isFunction(values)) {
-			self.getIterator = function () {
-				return new PairIterator(new CountIterator(), values());
-			};
-		}
-		else {
-			self.getIterator = function () {
-				return new PairIterator(new CountIterator(), new ArrayIterator(values));
-			};
-		}
-		return;
+	if (!index) {
+		self._indexIterable = function () {
+			return new CountIterator();
+		};
 	}
-
-	var index = config.index;
-
-	if (Object.isArray(index)) {
-		if (Object.isFunction(values)) {
-			return new PairIterator(new ArrayIterator(index), values());
-		}
-		else {
-			self.getIterator = function () {
-				return new PairIterator(new ArrayIterator(index), new ArrayIterator(values));
-			};			
-		}
+	else if (Object.isArray(index)) {
+		self._indexIterable = function () {
+			return new ArrayIterator(index);
+		};
 	}
 	else {
-		if (Object.isFunction(values)) {
-			return new PairIterator(
-				new SelectIterator(
-					index.getIterator(),
-					function (pair) {
-						return pair[1];
-					}
-				), 
-				values()
-			);
-		}
-		else {
-			self.getIterator = function () {
-				return new PairIterator(
-					new SelectIterator(
-						index.getIterator(),
-						function (pair) {
-							return pair[1];
-						}
-					),
-					new ArrayIterator(values)
-				);
-			};			
+		self._indexIterable = function () {
+			return index.getValuesIterator();
+		};
+	}
+
+	if (Object.isFunction(values)) {
+		self._valuesIterable = values;
+	}
+	else {
+
+		self._valuesIterable = function () {
+			return new ArrayIterator(values);
 		}
 	}
 };
@@ -120,10 +116,30 @@ var DataFrame = require('./dataframe');
 var zipSeries = require('./zip-series');
 
 /**
- * Get an iterator for the iterating the values of the series.
+ * Get an iterator for index & values of the series.
  */
 Series.prototype.getIterator = function () {
-	return new EmptyIterator(); // This is redefined by the constructor.
+	var self = this;
+	return new PairIterator(
+		self.getIndexIterator(),
+		self.getValuesIterator()
+	);
+};
+
+/*
+ * Get an iterator for the index.
+ */
+Series.prototype.getIndexIterator = function () {
+	var self = this;
+	return self._indexIterable();
+};
+
+/*
+ * Get an iterator for the values.
+ */
+Series.prototype.getValuesIterator = function () {
+	var self = this;
+	return self._valuesIterable();
 };
 
 /**
@@ -132,13 +148,8 @@ Series.prototype.getIterator = function () {
 Series.prototype.getIndex = function () {
 	var self = this;
 	return new Series({
-		iterable: function () {		
-			return new SelectIterator(
-				self.getIterator(),
-				function (pair, index) {
-					return [index, pair[0]]; // Extract index.
-				}
-			);
+		values: function () {
+			return self.getIndexIterator();
 		},
 	});
 };
@@ -150,13 +161,8 @@ Series.prototype.resetIndex = function () {
 
 	var self = this;
 	return new Series({
-		iterable: function () {
-			return new SelectIterator(
-				self.getIterator(),
-				function (pair, i) {
-					return [i, pair[1]];
-				}
-			);
+		values: function () {
+			return self.getValuesIterator();
 		},
 	});
 };
@@ -666,56 +672,6 @@ Series.prototype.rollingWindow = function (period, obsoleteSelector) {
 	});
 };
 
-/**
- * Create a new series, reindexed from this series.
- *
- * @param {index} newIndex - The index used to generate the new series.
- */
-Series.prototype.reindex = function (newIndex) {
-	assert.isObject(newIndex, "Expected 'newIndex' parameter to 'reindex' function to be an index.");
-
-	var self = this;
-
-	return new Series({
-		iterable: function () {
-			//
-			// Generate a map to relate an index value to a series value.
-			//
-			var indexMap = {};
-			var indexExists = {};
-
-			E.from(self.getIndex().toValues())
-				.zip(self.toValues(), 
-					function (indexValue, seriesValue) {
-						return [indexValue, seriesValue];
-					}
-				)
-				.toArray()
-				.forEach(function (pair) {
-					var index = pair[0];
-					var value = pair[1];
-
-					if (indexExists[index]) {
-						throw new Error("Duplicate index detected, failed to 'reindex'");
-					}
-
-					indexMap[index] = value;
-					indexExists[index] = true;
-				});
-
-			//
-			// Return the series values in the order specified by the new index.
-			//
-			return new ArrayIterator(E.from(newIndex.toValues())
-				.select(function (newIndexValue) {
-					return [newIndexValue, indexMap[newIndexValue]];
-				})
-				.toArray()
-			);
-		},		
-	});
-};
-
 /** 
  * Format the data frame for display as a string.
  */
@@ -984,13 +940,13 @@ Series.prototype.truncateStrings = function (maxLength) {
 Series.prototype.toValues = function () {
 
 	var self = this;
-	var iterator = self.getIterator();
+	var iterator = self.getValuesIterator();
 	validateIterator(iterator);
 
 	var values = [];
 
 	while (iterator.moveNext()) {
-		values.push(iterator.getCurrent()[1]);
+		values.push(iterator.getCurrent());
 	}
 
 	return values;
@@ -1042,7 +998,7 @@ Series.prototype.count = function () {
 
 	var self = this;
 	var total = 0;
-	var iterator = self.getIterator();
+	var iterator = self.getValuesIterator();
 
 	while (iterator.moveNext()) {
 		++total;

@@ -24,7 +24,7 @@ describe('Series', function () {
 	it('default index is generated', function () {
 		
 		var column = new dataForge.Series({ values: [100, 200] });
-		expect(column.getIndex().toValues()).to.eql([			
+		expect(column.getIndex().take(2).toValues()).to.eql([			
 			0,
 			1			
 		]);		
@@ -43,7 +43,7 @@ describe('Series', function () {
 
 		var series = new dataForge.Series({ values: [100, 200], index: [5, 6] });
 		var reset = series.resetIndex();
-		expect(reset.getIndex().toValues()).to.eql([
+		expect(reset.getIndex().take(2).toValues()).to.eql([
 			0,
 			1
 		]);
@@ -560,30 +560,7 @@ describe('Series', function () {
 		var values = newSeries.toValues();
 		expect(values).to.eql([2, 3, 4, 5]);
 	});
-
-	it('can reindex series', function () {
-
-		var series = initSeries([0, 1, 2, 3], [100, 300, 200, 5]);
-		var newIndex = new Series({ values: [3, 10, 1, 32] });
-
-		var reindexed = series.reindex(newIndex);
-		expect(reindexed.getIndex().toValues()).to.eql([3, 10, 1, 32]);
-		expect(reindexed.toValues()).to.eql([5, undefined, 300, undefined]);
-	});
-
-	it('reindexing a series with duplicate indicies throws', function () {
-
-		var series = initSeries([0, 1, 1, 3], [100, 300, 200, 5]);
-		var newIndex = new Series({ values: [3, 10, 1, 32] });
-
-		var reindexed = series.reindex(newIndex);
-
-		expect(function () {
-			reindexed.toValues(); // Force lazy evaluation to complete.
-			
-		}).to.throw(Error);
-	});
-
+	
 	it('can compute pct changed', function () {
 
 		var series = initSeries([0, 1, 2, 3], [1, 2, 4, 8]);
@@ -756,7 +733,7 @@ describe('Series', function () {
 		var series = initSeries([1], [1]);
 		var types = series.detectTypes();
 		expect(types.getColumnNames()).to.eql(['Type', 'Frequency']);
-		expect(types.getIndex().toValues()).to.eql([0]);
+		expect(types.getIndex().take(1).toValues()).to.eql([0]);
 		expect(types.toRows()).to.eql([
 			['number', 100]
 		]);
@@ -767,7 +744,7 @@ describe('Series', function () {
 		var series = initSeries([1], [new Date(2015, 1, 1)]);
 		var types = series.detectTypes();
 		expect(types.getColumnNames()).to.eql(['Type', 'Frequency']);
-		expect(types.getIndex().toValues()).to.eql([0]);
+		expect(types.getIndex().take(1).toValues()).to.eql([0]);
 		expect(types.toRows()).to.eql([
 			['date', 100]
 		]);
@@ -778,7 +755,7 @@ describe('Series', function () {
 		var series = initSeries([1, 2], [1, 'foo']);
 		var types = series.detectTypes();
 		expect(types.getColumnNames()).to.eql(['Type', 'Frequency']);
-		expect(types.getIndex().toValues()).to.eql([0, 1]);
+		expect(types.getIndex().take(2).toValues()).to.eql([0, 1]);
 		expect(types.toRows()).to.eql([
 			['number', 50],
 			['string', 50],
@@ -789,7 +766,7 @@ describe('Series', function () {
 		var series = initSeries([1, 2], [1, 'foo']);
 		var values = series.detectValues();
 		expect(values.getColumnNames()).to.eql(['Value', 'Frequency']);
-		expect(values.getIndex().toValues()).to.eql([0, 1]);
+		expect(values.getIndex().take(2).toValues()).to.eql([0, 1]);
 		expect(values.toRows()).to.eql([
 			[1, 50],
 			['foo', 50],

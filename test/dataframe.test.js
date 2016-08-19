@@ -324,7 +324,7 @@ describe('DataFrame', function () {
 		]);
 	});
 
-	it('can add column', function () {
+	it('can set new series', function () {
 		
 		var dataFrame = initDataFrame(
 			[ "Date", "Value1", "Value2", "Value3" ],
@@ -336,7 +336,8 @@ describe('DataFrame', function () {
 			],
 			[5, 6, 7, 8]
 		);
-		var modified = dataFrame.setSeries('Value4', [1, 2, 3, 4]);
+		var series = new dataForge.Series({ index: [5, 6, 7, 8], values: [1, 2, 3, 4] });
+		var modified = dataFrame.setSeries('Value4', series);
 		expect(modified.getIndex().toValues()).to.eql([5, 6, 7, 8]);
 		expect(modified.getColumnNames()).to.eql([
 			"Date",
@@ -353,7 +354,7 @@ describe('DataFrame', function () {
 		]);
 	});
 
-	it('can overwrite column', function () {
+	it('can set existing series', function () {
 		
 		var dataFrame = initDataFrame(
 			[ "Date", "Value1", "Value2", "Value3" ],
@@ -365,7 +366,8 @@ describe('DataFrame', function () {
 			],
 			[5, 6, 7, 8]
 		);
-		var modified = dataFrame.setSeries('Value1', [1, 2, 3, 4]);
+		var series = new dataForge.Series({ index: [5, 6, 7, 8], values: [1, 2, 3, 4] });
+		var modified = dataFrame.setSeries('Value1', series);
 		expect(modified.getIndex().toValues()).to.eql([5, 6, 7, 8]);
 		expect(modified.toRows()).to.eql([
 			[new Date(2011, 24, 2), 1, 'c', 3],
@@ -375,7 +377,7 @@ describe('DataFrame', function () {
 		]);
 	});
 
-	it('can add column from other data frame', function () {
+	it('can set series from another data frame', function () {
 		
 		var dataFrame1 = initDataFrame(
 			[ "Date", "Value1", "Value2", "Value3" ],
@@ -447,51 +449,6 @@ describe('DataFrame', function () {
 
 		expect(mergedSeries.getIndex().toValues()).to.eql([5, 7]);
 		expect(mergedSeries.toValues()).to.eql([3, 1]);
-	});
-
-	it('can set column procedurally from a function', function () {
-
-		var original = initDataFrame(
-			[ "Existing" ],
-			[
-				[11],
-				[12],
-			],
-			[5, 6]
-		);		
-
-		var modified = original.setSeries('Generated', 
-				function (row) {
-					return row.Existing * 2;
-				}
-			);
-		expect(original.getColumnNames()).to.eql(["Existing"]);
-		expect(modified.getColumnNames()).to.eql(["Existing", "Generated"]);
-		expect(modified.getSeries("Existing").toValues()).to.eql([11, 12]);
-		expect(modified.getSeries("Generated").toValues()).to.eql([22, 24]);
-	});
-
-	it('can set column procedurally from a function - with index', function () {
-
-		var original = initDataFrame(
-			[ "Existing" ],
-			[
-				[11],
-				[12],
-			],
-			[5, 6]
-		);		
-
-		var modified = original.setSeries('Generated', 
-				function (row, index) {
-					return index;
-				}
-			);
-
-		expect(modified.toPairs()).to.eql([
-			[5, { Existing: 11, Generated: 5 }],
-			[6, { Existing: 12, Generated: 6 }],
-		]);
 	});
 
 	it('can get slice of rows', function () {
@@ -597,7 +554,7 @@ describe('DataFrame', function () {
 		);
 		var dataFrameWithIndexReset = dataFrame.setIndex("Date").resetIndex();
 
-		expect(dataFrameWithIndexReset.getIndex().toValues()).to.eql([
+		expect(dataFrameWithIndexReset.getIndex().take(2).toValues()).to.eql([
 			0,
 			1
 		]);
@@ -621,8 +578,8 @@ describe('DataFrame', function () {
 
 		var detectedTypes = dataFrame.detectTypes();
 		expect(detectedTypes.getColumnNames()).to.eql(["Type", "Frequency", "Column"]);
-		expect(detectedTypes.getIndex().toValues()).to.eql([0, 1, 2]);
-		expect(detectedTypes.toRows()).to.eql([
+		expect(detectedTypes.getIndex().take(3).toValues()).to.eql([0, 1, 2]);
+		expect(detectedTypes.take(3).toRows()).to.eql([
 			['date', 100, "Date"],
 			['string', 50, "Value1"],
 			['number', 50, "Value1"],
@@ -1289,7 +1246,7 @@ describe('DataFrame', function () {
 			[new Date(2015, 24, 2), 200, 'bar', 22],
 		];
 		var dataFrame = new dataForge.DataFrame({ columnNames: columns, rows: rows });
-		expect(dataFrame.getIndex().toValues()).to.eql([0, 1 ]);
+		expect(dataFrame.getIndex().take(2).toValues()).to.eql([0, 1 ]);
 	});
 
 	it('there are no rows or columns when no columns or rows are specified', function () {
