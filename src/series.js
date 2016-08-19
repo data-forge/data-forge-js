@@ -75,18 +75,19 @@ var Series = function (config) {
 	}
 
 	if (config.index) {
-		if (!Object.isArray(config.index)) {
-			assert.isObject(config.index, "Expected 'index' field of 'config' parameter to Series constructor to be an array of values or an Index object.");
+		if (!Object.isFunction(config.index) && !Object.isArray(config.index)) {
+			assert.isObject(config.index, "Expected 'index' field of 'config' parameter to Series constructor to be an array, function or Series object.");
 		}
 	}
 
 	var index = config.index;
-	var values = config.values;
-
 	if (!index) {
 		self._indexIterable = function () {
 			return new CountIterator();
 		};
+	}
+	else if (Object.isFunction(index)) {
+		self._indexIterable = index; //todo: test me!
 	}
 	else if (Object.isArray(index)) {
 		self._indexIterable = function () {
@@ -99,6 +100,7 @@ var Series = function (config) {
 		};
 	}
 
+	var values = config.values;
 	if (Object.isFunction(values)) {
 		self._valuesIterable = values;
 	}
@@ -177,8 +179,12 @@ Series.prototype.skip = function (numRows) {
 
 	var self = this;
 	return new self.Constructor({
-		iterable: function () {
-			return new SkipIterator(self.getIterator(), numRows);
+		index: function () {
+			return new SkipIterator(self.getIndexIterator(), numRows);
+		},
+
+		values: function () {
+			return new SkipIterator(self.getValuesIterator(), numRows);
 		},		
 	}); 	
 };
@@ -227,8 +233,12 @@ Series.prototype.take = function (numRows) {
 
 	var self = this;
 	return new self.Constructor({
-		iterable: function () {
-			return new TakeIterator(self.getIterator(), numRows);
+		index: function () {
+			return new TakeIterator(self.getIndexIterator(), numRows);
+		},
+
+		values: function () {
+			return new TakeIterator(self.getValuesIterator(), numRows);
 		},
 	});
 };
@@ -1013,13 +1023,13 @@ Series.prototype.count = function () {
 Series.prototype.first = function () {
 
 	var self = this;
-	var iterator = self.getIterator();
+	var iterator = self.getValuesIterator();
 
 	if (!iterator.moveNext()) {
 		throw new Error("No values in Series.");
 	}
 
-	return iterator.getCurrent()[1];
+	return iterator.getCurrent();
 };
 
 /**
@@ -1028,7 +1038,7 @@ Series.prototype.first = function () {
 Series.prototype.last = function () {
 
 	var self = this;
-	var iterator = self.getIterator();
+	var iterator = self.getValuesIterator();
 
 	if (!iterator.moveNext()) {
 		throw new Error("No values in Series.");
@@ -1038,7 +1048,7 @@ Series.prototype.last = function () {
 		; // Don't evaluate each item, it's too expensive.
 	}
 
-	return iterator.getCurrent()[1]; // Just evaluate the last item of the iterator.
+	return iterator.getCurrent(); // Just evaluate the last item of the iterator.
 };
 
 /**
@@ -1081,13 +1091,13 @@ Series.prototype.lastPair = function () {
 Series.prototype.firstIndex = function () {
 
 	var self = this;
-	var iterator = self.getIterator();
+	var iterator = self.getIndexIterator();
 
 	if (!iterator.moveNext()) {
 		throw new Error("No values in Series.");
 	}
 
-	return iterator.getCurrent()[0];
+	return iterator.getCurrent();
 };
 
 /**
@@ -1096,7 +1106,7 @@ Series.prototype.firstIndex = function () {
 Series.prototype.lastIndex = function () {
 
 	var self = this;
-	var iterator = self.getIterator();
+	var iterator = self.getIndexIterator();
 
 	if (!iterator.moveNext()) {
 		throw new Error("No values in Series.");
@@ -1106,7 +1116,7 @@ Series.prototype.lastIndex = function () {
 		; // Don't evaluate each item, it's too expensive.
 	}
 
-	return iterator.getCurrent()[0];
+	return iterator.getCurrent();
 };
 
 /** 

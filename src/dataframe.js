@@ -222,8 +222,8 @@ var DataFrame = function (config) {
 	assert.isObject(config, "Expected 'config' parameter to DataFrame constructor to be an object with options for initialisation.");
 
 	if (config.index) {
-		if (!Object.isArray(config.index)) {
-			assert.isObject(config.index, "Expected 'index' member of 'config' parameter to DataFrame constructor to be an object.");			
+		if (!Object.isFunction(config.index) && !Object.isArray(config.index)) {
+			assert.isObject(config.index, "Expected 'index' member of 'config' parameter to DataFrame constructor to be an array, function or Series object.");			
 		}
 	}
 
@@ -267,8 +267,11 @@ var DataFrame = function (config) {
 	var columns = config.columns;
 
 	if (config.index) {
-		var index = config.index;
-		if (Object.isArray(index)) { // Index is an array.
+		var index = config.index; //todo: test me!
+		if (Object.isFunction(index)) { // Index is a function that returns an iterator.
+			this._indexIterable = index;
+		}
+		else if (Object.isArray(index)) { // Index is an array.
 			this._indexIterable = function () {
 				return new ArrayIterator(index);
 			};
