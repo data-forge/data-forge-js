@@ -541,25 +541,7 @@ DataFrame.prototype.setSeries = function (columnName, series) {
 DataFrame.prototype.setIndex = function (columnName) {
 
 	var self = this;
-	return new DataFrame({
-		columnNames: self.getColumnNames(),
-		iterable: function () {
-			return new PairIterator(
-				new SelectIterator(
-					self.getSeries(columnName).getIterator(),
-					function (pair) {
-						return pair[1];
-					}
-				),				
-				new SelectIterator(
-					self.getIterator(),
-					function (pair) {
-						return pair[1];
-					}
-				)
-			);
-		},
-	});
+	return self.withIndex(self.getSeries(columnName));
 };
 
 /**
