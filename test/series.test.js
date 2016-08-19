@@ -38,6 +38,34 @@ describe('Series', function () {
 			6
 		]);		
 	});
+
+	it('can set new index from array', function () {
+
+		var series = new dataForge.Series({ values: [100, 200], index: [5, 6] });
+		var modified = series.withIndex([10, 20]);
+		expect(modified.getIndex().toValues()).to.eql([
+			10,
+			20
+		]);		
+		expect(modified.toValues()).to.eql([
+			100,
+			200
+		]);		
+	});
+
+	it('can set new index from Series', function () {
+
+		var series = new dataForge.Series({ values: [100, 200], index: [5, 6] });
+		var modified = series.withIndex(new dataForge.Series({ values: [10, 20] }));
+		expect(modified.getIndex().toValues()).to.eql([
+			10,
+			20
+		]);		
+		expect(modified.toValues()).to.eql([
+			100,
+			200
+		]);		
+	});
 	
 	it('can reset index', function () {
 

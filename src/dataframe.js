@@ -563,6 +563,27 @@ DataFrame.prototype.setIndex = function (columnName) {
 };
 
 /**
+ * Apply a new index to the DataFrame.
+ * 
+ * @param {array|Series} newIndex - The new index to apply to the series.
+ */
+DataFrame.prototype.withIndex = function (newIndex) {
+
+	if (!Object.isArray(newIndex)) {
+		assert.isObject(newIndex, "'Expected 'newIndex' parameter to 'DataFrame.withIndex' to be an array or Series object.");
+	}	
+
+	var self = this;
+	return new DataFrame({
+		index: newIndex,
+		values: function () { 
+			return self.getValuesIterator();
+		}, 
+	});
+};
+
+
+/**
  * Reset the index of the data frame back to the default sequential integer index.
  */
 DataFrame.prototype.resetIndex = function () {

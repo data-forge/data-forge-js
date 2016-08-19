@@ -165,6 +165,26 @@ Series.prototype.getIndex = function () {
 };
 
 /**
+ * Apply a new index to the Series.
+ * 
+ * @param {array|Series} newIndex - The new index to apply to the Series.
+ */
+Series.prototype.withIndex = function (newIndex) {
+
+	if (!Object.isArray(newIndex)) {
+		assert.isObject(newIndex, "'Expected 'newIndex' parameter to 'Series.withIndex' to be an array or Series object.");
+	}	
+
+	var self = this;
+	return new Series({
+		index: newIndex,
+		values: function () { 
+			return self.getValuesIterator();
+		}, 
+	});
+};
+
+/**
  * Reset the index of the data frame back to the default sequential integer index.
  */
 Series.prototype.resetIndex = function () {

@@ -542,6 +542,34 @@ describe('DataFrame', function () {
 		]);
 	});
 
+	it('can set new index from array', function () {
+
+		var dataFrame = new DataFrame({
+			columnNames: ["C1"],
+			values: [[10], [30]],
+			index: [1, 2],
+		});
+
+		console.log(dataFrame.toPairs()); 
+
+		var modified = dataFrame.withIndex([5, 6]);
+		expect(modified.getIndex().toValues()).to.eql([5, 6]);
+		expect(modified.toRows()).to.eql([[10], [30]]);
+	});
+
+	it('can set new index from Series', function () {
+
+		var dataFrame = new DataFrame({
+			columnNames: ["C1"],
+			values: [[10], [30]],
+			index: [1, 2],
+		});
+
+		var modified = dataFrame.withIndex(new dataForge.Series({ values: [5, 6] }));
+		expect(modified.getIndex().toValues()).to.eql([5, 6]);
+		expect(modified.toRows()).to.eql([[10], [30]]);
+	});
+
 	it('can reset index', function () {
 
 		var dataFrame = initDataFrame(
