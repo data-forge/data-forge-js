@@ -167,7 +167,7 @@ module.exports = function (leftDataFrame, rightDataFrame, columnName) {
 
 		return new DataFrame({
 			columnNames: mergedColumnNames,
-			rows: function () {
+			values: function () {
 				return new ArrayIterator(mergedValues);
 			},
 			index: outputIndices,
@@ -286,7 +286,7 @@ module.exports = function (leftDataFrame, rightDataFrame, columnName) {
 
 		return new DataFrame({
 			columnNames: mergedColumnNames,
-			rows: function () {
+			values: function () {
 				return new ArrayIterator(mergedValues);
 			},
 			index: outputIndices,

@@ -16,7 +16,7 @@ describe('merge-performance', function () {
 
 		var df1 = new dataForge.DataFrame({
 			columnNames: ["Index", "Column1"],
-			rows: E.range(0, numRows).select(function (i) {
+			values: E.range(0, numRows).select(function (i) {
 					return [i, i*i];
 				})
 				.toArray()
@@ -24,7 +24,7 @@ describe('merge-performance', function () {
 
 		var df2 = new dataForge.DataFrame({
 			columnNames: ["Index", "Column2"],
-			rows: E.range(0, numRows).select(function (i) {
+			values: E.range(0, numRows).select(function (i) {
 					return [i, i+i];
 				})
 				.toArray()

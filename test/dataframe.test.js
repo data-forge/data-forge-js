@@ -19,7 +19,7 @@ describe('DataFrame', function () {
 		
 		var config = {
 			columnNames: columns,
-			rows: values,			
+			values: values,			
 		};
 
 		if (index) {
@@ -161,7 +161,7 @@ describe('DataFrame', function () {
 
 		var dataFrame = new DataFrame({
 			columnNames: ["C1"],
-			rows: [
+			values: [
 				[1]
 			],
 		});
@@ -1188,7 +1188,7 @@ describe('DataFrame', function () {
 	it('can get columns', function () {
 
 		var columns = ["Date", "Value1", "Value2","Value3" ];	
-		var dataFrame = new dataForge.DataFrame({ columnNames: columns, rows: [] });
+		var dataFrame = new dataForge.DataFrame({ columnNames: columns, values: [] });
 		expect(dataFrame.getColumnNames()).to.eql(columns);
 	});
 
@@ -1199,7 +1199,7 @@ describe('DataFrame', function () {
 			[new Date(1975, 24, 2), 100, 'foo', 11],
 			[new Date(2015, 24, 2), 200, 'bar', 22],
 		];
-		var dataFrame = new dataForge.DataFrame({ columnNames: columns, rows: rows });
+		var dataFrame = new dataForge.DataFrame({ columnNames: columns, values: rows });
 		expect(dataFrame.toRows()).to.eql(rows);
 	});
 
@@ -1213,7 +1213,7 @@ describe('DataFrame', function () {
 		var iterable = function ()  {
 			return new ArrayIterator(rows);
 		};
-		var dataFrame = new dataForge.DataFrame({ columnNames: columns, rows: iterable });
+		var dataFrame = new dataForge.DataFrame({ columnNames: columns, values: iterable });
 		expect(dataFrame.toRows()).to.eql(rows);
 	});
 
@@ -1232,7 +1232,7 @@ describe('DataFrame', function () {
 		var iterable = function ()  {
 			return new ArrayIterator(rows);
 		};
-		var dataFrame = new dataForge.DataFrame({ rows: iterable });
+		var dataFrame = new dataForge.DataFrame({ values: iterable });
 		expect(dataFrame.getColumnNames()).to.eql(["V1", "V2"]);
 		expect(dataFrame.getSeries("V1").toValues()).to.eql([1, 2]);
 		expect(dataFrame.getSeries("V2").toValues()).to.eql([10, 100]);
@@ -1245,7 +1245,7 @@ describe('DataFrame', function () {
 			[new Date(1975, 24, 2), 100, 'foo', 11],
 			[new Date(2015, 24, 2), 200, 'bar', 22],
 		];
-		var dataFrame = new dataForge.DataFrame({ columnNames: columns, rows: rows });
+		var dataFrame = new dataForge.DataFrame({ columnNames: columns, values: rows });
 		expect(dataFrame.getIndex().take(2).toValues()).to.eql([0, 1 ]);
 	});
 
@@ -1268,7 +1268,7 @@ describe('DataFrame', function () {
 	it('can initialize from array of objects', function () {
 
 		var dataFrame = new dataForge.DataFrame({
-				rows: [
+				values: [
 					{
 						Col1: 1,
 						Col2: 'hello',
@@ -1301,7 +1301,7 @@ describe('DataFrame', function () {
 	it('can initialize from array of objects with different fields', function () {
 
 		var dataFrame = new dataForge.DataFrame({
-				rows: [
+				values: [
 					{
 						Col1: 1,
 						Col2: 'hello',
@@ -1340,7 +1340,7 @@ describe('DataFrame', function () {
 	it('can initialize from array of objects with zero fields', function () {
 
 		var dataFrame = new dataForge.DataFrame({
-				rows: [
+				values: [
 					{},
 					{}
 				]
@@ -1390,13 +1390,13 @@ describe('DataFrame', function () {
 
 		var df1 = new DataFrame({
 			columnNames: ["c"],
-			rows: [[1], [2]],
+			values: [[1], [2]],
 			index: [20, 27],
 		});
 
 		var df2 = new DataFrame({
 			columnNames: ["x"],
-			rows: [[100], [200]],
+			values: [[100], [200]],
 			index: [30, 62],
 		});
 
@@ -1534,7 +1534,7 @@ describe('DataFrame', function () {
 
 		var df = new DataFrame({
 			columnNames: ['c1', 'c2'],
-			rows: [
+			values: [
 				[1, 15], // 0
 				[1, 35], // 1
 				[3, 35], // 2
@@ -1568,7 +1568,7 @@ describe('DataFrame', function () {
 
 		var df = new DataFrame({
 			columnNames: ["Date", "Ticker", "Close"],
-			rows: [
+			values: [
 				["2016-06-01", "1PG", 5.2],
 				["2016-06-02", "1PG", 5.3],
 				["2016-06-03", "1PG", 5.4],
@@ -1588,7 +1588,7 @@ describe('DataFrame', function () {
 
 		var df = new DataFrame({
 			columnNames: ["Date", "Ticker", "Close"],
-			rows: [
+			values: [
 				["2016-06-01", "1PG", 5.2],
 				["2016-06-02", "1PG", 5.3],
 				["2016-06-03", "1PG", 5.4],
@@ -1608,7 +1608,7 @@ describe('DataFrame', function () {
 
 		var df = new DataFrame({
 			columnNames: ["Date", "Ticker", "Close"],
-			rows: [
+			values: [
 				["2016-06-02", "1PG", 5.2],
 				["2016-06-02", "ABC", 5.2],
 				["2016-06-02", "MPL", 1.2],
@@ -1647,7 +1647,7 @@ describe('DataFrame', function () {
 		var dataFrame = new DataFrame({ 
 			columnNames: ["Column1"],
 			index:  [100, 200, 300],
-			rows:   [[10], [20], [30]],
+			values:   [[10], [20], [30]],
 		});
 
 		expect(dataFrame.contains({ Column1: 20 })).to.eql(true);
@@ -1658,7 +1658,7 @@ describe('DataFrame', function () {
 		var dataFrame = new DataFrame({ 
 			columnNames: ["Column1"],
 			index:  [100, 200, 300],
-			rows:   [[10], [20], [30]],
+			values:   [[10], [20], [30]],
 		});
 
 		expect(dataFrame.contains({ Column1: 3000 })).to.eql(false);
@@ -1669,7 +1669,7 @@ describe('DataFrame', function () {
 		var dataFrame1 = new DataFrame({
 			columnNames: ["Column1"],
 			index: [1, 2],
-			rows: [[10], [20]],
+			values: [[10], [20]],
 		});
 		var dataFrame2 = new DataFrame();
 
@@ -1686,7 +1686,7 @@ describe('DataFrame', function () {
 		var dataFrame2 = new DataFrame({
 			columnNames: ["Column1"],
 			index: [3, 4],
-			rows: [[30], [40]],
+			values: [[30], [40]],
 		});
 
 		var output = dataFrame1.concat(dataFrame2); 
@@ -1701,12 +1701,12 @@ describe('DataFrame', function () {
 		var dataFrame1 = new DataFrame({
 			columnNames: ["Column1"],
 			index: [1, 2],
-			rows: [[10], [20]],
+			values: [[10], [20]],
 		});
 		var dataFrame2 = new DataFrame({
 			columnNames: ["Column1"],
 			index: [3, 4],
-			rows: [[30], [40]],
+			values: [[30], [40]],
 		});
 
 		var output = dataFrame1.concat(dataFrame2); 
@@ -1722,7 +1722,7 @@ describe('DataFrame', function () {
 
 		var df = new DataFrame({
 			columnNames: ["V1", "V2"],
-			rows: [
+			values: [
 				['1', '2'],
 				['10', '11'],
 			],
@@ -1739,7 +1739,7 @@ describe('DataFrame', function () {
 
 		var df = new DataFrame({
 			columnNames: ["V1", "V2"],
-			rows: [
+			values: [
 				['1', '2'],
 				['10', '11'],
 			],
@@ -1756,7 +1756,7 @@ describe('DataFrame', function () {
 
 		var df = new DataFrame({
 			columnNames: ["V1", "V2"],
-			rows: [
+			values: [
 				[1, 2],
 				[10, 11],
 			],
@@ -1774,7 +1774,7 @@ describe('DataFrame', function () {
 
 		var df = new DataFrame({
 			columnNames: ["V1", "V2"],
-			rows: [
+			values: [
 				[1, 2],
 				[10, 11],
 			],

@@ -17,7 +17,7 @@ describe('data-forge', function () {
 
 		return new dataForge.DataFrame({
 			columnNames: columns,
-			rows: function () {
+			values: function () {
 				return new ArrayIterator(values);
 			},
 			index: index,

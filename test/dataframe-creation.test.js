@@ -13,7 +13,7 @@ describe('dataframe creation', function () {
 		var columnNames = ["c1", "c2"];
 		var dataFrame = new DataFrame({
 			columnNames: columnNames,
-			rows: [
+			values: [
 				[1, 2],
 				[3, 4],
 			],
@@ -31,7 +31,7 @@ describe('dataframe creation', function () {
 		var columnNames = ["c1", "c2"];
 		var dataFrame = new DataFrame({
 			columnNames: columnNames,
-			rows: [
+			values: [
 				[1, 2],
 				[3, 4],
 			],
@@ -50,7 +50,7 @@ describe('dataframe creation', function () {
 		var columnNames = ["c1", "c2"];
 		var dataFrame = new DataFrame({
 			columnNames: columnNames,
-			rows: [
+			values: [
 				[1, 2],
 				[3, 4],
 			],
@@ -67,7 +67,7 @@ describe('dataframe creation', function () {
 	it('can create from objects', function () {
 		
 		var dataFrame = new DataFrame({
-			rows: [
+			values: [
 				{ c1: 1, c2: 2 },
 				{ c1: 3, c2: 4 },
 			],
@@ -84,7 +84,7 @@ describe('dataframe creation', function () {
 	it('creating from objects with variable fields - by default just uses first row to determine column names', function () {
 		
 		var dataFrame = new DataFrame({
-			rows: [
+			values: [
 				{ c1: 1, c2: 2 },
 				{ c3: 3, c4: 4 },
 			],
@@ -101,7 +101,7 @@ describe('dataframe creation', function () {
 	it('creating from objects with variable fields - can force all rows to be considered to determine column names', function () {
 		
 		var dataFrame = new DataFrame({
-			rows: [
+			values: [
 				{ c1: 1, c2: 2 },
 				{ c3: 3, c4: 4 },
 			],
@@ -119,7 +119,7 @@ describe('dataframe creation', function () {
 	it('creating from objects with variable fields - can force all rows to be considered to determine column names - rows come from function', function () {
 		
 		var dataFrame = new DataFrame({
-			rows: function () {
+			values: function () {
 				return new ArrayIterator([
 					{ c1: 1, c2: 2 },
 					{ c3: 3, c4: 4 },
@@ -159,7 +159,7 @@ describe('dataframe creation', function () {
 	it('can create from objects with index', function () {
 		
 		var dataFrame = new DataFrame({
-			rows: [
+			values: [
 				{ c1: 1, c2: 2 },
 				{ c1: 3, c2: 4 },
 			],
@@ -177,7 +177,7 @@ describe('dataframe creation', function () {
 	it('can create from objects with array index', function () {
 		
 		var dataFrame = new DataFrame({
-			rows: [
+			values: [
 				{ c1: 1, c2: 2 },
 				{ c1: 3, c2: 4 },
 			],
@@ -236,7 +236,7 @@ describe('dataframe creation', function () {
 		var columnNames = ["c1", "c2"];
 		var dataFrame = new DataFrame({
 			columnNames: columnNames,
-			rows: function () {
+			values: function () {
 				return new ArrayIterator([
 					[1, 2],
 					[3, 4],
@@ -257,7 +257,7 @@ describe('dataframe creation', function () {
 		var columnNames = ["c1", "c2"];
 		var dataFrame = new DataFrame({
 			columnNames: columnNames,
-			rows: function () {
+			values: function () {
 				return new ArrayIterator([
 					[1, 2],
 					[3, 4],
@@ -276,7 +276,7 @@ describe('dataframe creation', function () {
 	it('can create from objects iterable', function () {
 		
 		var dataFrame = new DataFrame({
-			rows: function () {
+			values: function () {
 				return new ArrayIterator([
 					{ c1: 1, c2: 2 },
 					{ c1: 3, c2: 4 },
@@ -295,7 +295,7 @@ describe('dataframe creation', function () {
 	it('can create from objects iterable with index', function () {
 		
 		var dataFrame = new DataFrame({
-			rows: function () {
+			values: function () {
 				return new ArrayIterator([
 					{ c1: 1, c2: 2 },
 					{ c1: 3, c2: 4 },
@@ -315,7 +315,7 @@ describe('dataframe creation', function () {
 	it("can handle undefined row", function () {
 		var d = new DataFrame({
 			columnNames: ["c1", "c2"],
-			rows: [
+			values: [
 				[1, 2],
 				undefined,
 				[5, 2]
@@ -332,7 +332,7 @@ describe('dataframe creation', function () {
 		expect(function () {
 			new DataFrame({
 				columnNames: ["c1", "c2"],
-				rows: [
+				values: [
 					[1, 2],
 					undefined,
 					[5, 2]
@@ -345,7 +345,7 @@ describe('dataframe creation', function () {
 	it("test case that was broken due to missing comma", function () {
 		var d = new DataFrame({
 			columnNames: ["c1", "c2"],
-			rows: [
+			values: [
 				[1, 2],
 				[1, 3],
 				[5, 2]  // Missing comma here was causing a problem. This entire row goes missing from the data frame.
@@ -364,7 +364,7 @@ describe('dataframe creation', function () {
 		expect(function () {
 			new DataFrame({
 				columnNames: ["c1", "c2"],
-				rows: [
+				values: [
 					[1, 2],
 					[1, 3],
 					[5, 2]  // Missing comma here was causing a problem. This entire row goes missing from the data frame.

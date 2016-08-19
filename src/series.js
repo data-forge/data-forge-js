@@ -829,7 +829,7 @@ Series.prototype.detectTypes = function () {
 
 	return new DataFrame({
 		columnNames: ["Type", "Frequency"],
-		rows: function () { //todo: make this properly lazy.
+		values: function () { //todo: make this properly lazy.
 			var values = self.toValues();
 			var totalValues = values.length;
 
@@ -879,7 +879,7 @@ Series.prototype.detectValues = function () {
 
 	return new DataFrame({
 		columnNames: ["Value", "Frequency"],
-		rows: function () {
+		values: function () {
 			var values = self.toValues();
 			var totalValues = values.length;
 

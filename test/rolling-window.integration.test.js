@@ -12,7 +12,7 @@ describe('rolling window integration', function () {
 
 		var dataFrame = new dataForge.DataFrame({
 			columnNames: [ "Value" ],
-			rows: E.range(1, 12)
+			values: E.range(1, 12)
 				.select(function (i) {
 					return [i];
 				})
@@ -56,7 +56,7 @@ describe('rolling window integration', function () {
 		
 		var config = {
 			columnNames: columns,
-			rows: values,			
+			values: values,			
 		};
 
 		if (index) {

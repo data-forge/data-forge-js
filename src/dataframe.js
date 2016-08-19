@@ -208,7 +208,7 @@ var DataFrame = function (config) {
 		return;
 	}
 
-	if (!config.rows &&  !config.columns) {
+	if (!config.values &&  !config.columns) {
 		self._columnNames = config.columnNames || [];
 		self._indexIterable = function () {
 			return new EmptyIterator();
@@ -234,28 +234,28 @@ var DataFrame = function (config) {
 			assert.isString(columnName, "Expected 'columnNames' member of 'config' parameter to DataFrame constructor to be an array of strings or a function that produces an array of strings.");
 		});
 
-		if (!config.rows) {
-			throw new Error("Expected to find a 'rows' member of 'config' parameter to DataFrame constructor.");
+		if (!config.values) {
+			throw new Error("Expected to find a 'values' member of 'config' parameter to DataFrame constructor.");
 		}
 
-	 	if (!Object.isFunction(config.rows)) {
-			assert.isArray(config.rows, "Expected 'rows' member of 'config' parameter to DataFrame constructor to be an array of rows.");
+	 	if (!Object.isFunction(config.values)) {
+			assert.isArray(config.values, "Expected 'values' member of 'config' parameter to DataFrame constructor to be an array of rows.");
 
 			if (config.debug) {
-				config.rows.forEach(function (row) {
-					assert.isArray(row, "Expected 'rows' member of 'config' parameter to DataFrame constructor to be an array of arrays, an array of objects or an iterator.");
+				config.values.forEach(function (row) {
+					assert.isArray(row, "Expected 'values' member of 'config' parameter to DataFrame constructor to be an array of arrays, an array of objects or an iterator.");
 				});
 			}
 		}
 	}
-	else if (config.rows) {
-		assert(!config.columns, "Can't use both 'rows' and 'columns' fields of 'config' parameter to DataFrame constructor.");
+	else if (config.values) {
+		assert(!config.columns, "Can't use both 'values' and 'columns' fields of 'config' parameter to DataFrame constructor.");
 
-		if (!Object.isFunction(config.rows)) {
-			assert.isArray(config.rows, "Expected 'rows' member of 'config' parameter to DataFrame constructor to be an array of JavaScript objects.");
+		if (!Object.isFunction(config.values)) {
+			assert.isArray(config.values, "Expected 'values' member of 'config' parameter to DataFrame constructor to be an array of JavaScript objects.");
 			
-			if (config.rows.length > 0) {
-				assert.isObject(config.rows[0], "Expected 'rows' member of 'config' parameter to DataFrame constructor to be an array of JavaScript objects.")
+			if (config.values.length > 0) {
+				assert.isObject(config.values[0], "Expected 'values' member of 'config' parameter to DataFrame constructor to be an array of JavaScript objects.")
 			}
 		}
 	}
@@ -263,7 +263,7 @@ var DataFrame = function (config) {
 		assert.isObject(config.columns, "Expected 'columns' member of 'config' parameter to DataFrame constructor to be an object with fields that define columns.");
 	}
 
-	var rows = config.rows;
+	var values = config.values;
 	var columns = config.columns;
 
 	if (config.index) {
@@ -293,38 +293,38 @@ var DataFrame = function (config) {
 	if (config.columnNames)	{
 		self._columnNames = config.columnNames;
 
-		if (Object.isFunction(rows)) {
+		if (Object.isFunction(values)) {
 			this._valuesIterable = function () {
-				return convertRowsToObjects(self._columnNames, rows());
+				return convertRowsToObjects(self._columnNames, values());
 			};
 		}
 		else {
 			this._valuesIterable = function () {
-				return convertRowsToObjects(self._columnNames, new ArrayIterator(rows));
+				return convertRowsToObjects(self._columnNames, new ArrayIterator(values));
 			};
 		}
 	}
 	else {
-		if (rows) {
-			if (Object.isFunction(rows)) {
-				self._columnNames = determineColumnNamesFromObjectsIterable(rows, config.considerAllRows);
+		if (values) {
+			if (Object.isFunction(values)) {
+				self._columnNames = determineColumnNamesFromObjectsIterable(values, config.considerAllRows);
 			}
 			else {
 				// Derive column names from object fields.
-				self._columnNames = determineColumnNamesFromObjectRows(rows, config.considerAllRows);
+				self._columnNames = determineColumnNamesFromObjectRows(values, config.considerAllRows);
 			}
 		}
 		else {
 			self._columnNames = Object.keys(columns);
 		}
 
-		if (rows) {
-			if (Object.isFunction(rows)) {
-				this._valuesIterable = rows;
+		if (values) {
+			if (Object.isFunction(values)) {
+				this._valuesIterable = values;
 			}
 			else {
 				this._valuesIterable = function () {
-					return new ArrayIterator(rows);
+					return new ArrayIterator(values);
 				};
 			}
 		}
@@ -612,7 +612,7 @@ DataFrame.prototype.setSeries = function (columnName, series) {
 
 	return new DataFrame({
 		index: self.getIndex(),
-		rows: function () {
+		values: function () {
 			return new SelectIterator(
 				self.getIterator(),
 				function (pair) {
@@ -864,7 +864,7 @@ DataFrame.prototype.truncateStrings = function (maxLength) {
 
 	return new DataFrame({
 			columnNames: self.getColumnNames(),
-			rows: truncatedValues,
+			values: truncatedValues,
 		});
 };
 
@@ -886,7 +886,7 @@ DataFrame.prototype.remapColumns = function (columnNames) {
 
 	return new DataFrame({
 		columnNames: columnNames,
-		rows: function () { //todo: make this properly lazy.
+		values: function () { //todo: make this properly lazy.
 			return new ArrayIterator(
 				E.from(self.toRows())
 					.select(function (row) {
@@ -1369,7 +1369,7 @@ DataFrame.prototype.variableWindow = function (comparer, obsoleteSelector) {
 	}
 
 	return new DataFrame({
-			rows: E.from(output)
+			values: E.from(output)
 				.select(function (pair) {
 					return pair[1];
 				})

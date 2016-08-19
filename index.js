@@ -81,7 +81,7 @@ var dataForge = {
 		}
 
 		var baseConfig = {
-			rows: JSON.parse(jsonTextString)
+			values: JSON.parse(jsonTextString)
 		};
 
 		var dataFrameConfig = extend({}, config || {}, baseConfig);
@@ -129,7 +129,7 @@ var dataForge = {
 		*/
 
 		if (rows.length === 0) {
-			return new dataForge.DataFrame({ columnNames: [], rows: [] });
+			return new dataForge.DataFrame({ columnNames: [], values: [] });
 		}
 				
 		var columnNames = E.from(E.from(rows).first())
@@ -151,7 +151,7 @@ var dataForge = {
 
 		var baseConfig = {
 			columnNames: columnNames, 
-			rows: remaining,
+			values: remaining,
 		};
 		var dataFrameConfig = extend({}, config || {}, baseConfig);
 		return new dataForge.DataFrame(dataFrameConfig);
@@ -227,7 +227,7 @@ var dataForge = {
 				})
 				.toArray(),
 
-			rows: function () {
+			values: function () {
 				var rowIndex = 0;
 				var nextValue = start;
 				var curRow = undefined;

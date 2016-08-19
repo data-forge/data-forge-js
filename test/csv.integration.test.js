@@ -13,7 +13,7 @@ describe('csv.integration', function () {
 					"Value2",
 					"Value3",
 				],
-				rows: [
+				values: [
 					['1975-2-24', '100', 'foo', '11'],
 					['2015-2-24', '200', 'bar', '22'],
 				]

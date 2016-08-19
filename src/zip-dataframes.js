@@ -41,6 +41,6 @@ module.exports = function (dataFrames, selector) {
 
 	return new DataFrame({
 		index: dataFrames[0].getIndex(),
-		rows: output,
+		values: output,
 	});
 };

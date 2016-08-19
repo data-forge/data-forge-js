@@ -50,7 +50,7 @@ describe('window performance', function () {
 
 		var dataFrame = new dataForge.DataFrame({
 			columnNames: ["c1"],
-			rows: E.range(0, numItems).select(v => [v]).toArray(),
+			values: E.range(0, numItems).select(v => [v]).toArray(),
 		});
 
 		var stopwatch1 = new Stopwatch();
