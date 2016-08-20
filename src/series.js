@@ -122,6 +122,7 @@ var Series = function (config) {
 
 module.exports = Series;
 
+var concatSeries = require('./concat-series');
 var DataFrame = require('./dataframe');
 var zipSeries = require('./zip-series');
 
@@ -1782,21 +1783,26 @@ Series.prototype.contains = function (value) {
 };
 
 /**
- * Concatenate a series on the end of this one and return the concatenated series.
- *
- * @param {Series} otherSeries - The series to concatenate to the end of this one.
+ * Concatenate multiple other series onto this series.
+ * 
+ * @param {array|Series*} series - Multiple arguments. Each can be either a series or an array of series. 
  */
-Series.prototype.concat = function (otherSeries) {
-
-	assert.instanceOf(otherSeries, Series, "Expected 'otherSeries' parameter to 'Series.concat' to be an instance of Series.");
+Series.prototype.concat = function () {
 
 	var self = this;
-
-	return new self.Constructor({
-		iterable: function () {
-			return new ArrayIterator(self.toPairs().concat(otherSeries.toPairs()))
-		},
-	})
+	return concatSeries(
+		[self].concat(
+			E.from(arguments)
+				.selectMany(function (argument) {
+					if (Object.isArray(argument)) {
+						return argument;
+					}
+					else {
+						return [argument];
+					}
+				})
+				.toArray()
+		)			
+	);
 };
-
 

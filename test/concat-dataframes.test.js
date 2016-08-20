@@ -1,6 +1,6 @@
 'use strict';
 
-describe('concat', function () {
+describe('concat-dataframes', function () {
 
     var expect = require('chai').expect;
 

@@ -177,9 +177,16 @@ var dataForge = {
 	/**
 	 * Concatenate multiple dataframes into a single dataframe.
 	 *
-	 * @param {array} series - Array of dataframes to concatenate. 
+	 * @param {array} dataFrames - Array of dataframes to concatenate. 
 	 */
 	concat: require('./src/concat-dataframes'),
+
+	/**
+	 * Concatenate multiple series into a single series.
+	 * 
+	 * @param {array} series - Array of series to concatenate. 
+	 */
+	concatSeries: require('./src/concat-series'),
 
 	/**
 	 * Generate a series from a range of numbers.
