@@ -500,10 +500,10 @@ DataFrame.prototype.keepSeries = function (columnOrColumns) {
  * @param {string} columnName - The name of the column to add or replace.
  * @param {Series} series - Series to add to the data-frame.
  */
-DataFrame.prototype.setSeries = function (columnName, series) {
+DataFrame.prototype.withSeries = function (columnName, series) {
 
-	assert.isString(columnName, "Expected 'columnName' parameter to 'DataFrame.setSeries' function to be a string that specifies the column to set or replace.");
-	assert.isObject(series, "Expected 'series' parameter to 'DataFrame.setSeries' to be a Series object.");
+	assert.isString(columnName, "Expected 'columnName' parameter to 'DataFrame.withSeries' function to be a string that specifies the column to set or replace.");
+	assert.isObject(series, "Expected 'series' parameter to 'DataFrame.withSeries' to be a Series object.");
 
 	var self = this;
 
@@ -622,11 +622,11 @@ DataFrame.prototype.parseInts = function (columnNameOrNames) {
 	if (Object.isArray(columnNameOrNames)) {
 		return E.from(columnNameOrNames)
 			.aggregate(self, function (self, columnName) {
-				return self.setSeries(columnName, self.getSeries(columnName).parseInts());
+				return self.withSeries(columnName, self.getSeries(columnName).parseInts());
 			});
 	}
 	else {
-		return self.setSeries(columnNameOrNames, self.getSeries(columnNameOrNames).parseInts());
+		return self.withSeries(columnNameOrNames, self.getSeries(columnNameOrNames).parseInts());
 	}
 };
 
@@ -641,11 +641,11 @@ DataFrame.prototype.parseFloats = function (columnNameOrNames) {
 	if (Object.isArray(columnNameOrNames)) {
 		return E.from(columnNameOrNames)
 			.aggregate(self, function (self, columnName) {
-				return self.setSeries(columnName, self.getSeries(columnName).parseFloats());
+				return self.withSeries(columnName, self.getSeries(columnName).parseFloats());
 			});
 	}
 	else {
-		return self.setSeries(columnNameOrNames, self.getSeries(columnNameOrNames).parseFloats());
+		return self.withSeries(columnNameOrNames, self.getSeries(columnNameOrNames).parseFloats());
 	}
 };
 
@@ -665,11 +665,11 @@ DataFrame.prototype.parseDates = function (columnNameOrNames, formatString) {
 	if (Object.isArray(columnNameOrNames)) {
 		return E.from(columnNameOrNames)
 			.aggregate(self, function (self, columnName) {
-				return self.setSeries(columnName, self.getSeries(columnName).parseDates(formatString));
+				return self.withSeries(columnName, self.getSeries(columnName).parseDates(formatString));
 			});
 	}
 	else {
-		return self.setSeries(columnNameOrNames, self.getSeries(columnNameOrNames).parseDates(formatString));
+		return self.withSeries(columnNameOrNames, self.getSeries(columnNameOrNames).parseDates(formatString));
 	}
 };
 
@@ -689,11 +689,11 @@ DataFrame.prototype.toStrings = function (columnNameOrNames, formatString) {
 	if (Object.isArray(columnNameOrNames)) {
 		return E.from(columnNameOrNames)
 			.aggregate(self, function (self, columnName) {
-				return self.setSeries(columnName, self.getSeries(columnName).toStrings(formatString));
+				return self.withSeries(columnName, self.getSeries(columnName).toStrings(formatString));
 			});
 	}
 	else {
-		return self.setSeries(columnNameOrNames, self.getSeries(columnNameOrNames).toStrings(formatString));
+		return self.withSeries(columnNameOrNames, self.getSeries(columnNameOrNames).toStrings(formatString));
 	}
 };
 
@@ -718,7 +718,7 @@ DataFrame.prototype.detectTypes = function () {
 			});
 			return column.series
 				.detectTypes()
-				.setSeries('Column', newSeries);
+				.withSeries('Column', newSeries);
 		})
 		.toArray();
 	return concatDataFrames(dataFrames).resetIndex();
@@ -742,7 +742,7 @@ DataFrame.prototype.detectValues = function () {
 					})
 					.toArray()
 			});
-			return column.series.detectValues().setSeries('Column', newSeries);
+			return column.series.detectValues().withSeries('Column', newSeries);
 		})
 		.toArray();
 	return concatDataFrames(dataFrames).resetIndex();
@@ -980,7 +980,7 @@ DataFrame.prototype.transformSeries = function (columnSelectors) {
 	return E.from(Object.keys(columnSelectors))
 		.aggregate(self, function (prevDataFrame, columnName) {
 			if (prevDataFrame.hasSeries(columnName)) {
-				return prevDataFrame.setSeries(
+				return prevDataFrame.withSeries(
 					columnName,
 					prevDataFrame.getSeries(columnName)
 						.select(columnSelectors[columnName])
@@ -1014,7 +1014,7 @@ DataFrame.prototype.generateSeries = function (generator) {
 
 		return E.from(newColumns.getColumnNames())
 			.aggregate(self, function (prevDataFrame, newColumnName) {
-				return prevDataFrame.setSeries(newColumnName, newColumns.getSeries(newColumnName).bake()).bake();
+				return prevDataFrame.withSeries(newColumnName, newColumns.getSeries(newColumnName).bake()).bake();
 			})
 			;
 	}
@@ -1022,7 +1022,7 @@ DataFrame.prototype.generateSeries = function (generator) {
 		var newColumnNames = Object.keys(generator);
 		return E.from(newColumnNames)
 			.aggregate(self, function (prevDataFrame, newColumnName) {
-				return prevDataFrame.setSeries(newColumnName, prevDataFrame.deflate(generator[newColumnName]).bake()).bake();
+				return prevDataFrame.withSeries(newColumnName, prevDataFrame.deflate(generator[newColumnName]).bake()).bake();
 			})
 			;
 	}

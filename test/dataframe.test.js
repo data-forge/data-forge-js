@@ -74,7 +74,7 @@ describe('DataFrame', function () {
 				],
 				[5, 6]
 			);
-			dataFrame.setSeries('non-existing column name');			
+			dataFrame.withSeries('non-existing column name');			
 		}).to.throw(Error);
 	});
 
@@ -337,7 +337,7 @@ describe('DataFrame', function () {
 			[5, 6, 7, 8]
 		);
 		var series = new dataForge.Series({ index: [5, 6, 7, 8], values: [1, 2, 3, 4] });
-		var modified = dataFrame.setSeries('Value4', series);
+		var modified = dataFrame.withSeries('Value4', series);
 		expect(modified.getIndex().toValues()).to.eql([5, 6, 7, 8]);
 		expect(modified.getColumnNames()).to.eql([
 			"Date",
@@ -367,7 +367,7 @@ describe('DataFrame', function () {
 			[5, 6, 7, 8]
 		);
 		var series = new dataForge.Series({ index: [5, 6, 7, 8], values: [1, 2, 3, 4] });
-		var modified = dataFrame.setSeries('Value1', series);
+		var modified = dataFrame.withSeries('Value1', series);
 		expect(modified.getIndex().toValues()).to.eql([5, 6, 7, 8]);
 		expect(modified.toRows()).to.eql([
 			[new Date(2011, 24, 2), 1, 'c', 3],
@@ -397,7 +397,7 @@ describe('DataFrame', function () {
 			],
 			[5, 6, 7, 8]
 		);
-		var modified = dataFrame2.setSeries('Value4', dataFrame1.getSeries('Value2'));
+		var modified = dataFrame2.withSeries('Value4', dataFrame1.getSeries('Value2'));
 		expect(modified.getColumnNames()).to.eql([
 			"Date",
 			"Value1",
@@ -429,7 +429,7 @@ describe('DataFrame', function () {
 		var newColumnName = "new column";
 		var newIndex = [0, 5, 2, 7];
 		var newSeries = new dataForge.Series({ values: [4, 3, 2, 1], index: newIndex });
-		var modified = dataFrame.setSeries(newColumnName, newSeries);
+		var modified = dataFrame.withSeries(newColumnName, newSeries);
 		var mergedSeries = modified.getSeries(newColumnName);
 
 		expect(modified.getIndex().toValues()).to.eql([5, 6, 7, 8]);
