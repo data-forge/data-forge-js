@@ -576,25 +576,15 @@ An index is actually just another Series so you can call the `toValues` function
 
 New columns can be added to a data-frame. This doesn't change the original data-frame, it generates a new data-frame that contains the additional column.
 
-	var newDf = df.setSeries("Some-New-Column", someNewSeries); 
+	var newDf = df.withSeries("Some-New-Column", someNewSeries); 
 
 ## Replacing a column
 
-`setSeries` can also replace an existing column:
+`withSeries` can also replace an existing column:
 
-	var newDf = df.setSeries("Some-Existing-Column", someNewSeries);
+	var newDf = df.withSeries("Some-Existing-Column", someNewSeries);
 
 Again note that it is only the new data frame that includes the modified column.
-
-## Generating a column
-
-`setSeries` can be passed a function that is used to generate a new column from the existing contents of the date-frame:
-
-	var newDf = df.setSeries("Generated-Column", function (row) {
-			var someValue = ... 
-			// ... generate values for the new column from the contents of the data-frame ...
-			return someValue;
-		});
 
 ## Removing columns
 
@@ -786,7 +776,7 @@ Series can be transformed using `select`:
 		});	
 
 	// Plug the modified series back into the data-frame.
-	var newDf = df.setSeries("Some-Column", newSeries);
+	var newDf = df.withSeries("Some-Column", newSeries);
 
 The source index is preserved to the transformed series.
 
@@ -857,7 +847,7 @@ Pandas-style functions that are currently available:
 
 - pivot
 - merge/mergeSeries
-- getSeries/setSeries
+- getSeries/withSeries
 - window/rollingWindow/variableWindow
 
 # Collapsing unique values
