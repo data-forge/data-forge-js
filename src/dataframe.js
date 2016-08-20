@@ -1287,3 +1287,27 @@ DataFrame.prototype.contains = function (row) {
 			return JSON.stringify(searchRow) === json;
 		});
 };
+
+/**
+ * Concatenate multiple other dataframes onto this dataframe.
+ * 
+ * @param {array|DataFrame*} dataFrames - Multiple arguments. Each can be either a dataframe or an array of dataframe. 
+ */
+DataFrame.prototype.concat = function () {
+
+	var self = this;
+	return concatDataFrames(
+		[self].concat(
+			E.from(arguments)
+				.selectMany(function (argument) {
+					if (Object.isArray(argument)) {
+						return argument;
+					}
+					else {
+						return [argument];
+					}
+				})
+				.toArray()
+		)			
+	);
+};

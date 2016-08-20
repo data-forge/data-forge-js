@@ -175,9 +175,9 @@ var dataForge = {
 	mergeSeries: require('./src/merge-series'),
 
 	/**
-	 * Concatenate multiple data frames into a single.
+	 * Concatenate multiple dataframes into a single dataframe.
 	 *
-	 * @param {array} dataFrames - Array of data frames to concatenate.
+	 * @param {array} series - Array of dataframes to concatenate. 
 	 */
 	concat: require('./src/concat-dataframes'),
 
