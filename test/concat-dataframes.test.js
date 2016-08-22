@@ -159,4 +159,18 @@ describe('concat-dataframes', function () {
             [6],
         ]);
     });
+
+    it('can concat along other axis', function () {
+
+        var df1 = new DataFrame({ columnNames: ["C1"], values: [[1], [2]] });
+        var df2 = new DataFrame({ columnNames: ["C2"], values: [[3], [4]] });
+
+        var concatenated = concat([df1, df2], { axis: 1 })
+        expect(concatenated.getColumnNames()).to.eql(['C1', 'C2']);
+        expect(concatenated.toRows()).to.eql([
+            [1, 3],
+            [2, 4],
+        ]);
+
+    });
 });
