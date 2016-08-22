@@ -736,6 +736,33 @@ There is a [Code Project article](http://www.codeproject.com/Articles/1069489/Hi
 
 # Data transformation
 
+## Concatenation
+
+Series and DataFrames can be concatenated.
+
+	var df1 = ... some dataframe ...
+	var df2 = ... some other dataframe ...
+
+	var concatenated = df1.concat(df2);
+
+Multiple series or dataframes may be passed to concat:
+
+	var concatenated = df1.concat(df2, df3, df4, etc);
+
+Or an array may be used:
+
+	var toConcat = [df2, df3, df4, etc];
+	var concatenated = df1.concat(toConcat); 
+
+You can also concatenate by passing a list to the global data-forge `concat` function:
+
+	var toConcat = [df2, df3, df4, etc];
+	var concatenated = dataForge.concat(toConcat);
+
+Note that when concatenating series using the global function you must use the Series-specific version:
+
+	var concatenatedSeries = dataForge.concatSeries([series1, series2, etc]);
+
 ## Data frame transformation
 
 An data-frame can be transformed using the [LINQ](https://en.wikipedia.org/wiki/Language_Integrated_Query)-style [`select`](http://www.dotnetperls.com/select) function:
