@@ -94,9 +94,9 @@ describe('data-forge', function () {
 
 		var merged = dataForge.merge(left, right);
 		expect(merged.getColumnNames()).to.eql([
-			'merge-key',
+			'merge-key.1',
 			'left-val',
-			'merge-key',
+			'merge-key.2',
 			'right-val',
 			'other-right-value',
 		]);

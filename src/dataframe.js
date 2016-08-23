@@ -200,7 +200,47 @@ var DataFrame = function (config) {
 			var columns = config.columns;
 
 			if (config.columnNames)	{
-				self._columnNames = config.columnNames;
+				//
+				// Rename duplicate columns.
+				//
+				var duplicateColumns = E.from(config.columnNames)
+					.groupBy(function (columnName) {
+						return columnName.toLowerCase();
+					})
+					.select(function (group) {
+						return {
+							name: group.key(),
+							count: group.getSource().length,
+						}
+					})
+					.where(function (column) {
+						return column.count > 1;
+					})
+					.toArray();
+
+				var duplicateColumnCounts = E.from(duplicateColumns)
+					.toObject(
+						function (column) {
+							return column.name;
+						},						
+						function (column) {
+							return 1;
+						}						
+					);
+
+				self._columnNames = E.from(config.columnNames)
+					.select(function (columnName) {
+						var key = columnName.toLowerCase();
+						var columnCount = duplicateColumnCounts[key];
+						if (columnCount) {
+							duplicateColumnCounts[key] += 1; // Increment count. 
+							return columnName + "." + columnCount; // Number duplicates in order.
+						}
+						else {
+							return columnName; // No duplicate.
+						}
+					})
+					.toArray();
 
 				if (Object.isFunction(values)) {
 					config.values = function () {
