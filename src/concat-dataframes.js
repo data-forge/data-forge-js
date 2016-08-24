@@ -21,25 +21,29 @@ module.exports = function (dataFrames, options) {
 	}
 
 	if (options && options.axis === 1) {
+		var columnNames = E.from(dataFrames)
+			.selectMany(function (dataFrame) {
+				return dataFrame.getColumnNames();
+			})
+			.toArray();
+
+		var rows = E.from(dataFrames)
+			.select(function (dataFrame) {
+				return dataFrame.toRows();
+			})
+			.toArray();
+
+		var concatenatedRows = E.from(rows)
+			.aggregate(function (prev, cur) {
+				return E.from(prev).zip(cur, function (p, c) {
+						return p.concat(c);
+					})
+					.toArray();
+			});
+
 		return new DataFrame({
-			values: function () {
-				var iterators = E.from(dataFrames)
-					.select(function (dataFrame) {
-						return dataFrame.getValuesIterator();
-					})						
-					.toArray()
-				return new SelectIterator(
-					new MultiIterator(iterators),
-					function (multi) {
-						var result = E.from(multi)
-							.aggregate({}, function (prev, toIntegrate) {
-								return extend(prev, toIntegrate);
-							})
-							;		
-						return result;			
-					}
-				);
-			},
+			columnNames: columnNames,
+			values: concatenatedRows
 		});
 	}
 	else {

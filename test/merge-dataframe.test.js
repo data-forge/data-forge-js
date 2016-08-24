@@ -86,29 +86,29 @@ describe('merge-examples', function () {
 
     });
 
-    /*
     it('Join the two dataframes along columns', function () {
 
         var df_new = dataForge.concat([df_a, df_b], { axis: 1 });
 
-        expect(df_new.toValues()).to.eql([
+        expect(df_new.getColumnNames()).to.eql([
+            'subject_id.1',
+            'first_name.1',
+            'last_name.1',
+            'subject_id.2',
+            'first_name.2',
+            'last_name.2',
+        ]);
+
+        expect(df_new.toRows()).to.eql([
             [1, 'Alex', 'Anderson', 4, 'Billy', 'Bonder'],
             [2, 'Amy', 'Ackerman', 5, 'Brian', 'Black'],
             [3, 'Allen', 'Ali', 6, 'Bran', 'Balwner'],
             [4, 'Alice', 'Aoni', 7, 'Bryce', 'Brice'],
             [5, 'Ayoung', 'Aitches', 8, 'Betty', 'Btisan'],          
         ]);
-
-        expect(df_new.getColumnNames()).to.eql([
-            'subject_id',
-            'first_name',
-            'last_name',
-            'subject_id',
-            'first_name',
-            'last_name',
-        ]);
     });
 
+    /*
     it('Merge two dataframes along the subject_id value', function () {
 
         var df_new = dataForge.concat([df_a, df_b]);
@@ -121,7 +121,7 @@ describe('merge-examples', function () {
             "test_id",
         ]);
 
-        expect(df_new.toValues()).to.eql([
+        expect(df_new.toRows()).to.eql([
             [1, 'Alex', 'Anderson', 51],
             [2, 'Amy', 'Ackerman', 15],
             [3, 'Allen', 'Ali', 15],
@@ -149,7 +149,7 @@ describe('merge-examples', function () {
             "test_id",
         ]);
 
-        expect(df_new.toValues()).to.eql([
+        expect(df_new.toRows()).to.eql([
             [1, 'Alex', 'Anderson', 51],
             [2, 'Amy', 'Ackerman', 15],
             [3, 'Allen', 'Ali', 15],
@@ -178,7 +178,7 @@ describe('merge-examples', function () {
             "test_id",
         ]);
 
-        expect(df_new.toValues()).to.eql([
+        expect(df_new.toRows()).to.eql([
             [1, 'Alex', 'Anderson', 51],
             [2, 'Amy', 'Ackerman', 15],
             [3, 'Allen', 'Ali', 15],
@@ -206,7 +206,7 @@ describe('merge-examples', function () {
             'last_name_y',
         ]);
 
-        expect(df_new.toValues()).to.eql([
+        expect(df_new.toRows()).to.eql([
             [1, 'Alex', 'Anderson', undefined, undefined],
             [2, 'Amy', 'Ackerman', undefined, undefined],
             [3, 'Allen', 'Ali', undefined, undefined],
@@ -233,7 +233,7 @@ describe('merge-examples', function () {
             'last_name_y',
         ]);
 
-        expect(df_new.toValues()).to.eql([
+        expect(df_new.toRows()).to.eql([
             [4, 'Alice', 'Aoni', 'Billy', 'Bonder'],
             [5, 'Ayoung', 'Aitches', 'Brian', 'Black'],
         ]);
@@ -254,7 +254,7 @@ describe('merge-examples', function () {
             'last_name_y',
         ]);
 
-        expect(df_new.toValues()).to.eql([
+        expect(df_new.toRows()).to.eql([
             [4, 'Alice', 'Aoni', 'Billy', 'Bonder'],
             [5, 'Ayoung', 'Aitches', 'Brian', 'Black'],
             [6, undefined, undefined, 'Bran', 'Balwner'],
@@ -278,7 +278,7 @@ describe('merge-examples', function () {
             'last_name_y',
         ]);
 
-        expect(df_new.toValues()).to.eql([
+        expect(df_new.toRows()).to.eql([
             [1, 'Alex', 'Anderson', undefined, undefined],
             [2, 'Amy', 'Ackerman', undefined, undefined],
             [3, 'Allen', 'Ali', undefined, undefined],
@@ -303,7 +303,7 @@ describe('merge-examples', function () {
             'last_name_right',
         ]);
 
-        expect(df_new.toValues()).to.eql([
+        expect(df_new.toRows()).to.eql([
             [1, 'Alex', 'Anderson', undefined, undefined],
             [2, 'Amy', 'Ackerman', undefined, undefined],
             [3, 'Allen', 'Ali', undefined, undefined],
@@ -325,7 +325,7 @@ describe('merge-examples', function () {
             'last_name_y',
         ]);
 
-        expect(df_new.toValues()).to.eql([
+        expect(df_new.toRows()).to.eql([
             [1, 'Alex', 'Anderson', 4, 'Billy', 'Bonder'],
             [2, 'Amy', 'Ackerman', 5, 'Brian', 'Black'],
             [3, 'Allen', 'Ali', 6, 'Bran', 'Balwner'],
