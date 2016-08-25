@@ -269,7 +269,11 @@ var DataFrame = function (config) {
 					config.values = function () {
 						var columnIterators = E.from(self._columnNames)
 							.select(function (columnName) {
-								return new ArrayIterator(columns[columnName]);
+								var column = columns[columnName];
+								if (column instanceof Series) {
+									column = column.toValues();
+								}
+								return new ArrayIterator(column);
 							})
 							.toArray();
 						return convertRowsToObjects(self._columnNames, new MultiIterator(columnIterators));

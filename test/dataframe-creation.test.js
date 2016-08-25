@@ -384,6 +384,23 @@ describe('dataframe creation', function () {
 		]);
 	});
 
+	it('can create dataframe from columns - with series', function () {
+
+		var df = new DataFrame({
+			columns: {
+				A: new Series({ values: [1, 2, 3, 4] }),
+				B: new Series({ values: ['a', 'b', 'c', 'd'] }),
+			},
+		});
+
+		expect(df.toValues()).to.eql([
+			{ A: 1, B: 'a' },
+			{ A: 2, B: 'b' },
+			{ A: 3, B: 'c' },
+			{ A: 4, B: 'd' },
+		]);
+	});
+
 	it('can create data frame from column arrays - default index', function () {
 
 		var df = new DataFrame({
