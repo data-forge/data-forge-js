@@ -1806,3 +1806,33 @@ Series.prototype.concat = function () {
 	);
 };
 
+/**
+ * Correlates the elements of two sequences based on matching keys. 
+ */
+Series.prototype.join = function (inner, outerKeySelector, innerKeySelector, resultSelector) {
+
+	assert.instanceOf(inner, Series, "Expected 'inner' parameter of 'Series.join' to be a Series.");
+	assert.isFunction(outerKeySelector, "Expected 'outerKeySelector' parameter of 'Series.join' to be a selector function.");
+	assert.isFunction(innerKeySelector, "Expected 'innerKeySelector' parameter of 'Series.join' to be a selector function.");
+	assert.isFunction(resultSelector, "Expected 'resultSelector' parameter of 'Series.join' to be a selector function.");
+
+	var outer = this;
+	var joined =E.from(outer.toPairs())
+		.join(
+			inner.toPairs(),
+			function (outerPair) {
+				return outerKeySelector(outerPair[1], outerPair[0]);
+			},
+			function (innerPair) {
+				return innerKeySelector(innerPair[1], innerPair[0]);
+			},
+			function (outerPair, innerPair) {
+				return resultSelector(outerPair[1], innerPair[1]);
+			}
+		)
+		.toArray();
+
+	return new DataFrame({
+		values: joined,
+	});
+};

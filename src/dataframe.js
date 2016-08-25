@@ -295,8 +295,6 @@ var parent = inherit(DataFrame, Series);
 
 var concatDataFrames = require('./concat-dataframes');
 var zipDataFrames = require('./zip-dataframes');
-var mergeSeries = require('./merge-series');
-var mergeDataFrames = require('./merge-dataframes');
 
 /**
  * Get the names of the columns in the data frame.
@@ -632,16 +630,22 @@ DataFrame.prototype.toString = function () {
 	var self = this;
 	var Table = require('easy-table');
 
-	var index = self.getIndex().toValues();
-	var header = ["__index__"].concat(self.getColumnNames());
-	var rows = E.from(self.toRows())
-		.select(function (row, rowIndex) { 
-			return [index[rowIndex]].concat(row);
+	var columnNames = self.getColumnNames();
+	var pairs = E.from(self.toPairs())
+		.select(function (pair) { // Convert to rows.
+			return [pair[0]]
+				.concat(
+					E.from(columnNames) 
+						.select(function (columnName) {
+							return pair[1][columnName];
+						})
+						.toArray()					
+				);
 		})
-		.toArray()
-
+		.toArray();
+	var header = ["__index__"].concat(columnNames);
 	var t = new Table();
-	rows.forEach(function (row, rowIndex) {
+	pairs.forEach(function (row, rowIndex) {
 		row.forEach(function (cell, cellIndex) {
 			t.cell(header[cellIndex], cell);
 		});
@@ -1294,7 +1298,20 @@ DataFrame.prototype.pivot = function (column, value) {
 		})
 		.toArray();
 
-	return mergeSeries(newColumnNames, newSeries);
+	return new DataFrame({
+		columns: E.from(newColumnNames)
+			.zip(newSeries, function (columnName, series) {
+				return [columnName, series];
+			}) 
+			.toObject(
+				function (column) {
+					return column[0];
+				},
+				function (column) {
+					return column[1].toValues();
+				}
+			),
+	});
 };
 
 /**
@@ -1351,3 +1368,4 @@ DataFrame.prototype.concat = function () {
 		)			
 	);
 };
+

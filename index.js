@@ -158,23 +158,6 @@ var dataForge = {
 	},
 
 	/**
-	 * Merge data-frames by index or a particular column.
-	 * 
-	 * @param {DataFrame} leftDataFrame - One data frame to merge.
-	 * @param {DataFrame} rightDataFrame - The other data frame to merge.
-	 * @param {string} [columnName] - The name of the column to merge on. Optional, when not specified merge is based on the index.
-	 */
-	merge: require('./src/merge-dataframes.js'),
-
-	/**
-	 * Merge multiple series into a new DataFrame.
-	 * 
-	 * @param {array} columnNames - Array of strings that defines the column names for the resulting DataFrame. Must have the same number of elements as the 'series' parameter.
-	 * @param {array} series - Array of series that defined the values for the columns. Must have the same number of elements as the 'columnNames' parameter.
-	 */
-	mergeSeries: require('./src/merge-series'),
-
-	/**
 	 * Concatenate multiple dataframes into a single dataframe.
 	 *
 	 * @param {array} dataFrames - Array of dataframes to concatenate. 
