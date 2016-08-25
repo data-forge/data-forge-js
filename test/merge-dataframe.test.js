@@ -370,13 +370,24 @@ describe('merge-examples', function () {
             ]);
         });
 
-    /*
         it('Merge two dataframes along the subject_id value', function () {
 
             var df_new = dataForge.concat([df_a, df_b]);
-            var df_merged = dataForge.merge(df_new, df_n, {
-                on: 'subject_id'
-            });
+            var df_merged = df_new.join(
+                    df_n,
+                    left => left.subject_id,
+                    right => right.subject_id,
+                    (left, right) => {
+                        return {
+                            subject_id: left.subject_id,
+                            first_name: left.first_name,
+                            last_name: left.last_name,
+                            test_id: right.test_id,
+                        };
+                    }
+                )
+                .orderBy(row => row.subject_id)
+                ;
 
             expect(df_merged.getColumnNames()).to.eql([
                 'subject_id',
@@ -398,6 +409,8 @@ describe('merge-examples', function () {
             ]);
 
         });
+
+    /*
 
         it('Merge two dataframes with both the left and right dataframes using the subject_id key', function () {
 
