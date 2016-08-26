@@ -1810,17 +1810,23 @@ Series.prototype.concat = function () {
 };
 
 /**
- * Correlates the elements of two sequences based on matching keys. 
+ * Correlates the elements of two Series or DataFrames based on matching keys.
+ *
+ * @param {Series|DataFrame} self - The outer Series or DataFrame to join. 
+ * @param {Series|DataFrame} inner - The inner Series or DataFrame to join.
+ * @param {function} outerKeySelector - Selector that chooses the join key from the outer sequence.
+ * @param {function} innerKeySelector - Selector that chooses the join key from the inner sequence.
+ * @param {function} resultSelector - Selector that defines how to merge outer and inner values. 
  */
 Series.prototype.join = function (inner, outerKeySelector, innerKeySelector, resultSelector) {
 
-	assert.instanceOf(inner, Series, "Expected 'inner' parameter of 'Series.join' to be a Series.");
+	assert.instanceOf(inner, Series, "Expected 'inner' parameter of 'Series.join' to be a Series or DataFrame.");
 	assert.isFunction(outerKeySelector, "Expected 'outerKeySelector' parameter of 'Series.join' to be a selector function.");
 	assert.isFunction(innerKeySelector, "Expected 'innerKeySelector' parameter of 'Series.join' to be a selector function.");
 	assert.isFunction(resultSelector, "Expected 'resultSelector' parameter of 'Series.join' to be a selector function.");
 
 	var outer = this;
-	var joined =E.from(outer.toPairs())
+	var joined = E.from(outer.toPairs())
 		.join(
 			inner.toPairs(),
 			function (outerPair) {
@@ -1840,14 +1846,28 @@ Series.prototype.join = function (inner, outerKeySelector, innerKeySelector, res
 	});
 };
 
-// http://blogs.geniuscode.net/RyanDHatch/?p=116
-Series.prototype.joinOuter = function (rightSeries, outerKeySelector, innerKeySelector, leftSelector, rightSelector) {
+/**
+ * Correlates the elements of two Series or DataFrames based on matching keys.
+ * Includes elements that have no correlation.
+ *
+ * @param {Series|DataFrame} self - The outer Series or DataFrame to join. 
+ * @param {Series|DataFrame} inner - The inner Series or DataFrame to join.
+ * @param {function} outerKeySelector - Selector that chooses the join key from the outer sequence.
+ * @param {function} innerKeySelector - Selector that chooses the join key from the inner sequence.
+ * @param {function} outerResultSelector - Selector that defines how to extract the outer value before join it with the inner value. 
+ * @param {function} innerResultSelector - Selector that defines how to extract the inner value before join it with the outer value.
+ * 
+ * Implementation from here:
+ * 
+ * 	http://blogs.geniuscode.net/RyanDHatch/?p=116
+ */
+Series.prototype.joinOuter = function (rightSeries, outerKeySelector, innerKeySelector, outerResultSelector, innerResultSelector) {
 
 	assert.instanceOf(rightSeries, Series, "Expected 'rightSeries' parameter of 'Series.joinOuter' to be a Series.");
 	assert.isFunction(outerKeySelector, "Expected 'outerKeySelector' parameter of 'Series.joinOuter' to be a selector function.");
 	assert.isFunction(innerKeySelector, "Expected 'innerKeySelector' parameter of 'Series.joinOuter' to be a selector function.");
-	assert.isFunction(leftSelector, "Expected 'leftSelector' parameter of 'Series.joinOuter' to be a selector function.");
-	assert.isFunction(rightSelector, "Expected 'rightSelector' parameter of 'Series.joinOuter' to be a selector function.");
+	assert.isFunction(outerResultSelector, "Expected 'outerResultSelector' parameter of 'Series.joinOuter' to be a selector function.");
+	assert.isFunction(innerResultSelector, "Expected 'innerResultSelector' parameter of 'Series.joinOuter' to be a selector function.");
 
 	var self = this;
 	var leftSeries = this.toValues();
@@ -1860,7 +1880,7 @@ Series.prototype.joinOuter = function (rightSeries, outerKeySelector, innerKeySe
 					return outerKeySelector(leftRow) === innerKeySelector(rightRow);
 				})
 				.select(function (rightRow) {
-					return extend({}, leftSelector(leftRow), rightSelector(rightRow));
+					return extend({}, outerResultSelector(leftRow), innerResultSelector(rightRow));
 				})
 				;
 
@@ -1870,7 +1890,7 @@ Series.prototype.joinOuter = function (rightSeries, outerKeySelector, innerKeySe
 				return matching;
 			}
 			else {
-				return [leftSelector(leftRow)];
+				return [outerResultSelector(leftRow)];
 			}
 		})
 		.toArray()
@@ -1883,7 +1903,7 @@ Series.prototype.joinOuter = function (rightSeries, outerKeySelector, innerKeySe
 					return outerKeySelector(leftRow) === innerKeySelector(rightRow);
 				})
 				.select(function (leftRow) {
-					return extend({}, leftSelector(leftRow), rightSelector(rightRow));
+					return extend({}, outerResultSelector(leftRow), innerResultSelector(rightRow));
 				})
 				;
 
@@ -1891,7 +1911,7 @@ Series.prototype.joinOuter = function (rightSeries, outerKeySelector, innerKeySe
 				return matching;
 			}
 			else {
-				return [rightSelector(rightRow)];
+				return [innerResultSelector(rightRow)];
 			}
 		})
 		.toArray()
