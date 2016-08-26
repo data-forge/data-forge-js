@@ -1977,3 +1977,30 @@ Series.prototype.joinOuter = function (rightSeries, outerKeySelector, innerKeySe
 		considerAllRows: true,
 	});
 };
+
+/**
+ * Returns the specified default sequence if the Series or DataFrame is empty. 
+ *
+ * @param {array|Series|DataFrame} defaultSequence - Default sequence to return if the Series or DataFrame is empty.
+ */
+Series.prototype.defaultIfEmpty = function (defaultSequence) {
+
+	if (!Object.isArray(defaultSequence)) {
+		assert.instanceOf(defaultSequence, Series, "Expect 'defaultSequence' parameter to 'Series.defaultIfEmpty' to be an array, Series or DataFrame.");
+	}
+
+	var self = this;
+	if (self.none()) {
+		if (defaultSequence instanceof Series) {
+			return defaultSequence;
+		}
+		else {
+			return new self.Constructor({
+				values: defaultSequence,
+			});
+		}
+	} 
+	else {
+		return self;
+	}
+};

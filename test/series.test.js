@@ -1771,5 +1771,26 @@ describe('Series', function () {
 		expect(series.contains(3000)).to.eql(false);
 	});
 
+	it('can select default instead of empty series - array', function () {
+
+		var series = new Series();
+		var defaulted = series.defaultIfEmpty([1, 2]);
+		expect(defaulted.toValues()).to.eql([1, 2]);
+	});
+
+	it('can select default instead of empty series - series', function () {
+
+		var series = new Series();
+		var defaulted = series.defaultIfEmpty(new Series({ values: [1, 2] }));
+		expect(defaulted.toValues()).to.eql([1, 2]);
+	});
+
+	it('default is ignored for non-empty series', function () {
+
+		var series = new Series({ values: [5, 6] });
+		var defaulted = series.defaultIfEmpty([1, 2]);
+		expect(defaulted.toValues()).to.eql([5, 6]);
+	});
+
 });
 
