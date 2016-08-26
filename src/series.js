@@ -19,6 +19,7 @@ var PairIterator = require('../src/iterators/pair');
 var WhereIterator = require('../src/iterators/where');
 var CountIterator = require('../src/iterators/count');
 var EmptyIterator = require('../src/iterators/empty');
+var extend = require('extend');
 
 //
 // Represents a time series.
@@ -493,6 +494,8 @@ var executeOrderBy = function (self, batch) {
 		iterable: function () {
 			return new ArrayIterator(executeLazySort());
 		},
+
+		considerAllRows: true, //todo: This is currently needed to have df columns survive sorting. 
 	});
 };
 
@@ -1834,5 +1837,123 @@ Series.prototype.join = function (inner, outerKeySelector, innerKeySelector, res
 
 	return new DataFrame({
 		values: joined,
+	});
+};
+
+// http://blogs.geniuscode.net/RyanDHatch/?p=116
+Series.prototype.joinOuter = function (rightSeries, outerKeySelector, innerKeySelector, leftSelector, rightSelector) {
+
+	assert.instanceOf(rightSeries, Series, "Expected 'rightSeries' parameter of 'Series.joinOuter' to be a Series.");
+	assert.isFunction(outerKeySelector, "Expected 'outerKeySelector' parameter of 'Series.joinOuter' to be a selector function.");
+	assert.isFunction(innerKeySelector, "Expected 'innerKeySelector' parameter of 'Series.joinOuter' to be a selector function.");
+	assert.isFunction(leftSelector, "Expected 'leftSelector' parameter of 'Series.joinOuter' to be a selector function.");
+	assert.isFunction(rightSelector, "Expected 'rightSelector' parameter of 'Series.joinOuter' to be a selector function.");
+
+	var self = this;
+	var leftSeries = this.toValues();
+	rightSeries = rightSeries.toValues();
+
+	var left = E.from(leftSeries)
+		.selectMany(function (leftRow) {
+			var matching = E.from(rightSeries)
+				.where(function (rightRow) {
+					return outerKeySelector(leftRow) === innerKeySelector(rightRow);
+				})
+				.select(function (rightRow) {
+					return extend({}, leftSelector(leftRow), rightSelector(rightRow));
+				})
+				;
+
+				//todo: a DefaultIfEmpty fn would nice here...
+
+			if (matching.any()) {
+				return matching;
+			}
+			else {
+				return [leftSelector(leftRow)];
+			}
+		})
+		.toArray()
+		;
+
+	var right = E.from(rightSeries)
+		.selectMany(function (rightRow) {
+			var matching = E.from(leftSeries)
+				.where(function (leftRow) {
+					return outerKeySelector(leftRow) === innerKeySelector(rightRow);
+				})
+				.select(function (leftRow) {
+					return extend({}, leftSelector(leftRow), rightSelector(rightRow));
+				})
+				;
+
+			if (matching.any()) {
+				return matching;
+			}
+			else {
+				return [rightSelector(rightRow)];
+			}
+		})
+		.toArray()
+		;	
+
+	/*todo: Why doesn't this work?
+	var leftSeries = this;
+	var left = leftSeries.selectMany(function (leftRow) {
+			var matching = rightSeries
+				.where(function (rightRow) {
+					return outerKeySelector(leftRow) === innerKeySelector(rightRow);
+				})
+				.select(function (rightRow) {
+					return extend({}, leftSelector(leftRow), rightSelector(rightRow));
+				})
+				.bake()
+				;
+
+				//todo: a DefaultIfEmpty fn would nice here...
+
+			if (matching.any()) {
+				return matching;
+			}
+			else {
+				return [leftSelector(leftRow)];
+			}
+		})
+		.bake()
+		;
+
+	var right = rightSeries.selectMany(function (rightRow) {
+			var matching = leftSeries
+				.where(function (leftRow) {
+					return outerKeySelector(leftRow) === innerKeySelector(rightRow);
+				})
+				.select(function (leftRow) {
+					return extend({}, leftSelector(leftRow), rightSelector(rightRow));
+				})
+				.bake()
+				;
+
+			if (matching.any()) {
+				return matching;
+			}
+			else {
+				return [rightSelector(rightRow)];
+			}
+		})
+		.bake()
+		;
+	*/
+
+	var concatenated = E.from(left).concat(right).toArray();
+	var joined = new DataFrame({ values: concatenated }) //todo: Can't hard code to a DF.
+		.distinct(function (row) {
+			return JSON.stringify(row); //todo: This is a horrible solution.
+		})
+		.toValues()
+		;
+
+	return new self.Constructor({
+		values: joined,
+		considerAllRows: true,
 	});
 };

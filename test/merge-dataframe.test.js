@@ -32,6 +32,7 @@ describe('merge-examples', function () {
                     ['foo', 2],
                 ]
             );
+
             var right = initDataFrame(
                 [
                     'merge-key',
@@ -450,13 +451,29 @@ describe('merge-examples', function () {
             ]);
         });
 
-    /*
         it('Merge with outer join', function () {
 
-            var df_merged = dataForge.merge(df_a, df_b, {
-                on: 'subject_id',
-                how: 'outer',
-            });
+            var df_merged = df_a.joinOuter(
+                    df_b,
+                    left => left.subject_id,
+                    right => right.subject_id,
+                    left => {
+                        return {
+                            subject_id: left.subject_id,
+                            first_name_x: left.first_name,
+                            last_name_x: left.last_name,
+                        };
+                    },
+                    right => {
+                        return {
+                            subject_id: right.subject_id,
+                            first_name_y: right.first_name,
+                            last_name_y: right.last_name,
+                        };
+                    }
+                )
+                .orderBy(row => row.subject_id)
+                ;
 
             expect(df_merged.getColumnNames()).to.eql([
                 'subject_id',
@@ -478,6 +495,7 @@ describe('merge-examples', function () {
             ]);
         });
 
+        /*
         it('Merge with inner join', function () {
 
             var df_merged = dataForge.merge(df_a, df_b, {
