@@ -223,6 +223,48 @@ describe('merge-examples', function () {
                 [3, 13],
             ]);
         });
+
+        // http://blogs.geniuscode.net/RyanDHatch/?p=116
+        it('outer join', function () {
+
+            var ryan = { Name: "Ryan" };
+            var jer = { Name: "Jer" };
+            var people = new dataForge.DataFrame({ values: [ ryan, jer ] });
+
+            var camp = { Name: "Camp", Owner: "Ryan" };
+            var brody = { Name: "Brody", Owner: "Ryan", };
+            var homeless = { Name: "Homeless" };
+            var dogs = new dataForge.DataFrame({ values: [ camp, brody, homeless ] });
+
+            var join = people.joinOuter(
+                    dogs,
+                    person => person.Name,
+                    dog => dog.Owner,
+                    person => {
+                        return {
+                            Person: person.Name,
+                        };
+                    },
+                    dog => {
+                        return {
+                            Dog: dog.Name,
+                        };
+                    },
+                    (person, dog) => {
+                        return extend({}, person, dog);
+                    }
+                )
+                ;
+
+            expect(join.count()).to.eql(4);
+            expect(join.getColumnNames()).to.eql(["Person", "Dog"]);
+            expect(join.toRows()).to.eql([
+                ["Ryan", "Camp"],
+                ["Ryan", "Brody"],
+                ["Jer", undefined],
+                [undefined, "Homeless"],
+            ]);
+        });
     });
 
     //
