@@ -2046,28 +2046,27 @@ Series.prototype.union = function (other, selector) {
  * Returns the intersection of values between two Series or DataFrames.
  *
  * @param {Series|DataFrame} other - The other Series or DataFrame to combine.
- * @param {function} [selector] - Optional selector that selects the value to compare.  
+ * @param {function} [comparer] - Optional comparer that selects the value to compare.  
  */
-Series.prototype.intersection = function (other, selector) {
+Series.prototype.intersection = function (other, comparer) {
 
 	assert.instanceOf(other, Series, "Expected 'other' parameter to 'Series.intersection' to be a Series or DataFrame.");
 
-	if (selector) {
-		assert.isFunction(selector, "Expected optional 'selector' parameter to 'Series.intersection' to be a selector function.");
+	if (comparer) {
+		assert.isFunction(comparer, "Expected optional 'comparer' parameter to 'Series.intersection' to be a comparer function.");
 	}
 	else {
-		selector = function (value) {
-			return value;
+		comparer = function (left, right) {
+			return left === right;
 		};
 	}
 
 	var self = this;
 	return self
 		.where(function (left) {
-			var leftValue = selector(left);
 			return other
 				.where(function (right) {
-					return leftValue === selector(right);										
+					return comparer(left, right);
 				})
 				.any();
 		})
@@ -2078,28 +2077,27 @@ Series.prototype.intersection = function (other, selector) {
  * Returns the exception of values between two Series or DataFrames.
  *
  * @param {Series|DataFrame} other - The other Series or DataFrame to combine.
- * @param {function} [selector] - Optional selector that selects the value to compare.  
+ * @param {function} [comparer] - Optional comparer that selects the value to compare.  
  */
-Series.prototype.except = function (other, selector) {
+Series.prototype.except = function (other, comparer) {
 
 	assert.instanceOf(other, Series, "Expected 'other' parameter to 'Series.except' to be a Series or DataFrame.");
 
-	if (selector) {
-		assert.isFunction(selector, "Expected optional 'selector' parameter to 'Series.except' to be a selector function.");
+	if (comparer) {
+		assert.isFunction(comparer, "Expected optional 'comparer' parameter to 'Series.except' to be a comparer function.");
 	}
 	else {
-		selector = function (value) {
-			return value;
+		comparer = function (left, right) {
+			return left === right;
 		};
 	}
 
 	var self = this;
 	return self
 		.where(function (left) {
-			var leftValue = selector(left);
 			return other
 				.where(function (right) {
-					return leftValue === selector(right);										
+					return comparer(left, right);
 				})
 				.none();
 		})

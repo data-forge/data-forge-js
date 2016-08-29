@@ -1843,8 +1843,8 @@ describe('Series', function () {
 
 		var series1 = new Series({ values: [{ X: 5 }, { X: 6 }] })
 		var series2 = new Series({ values: [{ X: 6 }, { X: 7 }] })
-		var result = series1.intersection(series2, function (row) { 
-			return row.X;
+		var result = series1.intersection(series2, function (left, right) { 
+			return left.X === right.X;
 		});
 
 		expect(result.toValues()).to.eql([ { X: 6 }, ]);
@@ -1872,8 +1872,8 @@ describe('Series', function () {
 
 		var series1 = new Series({ values: [{ X: 5 }, { X: 6 }] })
 		var series2 = new Series({ values: [{ X: 6 }, { X: 7 }] })
-		var result = series1.except(series2, function (row) { 
-			return row.X;
+		var result = series1.except(series2, function (left, right) { 
+			return left.X === right.X;
 		});
 
 		expect(result.toValues()).to.eql([ { X: 5 }, ]);
