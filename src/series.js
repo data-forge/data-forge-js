@@ -1854,8 +1854,8 @@ Series.prototype.join = function (inner, outerKeySelector, innerKeySelector, res
  * @param {Series|DataFrame} inner - The inner Series or DataFrame to join.
  * @param {function} outerKeySelector - Selector that chooses the join key from the outer sequence.
  * @param {function} innerKeySelector - Selector that chooses the join key from the inner sequence.
- * @param {function} outerResultSelector - Selector that defines how to extract the outer value before join it with the inner value. 
- * @param {function} innerResultSelector - Selector that defines how to extract the inner value before join it with the outer value.
+ * @param {function} outerResultSelector - Selector that defines how to extract the outer value before joining it with the inner value. 
+ * @param {function} innerResultSelector - Selector that defines how to extract the inner value before joining it with the outer value.
  * @param {function} mergeSelector - Selector that defines how to combine left and right.
  * 
  * Implementation from here:
@@ -2020,4 +2020,24 @@ Series.prototype.defaultIfEmpty = function (defaultSequence) {
 	else {
 		return self;
 	}
+};
+
+/**
+ * Returns the unique values in the union of two Series or DataFrames.
+ *
+ * @param {Series|DataFrame} other - The other Series or DataFrame to combine.
+ * @param {function} [selector] - Optional selector that selects the value to compare.  
+ */
+Series.prototype.union = function (other, selector) {
+
+	assert.instanceOf(other, Series, "Expected 'other' parameter to 'Series.union' to be a Series or DataFrame.");
+
+	if (selector) {
+		assert.isFunction(selector, "Expected optional 'selector' parameter to 'Series.union' to be a selector function.");
+	}
+
+	var self = this;
+	return self.concat(other)
+		.distinct(selector)
+		;
 };

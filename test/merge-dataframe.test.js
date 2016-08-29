@@ -256,7 +256,6 @@ describe('merge-examples', function () {
                 )
                 ;
 
-            expect(join.count()).to.eql(4);
             expect(join.getColumnNames()).to.eql(["Person", "Dog"]);
             expect(join.toRows()).to.eql([
                 ["Ryan", "Camp"],

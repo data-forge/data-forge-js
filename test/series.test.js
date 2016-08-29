@@ -1792,5 +1792,33 @@ describe('Series', function () {
 		expect(defaulted.toValues()).to.eql([5, 6]);
 	});
 
+	it('can get union of 2 series with unique values', function () {
+
+		var series1 = new Series({ values: [5, 6] })
+		var series2 = new Series({ values: [7, 8] })
+		var result = series1.union(series2);
+
+		expect(result.toValues()).to.eql([5, 6, 7, 8]);
+	});
+
+	it('can get union of 2 series with overlapping values', function () {
+
+		var series1 = new Series({ values: [5, 6] })
+		var series2 = new Series({ values: [6, 7] })
+		var result = series1.union(series2);
+
+		expect(result.toValues()).to.eql([5, 6, 7]);
+	});
+
+	it('union can work with selector', function () {
+
+		var series1 = new Series({ values: [{ X: 5 }, { X: 6 }] })
+		var series2 = new Series({ values: [{ X: 6 }, { X: 7 }] })
+		var result = series1.union(series2, function (row) { 
+			return row.X;
+		});
+
+		expect(result.toValues()).to.eql([ { X: 5 }, { X: 6 }, { X: 7 }]);
+	});
 });
 
