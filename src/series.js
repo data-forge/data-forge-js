@@ -1884,8 +1884,6 @@ Series.prototype.joinOuter = function (rightSeries, outerKeySelector, innerKeySe
 				})
 				;
 
-				//todo: a DefaultIfEmpty fn would nice here...
-
 			if (matching.any()) {
 				return matching;
 			}
@@ -1965,7 +1963,7 @@ Series.prototype.joinOuter = function (rightSeries, outerKeySelector, innerKeySe
 	*/
 
 	var concatenated = E.from(left).concat(right).toArray();
-	var joined = new DataFrame({ values: concatenated }) //todo: Can't hard code to a DF.
+	var joined = new self.Constructor({ values: concatenated })
 		.distinct(function (row) {
 			return JSON.stringify(row); //todo: This is a horrible solution.
 		})
