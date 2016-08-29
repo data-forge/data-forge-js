@@ -499,13 +499,24 @@ describe('merge-examples', function () {
             ]);
         });
 
-        /*
         it('Merge with inner join', function () {
 
-            var df_merged = dataForge.merge(df_a, df_b, {
-                on: 'subject_id',
-                how: 'inner',
-            });
+            var df_merged = df_a.join(
+                    df_b,
+                    left => left.subject_id,
+                    right => right.subject_id,
+                    (left, right) => {
+                        return {
+                            subject_id: left.subject_id,
+                            first_name_x: left.first_name,
+                            last_name_x: left.last_name,
+                            first_name_y: right.first_name,
+                            last_name_y: right.last_name,
+                        };
+                    }
+                )
+                .orderBy(row => row.subject_id)
+                ;
 
             expect(df_merged.getColumnNames()).to.eql([
                 'subject_id',
@@ -521,6 +532,7 @@ describe('merge-examples', function () {
             ]);
         });
 
+        /*
         it('Merge with right join', function () {
 
             var df_merged = dataForge.merge(df_a, df_b, {
