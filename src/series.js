@@ -1856,60 +1856,76 @@ Series.prototype.join = function (inner, outerKeySelector, innerKeySelector, res
  * @param {function} innerKeySelector - Selector that chooses the join key from the inner sequence.
  * @param {function} outerResultSelector - Selector that defines how to extract the outer value before join it with the inner value. 
  * @param {function} innerResultSelector - Selector that defines how to extract the inner value before join it with the outer value.
+ * @param {function} mergeSelector - Selector that defines how to combine left and right.
  * 
  * Implementation from here:
  * 
  * 	http://blogs.geniuscode.net/RyanDHatch/?p=116
  */
-Series.prototype.joinOuter = function (rightSeries, outerKeySelector, innerKeySelector, outerResultSelector, innerResultSelector) {
+Series.prototype.joinOuter = function (rightSeries, outerKeySelector, innerKeySelector, outerResultSelector, innerResultSelector, mergeSelector) {
 
 	assert.instanceOf(rightSeries, Series, "Expected 'rightSeries' parameter of 'Series.joinOuter' to be a Series.");
 	assert.isFunction(outerKeySelector, "Expected 'outerKeySelector' parameter of 'Series.joinOuter' to be a selector function.");
 	assert.isFunction(innerKeySelector, "Expected 'innerKeySelector' parameter of 'Series.joinOuter' to be a selector function.");
 	assert.isFunction(outerResultSelector, "Expected 'outerResultSelector' parameter of 'Series.joinOuter' to be a selector function.");
 	assert.isFunction(innerResultSelector, "Expected 'innerResultSelector' parameter of 'Series.joinOuter' to be a selector function.");
+	assert.isFunction(mergeSelector, "Expected 'mergeSelector' parameter of 'Series.joinOuter' to be a selector function.");
 
 	var self = this;
 	var leftSeries = this.toValues();
 	rightSeries = rightSeries.toValues();
 
 	var left = E.from(leftSeries)
-		.selectMany(function (leftRow) {
+		.selectMany(function (leftRow, leftIndex) {
+			var leftIndexStr = leftIndex.toString();
+
 			var matching = E.from(rightSeries)
-				.where(function (rightRow) {
-					return outerKeySelector(leftRow) === innerKeySelector(rightRow);
+				.select(function (rightRow, rightIndex) {
+					var rightIndexStr = rightIndex.toString();
+					return [leftIndexStr + '-' + rightIndexStr, rightRow];
 				})
-				.select(function (rightRow) {
-					return extend({}, outerResultSelector(leftRow), innerResultSelector(rightRow));
+				.where(function (pair) {
+					return outerKeySelector(leftRow) === innerKeySelector(pair[1]);
 				})
+				.select(function (pair) {
+					return [pair[0], mergeSelector(outerResultSelector(leftRow), innerResultSelector(pair[1]))];
+				})
+				.toArray()
 				;
 
-			if (matching.any()) {
+			if (matching.length > 0) {
 				return matching;
 			}
 			else {
-				return [outerResultSelector(leftRow)];
+				return [[leftIndexStr + '-x', outerResultSelector(leftRow)]];
 			}
 		})
 		.toArray()
 		;
 
 	var right = E.from(rightSeries)
-		.selectMany(function (rightRow) {
+		.selectMany(function (rightRow, rightIndex) {
+			var rightIndexStr = rightIndex.toString();
+
 			var matching = E.from(leftSeries)
-				.where(function (leftRow) {
-					return outerKeySelector(leftRow) === innerKeySelector(rightRow);
+				.select(function (leftRow, leftIndex) {
+					var leftIndexStr = leftIndex.toString();
+					return [leftIndexStr + '-' + rightIndexStr, leftRow];
 				})
-				.select(function (leftRow) {
-					return extend({}, outerResultSelector(leftRow), innerResultSelector(rightRow));
+				.where(function (pair) {
+					return outerKeySelector(pair[1]) === innerKeySelector(rightRow);
 				})
+				.select(function (pair) {
+					return [pair[0], mergeSelector(outerResultSelector(pair[1]), innerResultSelector(rightRow))];
+				})
+				.toArray()
 				;
 
-			if (matching.any()) {
+			if (matching.length > 0) {
 				return matching;
 			}
 			else {
-				return [innerResultSelector(rightRow)];
+				return [['x-' + rightIndexStr, innerResultSelector(rightRow)]];
 			}
 		})
 		.toArray()
@@ -1963,9 +1979,12 @@ Series.prototype.joinOuter = function (rightSeries, outerKeySelector, innerKeySe
 	*/
 
 	var concatenated = E.from(left).concat(right).toArray();
-	var joined = new self.Constructor({ values: concatenated })
-		.distinct(function (row) {
-			return JSON.stringify(row); //todo: This is a horrible solution.
+	var joined = new Series({ values: concatenated })
+		.distinct(function (pair) {
+			return pair[0];
+		})
+		.select(function (pair) {
+			return pair[1];
 		})
 		.toValues()
 		;

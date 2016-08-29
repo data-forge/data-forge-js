@@ -6,6 +6,7 @@ describe('merge-examples', function () {
     var assert = require('chai').assert;
 
     var dataForge = require('../index');
+    var extend = require('extend');
 
 	var initDataFrame = function (columns, values, index) {
 		assert.isArray(columns);
@@ -470,6 +471,9 @@ describe('merge-examples', function () {
                             first_name_y: right.first_name,
                             last_name_y: right.last_name,
                         };
+                    },
+                    (left, right) => {
+                        return extend({}, left, right);
                     }
                 )
                 .orderBy(row => row.subject_id)
