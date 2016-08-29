@@ -2023,7 +2023,7 @@ Series.prototype.defaultIfEmpty = function (defaultSequence) {
 };
 
 /**
- * Returns the unique values in the union of two Series or DataFrames.
+ * Returns the unique union of values between two Series or DataFrames.
  *
  * @param {Series|DataFrame} other - The other Series or DataFrame to combine.
  * @param {function} [selector] - Optional selector that selects the value to compare.  
@@ -2039,5 +2039,37 @@ Series.prototype.union = function (other, selector) {
 	var self = this;
 	return self.concat(other)
 		.distinct(selector)
+		;
+};
+
+/**
+ * Returns the intersection of values between two Series or DataFrames.
+ *
+ * @param {Series|DataFrame} other - The other Series or DataFrame to combine.
+ * @param {function} [selector] - Optional selector that selects the value to compare.  
+ */
+Series.prototype.intersection = function (other, selector) {
+
+	assert.instanceOf(other, Series, "Expected 'other' parameter to 'Series.intersection' to be a Series or DataFrame.");
+
+	if (selector) {
+		assert.isFunction(selector, "Expected optional 'selector' parameter to 'Series.intersection' to be a selector function.");
+	}
+	else {
+		selector = function (value) {
+			return value;
+		};
+	}
+
+	var self = this;
+	return self
+		.where(function (left) {
+			var leftValue = selector(left);
+			return other
+				.where(function (right) {
+					return leftValue === selector(right);										
+				})
+				.any();
+		})
 		;
 };
