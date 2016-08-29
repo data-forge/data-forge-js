@@ -1862,137 +1862,37 @@ Series.prototype.join = function (inner, outerKeySelector, innerKeySelector, res
  * 
  * 	http://blogs.geniuscode.net/RyanDHatch/?p=116
  */
-Series.prototype.joinOuter = function (rightSeries, outerKeySelector, innerKeySelector, outerResultSelector, innerResultSelector, mergeSelector) {
+Series.prototype.joinOuter = function (rightSeries, outerKeySelector, innerKeySelector, resultSelector) {
 
 	assert.instanceOf(rightSeries, Series, "Expected 'rightSeries' parameter of 'Series.joinOuter' to be a Series.");
 	assert.isFunction(outerKeySelector, "Expected 'outerKeySelector' parameter of 'Series.joinOuter' to be a selector function.");
 	assert.isFunction(innerKeySelector, "Expected 'innerKeySelector' parameter of 'Series.joinOuter' to be a selector function.");
-	assert.isFunction(outerResultSelector, "Expected 'outerResultSelector' parameter of 'Series.joinOuter' to be a selector function.");
-	assert.isFunction(innerResultSelector, "Expected 'innerResultSelector' parameter of 'Series.joinOuter' to be a selector function.");
-	assert.isFunction(mergeSelector, "Expected 'mergeSelector' parameter of 'Series.joinOuter' to be a selector function.");
+	assert.isFunction(resultSelector, "Expected 'resultSelector' parameter of 'Series.joinOuter' to be a selector function.");
 
 	var self = this;
-	var leftSeries = this.toValues();
-	rightSeries = rightSeries.toValues();
 
-	var left = E.from(leftSeries)
-		.selectMany(function (leftRow, leftIndex) {
-			var leftIndexStr = leftIndex.toString();
-
-			var matching = E.from(rightSeries)
-				.select(function (rightRow, rightIndex) {
-					var rightIndexStr = rightIndex.toString();
-					return [leftIndexStr + '-' + rightIndexStr, rightRow];
-				})
-				.where(function (pair) {
-					return outerKeySelector(leftRow) === innerKeySelector(pair[1]);
-				})
-				.select(function (pair) {
-					return [pair[0], mergeSelector(outerResultSelector(leftRow), innerResultSelector(pair[1]))];
-				})
-				.toArray()
-				;
-
-			if (matching.length > 0) {
-				return matching;
-			}
-			else {
-				return [[leftIndexStr + '-x', outerResultSelector(leftRow)]];
-			}
+	var leftOuter = self.except(rightSeries, function (outer, inner) {
+			return outerKeySelector(outer) === innerKeySelector(inner);
 		})
-		.toArray()
+		.select(function (outer) { 
+			return resultSelector(outer, null);
+		})
 		;
 
-	var right = E.from(rightSeries)
-		.selectMany(function (rightRow, rightIndex) {
-			var rightIndexStr = rightIndex.toString();
-
-			var matching = E.from(leftSeries)
-				.select(function (leftRow, leftIndex) {
-					var leftIndexStr = leftIndex.toString();
-					return [leftIndexStr + '-' + rightIndexStr, leftRow];
-				})
-				.where(function (pair) {
-					return outerKeySelector(pair[1]) === innerKeySelector(rightRow);
-				})
-				.select(function (pair) {
-					return [pair[0], mergeSelector(outerResultSelector(pair[1]), innerResultSelector(rightRow))];
-				})
-				.toArray()
-				;
-
-			if (matching.length > 0) {
-				return matching;
-			}
-			else {
-				return [['x-' + rightIndexStr, innerResultSelector(rightRow)]];
-			}
+	var rightOuter = rightSeries.except(self, function (inner, outer) {
+			return outerKeySelector(outer) === innerKeySelector(inner);
 		})
-		.toArray()
-		;	
-
-	/*todo: Why doesn't this work?
-	var leftSeries = this;
-	var left = leftSeries.selectMany(function (leftRow) {
-			var matching = rightSeries
-				.where(function (rightRow) {
-					return outerKeySelector(leftRow) === innerKeySelector(rightRow);
-				})
-				.select(function (rightRow) {
-					return extend({}, leftSelector(leftRow), rightSelector(rightRow));
-				})
-				.bake()
-				;
-
-				//todo: a DefaultIfEmpty fn would nice here...
-
-			if (matching.any()) {
-				return matching;
-			}
-			else {
-				return [leftSelector(leftRow)];
-			}
+		.select(function (inner) {
+			return resultSelector(null, inner);
 		})
-		.bake()
 		;
 
-	var right = rightSeries.selectMany(function (rightRow) {
-			var matching = leftSeries
-				.where(function (leftRow) {
-					return outerKeySelector(leftRow) === innerKeySelector(rightRow);
-				})
-				.select(function (leftRow) {
-					return extend({}, leftSelector(leftRow), rightSelector(rightRow));
-				})
-				.bake()
-				;
+	var inner = self.join(rightSeries, outerKeySelector, innerKeySelector, resultSelector);
 
-			if (matching.any()) {
-				return matching;
-			}
-			else {
-				return [rightSelector(rightRow)];
-			}
-		})
-		.bake()
+	return leftOuter
+		.concat(inner)
+		.concat(rightOuter)
 		;
-	*/
-
-	var concatenated = E.from(left).concat(right).toArray();
-	var joined = new Series({ values: concatenated })
-		.distinct(function (pair) {
-			return pair[0];
-		})
-		.select(function (pair) {
-			return pair[1];
-		})
-		.toValues()
-		;
-
-	return new self.Constructor({
-		values: joined,
-		considerAllRows: true,
-	});
 };
 
 /**
@@ -2026,7 +1926,7 @@ Series.prototype.defaultIfEmpty = function (defaultSequence) {
  * Returns the unique union of values between two Series or DataFrames.
  *
  * @param {Series|DataFrame} other - The other Series or DataFrame to combine.
- * @param {function} [selector] - Optional selector that selects the value to compare.  
+ * @param {function} [comparer] - Optional comparer that selects the value to compare.  
  */
 Series.prototype.union = function (other, selector) {
 

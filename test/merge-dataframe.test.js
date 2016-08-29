@@ -240,27 +240,24 @@ describe('merge-examples', function () {
                     dogs,
                     person => person.Name,
                     dog => dog.Owner,
-                    person => {
-                        return {
-                            Person: person.Name,
-                        };
-                    },
-                    dog => {
-                        return {
-                            Dog: dog.Name,
-                        };
-                    },
                     (person, dog) => {
-                        return extend({}, person, dog);
+                        var output = {};
+                        if (person) {
+                            output.Person = person.Name;
+                        }
+                        if (dog) {
+                            output.Dog = dog.Name;
+                        }
+                        return output;
                     }
                 )
                 ;
 
             expect(join.getColumnNames()).to.eql(["Person", "Dog"]);
             expect(join.toRows()).to.eql([
+                ["Jer", undefined],
                 ["Ryan", "Camp"],
                 ["Ryan", "Brody"],
-                ["Jer", undefined],
                 [undefined, "Homeless"],
             ]);
         });
@@ -499,22 +496,19 @@ describe('merge-examples', function () {
                     df_b,
                     left => left.subject_id,
                     right => right.subject_id,
-                    left => {
-                        return {
-                            subject_id: left.subject_id,
-                            first_name_x: left.first_name,
-                            last_name_x: left.last_name,
-                        };
-                    },
-                    right => {
-                        return {
-                            subject_id: right.subject_id,
-                            first_name_y: right.first_name,
-                            last_name_y: right.last_name,
-                        };
-                    },
                     (left, right) => {
-                        return extend({}, left, right);
+                        var output = {};
+                        if (left) {
+                            output.subject_id = left.subject_id;
+                            output.first_name_x = left.first_name;
+                            output.last_name_x = left.last_name;                            
+                        }
+                        if (right) {
+                            output.subject_id = right.subject_id;
+                            output.first_name_y = right.first_name;
+                            output.last_name_y = right.last_name;                            
+                        }
+                        return output;
                     }
                 )
                 .orderBy(row => row.subject_id)
