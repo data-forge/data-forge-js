@@ -1849,5 +1849,34 @@ describe('Series', function () {
 
 		expect(result.toValues()).to.eql([ { X: 6 }, ]);
 	});
+
+	it('can get exception of 2 series with overlapping values', function () {
+		
+		var series1 = new Series({ values: [5, 6] })
+		var series2 = new Series({ values: [6, 7] })
+		var result = series1.except(series2);
+
+		expect(result.toValues()).to.eql([5]);
+	});
+
+	it('exception result is empty for 2 series that have fully overlapping values', function () {
+
+		var series1 = new Series({ values: [5, 6] })
+		var series2 = new Series({ values: [5, 6] })
+		var result = series1.except(series2);
+
+		expect(result.toValues()).to.eql([]);
+	});
+
+	it('except can work with selector', function () {
+
+		var series1 = new Series({ values: [{ X: 5 }, { X: 6 }] })
+		var series2 = new Series({ values: [{ X: 6 }, { X: 7 }] })
+		var result = series1.except(series2, function (row) { 
+			return row.X;
+		});
+
+		expect(result.toValues()).to.eql([ { X: 5 }, ]);
+	});
 });
 
