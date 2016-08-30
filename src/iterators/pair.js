@@ -5,10 +5,13 @@ var E = require('linq');
 //
 // An iterator that can step multiple other iterators at once.
 //
-var PairIterator = function (it1, it2) {
+var PairIterator = function (iterable1, iterable2) {
 
 	var self = this;
 	var started = false;
+
+	var it1 = iterable1.getIterator();
+	var it2 = iterable2.getIterator();
 
 	self.moveNext = function () {	
 
