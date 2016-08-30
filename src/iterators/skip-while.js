@@ -3,10 +3,11 @@
 //
 // Iterator that skips elements while the predicate returns true.
 //
-var SkipWhileIterator = function (iterator, predicate) {
+var SkipWhileIterator = function (iterable, predicate) {
 
 	var self = this;
 	var skipped = false;
+	var iterator = iterable.getIterator();
 	
 	self.moveNext = function () {
 		for (;;) {

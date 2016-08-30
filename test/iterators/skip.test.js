@@ -14,38 +14,6 @@ describe('skip iterator', function () {
 		};		
 	};
 
-	var makeEmptyIterable = function () {
-		return {
-			getIterator: function () {
-				return {
-					moveNext: function () {
-						return false;
-					},
-
-					getCurrent: function () {
-						return null;
-					},					
-				};
-			},
-		};
-	};
-
-	var makeInfiniteIterable = function () {
-		return {
-			getIterator: function () {
-				return {
-					moveNext: function () {
-						return true;
-					},
-
-					getCurrent: function () {
-						return null;
-					},					
-				};
-			},
-		};
-	};	
-
 	it('result is undefined before moving to first element', function () {
 
 		var testObject = new SkipIterator(makeArrayIterable([1]), 1);
