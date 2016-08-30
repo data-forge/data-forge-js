@@ -3,10 +3,11 @@
 //
 // Iterator that takes elements while the predicate returns true.
 //
-var TakeWhileIterator = function (iterator, predicate) {
+var TakeWhileIterator = function (iterable, predicate) {
 
 	var self = this;
 	var taking = true;
+	var iterator = iterable.getIterator();
 
 	self.moveNext = function () {
 		if (!taking) {
