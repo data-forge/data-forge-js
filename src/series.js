@@ -1847,7 +1847,7 @@ Series.prototype.join = function (inner, outerKeySelector, innerKeySelector, res
 };
 
 /**
- * Correlates the elements of two Series or DataFrames based on matching keys.
+ * Performs an outer join on two Series or DataFrames. Correlates the elements based on matching keys.
  * Includes elements that have no correlation.
  *
  * @param {Series|DataFrame} self - The outer Series or DataFrame to join. 
@@ -1891,6 +1891,86 @@ Series.prototype.joinOuter = function (rightSeries, outerKeySelector, innerKeySe
 
 	return leftOuter
 		.concat(inner)
+		.concat(rightOuter)
+		;
+};
+
+/**
+ * Performs a left outer join on two Series or DataFrames. Correlates the elements based on matching keys.
+ * Includes left elements that have no correlation.
+ *
+ * @param {Series|DataFrame} self - The outer Series or DataFrame to join. 
+ * @param {Series|DataFrame} inner - The inner Series or DataFrame to join.
+ * @param {function} outerKeySelector - Selector that chooses the join key from the outer sequence.
+ * @param {function} innerKeySelector - Selector that chooses the join key from the inner sequence.
+ * @param {function} outerResultSelector - Selector that defines how to extract the outer value before joining it with the inner value. 
+ * @param {function} innerResultSelector - Selector that defines how to extract the inner value before joining it with the outer value.
+ * @param {function} mergeSelector - Selector that defines how to combine left and right.
+ * 
+ * Implementation from here:
+ * 
+ * 	http://blogs.geniuscode.net/RyanDHatch/?p=116
+ */
+Series.prototype.joinOuterLeft = function (rightSeries, outerKeySelector, innerKeySelector, resultSelector) {
+
+	assert.instanceOf(rightSeries, Series, "Expected 'rightSeries' parameter of 'Series.joinOuterLeft' to be a Series.");
+	assert.isFunction(outerKeySelector, "Expected 'outerKeySelector' parameter of 'Series.joinOuterLeft' to be a selector function.");
+	assert.isFunction(innerKeySelector, "Expected 'innerKeySelector' parameter of 'Series.joinOuterLeft' to be a selector function.");
+	assert.isFunction(resultSelector, "Expected 'resultSelector' parameter of 'Series.joinOuterLeft' to be a selector function.");
+
+	var self = this;
+
+	var leftOuter = self.except(rightSeries, function (outer, inner) {
+			return outerKeySelector(outer) === innerKeySelector(inner);
+		})
+		.select(function (outer) { 
+			return resultSelector(outer, null);
+		})
+		;
+
+	var inner = self.join(rightSeries, outerKeySelector, innerKeySelector, resultSelector);
+
+	return leftOuter
+		.concat(inner)
+		;
+};
+
+/**
+ * Performs a right outer join on two Series or DataFrames. Correlates the elements based on matching keys.
+ * Includes right elements that have no correlation.
+ *
+ * @param {Series|DataFrame} self - The outer Series or DataFrame to join. 
+ * @param {Series|DataFrame} inner - The inner Series or DataFrame to join.
+ * @param {function} outerKeySelector - Selector that chooses the join key from the outer sequence.
+ * @param {function} innerKeySelector - Selector that chooses the join key from the inner sequence.
+ * @param {function} outerResultSelector - Selector that defines how to extract the outer value before joining it with the inner value. 
+ * @param {function} innerResultSelector - Selector that defines how to extract the inner value before joining it with the outer value.
+ * @param {function} mergeSelector - Selector that defines how to combine left and right.
+ * 
+ * Implementation from here:
+ * 
+ * 	http://blogs.geniuscode.net/RyanDHatch/?p=116
+ */
+Series.prototype.joinOuterRight = function (rightSeries, outerKeySelector, innerKeySelector, resultSelector) {
+
+	assert.instanceOf(rightSeries, Series, "Expected 'rightSeries' parameter of 'Series.joinOuterRight' to be a Series.");
+	assert.isFunction(outerKeySelector, "Expected 'outerKeySelector' parameter of 'Series.joinOuterRight' to be a selector function.");
+	assert.isFunction(innerKeySelector, "Expected 'innerKeySelector' parameter of 'Series.joinOuterRight' to be a selector function.");
+	assert.isFunction(resultSelector, "Expected 'resultSelector' parameter of 'Series.joinOuterRight' to be a selector function.");
+
+	var self = this;
+
+	var rightOuter = rightSeries.except(self, function (inner, outer) {
+			return outerKeySelector(outer) === innerKeySelector(inner);
+		})
+		.select(function (inner) {
+			return resultSelector(null, inner);
+		})
+		;
+
+	var inner = self.join(rightSeries, outerKeySelector, innerKeySelector, resultSelector);
+
+	return inner
 		.concat(rightOuter)
 		;
 };
