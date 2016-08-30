@@ -329,6 +329,11 @@ describe('merge-examples', function () {
 
             var df_new = dataForge.concat([df_a, df_b]);
 
+            expect(df_new.getIndex().toValues()).to.eql([
+                0, 1, 2, 3, 4,
+                0, 1, 2, 3, 4,
+            ]);
+
             expect(df_new.toRows()).to.eql([
                 [1, 'Alex', 'Anderson'],
                 [2, 'Amy', 'Ackerman'],
@@ -347,6 +352,10 @@ describe('merge-examples', function () {
         it('Join the two dataframes along columns', function () {
 
             var df_new = dataForge.concat([df_a, df_b], { axis: 1 });
+
+            expect(df_new.getIndex().take(5).toValues()).to.eql([
+                0, 1, 2, 3, 4,
+            ]);
 
             expect(df_new.getColumnNames()).to.eql([
                 'subject_id.1',
@@ -387,8 +396,11 @@ describe('merge-examples', function () {
                         };
                     }
                 )
-                .orderBy(row => row.subject_id)
                 ;
+
+            expect(df_merged.getIndex().take(9).toValues()).to.eql([
+                0, 1, 2, 3, 4, 5, 6, 7, 8,
+            ]);
 
             expect(df_merged.getColumnNames()).to.eql([
                 'subject_id',
@@ -402,8 +414,8 @@ describe('merge-examples', function () {
                 [2, 'Amy', 'Ackerman', 15],
                 [3, 'Allen', 'Ali', 15],
                 [4, 'Alice', 'Aoni', 61],
-                [4, 'Billy', 'Bonder', 61],
                 [5, 'Ayoung', 'Aitches', 16],
+                [4, 'Billy', 'Bonder', 61], // Note this is slighly different to the ordering from Pandas.
                 [5, 'Brian', 'Black', 16],
                 [7, 'Bryce', 'Brice', 14],
                 [8, 'Betty', 'Btisan', 15],
@@ -426,8 +438,11 @@ describe('merge-examples', function () {
                         };
                     }
                 )
-                .orderBy(row => row.subject_id)
                 ;
+
+            expect(df_merged.getIndex().take(9).toValues()).to.eql([
+                0, 1, 2, 3, 4, 5, 6, 7, 8,
+            ]);
 
             expect(df_merged.getColumnNames()).to.eql([
                 'subject_id',
@@ -441,8 +456,8 @@ describe('merge-examples', function () {
                 [2, 'Amy', 'Ackerman', 15],
                 [3, 'Allen', 'Ali', 15],
                 [4, 'Alice', 'Aoni', 61],
-                [4, 'Billy', 'Bonder', 61],
                 [5, 'Ayoung', 'Aitches', 16],
+                [4, 'Billy', 'Bonder', 61],  // Note this is slighly different to the ordering from Pandas.
                 [5, 'Brian', 'Black', 16],
                 [7, 'Bryce', 'Brice', 14],
                 [8, 'Betty', 'Btisan', 15],
@@ -467,8 +482,11 @@ describe('merge-examples', function () {
                         };
                     }
                 )
-                .orderBy(row => row.subject_id)
                 ;
+
+            expect(df_merged.getIndex().take(9).toValues()).to.eql([
+                0, 1, 2, 3, 4, 5, 6, 7, 8,
+            ]);
 
             expect(df_merged.getColumnNames()).to.eql([
                 'subject_id',
@@ -482,8 +500,8 @@ describe('merge-examples', function () {
                 [2, 'Amy', 'Ackerman', 15],
                 [3, 'Allen', 'Ali', 15],
                 [4, 'Alice', 'Aoni', 61],
-                [4, 'Billy', 'Bonder', 61],
                 [5, 'Ayoung', 'Aitches', 16],
+                [4, 'Billy', 'Bonder', 61],   // Note this is slighly different to the ordering from Pandas.
                 [5, 'Brian', 'Black', 16],
                 [7, 'Bryce', 'Brice', 14],
                 [8, 'Betty', 'Btisan', 15],
@@ -511,8 +529,11 @@ describe('merge-examples', function () {
                         return output;
                     }
                 )
-                .orderBy(row => row.subject_id)
                 ;
+
+            expect(df_merged.getIndex().take(8).toValues()).to.eql([
+                0, 1, 2, 3, 4, 5, 6, 7
+            ]);
 
             expect(df_merged.getColumnNames()).to.eql([
                 'subject_id',
@@ -550,8 +571,11 @@ describe('merge-examples', function () {
                         };
                     }
                 )
-                .orderBy(row => row.subject_id)
                 ;
+
+            expect(df_merged.getIndex().take(2).toValues()).to.eql([
+                0, 1,
+            ]);
 
             expect(df_merged.getColumnNames()).to.eql([
                 'subject_id',
@@ -588,8 +612,11 @@ describe('merge-examples', function () {
                         return output;
                     }
                 )
-                .orderBy(row => row.subject_id)
                 ;
+
+            expect(df_merged.getIndex().take(5).toValues()).to.eql([
+                0, 1, 2, 3, 4,
+            ]);
 
             expect(df_merged.getColumnNames()).to.eql([
                 'subject_id',
@@ -629,8 +656,11 @@ describe('merge-examples', function () {
                         return output;
                     }
                 )
-                .orderBy(row => row.subject_id)
                 ;
+
+            expect(df_merged.getIndex().take(5).toValues()).to.eql([
+                0, 1, 2, 3, 4,
+            ]);
 
             expect(df_merged.getColumnNames()).to.eql([
                 'subject_id',
@@ -670,8 +700,11 @@ describe('merge-examples', function () {
                         return output;
                     }
                 )
-                .orderBy(row => row.subject_id)
                 ;
+
+            expect(df_merged.getIndex().take(5).toValues()).to.eql([
+                0, 1, 2, 3, 4,
+            ]);
 
             expect(df_merged.getColumnNames()).to.eql([
                 'subject_id',
@@ -707,8 +740,11 @@ describe('merge-examples', function () {
                         };
                     }
                 )
-                .orderBy(row => row.subject_id)
                 ;
+
+            expect(df_merged.getIndex().take(5).toValues()).to.eql([
+                0, 1, 2, 3, 4,
+            ]);
 
             expect(df_merged.getColumnNames()).to.eql([
                 'subject_id_x',

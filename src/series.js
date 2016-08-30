@@ -1892,6 +1892,7 @@ Series.prototype.joinOuter = function (rightSeries, outerKeySelector, innerKeySe
 	return leftOuter
 		.concat(inner)
 		.concat(rightOuter)
+		.resetIndex()
 		;
 };
 
@@ -1932,6 +1933,7 @@ Series.prototype.joinOuterLeft = function (rightSeries, outerKeySelector, innerK
 
 	return leftOuter
 		.concat(inner)
+		.resetIndex()
 		;
 };
 
@@ -1972,6 +1974,7 @@ Series.prototype.joinOuterRight = function (rightSeries, outerKeySelector, inner
 
 	return inner
 		.concat(rightOuter)
+		.resetIndex()
 		;
 };
 
