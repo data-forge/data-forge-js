@@ -1,48 +1,45 @@
 'use strict';
 
-var E = require('linq');
+var assert = require('chai').assert;
 
 //
 // An iterator that can step multiple other iterators at once.
 //
-var MultiIterator = function (iterators) {
+var ConcatIterator = function (iterables) {
+
+	assert.isArray(iterables);
 
 	var self = this;
 
-	var curIterator = -1;
+	var workingIterator;
+	var nextIteratorIndex = 0;
 
-	self.moveNext = function () {				
-		
-		if (iterators.length === 0) {
-			return false;
-		}
+	self.moveNext = function () {
 
-		if (curIterator < 0) {
-			++curIterator;
-		}
-		
 		for (;;) {
-			if (iterators[curIterator].moveNext()) {
-				return true;
+			if (workingIterator) {
+				if (workingIterator.moveNext()) {
+					return true; // Moved next on current iterator.
+				}
+			}				
+
+			if (nextIteratorIndex >= iterables.length) {
+				return false; // Reached the end of all iterables.
 			}
 
-			if (curIterator >= iterators.length-1) {
-				return false;
-			}
-
-			++curIterator;
+			var nextIterable = iterables[nextIteratorIndex++]; // Grab the next iterable.
+			workingIterator = nextIterable.getIterator(); // Materialize an iterator.
 		}
 	};
 
 	self.getCurrent = function () {
-		if (curIterator >= 0) {
-			return iterators[curIterator].getCurrent();
-		}
-		else {
+		if (!workingIterator) {
 			return undefined;
 		}
+
+		return workingIterator.getCurrent();
 	};
 
 };
 
-module.exports = MultiIterator;
+module.exports = ConcatIterator;
