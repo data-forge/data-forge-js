@@ -8,11 +8,11 @@ var SelectIterator = require('./select');
 //
 // An iterator that can step multiple other iterators at once.
 //
-var SelectManyIterator = function (iterator, selector) {
+var SelectManyIterator = function (iterable, selector) {
 
 	var self = this;
 
-	var expandIterator = new SelectIterator(iterator, selector);
+	var expandIterator = new SelectIterator(iterable, selector);
 	var childIterator = null;
 
 	self.moveNext = function () {				
@@ -22,7 +22,10 @@ var SelectManyIterator = function (iterator, selector) {
 			}
 
 			childIterator = expandIterator.getCurrent();
-			if (Object.isArray(childIterator)) {
+			if (Object.isFunction(childIterator.getIterator)) {
+				childIterator = childIterator.getIterator();
+			}
+			else if (Object.isArray(childIterator)) {
 				childIterator = new ArrayIterator(childIterator);
 			}
 
@@ -38,7 +41,10 @@ var SelectManyIterator = function (iterator, selector) {
 			}
 
 			childIterator = expandIterator.getCurrent();
-			if (Object.isArray(childIterator)) {
+			if (Object.isFunction(childIterator.getIterator)) {
+				childIterator = childIterator.getIterator();
+			}
+			else if (Object.isArray(childIterator)) {
 				childIterator = new ArrayIterator(childIterator);
 			}
 
