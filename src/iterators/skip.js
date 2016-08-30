@@ -3,9 +3,10 @@
 //
 // Data-forge enumerator for iterating a standard JavaScript array.
 //
-var SkipIterator = function (iterator, skipAmount) {
+var SkipIterator = function (iterable, skipAmount) {
 
 	var self = this;
+	var iterator = iterable.getIterator();
 
 	self.moveNext = function () {
 		while (--skipAmount >= 0 && iterator.moveNext()) {
