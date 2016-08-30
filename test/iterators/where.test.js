@@ -6,9 +6,17 @@ describe('where iterator', function () {
 	var ArrayIterator = require('../../src/iterators/array');
 	var expect = require('chai').expect;
 
+	var makeArrayIterable = function (arr) {
+		return {
+			getIterator: function () {
+				return new ArrayIterator(arr);
+			},
+		};		
+	};
+
 	it('can filter out elements', function () {
 
-		var where = new WhereIterator(new ArrayIterator([1, 2, 3, 4]), function (value) {
+		var where = new WhereIterator(makeArrayIterable([1, 2, 3, 4]), function (value) {
 				return value == 2 || value == 4;
 			});
 
@@ -17,7 +25,7 @@ describe('where iterator', function () {
 
 	it('can always get last item at the end', function () {
 
-		var testObject = new WhereIterator(new ArrayIterator([1, 2, 3, 4]), function (value) {
+		var testObject = new WhereIterator(makeArrayIterable([1, 2, 3, 4]), function (value) {
 				return value == 2 || value == 4;
 			});
 
