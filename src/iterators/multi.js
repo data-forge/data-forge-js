@@ -1,11 +1,21 @@
 'use strict';
 
 var E = require('linq');
+var assert = require('chai').assert;
 
 //
 // An iterator that can step multiple other iterators at once.
 //
-var MultiIterator = function (iterators) {
+var MultiIterator = function (iterables) {
+
+	assert.isArray(iterables);
+
+	var iterators = E.from(iterables)
+		.select(function (iterable) {
+			return iterable.getIterator();
+		})
+		.toArray()
+		;
 
 	var self = this;
 	var started = false;
@@ -42,19 +52,6 @@ var MultiIterator = function (iterators) {
 			.toArray();
 	};
 
-	//
-	// Bake the iterator into an array.
-	//
-	self.realize = function () {
-
-		var output = [];
-
-		while (self.moveNext()) {
-			output.push(self.getCurrent());
-		}
-
-		return output;
-	};
 };
 
 module.exports = MultiIterator;
