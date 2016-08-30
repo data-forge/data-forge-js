@@ -6,66 +6,67 @@ describe('select iterator', function () {
 	var ArrayIterator = require('../../src/iterators/array');
 	var expect = require('chai').expect;
 
-	it('result is undefined before moving to first element', function () {
-
-		var mockIterator = {
-			moveNext: function () {
-				return false;
+	var makeArrayIterable = function (arr) {
+		return {
+			getIterator: function () {
+				return new ArrayIterator(arr);
 			},
+		};		
+	};
 
-			getCurrent: function () {
-				return null;
+	var makeEmptyIterable = function () {
+		return {
+			getIterator: function () {
+				return {
+					moveNext: function () {
+						return false;
+					},
+
+					getCurrent: function () {
+						return null;
+					},					
+				};
 			},
 		};
-		
-		var select = new SelectIterator(mockIterator, function () {});
+	};
+
+	var makeInfiniteIterable = function (value) {
+		return {
+			getIterator: function () {
+				return {
+					moveNext: function () {
+						return true;
+					},
+
+					getCurrent: function () {
+						return value;
+					},					
+				};
+			},
+		};
+	};	
+
+	it('result is undefined before moving to first element', function () {
+
+		var select = new SelectIterator(makeEmptyIterable(), function () {});
 		expect(select.getCurrent()).to.be.undefined;
 	});
 
 	it('completes straight way when there are no child iterators', function () {
 
-		var mockIterator = {
-			moveNext: function () {
-				return false;
-			},
-
-			getCurrent: function () {
-				return null;
-			},
-		};
-		var select = new SelectIterator(mockIterator, function () {});
+		var select = new SelectIterator(makeEmptyIterable(), function () {});
 		expect(select.moveNext()).to.eql(false);
 	});
 
 	it('completes when child iterator is complete', function () {
 
-		var mockIterator = {
-			moveNext: function () {
-				return false;
-			},
-
-			getCurrent: function () {
-				return null;
-			},
-		};
-
-		var select = new SelectIterator(mockIterator, function () {});
+		var select = new SelectIterator(makeEmptyIterable(), function () {});
 		expect(select.moveNext()).to.eql(false);
 	});
 
 	it('continues while child iterator is not complete', function () {
 
-		var mockIterator = {
-			moveNext: function () {
-				return true;
-			},
-
-			getCurrent: function () {
-				return null;
-			},
-		};
-
-		var select = new SelectIterator(mockIterator, function () {});
+		var select = new SelectIterator(makeInfiniteIterable(), function () {});
 		expect(select.moveNext()).to.eql(true);
 		expect(select.moveNext()).to.eql(true);
 		expect(select.moveNext()).to.eql(true);
@@ -76,17 +77,7 @@ describe('select iterator', function () {
 		var original = { something: 1 };
 		var transformed = { somethingElse: 2 };
 
-		var mockIterator = {
-			moveNext: function () {
-				return true;
-			},
-
-			getCurrent: function () {
-				return original;
-			},
-		};
-
-		var select = new SelectIterator(mockIterator, function (input) {
+		var select = new SelectIterator(makeInfiniteIterable(original), function (input) {
 				expect(input).to.equal(original);
 
 				return transformed;
@@ -98,7 +89,7 @@ describe('select iterator', function () {
 
 	it('can realize', function () {
 
-		var select = new SelectIterator(new ArrayIterator([1, 2]), 
+		var select = new SelectIterator(makeArrayIterable([1, 2]), 
 				function (value) {
 					return value + 1;
 				}
@@ -108,7 +99,7 @@ describe('select iterator', function () {
 
 	it('can always get last item at the end', function () {
 
-		var testObject = new SelectIterator(new ArrayIterator([1, 2]), 
+		var testObject = new SelectIterator(makeArrayIterable([1, 2]), 
 				function (value) {
 					return value + 1;
 				}
