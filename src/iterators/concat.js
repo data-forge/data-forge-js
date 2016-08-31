@@ -5,7 +5,7 @@ var E = require('linq');
 //
 // An iterator that can step multiple other iterators at once.
 //
-var MultiIterator = function (iterators) {
+var ConcatIterator = function (iterators) {
 
 	var self = this;
 
@@ -45,4 +45,4 @@ var MultiIterator = function (iterators) {
 
 };
 
-module.exports = MultiIterator;
+module.exports = ConcatIterator;
