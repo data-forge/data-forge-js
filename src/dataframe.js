@@ -159,6 +159,8 @@ var DataFrame = function (config) {
 	var self = this;
 	self.Constructor = DataFrame;
 
+	var _columnNames = null;
+
 	if (config) {
 		assert.isObject(config, "Expected 'config' parameter to DataFrame constructor to be an object with options for initialisation.");
 
@@ -188,10 +190,10 @@ var DataFrame = function (config) {
 			if (config.columnNames) {
 				assert.isArray(config.columnNames, "Expected 'columnNames' field of 'config' parameter to DataFrame constructor to be an array of column names or function that returns an array of column names.");
 
-				self._columnNames = config.columnNames;
+				_columnNames = config.columnNames;
 			}
 			else {
-				self._columnNames = determineColumnNamesFromPairsIterable(config.iterable, config.considerAllRows);
+				_columnNames = determineColumnNamesFromPairsIterable(config.iterable, config.considerAllRows);
 			}
 		}
 		else
@@ -228,7 +230,7 @@ var DataFrame = function (config) {
 						}						
 					);
 
-				self._columnNames = E.from(config.columnNames)
+				_columnNames = E.from(config.columnNames)
 					.select(function (columnName) {
 						var key = columnName.toLowerCase();
 						var columnCount = duplicateColumnCounts[key];
@@ -244,30 +246,30 @@ var DataFrame = function (config) {
 
 				if (Object.isFunction(values)) {
 					config.values = function () {
-						return convertRowsToObjects(self._columnNames, values());
+						return convertRowsToObjects(_columnNames, values());
 					};
 				}
 				else {
 					config.values = function () {
-						return convertRowsToObjects(self._columnNames, new ArrayIterator(values));
+						return convertRowsToObjects(_columnNames, new ArrayIterator(values));
 					};
 				}
 			}
 			else {
 				if (values) {
 					if (Object.isFunction(values)) {
-						self._columnNames = determineColumnNamesFromObjectsIterable(values, config.considerAllRows);
+						_columnNames = determineColumnNamesFromObjectsIterable(values, config.considerAllRows);
 					}
 					else {
 						// Derive column names from object fields.
-						self._columnNames = determineColumnNamesFromObjectRows(values, config.considerAllRows);
+						_columnNames = determineColumnNamesFromObjectRows(values, config.considerAllRows);
 					}
 				}
 				else if (columns) {
-					self._columnNames = Object.keys(columns);
+					_columnNames = Object.keys(columns);
 
 					config.values = function () {
-						var columnIterators = E.from(self._columnNames)
+						var columnIterators = E.from(_columnNames)
 							.select(function (columnName) {
 								var column = columns[columnName];
 								if (column instanceof Series) {
@@ -276,20 +278,24 @@ var DataFrame = function (config) {
 								return new ArrayIterator(column);
 							})
 							.toArray();
-						return convertRowsToObjects(self._columnNames, new MultiIterator(columnIterators));
+						return convertRowsToObjects(_columnNames, new MultiIterator(columnIterators));
 					};
 				}
 				else {
-					self._columnNames = [];
+					_columnNames = [];
 				}
 			}
 		}	
 	}
 	else {
-		self._columnNames = [];
+		_columnNames = [];
 	}
 
 	Series.call(this, config);
+
+	self.__iterable.getColumnNames = function () {
+		return _columnNames;
+	};
 };
 
 module.exports = DataFrame;
@@ -305,7 +311,7 @@ var zipDataFrames = require('./zip-dataframes');
  */
 DataFrame.prototype.getColumnNames = function () {
 	var self = this;
-	return self._columnNames;
+	return self.__iterable.getColumnNames();
 };
 
 /**

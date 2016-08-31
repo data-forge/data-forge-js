@@ -33,42 +33,50 @@ var Series = function (config) {
 	}
 
 	if (!config) {
-		self._indexIterable = function () {
-			return new EmptyIterator();
-		};
-		
-		self._valuesIterable = function () {
-			return new EmptyIterator();
+		self.__iterable = {
+			getIndexIterator: function () {
+				return new EmptyIterator();
+			},
+			getValuesIterator: function () {
+				return new EmptyIterator();
+			},
 		};
 		return;
 	}
 
 	assert.isObject(config, "Expected 'config' parameter to Series constructor to be an object with options for initialisation.");
 
-	if (config.iterable) { //todo: this is expensive.
+	if (config.__iterable) {
+		// Setting the inner iterable directly.
+		// Power to you!
+		self.__iterable = config.__iterable;
+		return;
+	}
+
+	if (config.iterable) { //todo: this is expensive. Want to eliminate it.
 
 		assert.isFunction(config.iterable, "Expected 'iterable' field of 'config' parameter to Series constructor to be a function that returns an index/value pairs iterator.");
 
 		var iterable = config.iterable;
 
-		self._indexIterable = function () {
-			return new SelectIterator(
-				iterable(),
-				function (pair) {
-					return pair[0];
-				}
-			);
+		self.__iterable = {
+			getIndexIterator: function () {
+				return new SelectIterator(
+					iterable(),
+					function (pair) {
+						return pair[0];
+					}
+				);
+			},
+			getValuesIterator: function () {
+				return new SelectIterator(
+					iterable(),
+					function (pair) {
+						return pair[1];
+					}
+				);
+			},
 		};
-		
-		self._valuesIterable = function () {
-			return new SelectIterator(
-				iterable(),
-				function (pair) {
-					return pair[1];
-				}
-			);
-		};
-
 		return;
 	}
 
@@ -84,40 +92,41 @@ var Series = function (config) {
 		}
 	}
 
+	self.__iterable = {};
+
 	var index = config.index;
 	if (!index) {
-		self._indexIterable = function () {
-			return new CountIterator();
+		self.__iterable.getIndexIterator = function () {
+			return new CountIterator();			
 		};
 	}
 	else if (Object.isFunction(index)) {
-		self._indexIterable = index; //todo: test me!
+		self.__iterable.getIndexIterator = index;
 	}
 	else if (Object.isArray(index)) {
-		self._indexIterable = function () {
+		self.__iterable.getIndexIterator = function () {
 			return new ArrayIterator(index);
 		};
 	}
-	else {
-		self._indexIterable = function () {
+	else {		
+		self.__iterable.getIndexIterator = function () { //todo: should actually check that index is a series and not a dataframe.
 			return index.getValuesIterator();
 		};
 	}
 
 	var values = config.values;
 	if (!values) {
-		self._valuesIterable = function () {
+		self.__iterable.getValuesIterator = function () {
 			return new EmptyIterator();
 		};
 	}
 	else if (Object.isFunction(values)) {
-		self._valuesIterable = values;
+		self.__iterable.getValuesIterator = values;
 	}
 	else {
-
-		self._valuesIterable = function () {
+		self.__iterable.getValuesIterator = function () {
 			return new ArrayIterator(values);
-		}
+		};
 	}
 };
 
@@ -130,7 +139,7 @@ var zipSeries = require('./zip-series');
 /**
  * Get an iterator for index & values of the series.
  */
-Series.prototype.getIterator = function () {
+Series.prototype.getIterator = function () { //todo: Would like to move this to '__iterable'.
 	var self = this;
 	return new PairIterator(
 		self.getIndexIterator(),
@@ -143,7 +152,7 @@ Series.prototype.getIterator = function () {
  */
 Series.prototype.getIndexIterator = function () {
 	var self = this;
-	return self._indexIterable();
+	return self.__iterable.getIndexIterator();
 };
 
 /*
@@ -151,7 +160,7 @@ Series.prototype.getIndexIterator = function () {
  */
 Series.prototype.getValuesIterator = function () {
 	var self = this;
-	return self._valuesIterable();
+	return self.__iterable.getValuesIterator();
 };
 
 /**
