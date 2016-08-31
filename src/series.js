@@ -326,12 +326,32 @@ Series.prototype.where = function (filterSelectorPredicate) {
 
 	var self = this;
 	return new self.Constructor({
-		iterable: function () {
-			return new WhereIterator(self.getIterator(), 
-				function (pair) {
-					return filterSelectorPredicate(pair[1], pair[0]);
-				}
-			);
+		__iterable: {
+			getIndexIterator: function () {
+				return new SelectIterator(
+					new WhereIterator(self.getIterator(), 
+						function (pair) {
+							return filterSelectorPredicate(pair[1]);
+						}
+					),
+					function (pair) {
+						return pair[0];
+					}
+				);
+			},
+
+			getValuesIterator: function () {
+				return new WhereIterator(
+					self.getValuesIterator(), 
+					function (value) {
+						return filterSelectorPredicate(value);
+					}
+				);
+			},
+
+			getColumnNames: function () {
+				return self.getColumnNames(); // Doesn't change column names, or order.
+			}
 		},
 	}); 	
 };

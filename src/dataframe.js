@@ -293,9 +293,12 @@ var DataFrame = function (config) {
 
 	Series.call(this, config);
 
-	self.__iterable.getColumnNames = function () {
-		return _columnNames;
-	};
+	if (!config || !config.__iterable)
+	{
+		self.__iterable.getColumnNames = function () {
+			return _columnNames;
+		};
+	}
 };
 
 module.exports = DataFrame;
