@@ -157,7 +157,7 @@ Series.prototype.getValuesIterator = function () {
 /**
  * Retreive the index of the series.
  */
-Series.prototype.getIndex = function () {
+Series.prototype.getIndex = function () { //todo: Do I need to move this to '__iterable'?
 	var self = this;
 	return new Series({
 		values: function () {
