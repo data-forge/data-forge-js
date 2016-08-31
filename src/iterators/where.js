@@ -3,10 +3,9 @@
 //
 // Iterate that filters elements based on a predicate.
 //
-var WhereIterator = function (iterable, predicate) {
+var WhereIterator = function (iterator, predicate) {
 
 	var self = this;
-	var iterator = iterable.getIterator();
 	
 	self.moveNext = function () {
 		for (;;) {

@@ -3,10 +3,9 @@
 //
 // Data-forge enumerator for iterating a standard JavaScript array.
 //
-var TakeIterator = function (iterable, takeAmount) {
+var TakeIterator = function (iterator, takeAmount) {
 
 	var self = this;
-	var iterator = iterable.getIterator();
 
 	self.moveNext = function () {
 		if (--takeAmount >= 0) {

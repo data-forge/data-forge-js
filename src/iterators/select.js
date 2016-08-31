@@ -5,12 +5,10 @@ var E = require('linq');
 //
 // An iterator that can step multiple other iterators at once.
 //
-var SelectIterator = function (iterable, selector) {
+var SelectIterator = function (iterator, selector) {
 
 	var self = this;
-	var i = -1;
-
-	var iterator = iterable.getIterator();
+	var i = -1; //todo: test this.
 
 	self.moveNext = function () {				
 		++i;
