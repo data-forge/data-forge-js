@@ -331,7 +331,7 @@ Series.prototype.where = function (filterSelectorPredicate) {
 				return new SelectIterator(
 					new WhereIterator(self.getIterator(), 
 						function (pair) {
-							return filterSelectorPredicate(pair[1]);
+							return filterSelectorPredicate(pair[1], pair[0]);
 						}
 					),
 					function (pair) {
@@ -341,10 +341,14 @@ Series.prototype.where = function (filterSelectorPredicate) {
 			},
 
 			getValuesIterator: function () {
-				return new WhereIterator(
-					self.getValuesIterator(), 
-					function (value) {
-						return filterSelectorPredicate(value);
+				return new SelectIterator(
+					new WhereIterator(self.getIterator(), 
+						function (pair) {
+							return filterSelectorPredicate(pair[1], pair[0]);
+						}
+					),
+					function (pair) {
+						return pair[1];
 					}
 				);
 			},
@@ -354,6 +358,34 @@ Series.prototype.where = function (filterSelectorPredicate) {
 			}
 		},
 	}); 	
+};
+
+//todo: Test me!
+var SelectIterable = function (iterable, selector) {
+
+	var self = this;
+
+	self.getIndexIterator = function () {
+		return iterable.getIndexIterator();
+	};
+
+	self.getValuesIterator = function () {
+		return new SelectIterator(iterable.getIterator(), 
+			function (pair) {
+				return selector(pair[1], pair[0]);
+			}
+		);
+	};
+
+	self.getColumnNames = function () {
+		// Have to get the first element to get field names.
+		var iterator = self.getValuesIterator();
+		if (!iterator.moveNext()) {
+			return [];
+		}
+
+		return Object.keys(iterator.getCurrent());
+	};
 };
 
 /**
@@ -366,13 +398,7 @@ Series.prototype.select = function (selector) {
 
 	var self = this;
 	return new self.Constructor({
-		iterable: function () {
-			return new SelectIterator(self.getIterator(), 
-				function (pair) {
-					return [pair[0], selector(pair[1], pair[0])];
-				}
-			);
-		},		
+		__iterable: new SelectIterable(self, selector),
 	}); 	
 };
 
