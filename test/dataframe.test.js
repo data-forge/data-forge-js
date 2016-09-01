@@ -1066,29 +1066,6 @@ describe('DataFrame', function () {
 		expect(series.toValues()).to.eql([11, 22, 33]);
 	});
 
-	it('can deflate dataframe to series - with index', function () {
-
-		var dataFrame = initDataFrame(
-				["Column1", "Column2"], 
-				[
-					[1, 10],
-					[2, 20],
-					[3, 30],
-				],
-				[10, 11, 12]
-			);
-
-		var series = dataFrame.deflate(function (row, index) {
-				return index;
-			});
-
-		expect(series.toPairs()).to.eql([
-			[10, 10], 
-			[11, 11], 
-			[12, 12],
-		]);
-	});
-
 	it('can aggregate dataframe', function () {
 
 		var dataFrame = initDataFrame(

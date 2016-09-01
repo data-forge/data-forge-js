@@ -241,7 +241,7 @@ Series.prototype.skipWhile = function (predicate) {
 		iterable: function () {
 			return new SkipWhileIterator(self.getIterator(), 
 				function (pair) {
-					return predicate(pair[1], pair[0]);
+					return predicate(pair[1]);
 				}
 			);
 		},
@@ -295,7 +295,7 @@ Series.prototype.takeWhile = function (predicate) {
 		iterable: function () {
 			return new TakeWhileIterator(self.getIterator(), 
 				function (pair) {
-					return predicate(pair[1], pair[0]);
+					return predicate(pair[1]);
 				}
 			);
 		},
@@ -331,7 +331,7 @@ Series.prototype.where = function (filterSelectorPredicate) {
 				return new SelectIterator(
 					new WhereIterator(self.getIterator(), 
 						function (pair) {
-							return filterSelectorPredicate(pair[1], pair[0]);
+							return filterSelectorPredicate(pair[1]);
 						}
 					),
 					function (pair) {
@@ -344,7 +344,7 @@ Series.prototype.where = function (filterSelectorPredicate) {
 				return new SelectIterator(
 					new WhereIterator(self.getIterator(), 
 						function (pair) {
-							return filterSelectorPredicate(pair[1], pair[0]);
+							return filterSelectorPredicate(pair[1]);
 						}
 					),
 					function (pair) {
@@ -372,7 +372,7 @@ var SelectIterable = function (iterable, selector) {
 	self.getValuesIterator = function () {
 		return new SelectIterator(iterable.getIterator(), 
 			function (pair) {
-				return selector(pair[1], pair[0]);
+				return selector(pair[1]);
 			}
 		);
 	};
@@ -440,7 +440,7 @@ Series.prototype.selectMany = function (selector) {
 		iterable: function () {
 			return new SelectManyIterator(self.getIterator(), 
 				function (pair) {
-					var newValues = selector(pair[1], pair[0]);
+					var newValues = selector(pair[1]);
 					if (!Object.isArray(newValues) &&
 						!(newValues instanceof Series) &&
 						!(newValues instanceof DataFrame)) {
@@ -1452,7 +1452,9 @@ Series.prototype.forEach = function (callback) {
 	}
 
 	return self;
-};/**
+};
+
+/**
  * Determine if the predicate returns truthy for all values.
  * Returns false as soon as the predicate evaluates to falsy.
  * Returns true if the predicate returns truthy for all values in the Series.
@@ -1471,7 +1473,7 @@ Series.prototype.all = function (predicate) {
 
 	while (iterator.moveNext()) {
 		var pair = iterator.getCurrent();
-		if (!predicate(pair[1], pair[0])) {
+		if (!predicate(pair[1])) {
 			return false;
 		}
 
@@ -1503,7 +1505,7 @@ Series.prototype.any = function (predicate) {
 
 	while (iterator.moveNext()) {
 		var pair = iterator.getCurrent();
-		if (predicate(pair[1], pair[0])) {
+		if (predicate(pair[1])) {
 			return true;
 		}
 	}
@@ -1535,7 +1537,7 @@ Series.prototype.none = function (predicate) {
 
 	while (iterator.moveNext()) {
 		var pair = iterator.getCurrent();
-		if (predicate(pair[1], pair[0])) {
+		if (predicate(pair[1])) {
 			return false;
 		}
 	}

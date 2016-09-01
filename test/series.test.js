@@ -120,8 +120,7 @@ describe('Series', function () {
 
 	it('can filter', function () {
 		var series = initSeries([0, 1, 2, 3], [100, 300, 200, 5]);
-		var filtered = series.where(function (value, index) {
-				expect(index).to.be.a('number');
+		var filtered = series.where(function (value) {
 				return value >= 100 && value < 300;
 			});
 		expect(filtered.getIndex().toValues()).to.eql([0, 2]);
@@ -135,16 +134,6 @@ describe('Series', function () {
 			});
 		expect(modified.getIndex().toValues()).to.eql([0, 1, 2, 3]);
 		expect(modified.toValues()).to.eql([110, 310, 210, 15]);		
-	});
-
-	it('can select with index', function () {
-		var series = initSeries([0, 1, 2, 3], [100, 300, 200, 5]);
-		var modified = series.select(function (value, index) {
-				expect(index).to.be.a('number');
-				return index;
-			});
-		expect(modified.getIndex().toValues()).to.eql([0, 1, 2, 3]);
-		expect(modified.toValues()).to.eql([0, 1, 2, 3]);		
 	});
 
 	it('can select pairs', function () {
@@ -190,17 +179,6 @@ describe('Series', function () {
 			});
 		expect(modified.getIndex().toValues()).to.eql([0, 0, 1, 1]);
 		expect(modified.toValues()).to.eql([{ Value: 100 }, { Value: 101 }, { Value: 300 }, { Value: 301 }]);
-	});
-
-	it('can select many with index', function () {
-		var series = initSeries([0, 1, 2, 3], [100, 300, 200, 5]);
-		var modified = series.selectMany(function (value, index) {
-			expect(index).to.be.a('number');
-			return [index, index];
-		});
-
-		expect(modified.getIndex().toValues()).to.eql([0, 0, 1, 1, 2, 2, 3, 3]);
-		expect(modified.toValues()).to.eql([0, 0, 1, 1, 2, 2, 3, 3]);
 	});
 
 	it('can select many pairs', function () {
@@ -1005,8 +983,7 @@ describe('Series', function () {
 	it('can skip while', function () {
 
 		var series = initSeries([0, 1, 2, 3], [true, true, false, true]);
-		var skipped = series.skipWhile(function (value, index) { 
-			expect(index).to.be.a("number");
+		var skipped = series.skipWhile(function (value) { 
 			return value; 
 		});
 		expect(skipped.toPairs()).to.eql([
@@ -1018,8 +995,7 @@ describe('Series', function () {
 	it('can skip until', function () {
 
 		var series = initSeries([0, 1, 2, 3], [false, false, true, false]);
-		var skipped = series.skipUntil(function (value, index) { 
-			expect(index).to.be.a("number");
+		var skipped = series.skipUntil(function (value) { 
 			return value; 
 		});
 		expect(skipped.toPairs()).to.eql([
@@ -1031,8 +1007,7 @@ describe('Series', function () {
 	it('can take while', function () {
 
 		var series = initSeries([0, 1, 2, 3], [true, true, false, true]);
-		var skipped = series.takeWhile(function (value, index) { 
-			expect(index).to.be.a("number");
+		var skipped = series.takeWhile(function (value) { 
 			return value; 
 		});
 		expect(skipped.toPairs()).to.eql([
@@ -1044,8 +1019,7 @@ describe('Series', function () {
 	it('can take until', function () {
 
 		var series = initSeries([0, 1, 2, 3], [false, false, true, false]);		
-		var skipped = series.takeUntil(function (value, index) { 
-			expect(index).to.be.a("number");
+		var skipped = series.takeUntil(function (value) { 
 			return value; 
 		});
 		expect(skipped.toPairs()).to.eql([

@@ -1101,7 +1101,7 @@ DataFrame.prototype.deflate = function (selector) {
 				return new SelectIterator(
 					self.getIterator(),
 					function (pair) {
-						var newValue = selector(pair[1], pair[0]);
+						var newValue = selector(pair[1]);
 						return [
 							pair[0],
 							newValue
