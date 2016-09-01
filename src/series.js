@@ -666,19 +666,44 @@ Series.prototype.slice = function (startIndexOrStartPredicate, endIndexOrEndPred
 	}
 
 	return new self.Constructor({
-		iterable: function () {
-			return new TakeWhileIterator(
-				new SkipWhileIterator(
-					self.getIterator(),
-					function (pair) {
-						return startPredicate(pair[0]); // Check index for start condition.
+		__iterable: {
+			getIndexIterator: function () {
+				return new TakeWhileIterator(
+					new SkipWhileIterator(
+						self.getIndexIterator(),
+						function (index) {
+							return startPredicate(index); // Check index for start condition.
+						}
+					),
+					function (index) {
+						return endPredicate(index); // Check index for end condition.
 					}
-				),
-				function (pair) {
-					return endPredicate(pair[0]); // Check index for end condition.
-				}
-			);
-		},		
+				);
+			},
+
+			getValuesIterator: function () {
+				return new SelectIterator(
+					new TakeWhileIterator(
+						new SkipWhileIterator(
+							self.getIterator(),
+							function (pair) {
+								return startPredicate(pair[0]); // Check index for start condition.
+							}
+						),
+						function (pair) {
+							return endPredicate(pair[0]); // Check index for end condition.
+						}
+					),
+					function (pair) {
+						return pair[1];
+					}
+				);
+			},
+
+			getColumnNames: function () {
+				return self.getColumnNames();
+			},
+		},
 	});
 };
 
