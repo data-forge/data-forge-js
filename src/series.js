@@ -1841,15 +1841,27 @@ Series.prototype.groupSequentialBy = function (selector) {
 Series.prototype.at = function (index) {
 
 	var self = this;
-	var search = self.skipWhile(function (value, searchIndex) { //todo: This could be optimized by using a type-specific index.
-			return searchIndex !== index;
-		});
+	var iterator = self.getIterator();
 
-	if (search.none()) {
+	if (!iterator.moveNext()) {
 		return undefined;
 	}
 
-	return search.first();
+	//
+	// This is pretty expensive.
+	// A specialised index could improve this.
+	//
+
+	do {
+
+		var curPair = iterator.getCurrent();
+		if (curPair[0] === index) {
+			return curPair[1];
+		}
+
+	} while (iterator.moveNext());
+
+	return undefined;
 };
 
 /**
