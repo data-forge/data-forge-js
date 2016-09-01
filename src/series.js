@@ -218,13 +218,19 @@ Series.prototype.skip = function (numRows) {
 
 	var self = this;
 	return new self.Constructor({
-		index: function () {
-			return new SkipIterator(self.getIndexIterator(), numRows);
-		},
+		__iterable: {
+			getIndexIterator: function () {
+				return new SkipIterator(self.getIndexIterator(), numRows);
+			},
 
-		values: function () {
+			getValuesIterator: function () {
 			return new SkipIterator(self.getValuesIterator(), numRows);
-		},		
+			},
+
+			getColumnNames: function () {
+				return self.getColumnNames();
+			},
+		}
 	}); 	
 };
 
@@ -238,13 +244,28 @@ Series.prototype.skipWhile = function (predicate) {
 
 	var self = this;
 	return new self.Constructor({
-		iterable: function () {
-			return new SkipWhileIterator(self.getIterator(), 
-				function (pair) {
-					return predicate(pair[1]);
-				}
-			);
-		},
+		__iterable: {
+			getIndexIterator: function () {
+				return new SelectIterator(
+					new SkipWhileIterator(self.getIterator(), 
+						function (pair) {
+							return predicate(pair[1]);
+						}
+					),
+					function (pair) {
+						return pair[0]; // Extract index.
+					}
+				);
+			},
+
+			getValuesIterator: function () {
+				return new SkipWhileIterator(self.getValuesIterator(), predicate); 
+			},
+
+			getColumnNames: function () {
+				return self.getColumnNames();
+			},
+		}
 	}); 	
 };
 
@@ -257,8 +278,8 @@ Series.prototype.skipUntil = function (predicate) {
 	assert.isFunction(predicate, "Expected 'predicate' parameter to 'skipUntil' function to be a predicate function that returns true/false.");
 
 	var self = this;
-	return self.skipWhile(function (value, index) { 
-		return !predicate(value, index); 
+	return self.skipWhile(function (value) { 
+		return !predicate(value); 
 	});
 };
 
@@ -272,12 +293,18 @@ Series.prototype.take = function (numRows) {
 
 	var self = this;
 	return new self.Constructor({
-		index: function () {
-			return new TakeIterator(self.getIndexIterator(), numRows);
-		},
+		__iterable: {
+			getIndexIterator: function () {
+				return new TakeIterator(self.getIndexIterator(), numRows);
+			},
 
-		values: function () {
-			return new TakeIterator(self.getValuesIterator(), numRows);
+			getValuesIterator: function () {
+				return new TakeIterator(self.getValuesIterator(), numRows);
+			},
+
+			getColumnNames: function () {
+				return self.getColumnNames();
+			},
 		},
 	});
 };
@@ -292,12 +319,28 @@ Series.prototype.takeWhile = function (predicate) {
 
 	var self = this;
 	return new self.Constructor({
-		iterable: function () {
-			return new TakeWhileIterator(self.getIterator(), 
-				function (pair) {
-					return predicate(pair[1]);
-				}
-			);
+		__iterable: {
+			getIndexIterator: function () {
+				return new SelectIterator( 
+					new TakeWhileIterator(self.getIterator(), 
+						function (pair) {
+							return predicate(pair[1]);
+						}
+					),
+					function (pair) {
+						return pair[0]; // Extract index.
+					}
+				);
+			},
+
+			getValuesIterator: function () {
+				return new TakeWhileIterator(self.getValuesIterator(), predicate); 
+			},
+
+			getColumnNames: function () {
+				return self.getColumnNames();
+			},
+
 		},
 	}); 	
 };
@@ -311,8 +354,8 @@ Series.prototype.takeUntil = function (predicate) {
 	assert.isFunction(predicate, "Expected 'predicate' parameter to 'takeUntil' function to be a predicate function that returns true/false.");
 
 	var self = this;
-	return self.takeWhile(function (value, index) { 
-		return !predicate(value, index); 
+	return self.takeWhile(function (value) { 
+		return !predicate(value); 
 	});
 };
 
@@ -341,16 +384,7 @@ Series.prototype.where = function (filterSelectorPredicate) {
 			},
 
 			getValuesIterator: function () {
-				return new SelectIterator(
-					new WhereIterator(self.getIterator(), 
-						function (pair) {
-							return filterSelectorPredicate(pair[1]);
-						}
-					),
-					function (pair) {
-						return pair[1];
-					}
-				);
+				return new WhereIterator(self.getValuesIterator(), filterSelectorPredicate);
 			},
 
 			getColumnNames: function () {
@@ -360,7 +394,7 @@ Series.prototype.where = function (filterSelectorPredicate) {
 	}); 	
 };
 
-//todo: Test me!
+//todo: Test me! And move out.
 var SelectIterable = function (iterable, selector) {
 
 	var self = this;
@@ -1270,9 +1304,10 @@ Series.prototype.inflate = function (selector) {
 	}
 
 	return new DataFrame({
-		iterable: function () {
-			return self.select(selector).getIterator();
-		},
+		__iterable: new SelectIterable(
+			self, 
+			selector
+		),
 	});
 };
 
@@ -1777,6 +1812,47 @@ Series.prototype.fillGaps = function (predicate, generator) {
 		;
 };
 
+//todo: Test me. move to another file.
+var ArrayIterable = function (arr) {
+	
+	assert.isArray(arr);
+
+	var self = this;
+
+	self.getIndexIterator = function () {
+		return new CountIterator();
+	};
+
+	self.getValuesIterator = function () {
+		return new ArrayIterator(arr);
+	};
+};
+
+var PairsIterable = function (arr) {
+	
+	assert.isArray(arr);
+
+	var self = this;
+
+	self.getIndexIterator = function () {
+		return new SelectIterator(
+			new ArrayIterator(arr),
+			function (pair) {
+				return pair[0];
+			}
+		);
+	};
+
+	self.getValuesIterator = function () {
+		return new SelectIterator(
+			new ArrayIterator(arr),
+			function (pair) {
+				return pair[1];
+			}
+		);
+	};
+};
+
 /**
  * Group the series according to the selector.
  *
@@ -1804,12 +1880,8 @@ Series.prototype.groupBy = function (selector) {
 		.toArray();
 
 	return new Series({
-		iterable: function () {
-			return new ArrayIterator(groupedPairs);
-		},
+		__iterable: new PairsIterable(groupedPairs),
 	});
-
-
 };
 
 /**
