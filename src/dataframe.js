@@ -370,18 +370,18 @@ DataFrame.prototype.getSeries = function (columnName) {
 	assert.isString(columnName, "Expected 'columnName' parameter to getSeries function to be a string that specifies the name of the column to retreive.");
 
 	return new Series({
-		iterable: function () {
-			return new WhereIterator(
-				new SelectIterator(self.getIterator(), function (pair) {
-					return [
-						pair[0],
-						pair[1][columnName],
-					];
-				}),
-				function (pair) {
-					return pair[1] !== undefined;
-				}
-			);
+		__iterable: {
+			getIndexIterator: function () {
+				return self.getIndexIterator();
+			},
+
+			getValuesIterator: function () {
+				return new SelectIterator(self.getValuesIterator(), 
+					function (value) {
+						return value[columnName];
+					}
+				);				
+			},
 		},
 	});
 };

@@ -1102,7 +1102,10 @@ Series.prototype.toValues = function () {
 	var values = [];
 
 	while (iterator.moveNext()) {
-		values.push(iterator.getCurrent());
+		var value = iterator.getCurrent();
+		if (value !== undefined) {
+			values.push(iterator.getCurrent());
+		}
 	}
 
 	return values;
@@ -1141,7 +1144,10 @@ Series.prototype.toPairs = function () {
 	var pairs = [];
 
 	while (iterator.moveNext()) {
-		pairs.push(iterator.getCurrent());
+		var pair = iterator.getCurrent();
+		if (pair[1] !== undefined) {
+			pairs.push(pair);
+		}		
 	}
 
 	return pairs;

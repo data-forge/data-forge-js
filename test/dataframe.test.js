@@ -125,15 +125,15 @@ describe('DataFrame', function () {
 		);
 		
 		var series1 = dataFrame.getSeries('Value1');
-		expect(series1.getIndex().toValues()).to.eql([5, 6]);
+		expect(series1.getIndex().take(2).toValues()).to.eql([5, 6]);
 		expect(series1.toValues()).to.eql([100, 200]);
 		
 		var series2 = dataFrame.getSeries('Value2');
-		expect(series2.getIndex().toValues()).to.eql([5, 6]);
+		expect(series2.getIndex().take(2).toValues()).to.eql([5, 6]);
 		expect(series2.toValues()).to.eql(['foo', 'bar']);
 		
 		var series3 = dataFrame.getSeries('Value3');
-		expect(series3.getIndex().toValues()).to.eql([5, 6]);
+		expect(series3.getIndex().take(2).toValues()).to.eql([5, 6]);
 		expect(series3.toValues()).to.eql([11, 22]);
 	});
 
@@ -432,7 +432,7 @@ describe('DataFrame', function () {
 		var modified = dataFrame.withSeries(newColumnName, newSeries);
 		var mergedSeries = modified.getSeries(newColumnName);
 
-		expect(modified.getIndex().toValues()).to.eql([5, 6, 7, 8]);
+		expect(modified.getIndex().take(4).toValues()).to.eql([5, 6, 7, 8]);
 		expect(modified.getColumnNames()).to.eql([
 			"Date",
 			"Value1",
@@ -447,7 +447,7 @@ describe('DataFrame', function () {
 			[new Date(2015, 24, 2), 100, 'd', 4, undefined],
 		]);
 
-		expect(mergedSeries.getIndex().toValues()).to.eql([5, 7]);
+		expect(mergedSeries.getIndex().take(4).toValues()).to.eql([5, 6, 7, 8]);
 		expect(mergedSeries.toValues()).to.eql([3, 1]);
 	});
 

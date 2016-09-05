@@ -590,7 +590,7 @@ describe('Series', function () {
 		var parsed = series.parseInts();
 
 		expect(parsed.getIndex().toValues()).to.eql([10]);
-		expect(parsed.toValues()).to.eql([undefined]);
+		expect(parsed.toValues()).to.eql([]);
 	});
 
 	it('can parse string series to int - with undefined', function () {
@@ -599,7 +599,7 @@ describe('Series', function () {
 		var parsed = series.parseInts();
 
 		expect(parsed.getIndex().toValues()).to.eql([10]);
-		expect(parsed.toValues()).to.eql([undefined]);
+		expect(parsed.toValues()).to.eql([]);
 	});
 
 	it('can parse string series to int - throws when source value is not a string', function () {
@@ -627,7 +627,7 @@ describe('Series', function () {
 		var parsed = series.parseFloats();
 
 		expect(parsed.getIndex().toValues()).to.eql([10]);
-		expect(parsed.toValues()).to.eql([undefined]);
+		expect(parsed.toValues()).to.eql([]);
 	});
 
 	it('can parse string series to float - with undefined', function () {
@@ -636,7 +636,7 @@ describe('Series', function () {
 		var parsed = series.parseFloats();
 
 		expect(parsed.getIndex().toValues()).to.eql([10]);
-		expect(parsed.toValues()).to.eql([undefined]);
+		expect(parsed.toValues()).to.eql([]);
 	});
 
 	it('can parse string series to float - throws when source value is not a string', function () {
@@ -664,7 +664,7 @@ describe('Series', function () {
 		var parsed = series.parseDates();
 
 		expect(parsed.getIndex().toValues()).to.eql([10]);
-		expect(parsed.toValues()).to.eql([undefined]);
+		expect(parsed.toValues()).to.eql([]);
 	});
 
 	it('can parse string series to date - with undefined', function () {
@@ -673,7 +673,7 @@ describe('Series', function () {
 		var parsed = series.parseDates();
 
 		expect(parsed.getIndex().toValues()).to.eql([10]);
-		expect(parsed.toValues()).to.eql([undefined]);
+		expect(parsed.toValues()).to.eql([]);
 	});
 
 	it('can parse string series to date - throws when source value is not a string', function () {
@@ -704,7 +704,6 @@ describe('Series', function () {
 		expect(converted.toValues()).to.eql([
 			'1', 
 			null, 
-			undefined, 
 			"foo", 
 			'5.5', 
 			'Sun Feb 01 2015 00:00:00 GMT+1000 (E. Australia Standard Time)'
@@ -801,7 +800,7 @@ describe('Series', function () {
 		var series = initSeries([1, 2, 3, 4], [null, undefined, 1, new Date(2015, 1, 1)]);
 		var truncated = series.truncateStrings(20);
 
-		expect(truncated.toValues()).to.eql([null, undefined, 1, new Date(2015, 1, 1)]);
+		expect(truncated.toValues()).to.eql([null, 1, new Date(2015, 1, 1)]);
 	});
 
 	it('can bake series', function () {
