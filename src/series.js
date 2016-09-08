@@ -404,11 +404,7 @@ var SelectIterable = function (iterable, selector) {
 	};
 
 	self.getValuesIterator = function () {
-		return new SelectIterator(iterable.getIterator(), 
-			function (pair) {
-				return selector(pair[1]);
-			}
-		);
+		return new SelectIterator(iterable.getValuesIterator(), selector);
 	};
 
 	self.getColumnNames = function () {
