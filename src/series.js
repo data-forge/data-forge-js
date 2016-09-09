@@ -1235,16 +1235,22 @@ Series.prototype.reverse = function () {
 
 	var self = this;
 	return new self.Constructor({
-		iterable: function () {
-			var pairs = [];
-			var iterator = self.getIterator();
+		__iterable: {
+			getIterator: function () {
+				var pairs = [];
+				var iterator = self.getIterator();
 
-			while (iterator.moveNext()) {
-				pairs.push(iterator.getCurrent());
-			}
+				while (iterator.moveNext()) {
+					pairs.push(iterator.getCurrent());
+				}
 
-			return new ArrayIterator(pairs.reverse());
-		},
+				return new ArrayIterator(pairs.reverse());
+			},
+
+			getColumnNames: function () {
+				return self.getColumnNames();
+			},
+		}
 	});
 };
 
