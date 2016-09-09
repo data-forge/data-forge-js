@@ -1727,8 +1727,14 @@ Series.prototype.insertPair = function (pair) {
 	var self = this;
 	var pairs = [pair].concat(self.toPairs());
 	return new self.Constructor({
-		iterable: function () {
-			return new ArrayIterator(pairs);
+		__iterable: {
+			getIterator: function () {
+				return new ArrayIterator(pairs);
+			},
+
+			getColumnNames: function () {
+				return self.getColumnNames();
+			},
 		},
 	});
 };
