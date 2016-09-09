@@ -1754,8 +1754,14 @@ Series.prototype.appendPair = function (pair) {
 	var pairs = self.toPairs();
 	pairs.push(pair);
 	return new self.Constructor({
-		iterable: function () {
-			return new ArrayIterator(pairs);
+		__iterable: {
+			getIterator: function () {
+				return new ArrayIterator(pairs);
+			},
+
+			getColumnNames: function () {
+				return self.getColumnNames();
+			},
 		},
 	});
 };
