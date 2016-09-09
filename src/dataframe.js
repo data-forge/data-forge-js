@@ -371,14 +371,10 @@ DataFrame.prototype.getSeries = function (columnName) {
 
 	return new Series({
 		__iterable: {
-			getIndexIterator: function () {
-				return self.getIndexIterator();
-			},
-
-			getValuesIterator: function () {
-				return new SelectIterator(self.getValuesIterator(), 
-					function (value) {
-						return value[columnName];
+			getIterator: function () {
+				return new SelectIterator(self.getIterator(), 
+					function (pair) {
+						return [pair[0], pair[1][columnName]];
 					}
 				);				
 			},
@@ -545,6 +541,7 @@ DataFrame.prototype.keepSeries = function (columnOrColumns) {
 		},
 	});
 };
+
 /**
  * Create a new data frame with an additional column specified by the passed-in series.
  *
@@ -593,46 +590,6 @@ DataFrame.prototype.setIndex = function (columnName) {
 
 	var self = this;
 	return self.withIndex(self.getSeries(columnName));
-};
-
-/**
- * Apply a new index to the DataFrame.
- * 
- * @param {array|Series} newIndex - The new index to apply to the series.
- */
-DataFrame.prototype.withIndex = function (newIndex) {
-
-	if (!Object.isArray(newIndex)) {
-		assert.isObject(newIndex, "'Expected 'newIndex' parameter to 'DataFrame.withIndex' to be an array or Series object.");
-	}	
-
-	var self = this;
-	return new DataFrame({
-		index: newIndex,
-		values: function () { 
-			return self.getValuesIterator();
-		}, 
-	});
-};
-
-
-/**
- * Reset the index of the data frame back to the default sequential integer index.
- */
-DataFrame.prototype.resetIndex = function () {
-
-	var self = this;
-	return new DataFrame({
-		columnNames: self.getColumnNames(),
-		iterable: function () {
-			return new SelectIterator(
-				self.getIterator(),
-				function (pair, i) {
-					return [i, pair[1]];
-				}
-			);
-		},
-	});
 };
 
 /** 
@@ -944,14 +901,14 @@ DataFrame.prototype.toRows = function () {
 
 	var self = this;
 
-	var iterator = self.getValuesIterator();
+	var iterator = self.getIterator();
 	validateIterator(iterator);
 
 	var values = [];
 	var columnNames = self.getColumnNames();
 
 	while (iterator.moveNext()) {
-		var curRow = iterator.getCurrent();
+		var curRow = iterator.getCurrent()[1];  // Extract value.
 
 		var asArray = [];
 		for (var columnIndex = 0; columnIndex < columnNames.length; ++columnIndex) {

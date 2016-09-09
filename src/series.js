@@ -19,6 +19,9 @@ var PairIterator = require('../src/iterators/pair');
 var WhereIterator = require('../src/iterators/where');
 var CountIterator = require('../src/iterators/count');
 var EmptyIterator = require('../src/iterators/empty');
+var PairsIterable = require('../src/iterables/pairs');
+var SelectIterable = require('../src/iterables/select');
+var ArrayIterable = require('../src/iterables/array');
 var extend = require('extend');
 
 //
@@ -34,10 +37,7 @@ var Series = function (config) {
 
 	if (!config) {
 		self.__iterable = {
-			getIndexIterator: function () {
-				return new EmptyIterator();
-			},
-			getValuesIterator: function () {
+			getIterator: function () {
 				return new EmptyIterator();
 			},
 		};
@@ -53,30 +53,19 @@ var Series = function (config) {
 		return;
 	}
 
-	if (config.iterable) { //todo: this is expensive. Want to eliminate it.
+	if (config.iterable) {
 
-		assert.isFunction(config.iterable, "Expected 'iterable' field of 'config' parameter to Series constructor to be a function that returns an index/value pairs iterator.");
+		if (Object.isFunction(config.iterable)) {
+			self.__iterable = {
+				getIterator: config.iterable
+			};
+		}
+		else {
+			assert.isObject(config.iterable, "Expected 'iterable' field of 'config' parameter to Series constructor to either be a function that returns a pairs iterator or an object with a getIterator function.");
+			assert.isFunction(config.iterable.getIterator, "Expected 'iterable' field of 'config' parameter to Series constructor to either be a function that returns a pairs iterator or an object with a getIterator function.");
 
-		var iterable = config.iterable;
-
-		self.__iterable = {
-			getIndexIterator: function () {
-				return new SelectIterator(
-					iterable(),
-					function (pair) {
-						return pair[0];
-					}
-				);
-			},
-			getValuesIterator: function () {
-				return new SelectIterator(
-					iterable(),
-					function (pair) {
-						return pair[1];
-					}
-				);
-			},
-		};
+			self.__iterable = config.iterable; 
+		}
 		return;
 	}
 
@@ -92,42 +81,65 @@ var Series = function (config) {
 		}
 	}
 
-	self.__iterable = {};
+	var indexIterable = null;
+	var valuesIterable = null;
 
 	var index = config.index;
 	if (!index) {
-		self.__iterable.getIndexIterator = function () {
-			return new CountIterator();			
+		indexIterable = {
+			getIterator: function () {
+				return new CountIterator();
+			},			
 		};
 	}
 	else if (Object.isFunction(index)) {
-		self.__iterable.getIndexIterator = index;
+		indexIterable = {
+			getIterator: index,
+		};
 	}
 	else if (Object.isArray(index)) {
-		self.__iterable.getIndexIterator = function () {
-			return new ArrayIterator(index);
+		indexIterable = {
+			getIterator: function () {
+				return new ArrayIterator(index);
+			},
 		};
 	}
 	else {		
-		self.__iterable.getIndexIterator = function () { //todo: should actually check that index is a series and not a dataframe.
-			return index.getValuesIterator();
+		indexIterable = {
+			getIterator: function () {
+				return new SelectIterator(
+					index.getIterator(),
+					function (pair) {
+						return pair[1]; // Extract the value from the index.
+					}
+				)
+
+			},
 		};
 	}
 
 	var values = config.values;
 	if (!values) {
-		self.__iterable.getValuesIterator = function () {
-			return new EmptyIterator();
+		valuesIterable = {
+			getIterator: function () {
+				return new EmptyIterator();
+			},			
 		};
 	}
 	else if (Object.isFunction(values)) {
-		self.__iterable.getValuesIterator = values;
-	}
-	else {
-		self.__iterable.getValuesIterator = function () {
-			return new ArrayIterator(values);
+		valuesIterable = {
+			getIterator: values,
 		};
 	}
+	else {
+		valuesIterable = {
+			getIterator: function () {
+				return new ArrayIterator(values);
+			},
+		};
+	}
+
+	self.__iterable = new PairsIterable(indexIterable, valuesIterable);
 };
 
 module.exports = Series;
@@ -139,38 +151,24 @@ var zipSeries = require('./zip-series');
 /**
  * Get an iterator for index & values of the series.
  */
-Series.prototype.getIterator = function () { //todo: Would like to move this to '__iterable'.
+Series.prototype.getIterator = function () {
 	var self = this;
-	return new PairIterator(
-		self.getIndexIterator(),
-		self.getValuesIterator()
-	);
-};
-
-/*
- * Get an iterator for the index.
- */
-Series.prototype.getIndexIterator = function () {
-	var self = this;
-	return self.__iterable.getIndexIterator();
-};
-
-/*
- * Get an iterator for the values.
- */
-Series.prototype.getValuesIterator = function () {
-	var self = this;
-	return self.__iterable.getValuesIterator();
+	return self.__iterable.getIterator();
 };
 
 /**
  * Retreive the index of the series.
  */
-Series.prototype.getIndex = function () { //todo: Do I need to move this to '__iterable'?
+Series.prototype.getIndex = function () {
 	var self = this;
 	return new Series({
 		values: function () {
-			return self.getIndexIterator();
+			return new SelectIterator(
+				self.getIterator(),
+				function (pair) {
+					return pair[0]; // Extract the index.
+				}
+			);
 		},
 	});
 };
@@ -187,11 +185,33 @@ Series.prototype.withIndex = function (newIndex) {
 	}	
 
 	var self = this;
-	return new Series({
-		index: newIndex,
-		values: function () { 
-			return self.getValuesIterator();
-		}, 
+	return new self.Constructor({
+		__iterable: {
+			getIterator: function () {
+				var indexIterator = Object.isArray(newIndex)
+					? new ArrayIterator(newIndex)
+					: new SelectIterator(
+						newIndex.getIterator(),
+						function (pair) {
+							return pair[1]; // Extract index value.
+						}
+					)
+					;
+				return new PairIterator(
+					indexIterator,
+					new SelectIterator(
+						self.getIterator(),
+						function (pair) {
+							return pair[1]; // Extract value.
+						}
+					)
+				);
+			},
+
+			getColumnNames: function () {
+				return self.getColumnNames();
+			},
+		}
 	});
 };
 
@@ -201,9 +221,23 @@ Series.prototype.withIndex = function (newIndex) {
 Series.prototype.resetIndex = function () {
 
 	var self = this;
-	return new Series({
-		values: function () {
-			return self.getValuesIterator();
+	return new self.Constructor({
+		__iterable: {
+			getIterator: function () {
+				return new PairIterator(
+					new CountIterator(), // Reset index.
+					new SelectIterator(
+						self.getIterator(),
+						function (pair) {
+							return pair[1]; // Extract value.
+						}
+					)
+				)
+			},
+
+			getColumnNames: function () {
+				return self.getColumnNames();
+			},
 		},
 	});
 };
@@ -219,12 +253,8 @@ Series.prototype.skip = function (numRows) {
 	var self = this;
 	return new self.Constructor({
 		__iterable: {
-			getIndexIterator: function () {
-				return new SkipIterator(self.getIndexIterator(), numRows);
-			},
-
-			getValuesIterator: function () {
-			return new SkipIterator(self.getValuesIterator(), numRows);
+			getIterator: function () {
+				return new SkipIterator(self.getIterator(), numRows);
 			},
 
 			getColumnNames: function () {
@@ -245,21 +275,14 @@ Series.prototype.skipWhile = function (predicate) {
 	var self = this;
 	return new self.Constructor({
 		__iterable: {
-			getIndexIterator: function () {
-				return new SelectIterator(
-					new SkipWhileIterator(self.getIterator(), 
-						function (pair) {
-							return predicate(pair[1]);
-						}
-					),
-					function (pair) {
-						return pair[0]; // Extract index.
-					}
-				);
-			},
 
-			getValuesIterator: function () {
-				return new SkipWhileIterator(self.getValuesIterator(), predicate); 
+			getIterator: function () {
+				return new SkipWhileIterator(
+					self.getIterator(),
+					function (pair) {
+						return predicate(pair[1]); // Extract the value.
+					}
+				); 
 			},
 
 			getColumnNames: function () {
@@ -294,12 +317,8 @@ Series.prototype.take = function (numRows) {
 	var self = this;
 	return new self.Constructor({
 		__iterable: {
-			getIndexIterator: function () {
-				return new TakeIterator(self.getIndexIterator(), numRows);
-			},
-
-			getValuesIterator: function () {
-				return new TakeIterator(self.getValuesIterator(), numRows);
+			getIterator: function () {
+				return new TakeIterator(self.getIterator(), numRows);
 			},
 
 			getColumnNames: function () {
@@ -320,21 +339,13 @@ Series.prototype.takeWhile = function (predicate) {
 	var self = this;
 	return new self.Constructor({
 		__iterable: {
-			getIndexIterator: function () {
-				return new SelectIterator( 
-					new TakeWhileIterator(self.getIterator(), 
-						function (pair) {
-							return predicate(pair[1]);
-						}
-					),
+			getIterator: function () {
+				return new TakeWhileIterator(
+					self.getIterator(),
 					function (pair) {
-						return pair[0]; // Extract index.
+						return predicate(pair[1]); // Extract the value.
 					}
-				);
-			},
-
-			getValuesIterator: function () {
-				return new TakeWhileIterator(self.getValuesIterator(), predicate); 
+				); 
 			},
 
 			getColumnNames: function () {
@@ -370,21 +381,13 @@ Series.prototype.where = function (filterSelectorPredicate) {
 	var self = this;
 	return new self.Constructor({
 		__iterable: {
-			getIndexIterator: function () {
-				return new SelectIterator(
-					new WhereIterator(self.getIterator(), 
-						function (pair) {
-							return filterSelectorPredicate(pair[1]);
-						}
-					),
+			getIterator: function () {
+				return new WhereIterator(
+					self.getIterator(), 
 					function (pair) {
-						return pair[0];
+						return filterSelectorPredicate(pair[1]); // Extract the value.
 					}
 				);
-			},
-
-			getValuesIterator: function () {
-				return new WhereIterator(self.getValuesIterator(), filterSelectorPredicate);
 			},
 
 			getColumnNames: function () {
@@ -394,29 +397,6 @@ Series.prototype.where = function (filterSelectorPredicate) {
 	}); 	
 };
 
-//todo: Test me! And move out.
-var SelectIterable = function (iterable, selector) {
-
-	var self = this;
-
-	self.getIndexIterator = function () {
-		return iterable.getIndexIterator();
-	};
-
-	self.getValuesIterator = function () {
-		return new SelectIterator(iterable.getValuesIterator(), selector);
-	};
-
-	self.getColumnNames = function () {
-		// Have to get the first element to get field names.
-		var iterator = self.getValuesIterator();
-		if (!iterator.moveNext()) {
-			return [];
-		}
-
-		return Object.keys(iterator.getCurrent());
-	};
-};
 
 /**
  * Generate a new series based on the results of the selector function.
@@ -697,35 +677,16 @@ Series.prototype.slice = function (startIndexOrStartPredicate, endIndexOrEndPred
 
 	return new self.Constructor({
 		__iterable: {
-			getIndexIterator: function () {
+			getIterator: function () {
 				return new TakeWhileIterator(
 					new SkipWhileIterator(
-						self.getIndexIterator(),
-						function (index) {
-							return startPredicate(index); // Check index for start condition.
-						}
-					),
-					function (index) {
-						return endPredicate(index); // Check index for end condition.
-					}
-				);
-			},
-
-			getValuesIterator: function () {
-				return new SelectIterator(
-					new TakeWhileIterator(
-						new SkipWhileIterator(
-							self.getIterator(),
-							function (pair) {
-								return startPredicate(pair[0]); // Check index for start condition.
-							}
-						),
+						self.getIterator(),
 						function (pair) {
-							return endPredicate(pair[0]); // Check index for end condition.
+							return startPredicate(pair[0]); // Check index for start condition.
 						}
 					),
 					function (pair) {
-						return pair[1];
+						return endPredicate(pair[0]); // Check index for end condition.
 					}
 				);
 			},
@@ -1092,15 +1053,15 @@ Series.prototype.truncateStrings = function (maxLength) {
 Series.prototype.toValues = function () {
 
 	var self = this;
-	var iterator = self.getValuesIterator();
+	var iterator = self.getIterator();
 	validateIterator(iterator);
 
 	var values = [];
 
 	while (iterator.moveNext()) {
-		var value = iterator.getCurrent();
+		var value = iterator.getCurrent()[1]; // Extract value.
 		if (value !== undefined) {
-			values.push(iterator.getCurrent());
+			values.push(value);
 		}
 	}
 
@@ -1156,7 +1117,7 @@ Series.prototype.count = function () {
 
 	var self = this;
 	var total = 0;
-	var iterator = self.getValuesIterator();
+	var iterator = self.getIterator();
 
 	while (iterator.moveNext()) {
 		++total;
@@ -1171,13 +1132,13 @@ Series.prototype.count = function () {
 Series.prototype.first = function () {
 
 	var self = this;
-	var iterator = self.getValuesIterator();
+	var iterator = self.getIterator();
 
 	if (!iterator.moveNext()) {
 		throw new Error("No values in Series.");
 	}
 
-	return iterator.getCurrent();
+	return iterator.getCurrent()[1]; // Extract value.
 };
 
 /**
@@ -1186,7 +1147,7 @@ Series.prototype.first = function () {
 Series.prototype.last = function () {
 
 	var self = this;
-	var iterator = self.getValuesIterator();
+	var iterator = self.getIterator();
 
 	if (!iterator.moveNext()) {
 		throw new Error("No values in Series.");
@@ -1196,7 +1157,7 @@ Series.prototype.last = function () {
 		; // Don't evaluate each item, it's too expensive.
 	}
 
-	return iterator.getCurrent(); // Just evaluate the last item of the iterator.
+	return iterator.getCurrent()[1]; // Just evaluate the last item of the iterator.
 };
 
 /**
@@ -1239,13 +1200,13 @@ Series.prototype.lastPair = function () {
 Series.prototype.firstIndex = function () {
 
 	var self = this;
-	var iterator = self.getIndexIterator();
+	var iterator = self.getIterator();
 
 	if (!iterator.moveNext()) {
 		throw new Error("No values in Series.");
 	}
 
-	return iterator.getCurrent();
+	return iterator.getCurrent()[0]; // Extract index.
 };
 
 /**
@@ -1254,7 +1215,7 @@ Series.prototype.firstIndex = function () {
 Series.prototype.lastIndex = function () {
 
 	var self = this;
-	var iterator = self.getIndexIterator();
+	var iterator = self.getIterator();
 
 	if (!iterator.moveNext()) {
 		throw new Error("No values in Series.");
@@ -1264,7 +1225,7 @@ Series.prototype.lastIndex = function () {
 		; // Don't evaluate each item, it's too expensive.
 	}
 
-	return iterator.getCurrent();
+	return iterator.getCurrent()[0]; // Extract index.
 };
 
 /** 
@@ -1306,10 +1267,7 @@ Series.prototype.inflate = function (selector) {
 	}
 
 	return new DataFrame({
-		__iterable: new SelectIterable(
-			self, 
-			selector
-		),
+		__iterable: new SelectIterable(self, selector),
 	});
 };
 
@@ -1814,47 +1772,6 @@ Series.prototype.fillGaps = function (predicate, generator) {
 		;
 };
 
-//todo: Test me. move to another file.
-var ArrayIterable = function (arr) {
-	
-	assert.isArray(arr);
-
-	var self = this;
-
-	self.getIndexIterator = function () {
-		return new CountIterator();
-	};
-
-	self.getValuesIterator = function () {
-		return new ArrayIterator(arr);
-	};
-};
-
-var PairsIterable = function (arr) {
-	
-	assert.isArray(arr);
-
-	var self = this;
-
-	self.getIndexIterator = function () {
-		return new SelectIterator(
-			new ArrayIterator(arr),
-			function (pair) {
-				return pair[0];
-			}
-		);
-	};
-
-	self.getValuesIterator = function () {
-		return new SelectIterator(
-			new ArrayIterator(arr),
-			function (pair) {
-				return pair[1];
-			}
-		);
-	};
-};
-
 /**
  * Group the series according to the selector.
  *
@@ -1873,16 +1790,14 @@ Series.prototype.groupBy = function (selector) {
 			return [
 				group.key(),
 				new Series({
-					iterable: function () {
-						return new ArrayIterator(group.getSource());
-					},
+					iterable: new ArrayIterable(group.getSource()), 
 				}),
 			];
 		})
 		.toArray();
 
 	return new Series({
-		__iterable: new PairsIterable(groupedPairs),
+		__iterable: new ArrayIterable(groupedPairs),
 	});
 };
 

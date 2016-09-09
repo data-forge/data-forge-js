@@ -62,21 +62,6 @@ describe('DataFrame', function () {
 		]);
 	});
 
-	
-	it('throws exception when pulling a non-existing column name', function () {
-		
-		expect(function () {
-			var dataFrame = initDataFrame(
-				[ "Date", "Value1", "Value2", "Value3" ],
-				[
-					[new Date(1975, 24, 2), 100, 'foo', 11],
-					[new Date(2015, 24, 2), 200, 'bar', 22],
-				],
-				[5, 6]
-			);
-			dataFrame.withSeries('non-existing column name');			
-		}).to.throw(Error);
-	});
 
 	it('can check that column exists', function () {
 		
@@ -537,57 +522,6 @@ describe('DataFrame', function () {
 		]);
 
 		expect(indexedDataFrame.toRows()).to.eql([
-			[new Date(1975, 24, 2), 100, 'foo', 11],
-			[new Date(2015, 24, 2), 200, 'bar', 22],
-		]);
-	});
-
-	it('can set new index from array', function () {
-
-		var dataFrame = new DataFrame({
-			columnNames: ["C1"],
-			values: [[10], [30]],
-			index: [1, 2],
-		});
-
-		console.log(dataFrame.toPairs()); 
-
-		var modified = dataFrame.withIndex([5, 6]);
-		expect(modified.getIndex().toValues()).to.eql([5, 6]);
-		expect(modified.toRows()).to.eql([[10], [30]]);
-	});
-
-	it('can set new index from Series', function () {
-
-		var dataFrame = new DataFrame({
-			columnNames: ["C1"],
-			values: [[10], [30]],
-			index: [1, 2],
-		});
-
-		var modified = dataFrame.withIndex(new dataForge.Series({ values: [5, 6] }));
-		expect(modified.getIndex().toValues()).to.eql([5, 6]);
-		expect(modified.toRows()).to.eql([[10], [30]]);
-	});
-
-	it('can reset index', function () {
-
-		var dataFrame = initDataFrame(
-			[ "Date", "Value1", "Value2", "Value3" ],
-			[
-				[new Date(1975, 24, 2), 100, 'foo', 11],
-				[new Date(2015, 24, 2), 200, 'bar', 22],
-			],
-			[5, 6]
-		);
-		var dataFrameWithIndexReset = dataFrame.setIndex("Date").resetIndex();
-
-		expect(dataFrameWithIndexReset.getIndex().take(2).toValues()).to.eql([
-			0,
-			1
-		]);
-
-		expect(dataFrameWithIndexReset.toRows()).to.eql([
 			[new Date(1975, 24, 2), 100, 'foo', 11],
 			[new Date(2015, 24, 2), 200, 'bar', 22],
 		]);
