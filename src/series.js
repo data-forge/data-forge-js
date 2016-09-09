@@ -1635,8 +1635,14 @@ Series.prototype.distinct = function (selector) {
 	}
 
 	return new self.Constructor({
-		iterable: function () {
-			return new ArrayIterator(output);
+		__iterable: {
+			getIterator: function () {
+				return new ArrayIterator(output);
+			},
+
+			getColumnNames: function () {
+				return self.getColumnNames();
+			}
 		},
 	});
 };
