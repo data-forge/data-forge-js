@@ -31,6 +31,7 @@ var TakeIterable = require('../src/iterables/take');
 var TakeWhileIterable = require('../src/iterables/take-while');
 var WhereIterable = require('../src/iterables/where');
 var SelectPairsIterable = require('../src/iterables/select-pairs');
+var SelectManyIterable = require('../src/iterables/select-many');
 var extend = require('extend');
 
 
@@ -342,35 +343,8 @@ Series.prototype.selectMany = function (selector) {
 	assert.isFunction(selector, "Expected 'selector' parameter to 'Series.selectMany' function to be a function.");
 
 	var self = this;
-
 	return new self.Constructor({
-		iterable: function () {
-			return new SelectManyIterator(self.getIterator(), 
-				function (pair) {
-					var newValues = selector(pair[1]);
-					if (!Object.isArray(newValues) &&
-						!(newValues instanceof Series) &&
-						!(newValues instanceof DataFrame)) {
-						throw new Error("Expected return value from 'Series.selectMany' selector to be an array, a Series or a DataFrame, each item in the data sequence represents a new value in the resulting series.");
-					}
-
-					if (newValues instanceof DataFrame) {
-						newValues = newValues.toValues();
-					}
-					else if (newValues instanceof Series)
-					{
-						newValues = newValues.toValues();
-					}
-
-					var newPairs = [];
-					for (var newValueIndex = 0; newValueIndex < newValues.length; ++newValueIndex) {
-						newPairs.push([pair[0], newValues[newValueIndex]]);
-					}
-
-					return newPairs;
-				}
-			);
-		},
+		__iterable: new SelectManyIterable(self, selector),
 	}); 	
 };
 
