@@ -20,6 +20,23 @@ describe('series creation', function () {
 		]);
 	});
 
+	it('can create with values from iterable', function () {
+
+		var series = new Series({
+			values: {
+				getIterator: function () {
+					return new ArrayIterator([41, 42, 43]);
+				},				
+			},
+		});
+
+		expect(series.toPairs()).to.eql([
+			[0, 41],
+			[1, 42],
+			[2, 43],
+		]);
+	});
+
 	it('can create from values with index', function () {
 
 		var series = new Series({

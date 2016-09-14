@@ -24,7 +24,7 @@ var SelectIterable = require('../src/iterables/select');
 var ArrayIterable = require('../src/iterables/array');
 var EmptyIterable = require('../src/iterables/empty');
 var CountIterable = require('../src/iterables/count');
-var ExtractIterator = require('../src/iterables/extract');
+var ExtractIterable = require('../src/iterables/extract');
 var extend = require('extend');
 
 //
@@ -43,7 +43,7 @@ var createIndexIterable = function (index) {
 		return new ArrayIterable(index);
 	}
 	else {		
-		return new ExtractIterator(index, 1);
+		return new ExtractIterable(index, 1);
 	}
 };
 
@@ -59,8 +59,11 @@ var createValuesIterable = function (values) {
 			getIterator: values,
 		};
 	}
-	else {
+	else if (Object.isArray(values)) {
 		return new ArrayIterable(values);
+	}
+	else {
+		return values;
 	}
 };
 
@@ -106,14 +109,16 @@ var Series = function (config) {
 	}
 
 	if (config.values) {
-		if (!Object.isFunction(config.values)) {
-			assert.isArray(config.values, "Expected 'values' field of 'config' parameter to Series constructor be an array of values or a function that returns an iterator.");
+		if (!Object.isFunction(config.values) && !Object.isArray(config.values)) {
+			assert.isObject(config.values, "Expected 'values' field of 'config' parameter to Series constructor be an array of values, a function that returns an iterator or an iterable.");
+			assert.isFunction(config.values.getIterator, "Expected 'values' field of 'config' parameter to Series constructor be an array of values, a function that returns an iterator or an iterable.");
 		}
 	}
 
 	if (config.index) {
 		if (!Object.isFunction(config.index) && !Object.isArray(config.index)) {
-			assert.isObject(config.index, "Expected 'index' field of 'config' parameter to Series constructor to be an array, function or Series object.");
+			assert.isObject(config.index, "Expected 'index' field of 'config' parameter to Series constructor to be an array, function that returns an iterator, Series, DataFrame or iterable.");
+			assert.isFunction(config.index.getIterator, "Expected 'index' field of 'config' parameter to Series constructor to be an array, function that returns an iterator, Series, DataFrame or iterable.");
 		}
 	}
 
@@ -143,14 +148,7 @@ Series.prototype.getIterator = function () {
 Series.prototype.getIndex = function () {
 	var self = this;
 	return new Series({
-		values: function () {
-			return new SelectIterator(
-				self.getIterator(),
-				function (pair) {
-					return pair[0]; // Extract the index.
-				}
-			);
-		},
+		values: new ExtractIterable(self, 0), // Extract the index. 
 	});
 };
 
