@@ -185,24 +185,14 @@ Series.prototype.withIndex = function (newIndex) {
 Series.prototype.resetIndex = function () {
 
 	var self = this;
-	return new self.Constructor({
-		__iterable: {
-			getIterator: function () {
-				return new PairIterator(
-					new CountIterator(), // Reset index.
-					new SelectIterator(
-						self.getIterator(),
-						function (pair) {
-							return pair[1]; // Extract value.
-						}
-					)
-				)
-			},
 
-			getColumnNames: function () {
-				return self.getColumnNames();
-			},
-		},
+
+
+	return new self.Constructor({
+		__iterable: new PairsIterable(
+			new CountIterable(),		 // Reset index.
+			new ExtractIterable(self, 1) // Extract value.
+		),
 	});
 };
 
