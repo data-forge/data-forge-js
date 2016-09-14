@@ -25,6 +25,7 @@ var ArrayIterable = require('../src/iterables/array');
 var EmptyIterable = require('../src/iterables/empty');
 var CountIterable = require('../src/iterables/count');
 var ExtractIterable = require('../src/iterables/extract');
+var SkipIterable = require('../src/iterables/skip');
 var extend = require('extend');
 
 //
@@ -185,9 +186,6 @@ Series.prototype.withIndex = function (newIndex) {
 Series.prototype.resetIndex = function () {
 
 	var self = this;
-
-
-
 	return new self.Constructor({
 		__iterable: new PairsIterable(
 			new CountIterable(),		 // Reset index.
@@ -206,15 +204,7 @@ Series.prototype.skip = function (numRows) {
 
 	var self = this;
 	return new self.Constructor({
-		__iterable: {
-			getIterator: function () {
-				return new SkipIterator(self.getIterator(), numRows);
-			},
-
-			getColumnNames: function () {
-				return self.getColumnNames();
-			},
-		}
+		__iterable: new SkipIterable(self, numRows), 
 	}); 	
 };
 
