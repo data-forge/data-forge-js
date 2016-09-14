@@ -6,17 +6,8 @@
 
 var ArrayIterator = require('./iterators/array');
 var MultiIterator = require('./iterators/multi');
-var PairIterator = require('./iterators/pair');
-var SkipIterator = require('./iterators/skip');
-var SkipWhileIterator = require('./iterators/skip-while');
 var BabyParse = require('babyparse');
 var SelectIterator = require('../src/iterators/select');
-var SelectManyIterator = require('../src/iterators/select-many');
-var TakeIterator = require('../src/iterators/take');
-var TakeWhileIterator = require('../src/iterators/take-while');
-var WhereIterator = require('../src/iterators/where');
-var CountIterator = require('../src/iterators/count');
-var EmptyIterator = require('../src/iterators/empty');
 var utils = require('./utils');
 var extend = require('extend');
 var inherit = require('./inherit');
