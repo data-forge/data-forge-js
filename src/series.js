@@ -28,6 +28,43 @@ var ExtractIterator = require('../src/iterables/extract');
 var extend = require('extend');
 
 //
+// Create an iterable for use as an index.
+//
+var createIndexIterable = function (index) {
+	if (!index) {
+		return new CountIterable();
+	}
+	else if (Object.isFunction(index)) {
+		return {
+			getIterator: index,
+		};
+	}
+	else if (Object.isArray(index)) {
+		return new ArrayIterable(index);
+	}
+	else {		
+		return new ExtractIterator(index, 1);
+	}
+};
+
+//
+// Create an iterable from values.
+//
+var createValuesIterable = function (values) {
+	if (!values) {
+		return new EmptyIterable(); 
+	}
+	else if (Object.isFunction(values)) {
+		return {
+			getIterator: values,
+		};
+	}
+	else {
+		return new ArrayIterable(values);
+	}
+};
+
+//
 // Represents a time series.
 //
 var Series = function (config) {
@@ -80,39 +117,10 @@ var Series = function (config) {
 		}
 	}
 
-	var indexIterable = null;
-	var valuesIterable = null;
-
-	var index = config.index;
-	if (!index) {
-		indexIterable = new CountIterable();
-	}
-	else if (Object.isFunction(index)) {
-		indexIterable = {
-			getIterator: index,
-		};
-	}
-	else if (Object.isArray(index)) {
-		indexIterable = new ArrayIterable(index);
-	}
-	else {		
-		indexIterable = new ExtractIterator(index, 1);
-	}
-
-	var values = config.values;
-	if (!values) {
-		valuesIterable = new EmptyIterable(); 
-	}
-	else if (Object.isFunction(values)) {
-		valuesIterable = {
-			getIterator: values,
-		};
-	}
-	else {
-		valuesIterable = new ArrayIterable(values);
-	}
-
-	self.__iterable = new PairsIterable(indexIterable, valuesIterable);
+	self.__iterable = new PairsIterable(
+		createIndexIterable(config.index), 
+		createValuesIterable(config.values)
+	);
 };
 
 module.exports = Series;
