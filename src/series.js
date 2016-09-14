@@ -101,11 +101,7 @@ var Series = function (config) {
 
 	var values = config.values;
 	if (!values) {
-		valuesIterable = {
-			getIterator: function () {
-				return new EmptyIterator();
-			},			
-		};
+		valuesIterable = new EmptyIterable(); 
 	}
 	else if (Object.isFunction(values)) {
 		valuesIterable = {
