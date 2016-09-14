@@ -29,6 +29,7 @@ var SkipIterable = require('../src/iterables/skip');
 var SkipWhileIterable = require('../src/iterables/skip-while');
 var TakeIterable = require('../src/iterables/take');
 var TakeWhileIterable = require('../src/iterables/take-while');
+var WhereIterable = require('../src/iterables/where');
 var extend = require('extend');
 
 
@@ -289,27 +290,16 @@ Series.prototype.takeUntil = function (predicate) {
 /**
  * Filter a series by a predicate selector.
  *
- * @param {function} filterSelectorPredicate - Predicte function to filter rows of the series.
+ * @param {function} predicate - Predicte function to filter rows of the series.
  */
-Series.prototype.where = function (filterSelectorPredicate) {
-	assert.isFunction(filterSelectorPredicate, "Expected 'filterSelectorPredicate' parameter to 'where' function to be a function.");
+Series.prototype.where = function (predicate) {
+	assert.isFunction(predicate, "Expected 'predicate' parameter to 'where' function to be a function.");
 
 	var self = this;
 	return new self.Constructor({
-		__iterable: {
-			getIterator: function () {
-				return new WhereIterator(
-					self.getIterator(), 
-					function (pair) {
-						return filterSelectorPredicate(pair[1]); // Extract the value.
-					}
-				);
-			},
-
-			getColumnNames: function () {
-				return self.getColumnNames(); // Doesn't change column names, or order.
-			}
-		},
+		__iterable: new WhereIterable(self, function (pair) {
+			return predicate(pair[1]);
+		}),
 	}); 	
 };
 
