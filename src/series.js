@@ -27,6 +27,7 @@ var CountIterable = require('../src/iterables/count');
 var ExtractIterable = require('../src/iterables/extract');
 var SkipIterable = require('../src/iterables/skip');
 var SkipWhileIterable = require('../src/iterables/skip-while');
+var TakeIterable = require('../src/iterables/take');
 var extend = require('extend');
 
 
@@ -250,15 +251,7 @@ Series.prototype.take = function (numRows) {
 
 	var self = this;
 	return new self.Constructor({
-		__iterable: {
-			getIterator: function () {
-				return new TakeIterator(self.getIterator(), numRows);
-			},
-
-			getColumnNames: function () {
-				return self.getColumnNames();
-			},
-		},
+		__iterable: new TakeIterable(self, numRows),
 	});
 };
 
