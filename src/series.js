@@ -566,31 +566,32 @@ Series.prototype.window = function (period, obsoleteSelector) {
 	var self = this;
 
 	return new Series({
-		iterable: function () {
+		__iterable: {
+			getIterator: function () {
 
-			var curOutput = undefined;
-			var windowIndex = 0;
+				var curOutput = undefined;
+				var windowIndex = 0;
 
-			return {
-				moveNext: function () {
-					var window = self.skip(windowIndex*period).take(period);
-					if (window.none(function () { return true; })) { //todo: Shouldn't have to pass a predicate.
-						return false; // Nothing left.
-					}
+				return {
+					moveNext: function () {
+						var window = self.skip(windowIndex*period).take(period);
+						if (window.none(function () { return true; })) { //todo: Shouldn't have to pass a predicate.
+							return false; // Nothing left.
+						}
 
-					curOutput = [
-						windowIndex, 
-						window,						
-					];
-					++windowIndex;
-					return true;
-				},
+						curOutput = [
+							windowIndex, 
+							window,						
+						];
+						++windowIndex;
+						return true;
+					},
 
-				getCurrent: function () {
-					return curOutput;
-				},
-			};
-
+					getCurrent: function () {
+						return curOutput;
+					},
+				};
+			},
 		}
 	});	
 };
@@ -609,33 +610,34 @@ Series.prototype.rollingWindow = function (period, obsoleteSelector) {
 	var self = this;
 
 	return new Series({
-		iterable: function () {
+		__iterable: { 
+			getIterator: function () {
 
-			var curOutput = undefined;
-			var done = false;
-			var windowIndex = 0;
+				var curOutput = undefined;
+				var done = false;
+				var windowIndex = 0;
 
-			return {
-				moveNext: function () {
-					var window = self.skip(windowIndex).take(period);
-					if (window.count() < period) {
-						return false;
-					}
+				return {
+					moveNext: function () {
+						var window = self.skip(windowIndex).take(period);
+						if (window.count() < period) {
+							return false;
+						}
 
-					curOutput = [
-						windowIndex, 
-						window,						
-					];
-					++windowIndex;
-					return true;
-				},
+						curOutput = [
+							windowIndex, 
+							window,						
+						];
+						++windowIndex;
+						return true;
+					},
 
-				getCurrent: function () {
-					return curOutput;
-				},
-			};
-
-		}
+					getCurrent: function () {
+						return curOutput;
+					},
+				};
+			},
+		},
 	});
 };
 
