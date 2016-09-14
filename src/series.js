@@ -92,11 +92,7 @@ var Series = function (config) {
 		};
 	}
 	else if (Object.isArray(index)) {
-		indexIterable = {
-			getIterator: function () {
-				return new ArrayIterator(index);
-			},
-		};
+		indexIterable = new ArrayIterable(index);
 	}
 	else {		
 		indexIterable = {
