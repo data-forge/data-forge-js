@@ -109,11 +109,7 @@ var Series = function (config) {
 		};
 	}
 	else {
-		valuesIterable = {
-			getIterator: function () {
-				return new ArrayIterator(values);
-			},
-		};
+		valuesIterable = new ArrayIterable(values);
 	}
 
 	self.__iterable = new PairsIterable(indexIterable, valuesIterable);
