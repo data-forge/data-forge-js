@@ -24,5 +24,5 @@ ExtractIterable.prototype.getIterator = function () {
 ExtractIterable.prototype.getColumnNames = function () {
 
     var self = this;
-    return self.getColumnNames();
+    return self._iterable.getColumnNames();
 };
