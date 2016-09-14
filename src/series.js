@@ -24,6 +24,7 @@ var SelectIterable = require('../src/iterables/select');
 var ArrayIterable = require('../src/iterables/array');
 var EmptyIterable = require('../src/iterables/empty');
 var CountIterable = require('../src/iterables/count');
+var ExtractIterator = require('../src/iterables/extract');
 var extend = require('extend');
 
 //
@@ -95,17 +96,7 @@ var Series = function (config) {
 		indexIterable = new ArrayIterable(index);
 	}
 	else {		
-		indexIterable = {
-			getIterator: function () {
-				return new SelectIterator(
-					index.getIterator(),
-					function (pair) {
-						return pair[1]; // Extract the value from the index.
-					}
-				)
-
-			},
-		};
+		indexIterable = new ExtractIterator(index, 1);
 	}
 
 	var values = config.values;
