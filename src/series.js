@@ -30,6 +30,7 @@ var SkipWhileIterable = require('../src/iterables/skip-while');
 var TakeIterable = require('../src/iterables/take');
 var TakeWhileIterable = require('../src/iterables/take-while');
 var WhereIterable = require('../src/iterables/where');
+var SelectPairsIterable = require('../src/iterables/select-pairs');
 var extend = require('extend');
 
 
@@ -328,17 +329,7 @@ Series.prototype.selectPairs = function (selector) {
 
 	var self = this;
 	return new self.Constructor({
-		iterable: function () {
-			return new SelectIterator(self.getIterator(), 
-				function (pair) {
-					var newPair = selector(pair[1], pair[0]);
-					if (!Object.isArray(newPair) || newPair.length !== 2) {
-						throw new Error("Expected return value from 'Series.selectPairs' selector to be a pair, that is an array with two items: [index, value].");
-					}
-					return newPair;
-				}
-			);
-		},		
+		__iterable: new SelectPairsIterable(self, selector),
 	}); 	
 };
 
