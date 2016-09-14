@@ -23,6 +23,7 @@ var PairsIterable = require('../src/iterables/pairs');
 var SelectIterable = require('../src/iterables/select');
 var ArrayIterable = require('../src/iterables/array');
 var EmptyIterable = require('../src/iterables/empty');
+var CountIterable = require('../src/iterables/count');
 var extend = require('extend');
 
 //
@@ -83,11 +84,7 @@ var Series = function (config) {
 
 	var index = config.index;
 	if (!index) {
-		indexIterable = {
-			getIterator: function () {
-				return new CountIterator();
-			},			
-		};
+		indexIterable = new CountIterable();
 	}
 	else if (Object.isFunction(index)) {
 		indexIterable = {
