@@ -1581,15 +1581,7 @@ Series.prototype.insertPair = function (pair) {
 	var self = this;
 	var pairs = [pair].concat(self.toPairs());
 	return new self.Constructor({
-		__iterable: {
-			getIterator: function () {
-				return new ArrayIterator(pairs);
-			},
-
-			getColumnNames: function () {
-				return self.getColumnNames();
-			},
-		},
+		__iterable: new ArrayIterable(pairs), 
 	});
 };
 
@@ -1608,15 +1600,7 @@ Series.prototype.appendPair = function (pair) {
 	var pairs = self.toPairs();
 	pairs.push(pair);
 	return new self.Constructor({
-		__iterable: {
-			getIterator: function () {
-				return new ArrayIterator(pairs);
-			},
-
-			getColumnNames: function () {
-				return self.getColumnNames();
-			},
-		},
+		__iterable: new ArrayIterable(pairs), 
 	});
 };
 
