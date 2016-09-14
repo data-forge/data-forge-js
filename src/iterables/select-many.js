@@ -10,6 +10,8 @@ var SelectManyIterable = function (iterable, selector) {
 module.exports = SelectManyIterable;
 
 var SelectManyIterator = require('../iterators/select-many');
+var Series = require('../series');
+var DataFrame = require('../dataframe');
 
 SelectManyIterable.prototype.getIterator = function () {
 
@@ -17,17 +19,14 @@ SelectManyIterable.prototype.getIterator = function () {
     return new SelectManyIterator(
         self._iterable.getIterator(), 
         function (pair) {
-            var newValues = selector(pair[1]);
+            var newValues = self._selector(pair[1]);
             if (!Object.isArray(newValues) &&
                 !(newValues instanceof Series) &&
                 !(newValues instanceof DataFrame)) {
                 throw new Error("Expected return value from 'Series.selectMany' selector to be an array, a Series or a DataFrame, each item in the data sequence represents a new value in the resulting series.");
             }
 
-            if (newValues instanceof DataFrame) {
-                newValues = newValues.toValues();
-            }
-            else if (newValues instanceof Series)
+            if (newValues instanceof Series)
             {
                 newValues = newValues.toValues();
             }

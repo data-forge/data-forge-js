@@ -31,7 +31,6 @@ var TakeIterable = require('../src/iterables/take');
 var TakeWhileIterable = require('../src/iterables/take-while');
 var WhereIterable = require('../src/iterables/where');
 var SelectPairsIterable = require('../src/iterables/select-pairs');
-var SelectManyIterable = require('../src/iterables/select-many');
 var extend = require('extend');
 
 
@@ -141,6 +140,7 @@ module.exports = Series;
 var concatSeries = require('./concat-series');
 var DataFrame = require('./dataframe');
 var zipSeries = require('./zip-series');
+var SelectManyIterable = require('../src/iterables/select-many');
 
 /**
  * Get an iterator for index & values of the series.
