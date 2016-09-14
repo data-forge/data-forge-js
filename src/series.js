@@ -22,6 +22,7 @@ var EmptyIterator = require('../src/iterators/empty');
 var PairsIterable = require('../src/iterables/pairs');
 var SelectIterable = require('../src/iterables/select');
 var ArrayIterable = require('../src/iterables/array');
+var EmptyIterable = require('../src/iterables/empty');
 var extend = require('extend');
 
 //
@@ -36,11 +37,7 @@ var Series = function (config) {
 	}
 
 	if (!config) {
-		self.__iterable = {
-			getIterator: function () {
-				return new EmptyIterator();
-			},
-		};
+		self.__iterable = new EmptyIterable();
 		return;
 	}
 
