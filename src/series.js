@@ -160,37 +160,22 @@ Series.prototype.getIndex = function () {
 Series.prototype.withIndex = function (newIndex) {
 
 	if (!Object.isArray(newIndex)) {
-		assert.isObject(newIndex, "'Expected 'newIndex' parameter to 'Series.withIndex' to be an array or Series object.");
-	}	
+		assert.isObject(newIndex, "'Expected 'newIndex' parameter to 'Series.withIndex' to be an array, Series or DataFrame.");
+		assert.isFunction(newIndex.getIterator, "'Expected 'newIndex' parameter to 'Series.withIndex' to be an array, Series or DataFrame.");
+	}
 
 	var self = this;
-	return new self.Constructor({
-		__iterable: {
-			getIterator: function () {
-				var indexIterator = Object.isArray(newIndex)
-					? new ArrayIterator(newIndex)
-					: new SelectIterator(
-						newIndex.getIterator(),
-						function (pair) {
-							return pair[1]; // Extract index value.
-						}
-					)
-					;
-				return new PairIterator(
-					indexIterator,
-					new SelectIterator(
-						self.getIterator(),
-						function (pair) {
-							return pair[1]; // Extract value.
-						}
-					)
-				);
-			},
+	var indexIterable = Object.isArray(newIndex)
+		? new ArrayIterable(newIndex)
+		: new ExtractIterable(newIndex, 1) // Extract index value.
+		;
+	var pairsIterable = new PairsIterable(
+		indexIterable,
+		new ExtractIterable(self, 1) // Extract value.
+	);
 
-			getColumnNames: function () {
-				return self.getColumnNames();
-			},
-		}
+	return new self.Constructor({
+		__iterable: pairsIterable,
 	});
 };
 
