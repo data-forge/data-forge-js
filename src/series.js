@@ -141,6 +141,7 @@ var concatSeries = require('./concat-series');
 var DataFrame = require('./dataframe');
 var zipSeries = require('./zip-series');
 var SelectManyIterable = require('../src/iterables/select-many');
+var SelectManyPairsIterable = require('../src/iterables/select-many-pairs');
 
 /**
  * Get an iterator for index & values of the series.
@@ -359,25 +360,7 @@ Series.prototype.selectManyPairs = function (selector) {
 	var self = this;
 
 	return new self.Constructor({
-		iterable: function () {
-			return new SelectManyIterator(self.getIterator(), 
-				function (pair) {
-					var newPairs = selector(pair[1], pair[0]);
-					if (!Object.isArray(newPairs)) {
-						throw new Error("Expected return value from 'Series.selectManyPairs' selector to be an array of pairs, each item in the array represents a new pair in the resulting series.");
-					}
-
-					for (var pairIndex = 0; pairIndex < newPairs.length; ++pairIndex) {
-						var newPair = newPairs[pairIndex];
-						if (!Object.isArray(newPair) || newPair.length !== 2) {
-							throw new Error("Expected return value from 'Series.selectManyPairs' selector to be am array of pairs, but item at index " + pairIndex + " is not an array with two items: [index, value].");
-						}
-					}
-
-					return newPairs;
-				}
-			);
-		},
+		__iterable: new SelectManyPairsIterable(self, selector),
 	}); 	
 };
 
