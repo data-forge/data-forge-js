@@ -26,7 +26,9 @@ var EmptyIterable = require('../src/iterables/empty');
 var CountIterable = require('../src/iterables/count');
 var ExtractIterable = require('../src/iterables/extract');
 var SkipIterable = require('../src/iterables/skip');
+var SkipWhileIterable = require('../src/iterables/skip-while');
 var extend = require('extend');
+
 
 //
 // Create an iterable for use as an index.
@@ -218,21 +220,9 @@ Series.prototype.skipWhile = function (predicate) {
 
 	var self = this;
 	return new self.Constructor({
-		__iterable: {
-
-			getIterator: function () {
-				return new SkipWhileIterator(
-					self.getIterator(),
-					function (pair) {
-						return predicate(pair[1]); // Extract the value.
-					}
-				); 
-			},
-
-			getColumnNames: function () {
-				return self.getColumnNames();
-			},
-		}
+		__iterable: new SkipWhileIterable(self, function (pair) {
+			return predicate(pair[1]);
+		}),
 	}); 	
 };
 
