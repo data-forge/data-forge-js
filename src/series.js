@@ -28,6 +28,7 @@ var ExtractIterable = require('../src/iterables/extract');
 var SkipIterable = require('../src/iterables/skip');
 var SkipWhileIterable = require('../src/iterables/skip-while');
 var TakeIterable = require('../src/iterables/take');
+var TakeWhileIterable = require('../src/iterables/take-while');
 var extend = require('extend');
 
 
@@ -265,21 +266,9 @@ Series.prototype.takeWhile = function (predicate) {
 
 	var self = this;
 	return new self.Constructor({
-		__iterable: {
-			getIterator: function () {
-				return new TakeWhileIterator(
-					self.getIterator(),
-					function (pair) {
-						return predicate(pair[1]); // Extract the value.
-					}
-				); 
-			},
-
-			getColumnNames: function () {
-				return self.getColumnNames();
-			},
-
-		},
+		__iterable: new TakeWhileIterable(self, function (pair) {
+			return predicate(pair[1]);
+		}),
 	}); 	
 };
 
