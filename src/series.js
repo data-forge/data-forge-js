@@ -937,9 +937,7 @@ Series.prototype.bake = function () {
 
 	var pairs = self.toPairs();
 	var baked = new Series({
-		iterable: function () {
-			return new ArrayIterator(pairs);
-		},
+		__iterable: new ArrayIterable(pairs),
 	});
 	baked._baked = true;
 	return baked;
