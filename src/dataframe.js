@@ -519,23 +519,28 @@ DataFrame.prototype.keepSeries = function (columnOrColumns) {
 	}
 
 	return new DataFrame({
-		columnNames: columnOrColumns,
-		iterable: function () {
-			return new SelectIterator(
-				self.getIterator(),
-				function (pair) {
-					var row = extend({}, pair[1]);
-					Object.keys(row).forEach(function (fieldName) {
-						if (!E.from(columnOrColumns).contains(fieldName)) {
-							delete row[fieldName];
-						}
-					});
-					return [
-						pair[0],
-						row
-					];					
-				}
-			);
+		__iterable: {
+			getIterator: function () {
+				return new SelectIterator(
+					self.getIterator(),
+					function (pair) {
+						var row = extend({}, pair[1]);
+						Object.keys(row).forEach(function (fieldName) {
+							if (!E.from(columnOrColumns).contains(fieldName)) {
+								delete row[fieldName];
+							}
+						});
+						return [
+							pair[0],
+							row
+						];					
+					}
+				);
+			},
+
+			getColumnNames: function() {
+				return columnOrColumns;
+			}
 		},
 	});
 };
