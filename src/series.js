@@ -1656,7 +1656,7 @@ Series.prototype.groupBy = function (selector) {
 			return [
 				group.key(),
 				new Series({
-					iterable: new ArrayIterable(group.getSource()), 
+					__iterable: new ArrayIterable(group.getSource()), 
 				}),
 			];
 		})
