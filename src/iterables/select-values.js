@@ -1,17 +1,17 @@
 
 'use strict';
 
-var SelectIterable = function (iterable, selector) {
+var SelectValuesIterable = function (iterable, selector) {
 	var self = this;
     self._iterable = iterable;
     self._selector = selector;
 };
 
-module.exports = SelectIterable;
+module.exports = SelectValuesIterable;
 
-var SelectIterator = require('../iterators/select');
+var SelectIterator = require('../iterators/select'); //todo: could use a special iterator for this.
 
-SelectIterable.prototype.getIterator = function () {
+SelectValuesIterable.prototype.getIterator = function () {
 
     var self = this;
     return new SelectIterator(
@@ -22,7 +22,7 @@ SelectIterable.prototype.getIterator = function () {
     );
 };
 
-SelectIterable.prototype.getColumnNames = function () {
+SelectValuesIterable.prototype.getColumnNames = function () {
 
     var self = this;
 

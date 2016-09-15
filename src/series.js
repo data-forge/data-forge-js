@@ -20,7 +20,7 @@ var WhereIterator = require('../src/iterators/where');
 var CountIterator = require('../src/iterators/count');
 var EmptyIterator = require('../src/iterators/empty');
 var PairsIterable = require('../src/iterables/pairs');
-var SelectIterable = require('../src/iterables/select');
+var SelectValuesIterable = require('../src/iterables/select-values');
 var ArrayIterable = require('../src/iterables/array');
 var EmptyIterable = require('../src/iterables/empty');
 var CountIterable = require('../src/iterables/count');
@@ -317,7 +317,7 @@ Series.prototype.select = function (selector) {
 
 	var self = this;
 	return new self.Constructor({
-		__iterable: new SelectIterable(self, selector),
+		__iterable: new SelectValuesIterable(self, selector),
 	}); 	
 };
 
@@ -1131,7 +1131,7 @@ Series.prototype.inflate = function (selector) {
 	}
 
 	return new DataFrame({
-		__iterable: new SelectIterable(self, selector),
+		__iterable: new SelectValuesIterable(self, selector),
 	});
 };
 
