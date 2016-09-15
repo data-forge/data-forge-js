@@ -569,6 +569,7 @@ DataFrame.prototype.withSeries = function (columnName, series) {
 		);
 
 	return new DataFrame({
+		//todo: do a multi iterator and select to combine.
 		index: self.getIndex(),
 		values: function () {
 			return new SelectIterator(
