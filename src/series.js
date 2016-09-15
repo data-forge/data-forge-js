@@ -410,11 +410,15 @@ var executeOrderBy = function (self, batch) {
 	};
 
 	return new self.Constructor({
-		iterable: function () {
-			return new ArrayIterator(executeLazySort());
-		},
+		__iterable: {
+			getIterator: function () {
+				return new ArrayIterator(executeLazySort());
+			},
 
-		considerAllRows: true, //todo: This is currently needed to have df columns survive sorting. 
+			getColumnNames: function () {
+				return self.getColumnNames();
+			},
+		},
 	});
 };
 
