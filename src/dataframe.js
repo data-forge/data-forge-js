@@ -481,21 +481,25 @@ DataFrame.prototype.dropSeries = function (columnOrColumns) {
 
 	return new DataFrame({
 		columnNames: newColumnNames,
-		iterable: function () {
-			return new SelectIterator(
-				self.getIterator(),
-				function (pair) {
-					var row = extend({}, pair[1]);
-					columnOrColumns.forEach(function (columnName) {
-						delete row[columnName];
-					});
-					return [
-						pair[0],
-						row
-					];					
-				}
-			);
-		},
+		__iterable: {
+			getIterator: function () {
+				return new SelectIterator(
+					self.getIterator(),
+					function (value) {
+						var row = extend({}, value);
+						columnOrColumns.forEach(function (columnName) {
+							delete row[columnName];
+						});
+						return row;
+					}
+				);
+
+			},
+
+			getColumnNames: function () {
+				return newColumnNames;
+			}
+		}, 
 	});
 };
 
