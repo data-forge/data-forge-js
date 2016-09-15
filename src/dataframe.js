@@ -299,6 +299,7 @@ var parent = inherit(DataFrame, Series);
 
 var concatDataFrames = require('./concat-dataframes');
 var zipDataFrames = require('./zip-dataframes');
+var SelectValuesIterable = require('./iterables/select-values');
 
 /**
  * Get the names of the columns in the data frame.
@@ -361,15 +362,12 @@ DataFrame.prototype.getSeries = function (columnName) {
 	assert.isString(columnName, "Expected 'columnName' parameter to getSeries function to be a string that specifies the name of the column to retreive.");
 
 	return new Series({
-		__iterable: {
-			getIterator: function () {
-				return new SelectIterator(self.getIterator(), 
-					function (pair) {
-						return [pair[0], pair[1][columnName]];
-					}
-				);				
-			},
-		},
+		__iterable: new SelectValuesIterable(
+			self,
+			function (value) {
+				return value[columnName];
+			}
+		),
 	});
 };
 
@@ -431,26 +429,31 @@ DataFrame.prototype.subset = function (columnNames) {
 	assert.isArray(columnNames, "Expected 'columnNames' parameter to 'subset' to be an array.");	
 	
 	return new DataFrame({
-		columnNames: columnNames,
-		iterable: function () {
-			return new SelectIterator(
-				self.getIterator(),
-				function (pair) {
-					return [
-						pair[0],
-						E.from(columnNames)
-							.toObject(
-								function (columnName) {
-									return columnName;
-								},
-								function (columnName) {
-									return pair[1][columnName];
-								}
-							)
-					];					
-				}
-			);
-		},
+		__iterable: {
+			getIterator: function () {
+				return new SelectIterator(
+					self.getIterator(),
+					function (pair) {
+						return [
+							pair[0],
+							E.from(columnNames)
+								.toObject(
+									function (columnName) {
+										return columnName;
+									},
+									function (columnName) {
+										return pair[1][columnName];
+									}
+								)
+						];					
+					}
+				);
+			},
+
+			getColumnNames: function () {
+				return columnNames;
+			},
+		}, 
 	});	 
 };
 
