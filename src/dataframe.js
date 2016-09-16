@@ -558,29 +558,36 @@ DataFrame.prototype.withSeries = function (columnName, series) {
 
 	var self = this;
 
-	var seriesValueMap = E.from(series.toPairs())
-		.toObject(
-			function (pair) {
-				return pair[0];
-			},
-			function (pair) {
-				return pair[1];
-			}
-		);
-
 	return new DataFrame({
-		//todo: do a multi iterator and select to combine.
-		index: self.getIndex(),
-		values: function () {
-			return new SelectIterator(
-				self.getIterator(),
-				function (pair) {
-					var index = pair[0];
-					var newValue = extend({}, pair[1]);
-					newValue[columnName] = seriesValueMap[index];
-					return newValue;						
-				}
-			);			
+		__iterable: {
+			getIterator: function () {
+				var seriesValueMap = E.from(series.toPairs())
+					.toObject(
+						function (pair) {
+							return pair[0];
+						},
+						function (pair) {
+							return pair[1];
+						}
+					);
+
+				return new SelectIterator(
+					self.getIterator(),
+					function (pair) {
+						var index = pair[0];
+						var newValue = extend({}, pair[1]);
+						newValue[columnName] = seriesValueMap[index];
+						return [index, newValue];						
+					}
+				);
+			},
+
+			getColumnNames: function () {
+				return E.from(self.getColumnNames())
+					.concat([columnName])
+					.distinct()
+					.toArray();
+			},
 		},
 	});
 };
