@@ -144,7 +144,7 @@ Series.prototype.getIterator = function () {
 Series.prototype.getIndex = function () {
 	var self = this;
 	return new Series({
-		values: new ExtractIterable(self, 0), // Extract the index. 
+		values: new ExtractIterable(self.iterable, 0), // Extract the index. 
 	});
 };
 
@@ -167,7 +167,7 @@ Series.prototype.withIndex = function (newIndex) {
 		;
 	var pairsIterable = new PairsIterable(
 		indexIterable,
-		new ExtractIterable(self, 1) // Extract value.
+		new ExtractIterable(self.iterable, 1) // Extract value.
 	);
 
 	return new self.Constructor({
@@ -184,7 +184,7 @@ Series.prototype.resetIndex = function () {
 	return new self.Constructor({
 		iterable: new PairsIterable(
 			new CountIterable(),		 // Reset index.
-			new ExtractIterable(self, 1) // Extract value.
+			new ExtractIterable(self.iterable, 1) // Extract value.
 		),
 	});
 };
@@ -199,7 +199,7 @@ Series.prototype.skip = function (numRows) {
 
 	var self = this;
 	return new self.Constructor({
-		iterable: new SkipIterable(self, numRows), 
+		iterable: new SkipIterable(self.iterable, numRows), 
 	}); 	
 };
 
@@ -213,7 +213,7 @@ Series.prototype.skipWhile = function (predicate) {
 
 	var self = this;
 	return new self.Constructor({
-		iterable: new SkipWhileIterable(self, function (pair) {
+		iterable: new SkipWhileIterable(self.iterable, function (pair) {
 			return predicate(pair[1]);
 		}),
 	}); 	
@@ -243,7 +243,7 @@ Series.prototype.take = function (numRows) {
 
 	var self = this;
 	return new self.Constructor({
-		iterable: new TakeIterable(self, numRows),
+		iterable: new TakeIterable(self.iterable, numRows),
 	});
 };
 
@@ -257,7 +257,7 @@ Series.prototype.takeWhile = function (predicate) {
 
 	var self = this;
 	return new self.Constructor({
-		iterable: new TakeWhileIterable(self, function (pair) {
+		iterable: new TakeWhileIterable(self.iterable, function (pair) {
 			return predicate(pair[1]);
 		}),
 	}); 	
@@ -287,7 +287,7 @@ Series.prototype.where = function (predicate) {
 
 	var self = this;
 	return new self.Constructor({
-		iterable: new WhereIterable(self, function (pair) {
+		iterable: new WhereIterable(self.iterable, function (pair) {
 			return predicate(pair[1]);
 		}),
 	}); 	
@@ -304,7 +304,7 @@ Series.prototype.select = function (selector) {
 
 	var self = this;
 	return new self.Constructor({
-		iterable: new SelectValuesIterable(self, selector),
+		iterable: new SelectValuesIterable(self.iterable, selector),
 	}); 	
 };
 
@@ -318,7 +318,7 @@ Series.prototype.selectPairs = function (selector) {
 
 	var self = this;
 	return new self.Constructor({
-		iterable: new SelectPairsIterable(self, selector),
+		iterable: new SelectPairsIterable(self.iterable, selector),
 	}); 	
 };
 
@@ -332,7 +332,7 @@ Series.prototype.selectMany = function (selector) {
 
 	var self = this;
 	return new self.Constructor({
-		iterable: new SelectManyIterable(self, selector),
+		iterable: new SelectManyIterable(self.iterable, selector),
 	}); 	
 };
 
@@ -347,7 +347,7 @@ Series.prototype.selectManyPairs = function (selector) {
 	var self = this;
 
 	return new self.Constructor({
-		iterable: new SelectManyPairsIterable(self, selector),
+		iterable: new SelectManyPairsIterable(self.iterable, selector),
 	}); 	
 };
 
@@ -403,7 +403,7 @@ var executeOrderBy = function (self, batch) {
 			},
 
 			getColumnNames: function () {
-				return self.getColumnNames();
+				return self.iterable.getColumnNames();
 			},
 		},
 	});
@@ -525,7 +525,7 @@ Series.prototype.slice = function (startIndexOrStartPredicate, endIndexOrEndPred
 			getIterator: function () {
 				return new TakeWhileIterator(
 					new SkipWhileIterator(
-						self.getIterator(),
+						self.iterable.getIterator(),
 						function (pair) {
 							return startPredicate(pair[0]); // Check index for start condition.
 						}
@@ -537,7 +537,7 @@ Series.prototype.slice = function (startIndexOrStartPredicate, endIndexOrEndPred
 			},
 
 			getColumnNames: function () {
-				return self.getColumnNames();
+				return self.iterable.getColumnNames();
 			},
 		},
 	});
@@ -934,7 +934,7 @@ Series.prototype.bake = function () {
 			},
 
 			getColumnNames: function () {
-				return self.getColumnNames();
+				return self.iterable.getColumnNames();
 			},
 		}
 	});
@@ -1091,7 +1091,7 @@ Series.prototype.reverse = function () {
 		iterable: {
 			getIterator: function () {
 				var pairs = [];
-				var iterator = self.getIterator();
+				var iterator = self.iterable.getIterator();
 
 				while (iterator.moveNext()) {
 					pairs.push(iterator.getCurrent());
@@ -1101,7 +1101,7 @@ Series.prototype.reverse = function () {
 			},
 
 			getColumnNames: function () {
-				return self.getColumnNames();
+				return self.iterable.getColumnNames();
 			},
 		}
 	});
@@ -1126,7 +1126,7 @@ Series.prototype.inflate = function (selector) {
 	}
 
 	return new DataFrame({
-		iterable: new SelectValuesIterable(self, selector),
+		iterable: new SelectValuesIterable(self.iterable, selector),
 	});
 };
 
@@ -1231,7 +1231,7 @@ Series.prototype.aggregate = function (seedOrSelector, selector) {
 		assert.isFunction(selector, "Expected 'selector' parameter to aggregate to be a function.");
 
 		var working = seedOrSelector;
-		var it = self.getIterator();
+		var it = self.iterable.getIterator();
 		while (it.moveNext()) {
 			var curValue = it.getCurrent()[1];
 			working = selector(working, curValue); //todo: should pass index in here as well.
@@ -1320,7 +1320,7 @@ Series.prototype.all = function (predicate) {
 	assert.isFunction(predicate, "Expected 'predicate' parameter to 'all' to be a function.")
 
 	var self = this;
-	var iterator = self.getIterator();
+	var iterator = self.iterable.getIterator();
 	validateIterator(iterator);
 
 	var count = 0;
@@ -1350,7 +1350,7 @@ Series.prototype.any = function (predicate) {
 	}
 
 	var self = this;
-	var iterator = self.getIterator();
+	var iterator = self.iterable.getIterator();
 	validateIterator(iterator);
 
 	if (!predicate) {
@@ -1382,7 +1382,7 @@ Series.prototype.none = function (predicate) {
 	}
 
 	var self = this;
-	var iterator = self.getIterator();
+	var iterator = self.iterable.getIterator();
 	validateIterator(iterator);
 
 	if (!predicate) {
@@ -1494,7 +1494,7 @@ Series.prototype.distinct = function (selector) {
 			},
 
 			getColumnNames: function () {
-				return self.getColumnNames();
+				return self.iterable.getColumnNames();
 			}
 		},
 	});
@@ -1693,7 +1693,7 @@ Series.prototype.groupSequentialBy = function (selector) {
 Series.prototype.at = function (index) {
 
 	var self = this;
-	var iterator = self.getIterator();
+	var iterator = self.iterable.getIterator();
 
 	if (!iterator.moveNext()) {
 		return undefined;

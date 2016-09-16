@@ -309,7 +309,7 @@ DataFrame.prototype.getColumnIndex = function (columnName) {
 	assert.isString(columnName, "Expected 'columnName' parameter to getColumnIndex to be a non-empty string.");
 	
 	var self = this;	
-	var columnNames = self.getColumnNames();
+	var columnNames = self.iterable.getColumnNames();
 	
 	for (var i = 0; i < columnNames.length; ++i) {
 		if (columnName === columnNames[i]) {
@@ -331,7 +331,7 @@ DataFrame.prototype.getColumnName = function (columnIndex) {
 	assert.isNumber(columnIndex, "Expected 'columnIndex' parameter to getColumnIndex to be a non-empty string.");
 
 	var self = this;	
-	var columnNames = self.getColumnNames();
+	var columnNames = self.iterable.getColumnNames();
 
 	if (columnIndex < 0 || columnIndex >= columnNames.length) {
 		return undefined;
@@ -352,7 +352,7 @@ DataFrame.prototype.getSeries = function (columnName) {
 
 	return new Series({
 		iterable: new SelectValuesIterable(
-			self,
+			self.iterable,
 			function (value) {
 				return value[columnName];
 			}
@@ -421,7 +421,7 @@ DataFrame.prototype.subset = function (columnNames) {
 		iterable: {
 			getIterator: function () {
 				return new SelectIterator(
-					self.getIterator(),
+					self.iterable.getIterator(),
 					function (pair) {
 						return [
 							pair[0],
@@ -461,7 +461,7 @@ DataFrame.prototype.dropSeries = function (columnOrColumns) {
 		columnOrColumns = [columnOrColumns]; // Convert to array for coding convenience.
 	}
 
-	var columnNames = self.getColumnNames().slice(0); // Clone array.
+	var columnNames = self.iterable.getColumnNames().slice(0); // Clone array.
 	var newColumnNames = E.from(columnNames)
 		.where(function (columnName) {
 			return !E.from(columnOrColumns).contains(columnName);
@@ -473,7 +473,7 @@ DataFrame.prototype.dropSeries = function (columnOrColumns) {
 		iterable: {
 			getIterator: function () {
 				return new SelectIterator(
-					self.getIterator(),
+					self.iterable.getIterator(),
 					function (value) {
 						var row = extend({}, value);
 						columnOrColumns.forEach(function (columnName) {
@@ -511,7 +511,7 @@ DataFrame.prototype.keepSeries = function (columnOrColumns) {
 		iterable: {
 			getIterator: function () {
 				return new SelectIterator(
-					self.getIterator(),
+					self.iterable.getIterator(),
 					function (pair) {
 						var row = extend({}, pair[1]);
 						Object.keys(row).forEach(function (fieldName) {
@@ -561,7 +561,7 @@ DataFrame.prototype.withSeries = function (columnName, series) {
 					);
 
 				return new SelectIterator(
-					self.getIterator(),
+					self.iterable.getIterator(),
 					function (pair) {
 						var index = pair[0];
 						var newValue = extend({}, pair[1]);
@@ -572,7 +572,7 @@ DataFrame.prototype.withSeries = function (columnName, series) {
 			},
 
 			getColumnNames: function () {
-				return E.from(self.getColumnNames())
+				return E.from(self.iterable.getColumnNames())
 					.concat([columnName])
 					.distinct()
 					.toArray();
@@ -600,7 +600,7 @@ DataFrame.prototype.toString = function () {
 	var self = this;
 	var Table = require('easy-table');
 
-	var columnNames = self.getColumnNames();
+	var columnNames = self.iterable.getColumnNames();
 	var pairs = E.from(self.toPairs())
 		.select(function (pair) { // Convert to rows.
 			return [pair[0]]
@@ -787,7 +787,7 @@ DataFrame.prototype.truncateStrings = function (maxLength) {
 		.toArray();
 
 	return new DataFrame({
-		columnNames: self.getColumnNames(),
+		columnNames: self.iterable.getColumnNames(),
 		values: truncatedValues,
 	});
 };
@@ -844,7 +844,7 @@ DataFrame.prototype.renameSeries = function (newColumnNames) {
 
 	if (Object.isObject(newColumnNames)) {
 		var self = this;
-		var renamedColumns = self.getColumnNames().slice(0); // Clone array.
+		var renamedColumns = self.iterable.getColumnNames().slice(0); // Clone array.
 
 		Object.keys(newColumnNames).forEach(function (existingColumnName, columnIndex) {
 			var columnIndex = self.getColumnIndex(existingColumnName);
@@ -858,7 +858,7 @@ DataFrame.prototype.renameSeries = function (newColumnNames) {
 		return self.renameSeries(renamedColumns);
 	}
 	else {
-		var existingColumns = self.getColumnNames();
+		var existingColumns = self.iterable.getColumnNames();
 		var numExistingColumns = existingColumns.length;
 
 		assert.isArray(newColumnNames, "Expected parameter 'newColumnNames' to renameColumns to be an array with column names.");
@@ -874,7 +874,7 @@ DataFrame.prototype.renameSeries = function (newColumnNames) {
 						.toArray();
 
 					return new SelectIterator(
-						self.getIterator(),
+						self.iterable.getIterator(),
 						function (pair) {
 							return [
 								pair[0],
@@ -906,11 +906,11 @@ DataFrame.prototype.toRows = function () {
 
 	var self = this;
 
-	var iterator = self.getIterator();
+	var iterator = self.iterable.getIterator();
 	validateIterator(iterator);
 
 	var values = [];
-	var columnNames = self.getColumnNames();
+	var columnNames = self.iterable.getColumnNames();
 
 	while (iterator.moveNext()) {
 		var curRow = iterator.getCurrent()[1];  // Extract value.
@@ -940,7 +940,7 @@ DataFrame.prototype.toJSON = function () {
 DataFrame.prototype.toCSV = function () {
 
 	var self = this;
-	var data = [self.getColumnNames()].concat(self.toRows());
+	var data = [self.iterable.getColumnNames()].concat(self.toRows());
 	return BabyParse.unparse(data);
 
 	/*Old csv stringify.
@@ -1040,7 +1040,7 @@ DataFrame.prototype.deflate = function (selector) {
 		iterable: {
 			getIterator: function () {
 				return new SelectIterator(
-					self.getIterator(),
+					self.iterable.getIterator(),
 					function (pair) {
 						var newValue = selector(pair[1]);
 						return [
@@ -1088,7 +1088,7 @@ DataFrame.prototype.aggregate = function (seedOrSelector, selector) {
 		assert.isFunction(selector, "Expected 'selector' parameter to aggregate to be a function.");
 
 		var working = seedOrSelector;
-		var it = self.getIterator();
+		var it = self.iterable.getIterator();
 		while (it.moveNext()) {
 			var curValue = it.getCurrent()[1];
 			working = selector(working, curValue); //todo: should pass index in here as well.
@@ -1166,7 +1166,7 @@ DataFrame.prototype.bringToFront = function (columnOrColumns) {
 	}
 
 	var self = this;
-	var existingColumnNames = self.getColumnNames();
+	var existingColumnNames = self.iterable.getColumnNames();
 	var columnsToMove = E.from(columnOrColumns) // Strip out non-existing columns.
 		.where(function (columnName) {
 			return E.from(existingColumnNames).contains(columnName);
@@ -1202,7 +1202,7 @@ DataFrame.prototype.bringToBack = function (columnOrColumns) {
 	}
 
 	var self = this;
-	var existingColumnNames = self.getColumnNames();
+	var existingColumnNames = self.iterable.getColumnNames();
 	var columnsToMove = E.from(columnOrColumns) // Strip out non-existing columns.
 		.where(function (columnName) {
 			return E.from(existingColumnNames).contains(columnName);
