@@ -877,30 +877,35 @@ DataFrame.prototype.renameSeries = function (newColumnNames) {
 		assert(newColumnNames.length === numExistingColumns, "Expected 'newColumnNames' array to have an element for each existing column. There are " + numExistingColumns + "existing columns.");
 
 		return new DataFrame({
-			columnNames: newColumnNames,
-			iterable: function () {
-				var columnMap = E.from(existingColumns)
-					.zip(newColumnNames, function (oldName, newName) {
-						return [oldName, newName];
-					})
-					.toArray();
+			__iterable: {
+				getIterator: function () {
+					var columnMap = E.from(existingColumns)
+						.zip(newColumnNames, function (oldName, newName) {
+							return [oldName, newName];
+						})
+						.toArray();
 
-				return new SelectIterator(
-					self.getIterator(),
-					function (pair) {
-						return [
-							pair[0],
-							E.from(columnMap).toObject(
-								function (remap) {
-									return remap[1];
-								},
-								function (remap) {
-									return pair[1][remap[0]];								
-								}
-							)
-						];
-					}
-				);
+					return new SelectIterator(
+						self.getIterator(),
+						function (pair) {
+							return [
+								pair[0],
+								E.from(columnMap).toObject(
+									function (remap) {
+										return remap[1];
+									},
+									function (remap) {
+										return pair[1][remap[0]];								
+									}
+								)
+							];
+						}
+					);
+				},
+
+				getColumnNames: function () {
+					return newColumnNames;
+				},
 			},
 		});
 	}
