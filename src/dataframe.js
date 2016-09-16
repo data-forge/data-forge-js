@@ -300,6 +300,7 @@ var parent = inherit(DataFrame, Series);
 var concatDataFrames = require('./concat-dataframes');
 var zipDataFrames = require('./zip-dataframes');
 var SelectValuesIterable = require('./iterables/select-values');
+var ArrayIterable = require('./iterables/array');
 
 /**
  * Get the names of the columns in the data frame.
@@ -798,9 +799,9 @@ DataFrame.prototype.truncateStrings = function (maxLength) {
 		.toArray();
 
 	return new DataFrame({
-			columnNames: self.getColumnNames(),
-			values: truncatedValues,
-		});
+		columnNames: self.getColumnNames(),
+		values: truncatedValues,
+	});
 };
 
 /**
@@ -966,28 +967,6 @@ DataFrame.prototype.toCSV = function () {
 			.toArray();
 	return [header].concat(rows).join('\r\n');	
 	*/
-};
-
-/**
- * Forces lazy evaluation to complete and 'bakes' the data frame into memory.
- */
-DataFrame.prototype.bake = function () {
-
-	var self = this;
-	if (self._baked) {
-		// Already baked, just return self.
-		return self;
-	}
-
-	var pairs = self.toPairs();
-	var baked = new DataFrame({
-		columnNames: self.getColumnNames(),
-		iterable: function () {
-			return new ArrayIterator(pairs);
-		},
-	});
-	baked._baked = true;
-	return baked;
 };
 
 /**

@@ -940,8 +940,16 @@ Series.prototype.bake = function () {
 	}
 
 	var pairs = self.toPairs();
-	var baked = new Series({
-		__iterable: new ArrayIterable(pairs),
+	var baked = new self.Constructor({
+		__iterable: {
+			getIterator: function () {
+				return new ArrayIterator(pairs);
+			},
+
+			getColumnNames: function () {
+				return self.getColumnNames();
+			},
+		}
 	});
 	baked._baked = true;
 	return baked;
