@@ -1044,7 +1044,8 @@ DataFrame.prototype.deflate = function (selector) {
 	var self = this;
 
 	return new Series({ 
-			iterable: function () {
+		__iterable: {
+			getIterator: function () {
 				return new SelectIterator(
 					self.getIterator(),
 					function (pair) {
@@ -1056,7 +1057,8 @@ DataFrame.prototype.deflate = function (selector) {
 					}
 				);
 			},
-		});
+		},
+	});
 };
 
 /** 
