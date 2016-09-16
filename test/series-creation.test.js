@@ -68,12 +68,14 @@ describe('series creation', function () {
 	it('can create from index/value with iterable', function () {
 
 		var series = new Series({
-			iterable: function () {
-				return new ArrayIterator([
-					[10, 1],
-					[11, 2],
-					[22, 3],
-				]);
+			__iterable: {
+				getIterator: function () {
+					return new ArrayIterator([
+						[10, 1],
+						[11, 2],
+						[22, 3],
+					]);
+				},
 			},
 		});
 

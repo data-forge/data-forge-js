@@ -136,26 +136,6 @@ describe('dataframe creation', function () {
 		]);
 	});
 
-	it('creating from objects with variable fields - can force all rows to be considered to determine column names - rows come from iterable', function () {
-		
-		var dataFrame = new DataFrame({
-			iterable: function () {
-				return new ArrayIterator([
-					[0, { c1: 1, c2: 2 }],
-					[1, { c3: 3, c4: 4 }],
-				]);
-			},
-			considerAllRows: true,
-		});
-
-		var columnNames = ["c1", "c2", "c3", "c4"];
-		expect(dataFrame.getColumnNames()).to.eql(columnNames);
-		expect(dataFrame.toPairs()).to.eql([
-			[0, { c1: 1, c2: 2 }],
-			[1, { c3: 3, c4: 4 }],
-		]);
-	});
-
 	it('can create from objects with index', function () {
 		
 		var dataFrame = new DataFrame({
@@ -194,33 +174,19 @@ describe('dataframe creation', function () {
 
 	it('can create from index/value iterable', function () {
 		
-		var dataFrame = new DataFrame({
-			iterable: function () {
-				return new ArrayIterator([
-					[20, { c1: 1, c2: 2 }],
-					[21, { c1: 3, c2: 4 }],
-				]);
-			},
-		});
-
 		var columnNames = ["c1", "c2"];
-		expect(dataFrame.getColumnNames()).to.eql(columnNames);
-		expect(dataFrame.toPairs()).to.eql([
-			[20, { c1: 1, c2: 2 }],
-			[21, { c1: 3, c2: 4 }],
-		]);
-	});
-
-	it('can create from index/value iterable with specified column order', function () {
-		
-		var columnNames = ["c2", "c1"];
 		var dataFrame = new DataFrame({
-			columnNames: columnNames,
-			iterable: function () {
-				return new ArrayIterator([
-					[20, { c1: 1, c2: 2 }],
-					[21, { c1: 3, c2: 4 }],
-				]);
+			__iterable: {
+				getIterator: function () {
+					return new ArrayIterator([
+						[20, { c1: 1, c2: 2 }],
+						[21, { c1: 3, c2: 4 }],
+					]);
+				},
+
+				getColumnNames: function () {
+					return columnNames;
+				},
 			},
 		});
 
