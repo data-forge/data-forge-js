@@ -56,34 +56,38 @@ describe('performance', function () {
 		stopwatch.start();
 
 		var df = new dataForge.DataFrame({
-				__iterable: {
-					getIterator: function () {
-						var i = 0;
-						return {
-							moveNext: function () {
-								return ++i < 100;
-							},
+			__iterable: {
+				getIterator: function () {
+					var i = 0;
+					return {
+						moveNext: function () {
+							return ++i < 100;
+						},
 
-							getCurrent: function () {
-								// Expensive operation!!
-								var y = 10;
-								var total = 0;
-								for (var x = 0; x < 1000; ++x) {
-									total += (function () {
-										return 3 + y;
+						getCurrent: function () {
+							// Expensive operation!!
+							var y = 10;
+							var total = 0;
+							for (var x = 0; x < 1000; ++x) {
+								total += (function () {
+									return 3 + y;
 
-									}())
-								}
+								}())
+							}
 
-								return [
-									i,
-									{ Total: total },
-								];
-							},
-						};
-					},
+							return [
+								i,
+								{ Total: total },
+							];
+						},
+					};
 				},
-			});
+				
+				getColumnNames: function () {
+					return ["Total"];
+				},
+			},
+		});
 
 		var lastValue = df.last();
 

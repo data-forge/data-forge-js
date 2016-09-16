@@ -93,11 +93,16 @@ var Series = function (config) {
 	assert.isObject(config, "Expected 'config' parameter to Series constructor to be an object with options for initialisation.");
 
 	if (config.__iterable) {
+		assert.isObject(config.__iterable, "Expect 'iterable' field of 'config' parameter to Series constructor to be an object that implements getIterator and getColumnNames.");
+		assert.isFunction(config.__iterable.getIterator, "Expect 'iterable' field of 'config' parameter to Series constructor to be an object that implements getIterator and getColumnNames.");
+
 		// Setting the inner iterable directly.
 		// Power to you!
 		self.__iterable = config.__iterable;
 		return;
 	}
+
+	assert(!config.iterable, "")
 
 	if (config.iterable) {
 
