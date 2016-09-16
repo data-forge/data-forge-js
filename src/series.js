@@ -102,24 +102,6 @@ var Series = function (config) {
 		return;
 	}
 
-	assert(!config.iterable, "")
-
-	if (config.iterable) {
-
-		if (Object.isFunction(config.iterable)) {
-			self.__iterable = {
-				getIterator: config.iterable
-			};
-		}
-		else {
-			assert.isObject(config.iterable, "Expected 'iterable' field of 'config' parameter to Series constructor to either be a function that returns a pairs iterator or an object with a getIterator function.");
-			assert.isFunction(config.iterable.getIterator, "Expected 'iterable' field of 'config' parameter to Series constructor to either be a function that returns a pairs iterator or an object with a getIterator function.");
-
-			self.__iterable = config.iterable; 
-		}
-		return;
-	}
-
 	if (config.values) {
 		if (!Object.isFunction(config.values) && !Object.isArray(config.values)) {
 			assert.isObject(config.values, "Expected 'values' field of 'config' parameter to Series constructor be an array of values, a function that returns an iterator or an iterable.");
