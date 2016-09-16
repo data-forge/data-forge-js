@@ -176,7 +176,7 @@ describe('dataframe creation', function () {
 		
 		var columnNames = ["c1", "c2"];
 		var dataFrame = new DataFrame({
-			__iterable: {
+			iterable: {
 				getIterator: function () {
 					return new ArrayIterator([
 						[20, { c1: 1, c2: 2 }],

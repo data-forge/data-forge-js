@@ -55,7 +55,7 @@ module.exports = function (dataFrames, options) {
 			.toArray();
 
 		return new DataFrame({
-			__iterable: {
+			iterable: {
 				getIterator: function () {
 					var iterators = E.from(dataFrames)
 						.select(function (dataFrame) {

@@ -16,7 +16,7 @@ describe('performance', function () {
 		stopwatch.start();
 
 		var series = new dataForge.Series({
-				__iterable: {
+				iterable: {
 					getIterator: function () {
 						var i = 0;
 						return {
@@ -56,7 +56,7 @@ describe('performance', function () {
 		stopwatch.start();
 
 		var df = new dataForge.DataFrame({
-			__iterable: {
+			iterable: {
 				getIterator: function () {
 					var i = 0;
 					return {
@@ -82,7 +82,7 @@ describe('performance', function () {
 						},
 					};
 				},
-				
+
 				getColumnNames: function () {
 					return ["Total"];
 				},

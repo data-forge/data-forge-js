@@ -155,10 +155,10 @@ var DataFrame = function (config) {
 	if (config) {
 		assert.isObject(config, "Expected 'config' parameter to DataFrame constructor to be an object with options for initialisation.");
 
-		if (config.__iterable) {
-			assert.isObject(config.__iterable, "Expect 'iterable' field of 'config' parameter to DataFrame constructor to be an object that implements getIterator and getColumnNames.");
-			assert.isFunction(config.__iterable.getIterator, "Expect 'iterable' field of 'config' parameter to DataFrame constructor to be an object that implements getIterator and getColumnNames.");
-			assert.isFunction(config.__iterable.getColumnNames, "Expect 'iterable' field of 'config' parameter to DataFrame constructor to be an object that implements getIterator and getColumnNames.");			
+		if (config.iterable) {
+			assert.isObject(config.iterable, "Expect 'iterable' field of 'config' parameter to DataFrame constructor to be an object that implements getIterator and getColumnNames.");
+			assert.isFunction(config.iterable.getIterator, "Expect 'iterable' field of 'config' parameter to DataFrame constructor to be an object that implements getIterator and getColumnNames.");
+			assert.isFunction(config.iterable.getColumnNames, "Expect 'iterable' field of 'config' parameter to DataFrame constructor to be an object that implements getIterator and getColumnNames.");			
 		}
 		else {
 			if (config.columnNames) {
@@ -272,9 +272,9 @@ var DataFrame = function (config) {
 
 	Series.call(this, config);
 
-	if (!config || !config.__iterable)
+	if (!config || !config.iterable)
 	{
-		self.__iterable.getColumnNames = function () {
+		self.iterable.getColumnNames = function () {
 			return _columnNames;
 		};
 	}
@@ -295,7 +295,7 @@ var ArrayIterable = require('./iterables/array');
  */
 DataFrame.prototype.getColumnNames = function () {
 	var self = this;
-	return self.__iterable.getColumnNames();
+	return self.iterable.getColumnNames();
 };
 
 /**
@@ -351,7 +351,7 @@ DataFrame.prototype.getSeries = function (columnName) {
 	assert.isString(columnName, "Expected 'columnName' parameter to getSeries function to be a string that specifies the name of the column to retreive.");
 
 	return new Series({
-		__iterable: new SelectValuesIterable(
+		iterable: new SelectValuesIterable(
 			self,
 			function (value) {
 				return value[columnName];
@@ -418,7 +418,7 @@ DataFrame.prototype.subset = function (columnNames) {
 	assert.isArray(columnNames, "Expected 'columnNames' parameter to 'subset' to be an array.");	
 	
 	return new DataFrame({
-		__iterable: {
+		iterable: {
 			getIterator: function () {
 				return new SelectIterator(
 					self.getIterator(),
@@ -470,7 +470,7 @@ DataFrame.prototype.dropSeries = function (columnOrColumns) {
 
 	return new DataFrame({
 		columnNames: newColumnNames,
-		__iterable: {
+		iterable: {
 			getIterator: function () {
 				return new SelectIterator(
 					self.getIterator(),
@@ -508,7 +508,7 @@ DataFrame.prototype.keepSeries = function (columnOrColumns) {
 	}
 
 	return new DataFrame({
-		__iterable: {
+		iterable: {
 			getIterator: function () {
 				return new SelectIterator(
 					self.getIterator(),
@@ -548,7 +548,7 @@ DataFrame.prototype.withSeries = function (columnName, series) {
 	var self = this;
 
 	return new DataFrame({
-		__iterable: {
+		iterable: {
 			getIterator: function () {
 				var seriesValueMap = E.from(series.toPairs())
 					.toObject(
@@ -865,7 +865,7 @@ DataFrame.prototype.renameSeries = function (newColumnNames) {
 		assert(newColumnNames.length === numExistingColumns, "Expected 'newColumnNames' array to have an element for each existing column. There are " + numExistingColumns + "existing columns.");
 
 		return new DataFrame({
-			__iterable: {
+			iterable: {
 				getIterator: function () {
 					var columnMap = E.from(existingColumns)
 						.zip(newColumnNames, function (oldName, newName) {
@@ -1037,7 +1037,7 @@ DataFrame.prototype.deflate = function (selector) {
 	var self = this;
 
 	return new Series({ 
-		__iterable: {
+		iterable: {
 			getIterator: function () {
 				return new SelectIterator(
 					self.getIterator(),

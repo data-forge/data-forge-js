@@ -86,19 +86,19 @@ var Series = function (config) {
 	}
 
 	if (!config) {
-		self.__iterable = new EmptyIterable();
+		self.iterable = new EmptyIterable();
 		return;
 	}
 
 	assert.isObject(config, "Expected 'config' parameter to Series constructor to be an object with options for initialisation.");
 
-	if (config.__iterable) {
-		assert.isObject(config.__iterable, "Expect 'iterable' field of 'config' parameter to Series constructor to be an object that implements getIterator and getColumnNames.");
-		assert.isFunction(config.__iterable.getIterator, "Expect 'iterable' field of 'config' parameter to Series constructor to be an object that implements getIterator and getColumnNames.");
+	if (config.iterable) {
+		assert.isObject(config.iterable, "Expect 'iterable' field of 'config' parameter to Series constructor to be an object that implements getIterator and getColumnNames.");
+		assert.isFunction(config.iterable.getIterator, "Expect 'iterable' field of 'config' parameter to Series constructor to be an object that implements getIterator and getColumnNames.");
 
 		// Setting the inner iterable directly.
 		// Power to you!
-		self.__iterable = config.__iterable;
+		self.iterable = config.iterable;
 		return;
 	}
 
@@ -116,7 +116,7 @@ var Series = function (config) {
 		}
 	}
 
-	self.__iterable = new PairsIterable(
+	self.iterable = new PairsIterable(
 		createIndexIterable(config.index), 
 		createValuesIterable(config.values)
 	);
@@ -135,7 +135,7 @@ var SelectManyPairsIterable = require('../src/iterables/select-many-pairs');
  */
 Series.prototype.getIterator = function () {
 	var self = this;
-	return self.__iterable.getIterator();
+	return self.iterable.getIterator();
 };
 
 /**
@@ -171,7 +171,7 @@ Series.prototype.withIndex = function (newIndex) {
 	);
 
 	return new self.Constructor({
-		__iterable: pairsIterable,
+		iterable: pairsIterable,
 	});
 };
 
@@ -182,7 +182,7 @@ Series.prototype.resetIndex = function () {
 
 	var self = this;
 	return new self.Constructor({
-		__iterable: new PairsIterable(
+		iterable: new PairsIterable(
 			new CountIterable(),		 // Reset index.
 			new ExtractIterable(self, 1) // Extract value.
 		),
@@ -199,7 +199,7 @@ Series.prototype.skip = function (numRows) {
 
 	var self = this;
 	return new self.Constructor({
-		__iterable: new SkipIterable(self, numRows), 
+		iterable: new SkipIterable(self, numRows), 
 	}); 	
 };
 
@@ -213,7 +213,7 @@ Series.prototype.skipWhile = function (predicate) {
 
 	var self = this;
 	return new self.Constructor({
-		__iterable: new SkipWhileIterable(self, function (pair) {
+		iterable: new SkipWhileIterable(self, function (pair) {
 			return predicate(pair[1]);
 		}),
 	}); 	
@@ -243,7 +243,7 @@ Series.prototype.take = function (numRows) {
 
 	var self = this;
 	return new self.Constructor({
-		__iterable: new TakeIterable(self, numRows),
+		iterable: new TakeIterable(self, numRows),
 	});
 };
 
@@ -257,7 +257,7 @@ Series.prototype.takeWhile = function (predicate) {
 
 	var self = this;
 	return new self.Constructor({
-		__iterable: new TakeWhileIterable(self, function (pair) {
+		iterable: new TakeWhileIterable(self, function (pair) {
 			return predicate(pair[1]);
 		}),
 	}); 	
@@ -287,7 +287,7 @@ Series.prototype.where = function (predicate) {
 
 	var self = this;
 	return new self.Constructor({
-		__iterable: new WhereIterable(self, function (pair) {
+		iterable: new WhereIterable(self, function (pair) {
 			return predicate(pair[1]);
 		}),
 	}); 	
@@ -304,7 +304,7 @@ Series.prototype.select = function (selector) {
 
 	var self = this;
 	return new self.Constructor({
-		__iterable: new SelectValuesIterable(self, selector),
+		iterable: new SelectValuesIterable(self, selector),
 	}); 	
 };
 
@@ -318,7 +318,7 @@ Series.prototype.selectPairs = function (selector) {
 
 	var self = this;
 	return new self.Constructor({
-		__iterable: new SelectPairsIterable(self, selector),
+		iterable: new SelectPairsIterable(self, selector),
 	}); 	
 };
 
@@ -332,7 +332,7 @@ Series.prototype.selectMany = function (selector) {
 
 	var self = this;
 	return new self.Constructor({
-		__iterable: new SelectManyIterable(self, selector),
+		iterable: new SelectManyIterable(self, selector),
 	}); 	
 };
 
@@ -347,7 +347,7 @@ Series.prototype.selectManyPairs = function (selector) {
 	var self = this;
 
 	return new self.Constructor({
-		__iterable: new SelectManyPairsIterable(self, selector),
+		iterable: new SelectManyPairsIterable(self, selector),
 	}); 	
 };
 
@@ -397,7 +397,7 @@ var executeOrderBy = function (self, batch) {
 	};
 
 	return new self.Constructor({
-		__iterable: {
+		iterable: {
 			getIterator: function () {
 				return new ArrayIterator(executeLazySort());
 			},
@@ -521,7 +521,7 @@ Series.prototype.slice = function (startIndexOrStartPredicate, endIndexOrEndPred
 	}
 
 	return new self.Constructor({
-		__iterable: {
+		iterable: {
 			getIterator: function () {
 				return new TakeWhileIterator(
 					new SkipWhileIterator(
@@ -557,7 +557,7 @@ Series.prototype.window = function (period, obsoleteSelector) {
 	var self = this;
 
 	return new Series({
-		__iterable: {
+		iterable: {
 			getIterator: function () {
 
 				var curOutput = undefined;
@@ -601,7 +601,7 @@ Series.prototype.rollingWindow = function (period, obsoleteSelector) {
 	var self = this;
 
 	return new Series({
-		__iterable: { 
+		iterable: { 
 			getIterator: function () {
 
 				var curOutput = undefined;
@@ -928,7 +928,7 @@ Series.prototype.bake = function () {
 
 	var pairs = self.toPairs();
 	var baked = new self.Constructor({
-		__iterable: {
+		iterable: {
 			getIterator: function () {
 				return new ArrayIterator(pairs);
 			},
@@ -1088,7 +1088,7 @@ Series.prototype.reverse = function () {
 
 	var self = this;
 	return new self.Constructor({
-		__iterable: {
+		iterable: {
 			getIterator: function () {
 				var pairs = [];
 				var iterator = self.getIterator();
@@ -1126,7 +1126,7 @@ Series.prototype.inflate = function (selector) {
 	}
 
 	return new DataFrame({
-		__iterable: new SelectValuesIterable(self, selector),
+		iterable: new SelectValuesIterable(self, selector),
 	});
 };
 
@@ -1488,7 +1488,7 @@ Series.prototype.distinct = function (selector) {
 	}
 
 	return new self.Constructor({
-		__iterable: {
+		iterable: {
 			getIterator: function () {
 				return new ArrayIterator(output);
 			},
@@ -1580,7 +1580,7 @@ Series.prototype.insertPair = function (pair) {
 	var self = this;
 	var pairs = [pair].concat(self.toPairs());
 	return new self.Constructor({
-		__iterable: new ArrayIterable(pairs), 
+		iterable: new ArrayIterable(pairs), 
 	});
 };
 
@@ -1599,7 +1599,7 @@ Series.prototype.appendPair = function (pair) {
 	var pairs = self.toPairs();
 	pairs.push(pair);
 	return new self.Constructor({
-		__iterable: new ArrayIterable(pairs), 
+		iterable: new ArrayIterable(pairs), 
 	});
 };
 
@@ -1651,14 +1651,14 @@ Series.prototype.groupBy = function (selector) {
 			return [
 				group.key(),
 				new Series({
-					__iterable: new ArrayIterable(group.getSource()), 
+					iterable: new ArrayIterable(group.getSource()), 
 				}),
 			];
 		})
 		.toArray();
 
 	return new Series({
-		__iterable: new ArrayIterable(groupedPairs),
+		iterable: new ArrayIterable(groupedPairs),
 	});
 };
 

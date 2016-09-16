@@ -14,7 +14,7 @@ module.exports = function (series) {
 	assert.isArray(series, "Expected 'series' parameter to 'dataForge.concatSeries' to be an array of series.");
 
 	return new Series({
-		__iterable: {
+		iterable: {
 			getIterator: function () {
 				var iterators = E.from(series)
 					.select(function (series) {
