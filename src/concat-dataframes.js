@@ -55,17 +55,22 @@ module.exports = function (dataFrames, options) {
 			.toArray();
 
 		return new DataFrame({
-			columnNames: concatenatedColumnsNames,
-			iterable: function () {
-				var iterators = E.from(dataFrames)
-					.select(function (dataFrame) {
-						return dataFrame.remapColumns(concatenatedColumnsNames);
-					})
-					.select(function (dataFrame) {
-						return dataFrame.getIterator();
-					})						
-					.toArray()
-				return new ConcatIterator(iterators);
+			__iterable: {
+				getIterator: function () {
+					var iterators = E.from(dataFrames)
+						.select(function (dataFrame) {
+							return dataFrame.remapColumns(concatenatedColumnsNames);
+						})
+						.select(function (dataFrame) {
+							return dataFrame.getIterator();
+						})						
+						.toArray()
+					return new ConcatIterator(iterators);
+				},
+
+				getColumnNames: function () {
+					return concatenatedColumnsNames;
+				},
 			},
 		});
 	}
