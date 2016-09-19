@@ -153,117 +153,123 @@ var DataFrame = function (config) {
 	var _columnNames = null;
 
 	if (config) {
-		assert.isObject(config, "Expected 'config' parameter to DataFrame constructor to be an object with options for initialisation.");
 
-		if (config.iterable) {
-			assert.isObject(config.iterable, "Expect 'iterable' field of 'config' parameter to DataFrame constructor to be an object that implements getIterator and getColumnNames.");
-			assert.isFunction(config.iterable.getIterator, "Expect 'iterable' field of 'config' parameter to DataFrame constructor to be an object that implements getIterator and getColumnNames.");
-			assert.isFunction(config.iterable.getColumnNames, "Expect 'iterable' field of 'config' parameter to DataFrame constructor to be an object that implements getIterator and getColumnNames.");			
-		}
-		else {
-			if (config.columnNames) {
-				assert.isArray(config.columnNames, "Expected 'columnNames' member of 'config' parameter to DataFrame constructor to be an array of strings.");
-
-				config.columnNames.forEach(function (columnName) {
-					assert.isString(columnName, "Expected 'columnNames' member of 'config' parameter to DataFrame constructor to be an array of strings.");
-				});
-			}
-			
-			if (config.values) {
-				assert(!config.columns, "Can't use both 'values' and 'columns' fields of 'config' parameter to DataFrame constructor.");
-			}
-			else if (config.columns) {
-				assert.isObject(config.columns, "Expected 'columns' member of 'config' parameter to DataFrame constructor to be an object with fields that define columns.");
-				assert(!config.columnNames, "Can't use both 'columns' and 'columnNames' of 'config' parameter to DataFrame constructor.");
-			}
-
-			var values = config.values;
-			var columns = config.columns;
-
-			if (config.columnNames)	{
-				//
-				// Rename duplicate columns.
-				//
-				var duplicateColumns = E.from(config.columnNames)
-					.groupBy(function (columnName) {
-						return columnName.toLowerCase();
-					})
-					.select(function (group) {
-						return {
-							name: group.key(),
-							count: group.getSource().length,
-						}
-					})
-					.where(function (column) {
-						return column.count > 1;
-					})
-					.toArray();
-
-				var duplicateColumnCounts = E.from(duplicateColumns)
-					.toObject(
-						function (column) {
-							return column.name;
-						},						
-						function (column) {
-							return 1;
-						}						
-					);
-
-				_columnNames = E.from(config.columnNames)
-					.select(function (columnName) {
-						var key = columnName.toLowerCase();
-						var columnCount = duplicateColumnCounts[key];
-						if (columnCount) {
-							duplicateColumnCounts[key] += 1; // Increment count. 
-							return columnName + "." + columnCount; // Number duplicates in order.
-						}
-						else {
-							return columnName; // No duplicate.
-						}
-					})
-					.toArray();
-
-				if (Object.isFunction(values)) {
-					config.values = function () {
-						return convertRowsToObjects(_columnNames, values());
-					};
-				}
-				else {
-					config.values = function () {
-						return convertRowsToObjects(_columnNames, new ArrayIterator(values));
-					};
-				}
+		if (Object.isObject(config)) {			
+			if (config.iterable) {
+				assert.isObject(config.iterable, "Expect 'iterable' field of 'config' parameter to DataFrame constructor to be an object that implements getIterator and getColumnNames.");
+				assert.isFunction(config.iterable.getIterator, "Expect 'iterable' field of 'config' parameter to DataFrame constructor to be an object that implements getIterator and getColumnNames.");
+				assert.isFunction(config.iterable.getColumnNames, "Expect 'iterable' field of 'config' parameter to DataFrame constructor to be an object that implements getIterator and getColumnNames.");			
 			}
 			else {
-				if (values) {
+				if (config.columnNames) {
+					assert.isArray(config.columnNames, "Expected 'columnNames' member of 'config' parameter to DataFrame constructor to be an array of strings.");
+
+					config.columnNames.forEach(function (columnName) {
+						assert.isString(columnName, "Expected 'columnNames' member of 'config' parameter to DataFrame constructor to be an array of strings.");
+					});
+				}
+				
+				if (config.values) {
+					assert(!config.columns, "Can't use both 'values' and 'columns' fields of 'config' parameter to DataFrame constructor.");
+				}
+				else if (config.columns) {
+					assert.isObject(config.columns, "Expected 'columns' member of 'config' parameter to DataFrame constructor to be an object with fields that define columns.");
+					assert(!config.columnNames, "Can't use both 'columns' and 'columnNames' of 'config' parameter to DataFrame constructor.");
+				}
+
+				var values = config.values;
+				var columns = config.columns;
+
+				if (config.columnNames)	{
+					//
+					// Rename duplicate columns.
+					//
+					var duplicateColumns = E.from(config.columnNames)
+						.groupBy(function (columnName) {
+							return columnName.toLowerCase();
+						})
+						.select(function (group) {
+							return {
+								name: group.key(),
+								count: group.getSource().length,
+							}
+						})
+						.where(function (column) {
+							return column.count > 1;
+						})
+						.toArray();
+
+					var duplicateColumnCounts = E.from(duplicateColumns)
+						.toObject(
+							function (column) {
+								return column.name;
+							},						
+							function (column) {
+								return 1;
+							}						
+						);
+
+					_columnNames = E.from(config.columnNames)
+						.select(function (columnName) {
+							var key = columnName.toLowerCase();
+							var columnCount = duplicateColumnCounts[key];
+							if (columnCount) {
+								duplicateColumnCounts[key] += 1; // Increment count. 
+								return columnName + "." + columnCount; // Number duplicates in order.
+							}
+							else {
+								return columnName; // No duplicate.
+							}
+						})
+						.toArray();
+
 					if (Object.isFunction(values)) {
-						_columnNames = determineColumnNamesFromObjectsIterable(values, config.considerAllRows);
+						config.values = function () {
+							return convertRowsToObjects(_columnNames, values());
+						};
 					}
 					else {
-						// Derive column names from object fields.
-						_columnNames = determineColumnNamesFromObjectRows(values, config.considerAllRows);
+						config.values = function () {
+							return convertRowsToObjects(_columnNames, new ArrayIterator(values));
+						};
 					}
 				}
-				else if (columns) {
-					_columnNames = Object.keys(columns);
-
-					config.values = function () {
-						var columnIterators = E.from(_columnNames)
-							.select(function (columnName) {
-								var column = columns[columnName];
-								if (column instanceof Series) {
-									column = column.toValues();
-								}
-								return new ArrayIterator(column);
-							})
-							.toArray();
-						return convertRowsToObjects(_columnNames, new MultiIterator(columnIterators));
-					};
-				}
 				else {
-					_columnNames = [];
+					if (values) {
+						if (Object.isFunction(values)) {
+							_columnNames = determineColumnNamesFromObjectsIterable(values, config.considerAllRows);
+						}
+						else {
+							// Derive column names from object fields.
+							_columnNames = determineColumnNamesFromObjectRows(values, config.considerAllRows);
+						}
+					}
+					else if (columns) {
+						_columnNames = Object.keys(columns);
+
+						config.values = function () {
+							var columnIterators = E.from(_columnNames)
+								.select(function (columnName) {
+									var column = columns[columnName];
+									if (column instanceof Series) {
+										column = column.toValues();
+									}
+									return new ArrayIterator(column);
+								})
+								.toArray();
+							return convertRowsToObjects(_columnNames, new MultiIterator(columnIterators));
+						};
+					}
+					else {
+						_columnNames = [];
+					}
 				}
 			}
+		}
+		else {
+			assert.isArray(config, "Expected 'config' parameter to DataFrame constructor to be an array of objects or a configuration object with options for initialisation.");
+
+			_columnNames = determineColumnNamesFromObjectRows(config, false);			
 		}
 	}
 	else {

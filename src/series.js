@@ -90,36 +90,45 @@ var Series = function (config) {
 		return;
 	}
 
-	assert.isObject(config, "Expected 'config' parameter to Series constructor to be an object with options for initialisation.");
+	if (Object.isObject(config)) {	
+		
+		if (config.iterable) {
+			assert.isObject(config.iterable, "Expect 'iterable' field of 'config' parameter to Series constructor to be an object that implements getIterator and getColumnNames.");
+			assert.isFunction(config.iterable.getIterator, "Expect 'iterable' field of 'config' parameter to Series constructor to be an object that implements getIterator and getColumnNames.");
 
-	if (config.iterable) {
-		assert.isObject(config.iterable, "Expect 'iterable' field of 'config' parameter to Series constructor to be an object that implements getIterator and getColumnNames.");
-		assert.isFunction(config.iterable.getIterator, "Expect 'iterable' field of 'config' parameter to Series constructor to be an object that implements getIterator and getColumnNames.");
-
-		// Setting the inner iterable directly.
-		// Power to you!
-		self.iterable = config.iterable;
-		return;
-	}
-
-	if (config.values) {
-		if (!Object.isFunction(config.values) && !Object.isArray(config.values)) {
-			assert.isObject(config.values, "Expected 'values' field of 'config' parameter to Series constructor be an array of values, a function that returns an iterator or an iterable.");
-			assert.isFunction(config.values.getIterator, "Expected 'values' field of 'config' parameter to Series constructor be an array of values, a function that returns an iterator or an iterable.");
+			// Setting the inner iterable directly.
+			// Power to you!
+			self.iterable = config.iterable;
+			return;
 		}
-	}
 
-	if (config.index) {
-		if (!Object.isFunction(config.index) && !Object.isArray(config.index)) {
-			assert.isObject(config.index, "Expected 'index' field of 'config' parameter to Series constructor to be an array, function that returns an iterator, Series, DataFrame or iterable.");
-			assert.isFunction(config.index.getIterator, "Expected 'index' field of 'config' parameter to Series constructor to be an array, function that returns an iterator, Series, DataFrame or iterable.");
+		if (config.values) {
+			if (!Object.isFunction(config.values) && !Object.isArray(config.values)) {
+				assert.isObject(config.values, "Expected 'values' field of 'config' parameter to Series constructor be an array of values, a function that returns an iterator or an iterable.");
+				assert.isFunction(config.values.getIterator, "Expected 'values' field of 'config' parameter to Series constructor be an array of values, a function that returns an iterator or an iterable.");
+			}
 		}
-	}
 
-	self.iterable = new PairsIterable(
-		createIndexIterable(config.index), 
-		createValuesIterable(config.values)
-	);
+		if (config.index) {
+			if (!Object.isFunction(config.index) && !Object.isArray(config.index)) {
+				assert.isObject(config.index, "Expected 'index' field of 'config' parameter to Series constructor to be an array, function that returns an iterator, Series, DataFrame or iterable.");
+				assert.isFunction(config.index.getIterator, "Expected 'index' field of 'config' parameter to Series constructor to be an array, function that returns an iterator, Series, DataFrame or iterable.");
+			}
+		}
+
+		self.iterable = new PairsIterable(
+			createIndexIterable(config.index), 
+			createValuesIterable(config.values)
+		);
+	}
+	else {
+		assert.isArray(config, "Expected 'config' parameter to Series or DataFrame constructor to be an array of values or a configuration object with options for initialisation.");
+
+		self.iterable = new PairsIterable(
+			new CountIterable(),
+			new ArrayIterable(config)
+		);
+	}
 };
 
 module.exports = Series;

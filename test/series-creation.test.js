@@ -20,6 +20,17 @@ describe('series creation', function () {
 		]);
 	});
 
+	it('can create from just an array', function () {
+
+		var series = new Series([1, 2, 3]);
+
+		expect(series.toPairs()).to.eql([
+			[0, 1],
+			[1, 2],
+			[2, 3],
+		]);
+	});
+
 	it('can create with values from iterable', function () {
 
 		var series = new Series({

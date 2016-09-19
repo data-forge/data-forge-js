@@ -339,7 +339,9 @@ Alternatively (to support lazy evaluation) a generator may return a lazily evalu
 
 ## Getting data in
 
-The DataFrame constructor is passed a *config* object that specifies the initial contents of the data frame. 
+### DataFrame
+
+The DataFrame constructor is passed a *config* object that specifies the initial contents of the DataFrame and any additional options required. 
 
 Create a data frame from column names and rows:
 
@@ -374,12 +376,32 @@ A data frame can also be created from an array of JavaScript objects:
 			]
 		});
 
+If you need to specify any other configuration, you can also simply pass in an array of objects:
+
+	var dataFrame = new dataForge.DataFrame([
+				{
+					Col1: 1,
+					Col2: 'hello',
+					Col3: new Date(....)
+				},
+				{
+					Col1: 5,
+					Col2: 'computer',
+					Col3: new Date(....)
+				},
+				{
+					Col1: 10,
+					Col2: 'good day',
+					Col3: new Date(....)
+				}
+		]);
+
 In this case column names are automatically generated form the fields in the objects. For performance reasons only the fields of the first object are considered.  
 
 If you have irregular data you can enable *considerAllRows*, but be warned that this can be expensive as every value must be examined to determine column names:
 
 	var dataFrame = new dataForge.DataFrame({
-			rows: [
+			values: [
 				{
 					Col1: 1,
 					Col2: 'hello',
@@ -399,8 +421,21 @@ If you have irregular data you can enable *considerAllRows*, but be warned that 
 			considerAllRows: true, // Examine all rows to determine column names.
 		});
  
+### Series
 
-## Getting data out
+This is very similar to creating a DataFrame. You pass in a *configuration* object with the values and any additional options:
+
+	var series = new dataForge.Series({
+			values: [1, 2, 3]
+		});
+
+If you don't need additional options you can simply pass in an array:
+
+	var series = new dataForge.Series([1, 2, 3]);
+
+## Get data back out
+
+### DataFrame
 
 To get back the names of columns:
 
@@ -414,11 +449,17 @@ To get back an array of objects (with column names as field names):
 
 	var objects = dataFrame.toValues();
 
+### Series
+
+To retreive the data from Series as an array:
+
+	var values = series.toValues();
+
 ## Setting an index
 
-In the previous examples of creating a data-frame, an index was generated with values starting at zero.
+In the previous examples of creating Series and DataFrames no index was specified, so a default zero-based index was generated.
 
-An index can also be set explicitly when creating a data frame:
+An index can also be set explicitly when creating a Series or DataFrame:
 
 	var dataFrame = new dataForge.DataFrame({
 			columnNames: <column-names>,
@@ -426,11 +467,16 @@ An index can also be set explicitly when creating a data frame:
 			index: [5, 10, 100]
 		});
 
-A new index can be wired like so:
+	var series = new dataForge.Series({
+			values: <initial-values>,
+			index: [5, 10, 100]			
+		});
 
-	var dataFrameWithIndex = dataFrame.withIndex([1, 2, 3]);
+A new index can easily be assigned to either Series or DataFrame using the `withIndex` function:
 
-Most likely you will want to promise an existing column to an index:
+	var dataFrameWithNewIndex = dataFrame.withIndex([1, 2, 3]);
+
+Most likely when using a DataFrame you will want to promote an existing column to an index:
  
 	var dataFrame = new dataForge.DataFrame(someConfig).setIndex("Col3");
 
@@ -439,6 +485,24 @@ Be aware that promoting a column to an index in Data-Forge doesn't remove the co
 	var dataFrame = new dataForge.DataFrame(someConfig).setIndex("Col3").dropSeries("Col3");
 
 An index is required for certain operations like `merge`.
+
+# Immutability and Chained Functions
+
+You may have noticed in previous examples that multiple functions have been chained.
+
+Data-Forge supports only [immutable](https://en.wikipedia.org/wiki/Immutable_object) operations. Each operation returns a new immutable data frame or column. No *in place* operations are supported (one of the things I found confusing about *Pandas*). 
+
+This is why, in the following example, the final data frame is captured after all operations are applied:
+
+	var df = new dataForge.DataFrame(config).setIndex("Col3").dropSeries("Col3");
+
+Consider an alternate structure:
+
+	var df1 = new dataForge.DataFrame(config);
+	var df2 = df1.setIndex("Col3");
+	var df3 = df2.dropSeries("Col3");
+
+Here *df1*, *df2* and *df3* are separate data-frames with the results of the previous operations applied. These data-frames are all immutable and cannot be changed. Any function that transforms a data-frame returns a new and independent data frame. If you are not used to this sort of thing, it may require some getting used to!
 
 # Working with data
 
@@ -574,7 +638,7 @@ An index is actually just another Series so you can call the `toValues` function
 
 ## Adding a column
 
-New columns can be added to a data-frame. This doesn't change the original data-frame, it generates a new data-frame that contains the additional column.
+New columns can be added to a DataFrame. This doesn't change the original data-frame, it generates a new data-frame that contains the additional column.
 
 	var newDf = df.withSeries("Some-New-Column", someNewSeries); 
 
@@ -625,24 +689,6 @@ A particular value of a Series or a row of DataFrame can be set by specifying th
 	var newDataFrame = dataFrame.set(10, newRow);
 
 Series and DataFrame are immutable, so the set operation does not modify in place, it returns a new Series or DataFrame.
-
-# Immutability and Chained Functions
-
-You may have noticed in previous examples that multiple functions have been chained.
-
-Data-Forge supports only [immutable](https://en.wikipedia.org/wiki/Immutable_object) operations. Each operation returns a new immutable data frame or column. No *in place* operations are supported (one of the things I found confusing about *Pandas*). 
-
-This is why, in the following example, the final data frame is captured after all operations are applied:
-
-	var df = new dataForge.DataFrame(config).setIndex("Col3").dropSeries("Col3");
-
-Consider an alternate structure:
-
-	var df1 = new dataForge.DataFrame(config);
-	var df2 = df1.setIndex("Col3");
-	var df3 = df2.dropSeries("Col3");
-
-Here *df1*, *df2* and *df3* are separate data-frames with the results of the previous operations applied. These data-frames are all immutable and cannot be changed. Any function that transforms a data-frame returns a new and independent data frame. If you are not used to this sort of thing, it may require some getting used to!
 
 # Lazy Evaluation
 

@@ -81,6 +81,21 @@ describe('dataframe creation', function () {
 		]);
 	});
 
+	it('can create from simple array of objects', function () {
+		
+		var dataFrame = new DataFrame([
+			{ c1: 1, c2: 2 },
+			{ c1: 3, c2: 4 },
+		]);
+
+		var columnNames = ["c1", "c2"];
+		expect(dataFrame.getColumnNames()).to.eql(columnNames);
+		expect(dataFrame.toPairs()).to.eql([
+			[0, { c1: 1, c2: 2 }],
+			[1, { c1: 3, c2: 4 }],
+		]);
+	});
+
 	it('creating from objects with variable fields - by default just uses first row to determine column names', function () {
 		
 		var dataFrame = new DataFrame({
