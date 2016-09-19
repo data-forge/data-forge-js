@@ -138,7 +138,7 @@ describe('Series', function () {
 
 	it('can select pairs', function () {
 		var series = initSeries([0, 1, 2, 3], [100, 300, 200, 5]);
-		var modified = series.selectPairs(function (value, index) {
+		var modified = series.selectPairs(function (index, value) {
 				expect(index).to.be.a('number');
 				return [index+1, value + 10];
 			});
@@ -183,7 +183,7 @@ describe('Series', function () {
 
 	it('can select many pairs', function () {
 		var series = initSeries([0, 1, 2, 3], [100, 300, 200, 5]);
-		var modified = series.selectManyPairs(function (value, index) {
+		var modified = series.selectManyPairs(function (index, value) {
 				return [
 					[index, value],
 					[index, value],
@@ -375,7 +375,7 @@ describe('Series', function () {
 
 		var series = new Series();
 		var windowed = series.window(2)
-			.selectPairs(function (window, windowIndex) {
+			.selectPairs(function (windowIndex, window) {
 				return [windowIndex, window.sum()];
 			});
 
@@ -387,7 +387,7 @@ describe('Series', function () {
 		var series = new Series({ values: [1, 2, 3, 4] });
 		var windowed = series
 			.window(2)
-			.selectPairs(function (window, windowIndex) {
+			.selectPairs(function (windowIndex, window) {
 				return [windowIndex, window.toValues()];
 			});
 
@@ -402,7 +402,7 @@ describe('Series', function () {
 		var series = new Series({ values: [1, 2, 3, 4, 5] });
 		var windowed = series
 			.window(2)
-			.selectPairs(function (window, windowIndex) {
+			.selectPairs(function (windowIndex, window) {
 				return [windowIndex, window.toValues()];
 			});
 
@@ -418,7 +418,7 @@ describe('Series', function () {
 		var series = new Series({ values: [1, 2, 3, 4, 5, 6] });
 		var windowed = series
 			.window(3)
-			.selectPairs(function (window, windowIndex) {
+			.selectPairs(function (windowIndex, window) {
 				return [windowIndex, window.toValues()];
 			});
 
@@ -434,7 +434,7 @@ describe('Series', function () {
 		var series = new Series({ values: [1, 2, 3, 4, 5] });
 		var windowed = series
 			.window(3)
-			.selectPairs(function (window, windowIndex) {
+			.selectPairs(function (windowIndex, window) {
 				return [windowIndex, window.toValues()];
 			});
 
@@ -450,7 +450,7 @@ describe('Series', function () {
 		var series = initSeries([], []);
 		var newSeries = series
 			.rollingWindow(2)
-			.selectPairs(function (window, windowIndex) {
+			.selectPairs(function (windowIndex, window) {
 				return [windowIndex, window.toValues()];
 			});
 
@@ -462,7 +462,7 @@ describe('Series', function () {
 		var series = initSeries([0, 1], [1, 2]);
 		var newSeries = series
 			.rollingWindow(3)
-			.selectPairs(function (window, windowIndex) {
+			.selectPairs(function (windowIndex, window) {
 				return [windowIndex, window.toValues()];
 			});
 
@@ -474,7 +474,7 @@ describe('Series', function () {
 		var series = initSeries(E.range(0, 5).toArray(), E.range(0, 5).toArray());
 		var newSeries = series
 			.rollingWindow(2)
-			.selectPairs(function (window, windowIndex) {
+			.selectPairs(function (windowIndex, window) {
 				return [windowIndex, window.toValues()];
 			});
 
@@ -494,7 +494,7 @@ describe('Series', function () {
 		var series = initSeries(E.range(0, 5).toArray(), E.range(0, 5).toArray());
 		var newSeries = series
 			.rollingWindow(3)
-			.selectPairs(function (window, windowIndex) {
+			.selectPairs(function (windowIndex, window) {
 				return [windowIndex, window.toValues()];
 			});
 
@@ -513,7 +513,7 @@ describe('Series', function () {
 		var series = initSeries(E.range(0, 6).toArray(), E.range(0, 6).toArray());
 		var newSeries = series
 			.rollingWindow(2)
-			.selectPairs(function (window, windowIndex) {
+			.selectPairs(function (windowIndex, window) {
 				return [windowIndex+10, window.toValues()];
 			});
 
@@ -534,7 +534,7 @@ describe('Series', function () {
 		var series = initSeries(E.range(0, 6).toArray(), E.range(0, 6).toArray());
 		var newSeries = series
 			.rollingWindow(3)
-			.selectPairs(function (window, windowIndex) {
+			.selectPairs(function (windowIndex, window) {
 				return [windowIndex, window.toValues()];
 			});
 
@@ -554,7 +554,7 @@ describe('Series', function () {
 		var series = initSeries(E.range(0, 6).toArray(), E.range(0, 6).toArray());
 		var newSeries = series
 			.rollingWindow(3)
-			.selectPairs(function (window, windowIndex) {
+			.selectPairs(function (windowIndex, window) {
 				var index = window.getIndex().toValues();
 				var values = window.toValues();
 				return [index[index.length-1], values[values.length-1]];
@@ -1411,7 +1411,7 @@ describe('Series', function () {
 		});
 
 		var collapsed = series.groupSequentialBy()
-			.selectPairs(function (window) {
+			.selectPairs(function (windowIndex, window) {
 				return [window.getIndex().first(), window.first()];
 			});
 
@@ -1433,7 +1433,7 @@ describe('Series', function () {
 		});
 
 		var collapsed = series.groupSequentialBy()
-			.selectPairs(function (window) {
+			.selectPairs(function (windowIndex, window) {
 				return [window.lastPair()[0], window.last()];
 			});
 
@@ -1455,7 +1455,7 @@ describe('Series', function () {
 		});
 
 		var collapsed = series.groupSequentialBy(value => value.A)
-			.selectPairs(function (window) {
+			.selectPairs(function (windowIndex, window) {
 				return [window.lastIndex(), window.last().A];
 			});
 
@@ -1517,7 +1517,7 @@ describe('Series', function () {
 			.variableWindow(function (a, b) {
 				return a === b;
 			})
-			.selectPairs(function (window, windowIndex) {
+			.selectPairs(function (windowIndex, window) {
 				return [window.getIndex().first(), window.count()];
 			});
 

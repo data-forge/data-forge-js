@@ -22,7 +22,7 @@ describe('rolling window integration', function () {
 
 		var newSeries = dataFrame.getSeries('Value')
 			.rollingWindow(5)
-			.selectPairs(function (window, windowIndex) {
+			.selectPairs(function (windowIndex, window) {
 				return [window.getIndex().last(), window.last()];
 			});
 
@@ -97,7 +97,7 @@ describe('rolling window integration', function () {
 		var dataFrame = genDataFrame(2, 4);
 		var series = dataFrame
 			.window(2)
-			.selectPairs(function (window, windowIndex) {
+			.selectPairs(function (windowIndex, window) {
 				return [windowIndex, [window.getSeries("1").sum(), window.getSeries("2").sum()]];
 			})
 			.selectMany(function (value) {
@@ -118,7 +118,7 @@ describe('rolling window integration', function () {
 		var dataFrame = genDataFrame(2, 4);
 		var series = dataFrame
 			.rollingWindow(2)
-			.selectPairs(function (window, windowIndex) {
+			.selectPairs(function (windowIndex, window) {
 				return [windowIndex, [window.getSeries("1").sum(), window.getSeries("2").sum()]];
 			})
 			.selectMany(function (value) {

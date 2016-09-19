@@ -19,7 +19,7 @@ SelectManyPairsIterable.prototype.getIterator = function () {
     return new SelectManyIterator(
         self._iterable.getIterator(), 
         function (pair) {
-            var newPairs = self._selector(pair[1], pair[0]);
+            var newPairs = self._selector(pair[0], pair[1]);
             if (!Object.isArray(newPairs)) {
                 throw new Error("Expected return value from 'Series.selectManyPairs' selector to be an array of pairs, each item in the array represents a new pair in the resulting series.");
             }
@@ -49,7 +49,8 @@ SelectManyPairsIterable.prototype.getColumnNames = function () {
             return [];
         }
 
-        var result = self._selector(iterator.getCurrent()[1]);
+        var pair = iterator.getCurrent();
+        var result = self._selector(pair[0], pair[1]);
         if (result.length > 0) {
             return Object.keys(result[0][1]); // Extract pair value.
         }

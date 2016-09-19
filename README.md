@@ -782,8 +782,8 @@ This produces an entirely new immutable data-frame. However the new data-frame h
 Note that `select` only transforms the value. The index for each row is preserved in the new DataFrame. To completely transform a DataFrame, both value and index, you must use `selectPairs`:
 
 	var transformedDataFrame = sourceDataFrame
-		.selectPairs(function (row, index) {
-			return [ // Returns a pair.
+		.selectPairs(function (index, value) {
+			return [ // Returns a new pair.
 				... some new index ...,
 				... some new row ...
 			];
@@ -810,8 +810,8 @@ The source index is preserved to the transformed series.
 Use `selectPairs` to transform both value and index:  
 
 	var newSeries = oldSeries
-		.selectPairs(function (value, index) {
-			return [ // Returns a pair.
+		.selectPairs(function (index, value) {
+			return [ // Returns a new pair.
 				... some new index ...,
 				... some new value ...
 			];
@@ -956,7 +956,7 @@ An example that summarizes weekly sales data:
 	var salesData = ... series containing amount sales for each business day ...
 
 	var weeklySales = salesData.window(7)
-			.selectPairs(function (window, windowIndex) {
+			.selectPairs(function (windowIndex, window) {
 				// Return new index and value.
 				return [
 					window.lastIndex(), 	// Week ending.
@@ -993,7 +993,7 @@ Now consider an example that requires a configurable window size. Here is some c
 
 	var smaPeriod = ... configurable moving average period ...
  	var smSeries = someSeries.rollingWindow(smaPeriod)
-		.selectPairs(function (window, windowIndex) {
+		.selectPairs(function (windowIndex, window) {
     		return [
 				window.lastIndex(),
 				window.sum() / smaPeriod,

@@ -668,7 +668,7 @@ Series.prototype.percentChange = function () {
 	var self = this;
 	return self
 		.rollingWindow(2)
-		.selectPairs(function (window) {
+		.selectPairs(function (windowIndex, window) {
 			var values = window.toValues();
 			var amountChange = values[1] - values[0]; // Compute amount of change.
 			var pctChange = amountChange / values[0]; // Compute % change.
@@ -1420,7 +1420,7 @@ Series.prototype.sequentialDistinct = function (selector) {
 	return self.variableWindow(function (a, b) {
 			return selector(a) === selector(b);
 		})
-		.selectPairs(function (window) {
+		.selectPairs(function (windowIndex, window) {
 			return [window.getIndex().first(), window.first()];
 		});
 };
@@ -1617,7 +1617,7 @@ Series.prototype.fillGaps = function (predicate, generator) {
 	var self = this;
 
 	return self.rollingWindow(2)
-		.selectManyPairs(function (window) {
+		.selectManyPairs(function (windowIndex, window) {
 			var pairA = window.firstPair();
 			var pairB = window.lastPair();
 			if (!predicate(pairA, pairB)) {

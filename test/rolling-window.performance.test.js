@@ -23,7 +23,7 @@ describe('rolling window performance', function () {
 
 		var newSeries = series
 			.rollingWindow(windowSize)
-			.selectPairs(function (window, windowIndex) {
+			.selectPairs(function (windowIndex, window) {
 				return [windowIndex, windowIndex];
 			});
 

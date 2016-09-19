@@ -23,7 +23,7 @@ describe('window performance', function () {
 
 		var newSeries = series
 			.window(windowSize)
-			.selectPairs(function (window, windowIndex) {
+			.selectPairs(function (windowIndex, window) {
 				return [windowIndex, windowIndex];
 			});
 
@@ -58,7 +58,7 @@ describe('window performance', function () {
 
 		var newSeries = dataFrame
 			.window(windowSize)
-			.selectPairs(function (window, windowIndex) {
+			.selectPairs(function (windowIndex, window) {
 				return [windowIndex, windowIndex];
 			});
 
