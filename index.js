@@ -11,6 +11,7 @@ var extend = require('extend');
 var DataFrame = require('./src/dataframe');
 var Series = require('./src/series');
 var E = require('linq');
+var zip = require('./src/zip');
 
 //
 // Records plugins that have been registered.
@@ -37,14 +38,14 @@ var dataForge = {
 	/**
 	 * Constructor for DataFrame.
 	 *
-	 * @param {object} config - Specifies content and configuration for the DataFrame.
+	 * @param {object|array} config|values - Specifies content and configuration for the DataFrame.
 	 */
 	DataFrame: DataFrame,
 
 	/**
 	 * Constructor for Series.
 	 *
-	 * @param {object} config - Specifies content and configuration for the Series.
+	 * @param {object|array} config|values - Specifies content and configuration for the Series.
 	 */
 	Series: Series,
 
@@ -162,7 +163,7 @@ var dataForge = {
 	 *
 	 * @param {array} dataFrames - Array of dataframes to concatenate. 
 	 */
-	concat: require('./src/concat-dataframes'),
+	concatDataFrames: require('./src/concat-dataframes'),
 
 	/**
 	 * Concatenate multiple series into a single series.
@@ -251,7 +252,9 @@ var dataForge = {
 	 * @param {array} series - Array of series to zip together.
 	 * @param {function} selector - Selector function that produces a new series based on the input series.
 	 */
-	zipSeries: require('./src/zip-series'),
+	zipSeries: function (series, selector) {
+		return zip(series, selector, Series);
+	},
 
 	/**
 	 * Zip together multiple data-frames to create a new data-frame.
@@ -259,7 +262,9 @@ var dataForge = {
 	 * @param {array} dataFrames - Array of data-frames to zip together.
 	 * @param {function} selector - Selector function that produces a new data-frame based on the input data-frames.
 	 */
-	zip: require('./src/zip-dataframes'),	
+	zipDataFrames: function (dataFrames, selector) {
+		return zip(dataFrames, selector, DataFrame);
+	},
 };
 
 module.exports = dataForge;

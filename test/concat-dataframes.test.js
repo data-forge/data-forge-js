@@ -4,8 +4,62 @@ describe('concat-dataframes', function () {
 
     var expect = require('chai').expect;
 
-    var DataFrame = require('../src/dataframe.js');
-    var concat = require('../src/concat-dataframes.js');
+    var DataFrame = require('../src/dataframe');
+    var dataForge = require('../index');
+    var concat = require('../src/concat-dataframes');
+
+	it('can concat data frames', function () {
+
+	 	var df1 = new DataFrame({ columnNames: ["1", "2"], values: [[1, 2], [3, 4]] });
+	 	var df2 = new DataFrame({ columnNames: ["1", "2"], values: [[5, 6], [7, 8]] });
+	 	var df3 = new DataFrame({ columnNames: ["1", "2"], values: [[9, 10], [11, 12]] });
+
+	 	var result = dataForge.concatDataFrames([df1, df2, df3]);
+
+	 	expect(result.getColumnNames()).to.eql(["1", "2"]);
+	 	expect(result.toPairs()).to.eql([
+ 			[0, { "1": 1, "2": 2 }],
+ 			[1, { "1": 3, "2": 4 }],
+ 			[0, { "1": 5, "2": 6 }],
+ 			[1, { "1": 7, "2": 8 }],
+ 			[0, { "1": 9, "2": 10 }],
+ 			[1, { "1": 11, "2": 12 }],
+ 		]);
+	});
+
+	it('concat can handle out of order columns', function () {
+
+	 	var df1 = new DataFrame({ columnNames: ["1", "2"], values: [[1, 2], [3, 4]] });
+	 	var df2 = new DataFrame({ columnNames: ["2", "1"], values: [[6, 5], [8, 7]] });
+
+	 	var result = dataForge.concatDataFrames([df1, df2]);
+
+	 	expect(result.getColumnNames()).to.eql(["1", "2"]);
+	 	expect(result.getIndex().toValues()).to.eql([0, 1, 0, 1]);
+	 	expect(result.toRows()).to.eql([
+ 			[1, 2],
+ 			[3, 4],
+ 			[5, 6],
+ 			[7, 8],
+ 		]);
+	});
+
+	it('concat can handle uneven columns', function () {
+
+	 	var df1 = new DataFrame({ columnNames: ["1", "2"], values: [[1, 2], [3, 4]] });
+	 	var df2 = new DataFrame({ columnNames: ["2", "3"], values: [[6, 5], [8, 7]] });
+
+	 	var result = dataForge.concatDataFrames([df1, df2]);
+
+	 	expect(result.getColumnNames()).to.eql(["1", "2", "3"]);
+	 	expect(result.getIndex().toValues()).to.eql([0, 1, 0, 1]);
+	 	expect(result.toRows()).to.eql([
+ 			[1, 2, undefined],
+ 			[3, 4, undefined],
+ 			[undefined, 6, 5],
+ 			[undefined, 8, 7],
+ 		]);
+	});
 
     it('concatenating zero dataframes results in an empty dataframe', function () {
 

@@ -327,7 +327,7 @@ describe('merge-examples', function () {
 
         it('Join the two dataframes along rows', function () {
 
-            var df_new = dataForge.concat([df_a, df_b]);
+            var df_new = dataForge.concatDataFrames([df_a, df_b]);
 
             expect(df_new.getIndex().toValues()).to.eql([
                 0, 1, 2, 3, 4,
@@ -351,7 +351,7 @@ describe('merge-examples', function () {
 
         it('Join the two dataframes along columns', function () {
 
-            var df_new = dataForge.concat([df_a, df_b], { axis: 1 });
+            var df_new = dataForge.concatDataFrames([df_a, df_b], { axis: 1 });
 
             expect(df_new.getIndex().take(5).toValues()).to.eql([
                 0, 1, 2, 3, 4,
@@ -377,7 +377,7 @@ describe('merge-examples', function () {
 
         it('Merge two dataframes along the subject_id value', function () {
 
-            var df_new = dataForge.concat([df_a, df_b]);
+            var df_new = dataForge.concatDataFrames([df_a, df_b]);
             var df_merged = df_new
                 .join(
                     df_n,
@@ -424,7 +424,7 @@ describe('merge-examples', function () {
 
         it('Merge two dataframes along the subject_id value', function () {
 
-            var df_new = dataForge.concat([df_a, df_b]);
+            var df_new = dataForge.concatDataFrames([df_a, df_b]);
             var df_merged = df_new.join(
                     df_n,
                     left => left.subject_id,
@@ -468,7 +468,7 @@ describe('merge-examples', function () {
         // Exactly the same as the previous example.
         it('Merge two dataframes with both the left and right dataframes using the subject_id key', function () {
 
-            var df_new = dataForge.concat([df_a, df_b]);
+            var df_new = dataForge.concatDataFrames([df_a, df_b]);
             var df_merged = df_new.join(
                     df_n,
                     left => left.subject_id,

@@ -135,7 +135,7 @@ module.exports = Series;
 
 var concatSeries = require('./concat-series');
 var DataFrame = require('./dataframe');
-var zipSeries = require('./zip-series');
+var zip = require('./zip');
 var SelectManyIterable = require('../src/iterables/select-many');
 var SelectManyPairsIterable = require('../src/iterables/select-many-pairs');
 
@@ -1267,12 +1267,14 @@ Series.prototype.toObject = function (keySelector, valueSelector) {
 };
 
 /**
- * Zip together multiple series to produce a new series.
+ * Zip together multiple series or dataframes to produce a new series or dataframe.
  *
- * @param {...series} series - Each series that is to be zipped.
- * @param {function} selector - Selector function that produces a new series based on the inputs.
+ * @param {...series|dataframe} series|dataframe - Each series or dataframe that is to be zipped.
+ * @param {function} selector - Selector function that produces a new series or dataframe based on the inputs.
  */
 Series.prototype.zip = function () {
+
+	var self = this;
 
 	var inputSeries = E.from(arguments)
 		.takeWhile(function (arg) {
@@ -1280,7 +1282,7 @@ Series.prototype.zip = function () {
 		})
 		.toArray();
 
-	assert(inputSeries.length >= 0, "Expected 1 or more 'series' parameters to the zip function.");
+	assert(inputSeries.length >= 0, "Expected 1 or more 'series' or 'dataframe' parameters to the Series.zip function.");
 
 	inputSeries = [this].concat(inputSeries);
 
@@ -1290,11 +1292,15 @@ Series.prototype.zip = function () {
 		})
 		.firstOrDefault();
 
-	assert.isFunction(selector, "Expect 'selector' parameter to zip to be a function.");
+	assert.isFunction(selector, "Expect 'selector' parameter to Series.zip to be a function.");
 
-	return zipSeries(inputSeries, function (values) {
+	return zip(
+		inputSeries, 
+		function (values) {
 			return selector.apply(undefined, values);
-		});
+		},
+		self.Constructor
+	);
 };
 
 /**
