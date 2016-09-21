@@ -1298,3 +1298,28 @@ DataFrame.prototype.concat = function () {
 	);
 };
 
+/**
+ * Retreive each row of the dataframe as an array (no column names included)
+ */
+DataFrame.prototype.toRows = function () {
+
+	var self = this;
+	var iterator = self.getIterator();
+	validateIterator(iterator);
+
+	var rows = [];
+	var columnNames = self.getColumnNames();
+
+	while (iterator.moveNext()) {
+		var pair = iterator.getCurrent();
+		var value = pair[1];
+		var row = E.from(columnNames)
+			.select(function (columnName) {
+				return value[columnName];
+			})
+			.toArray();
+		rows.push(row);
+	}
+
+	return rows;
+};

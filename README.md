@@ -441,19 +441,27 @@ To get back the names of columns:
 
 	var columnNames = dataFrame.getColumnNames();
 
+To get back an array of objects (with column names as field names):
+
+	var objects = dataFrame.toValues();
+
 To get back an array of rows (in column order):
 
 	var rows = dataFrame.toRows();
 
-To get back an array of objects (with column names as field names):
+To get back index and value pairs:
 
-	var objects = dataFrame.toValues();
+	var pairs = dataFrame.toPairs(); 
 
 ### Series
 
 To retreive the data from Series as an array:
 
 	var values = series.toValues();
+
+To get back index and value pairs:
+
+	var pairs = series.toPairs(); 
 
 ## Setting an index
 
