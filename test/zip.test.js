@@ -18,7 +18,7 @@ describe('zip', function () {
 
 		var zipped = dataForge.zipSeries([series1, series2, series3], 
 			function (values) {
-				return E.from(values).sum();
+				return values.sum();
 			}
 		);
 
@@ -43,7 +43,7 @@ describe('zip', function () {
 
 		var zipped = dataForge.zipSeries([series1, series2, series3], 
 			function (values) {
-				return E.from(values).sum();
+				return values.sum();
 			}
 		);
 
@@ -65,7 +65,7 @@ describe('zip', function () {
 
 		var zipped = dataForge.zipDataFrames([df1, df2, df3],
 			function (rows) {
-				return extend({}, rows[0], rows[1], rows[2]);
+				return extend({}, rows.at(0), rows.at(1), rows.at(2));
 			}
 		);
 
@@ -101,7 +101,7 @@ describe('zip', function () {
 
 		var zipped = dataForge.zipDataFrames([df1, df2, df3],
 			function (rows) {
-				return extend({}, rows[0], rows[1], rows[2]);
+				return extend({}, rows.at(0), rows.at(1), rows.at(2));
 			}
 		);
 

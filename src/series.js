@@ -1296,8 +1296,8 @@ Series.prototype.zip = function () {
 
 	return zip(
 		inputSeries, 
-		function (values) {
-			return selector.apply(undefined, values);
+		function (series) {
+			return selector.apply(undefined, series.toValues());
 		},
 		self.Constructor
 	);

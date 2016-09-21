@@ -37,7 +37,7 @@ module.exports = function (input, selector, Constructor) {
 				return values[i];
 			})
 			.toArray();
-		output.push(selector(curElements));
+		output.push(selector(new Series({ values: curElements })));
 	}
 
 	return new Constructor({
