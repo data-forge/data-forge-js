@@ -15,12 +15,23 @@ describe('accessing columns, rows and cells', function () {
     var fs = require('fs');
     var path = require('path');
 
-    it('can load csv', function () {
+    var df1;
+    var df2;
+
+    beforeEach(function () {
 
         var csv = fs.readFileSync(path.join(__dirname, 'accessing-columns-rows-and-cells.csv'), 'utf8');
-        var df1 = dataForge.fromCSV(csv)
+        df1 = dataForge.fromCSV(csv)
             .parseInts(["2005", "2006", "2007", "2008", "2009", "2010", "2011", "2012", "2013", ])
             ;
+
+        df2 = df1
+            .setIndex("State")
+            .dropSeries("State")
+            ;
+    })
+
+    it('can load csv', function () {
 
         expect(df1.getColumnNames()).to.eql(["GEOID", "State", "2005", "2006", "2007", "2008", "2009", "2010", "2011", "2012", "2013", ]);
         expect(df1.getIndex().toValues()).to.eql([0, 1, 2, 3, 4]);        
@@ -32,5 +43,35 @@ describe('accessing columns, rows and cells', function () {
             ["04000US06", "California", 51755, 55319, 55734, 57014, 56134, 54283, 53367, 57020, 57528],
         ]);
     });
+
+    it('can set index', function () {
+
+        expect(df2.getColumnNames()).to.eql(["GEOID", "2005", "2006", "2007", "2008", "2009", "2010", "2011", "2012", "2013", ]);
+        expect(df2.getIndex().toValues()).to.eql(["Alabama", "Alaska", "Arizona", "Arkansas", "California", ]);        
+        expect(df2.toRows()).to.eql([
+            ["04000US01", 37150, 37952, 42212, 44476, 39980, 40933, 42590, 43464, 41381],            
+            ["04000US02", 55891, 56418, 62993, 63989, 61604, 57848, 57431, 63648, 61137],         
+            ["04000US04", 45245, 46657, 47215, 46914, 45739, 46896, 48621, 47044, 50602],
+            ["04000US05", 36658, 37057, 40795, 39586, 36538, 38587, 41302, 39018, 39919],
+            ["04000US06", 51755, 55319, 55734, 57014, 56134, 54283, 53367, 57020, 57528],
+        ]);
+    });
+
+    it('can take subset', function () {
+
+        var subset = df2
+            .subset(["2005", "2006", "2007"]) 
+            .slice("Alaska", "California")
+            ;
+
+        expect(subset.getColumnNames()).to.eql(["2005", "2006", "2007", ]);
+        expect(subset.getIndex().toValues()).to.eql(["Alaska", "Arizona", "Arkansas", ]);        
+        expect(subset.toRows()).to.eql([
+            [55891, 56418, 62993],         
+            [45245, 46657, 47215],
+            [36658, 37057, 40795],
+        ]);
+    });
+
 
 });

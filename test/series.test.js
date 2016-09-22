@@ -305,13 +305,27 @@ describe('Series', function () {
 	});
 
 
-	it('can get slice of rows', function () {
+	it('can get slice of rows - with integer indices', function () {
 
 		var series = initSeries([0, 1, 2, 3], [100, 300, 200, 5]);
 		var slice = series.slice(1, 3);
 		expect(slice.toPairs()).to.eql([
 			[1, 300],
 			[2, 200],
+		]);
+	});
+
+	it('can get slice of rows - with string indices', function () {
+
+		var series = new Series({
+			index: ["a", "b", "c", "d", "e"], 
+			values: [100, 300, 200, 5, 30],
+		});
+		var slice = series.slice("b", "e");
+		expect(slice.toPairs()).to.eql([
+			["b", 300],
+			["c", 200],
+			["d", 5],
 		]);
 	});
 
