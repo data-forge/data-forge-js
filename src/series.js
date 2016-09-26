@@ -515,7 +515,7 @@ Series.prototype.slice = function (startIndexOrStartPredicate, endIndexOrEndPred
 	else {
 		startIndex = startIndexOrStartPredicate;
 		startPredicate = function (value) {
-				return predicate && predicate(value, startIndex) || value !== startIndex;
+				return predicate ? predicate(value, startIndex) : value !== startIndex;
 			};
 	}
 
@@ -525,7 +525,7 @@ Series.prototype.slice = function (startIndexOrStartPredicate, endIndexOrEndPred
 	else {
 		endIndex = endIndexOrEndPredicate;
 		endPredicate = function (value) {
-				return predicate && predicate(value, endIndex) || value !== endIndex;
+				return predicate ? predicate(value, endIndex) : value !== endIndex;
 			};
 	}
 
