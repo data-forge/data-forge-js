@@ -81,4 +81,18 @@ describe('accessing columns, rows and cells', function () {
         expect(series.toValues()).to.eql([ 37150, 55891, 45245, 36658, 51755, ]);
     });
 
+    it('can get single cell', function () {
+
+        var value = df2.getSeries("2013").at("California");
+
+        expect(value).to.eql(57528);
+    });
+
+    it('apply method to series', function () {
+
+        var average = df2.getSeries("2005").average();
+
+        expect(average).to.eql(45339.8);
+    });
+    
 });
