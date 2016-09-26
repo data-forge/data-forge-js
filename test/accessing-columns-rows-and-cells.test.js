@@ -73,5 +73,12 @@ describe('accessing columns, rows and cells', function () {
         ]);
     });
 
+    it('can take column', function () {
+
+        var series = df2.getSeries("2005");
+
+        expect(series.getIndex().toValues()).to.eql(["Alabama", "Alaska", "Arizona", "Arkansas", "California"]);        
+        expect(series.toValues()).to.eql([ 37150, 55891, 45245, 36658, 51755, ]);
+    });
 
 });
