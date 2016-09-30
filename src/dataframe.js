@@ -312,7 +312,7 @@ DataFrame.prototype.getColumnNames = function () {
  *
  * @param {string} columnName - The name of the column to retrieve the column index for.
  *
- * @returns {Number} Returns the index of the named column or -1 if the requested column was not found.
+ * @returns {int} Returns the index of the named column or -1 if the requested column was not found.
  */
 DataFrame.prototype.getColumnIndex = function (columnName) {
 	assert.isString(columnName, "Expected 'columnName' parameter to getColumnIndex to be a non-empty string.");

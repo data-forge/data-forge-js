@@ -20,8 +20,10 @@ Browser:
 * [dataForge](#dataForge) : <code>object</code>
     * [.DataFrame](#dataForge.DataFrame) ⇐ <code>[Series](#dataForge.Series)</code>
         * [new DataFrame(config|values)](#new_dataForge.DataFrame_new)
+        * [.thenBy](#dataForge.Series+thenBy) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.thenByDescending](#dataForge.Series+thenByDescending) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
         * [.getColumnNames()](#dataForge.DataFrame+getColumnNames)
-        * [.getColumnIndex(columnName)](#dataForge.DataFrame+getColumnIndex) ⇒ <code>Number</code>
+        * [.getColumnIndex(columnName)](#dataForge.DataFrame+getColumnIndex) ⇒ <code>int</code>
         * [.getColumnName(columnIndex)](#dataForge.DataFrame+getColumnName) ⇒ <code>string</code>
         * [.getSeries(columnName)](#dataForge.DataFrame+getSeries)
         * [.hasSeries(columnName)](#dataForge.DataFrame+hasSeries)
@@ -72,8 +74,6 @@ Browser:
         * [.selectPairs(selector)](#dataForge.Series+selectPairs) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
         * [.selectMany(generator)](#dataForge.Series+selectMany) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
         * [.selectManyPairs(generator)](#dataForge.Series+selectManyPairs) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
-        * [.thenBy(sortSelector)](#dataForge.Series+thenBy) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
-        * [.thenByDescending(sortSelector)](#dataForge.Series+thenByDescending) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
         * [.orderBy(sortSelector)](#dataForge.Series+orderBy) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
         * [.orderByDescending(sortSelector)](#dataForge.Series+orderByDescending) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
         * [.slice(startIndexOrStartPredicate, endIndexOrEndPredicate, [predicate])](#dataForge.Series+slice)
@@ -122,6 +122,8 @@ Browser:
         * [.except(other, [comparer])](#dataForge.Series+except)
     * [.Series](#dataForge.Series)
         * [new Series(config|values)](#new_dataForge.Series_new)
+        * [.thenBy](#dataForge.Series+thenBy) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.thenByDescending](#dataForge.Series+thenByDescending) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
         * [.getIterator()](#dataForge.Series+getIterator) ⇒ <code>iterator</code>
         * [.getIndex()](#dataForge.Series+getIndex) ⇒ <code>Series</code>
         * [.withIndex(newIndex)](#dataForge.Series+withIndex) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
@@ -137,8 +139,6 @@ Browser:
         * [.selectPairs(selector)](#dataForge.Series+selectPairs) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
         * [.selectMany(generator)](#dataForge.Series+selectMany) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
         * [.selectManyPairs(generator)](#dataForge.Series+selectManyPairs) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
-        * [.thenBy(sortSelector)](#dataForge.Series+thenBy) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
-        * [.thenByDescending(sortSelector)](#dataForge.Series+thenByDescending) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
         * [.orderBy(sortSelector)](#dataForge.Series+orderBy) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
         * [.orderByDescending(sortSelector)](#dataForge.Series+orderByDescending) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
         * [.slice(startIndexOrStartPredicate, endIndexOrEndPredicate, [predicate])](#dataForge.Series+slice)
@@ -213,8 +213,10 @@ Browser:
 
 * [.DataFrame](#dataForge.DataFrame) ⇐ <code>[Series](#dataForge.Series)</code>
     * [new DataFrame(config|values)](#new_dataForge.DataFrame_new)
+    * [.thenBy](#dataForge.Series+thenBy) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.thenByDescending](#dataForge.Series+thenByDescending) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
     * [.getColumnNames()](#dataForge.DataFrame+getColumnNames)
-    * [.getColumnIndex(columnName)](#dataForge.DataFrame+getColumnIndex) ⇒ <code>Number</code>
+    * [.getColumnIndex(columnName)](#dataForge.DataFrame+getColumnIndex) ⇒ <code>int</code>
     * [.getColumnName(columnIndex)](#dataForge.DataFrame+getColumnName) ⇒ <code>string</code>
     * [.getSeries(columnName)](#dataForge.DataFrame+getSeries)
     * [.hasSeries(columnName)](#dataForge.DataFrame+hasSeries)
@@ -265,8 +267,6 @@ Browser:
     * [.selectPairs(selector)](#dataForge.Series+selectPairs) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
     * [.selectMany(generator)](#dataForge.Series+selectMany) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
     * [.selectManyPairs(generator)](#dataForge.Series+selectManyPairs) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
-    * [.thenBy(sortSelector)](#dataForge.Series+thenBy) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
-    * [.thenByDescending(sortSelector)](#dataForge.Series+thenByDescending) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
     * [.orderBy(sortSelector)](#dataForge.Series+orderBy) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
     * [.orderByDescending(sortSelector)](#dataForge.Series+orderByDescending) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
     * [.slice(startIndexOrStartPredicate, endIndexOrEndPredicate, [predicate])](#dataForge.Series+slice)
@@ -324,6 +324,32 @@ Constructor for DataFrame.
 | --- | --- | --- |
 | config|values | <code>object</code> &#124; <code>array</code> | Specifies content and configuration for the DataFrame. |
 
+<a name="dataForge.Series+thenBy"></a>
+
+#### dataFrame.thenBy ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+Performs additional sorting (ascending).
+
+**Kind**: instance property of <code>[DataFrame](#dataForge.DataFrame)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a new series or dataframe that has been sorted by the value returned by the selector.  
+**Access:** public  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| sortSelector | <code>function</code> | Selects the value to sort by. |
+
+<a name="dataForge.Series+thenByDescending"></a>
+
+#### dataFrame.thenByDescending ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+Performs additional sorting (descending).
+
+**Kind**: instance property of <code>[DataFrame](#dataForge.DataFrame)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a new series or dataframe that has been sorted by the value returned by the selector.  
+**Access:** public  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| sortSelector | <code>function</code> | Selects the value to sort by. |
+
 <a name="dataForge.DataFrame+getColumnNames"></a>
 
 #### dataFrame.getColumnNames()
@@ -332,11 +358,11 @@ Get the names of the columns in the data frame.
 **Kind**: instance method of <code>[DataFrame](#dataForge.DataFrame)</code>  
 <a name="dataForge.DataFrame+getColumnIndex"></a>
 
-#### dataFrame.getColumnIndex(columnName) ⇒ <code>Number</code>
+#### dataFrame.getColumnIndex(columnName) ⇒ <code>int</code>
 Gets a column index from a column name.
 
 **Kind**: instance method of <code>[DataFrame](#dataForge.DataFrame)</code>  
-**Returns**: <code>Number</code> - Returns the index of the named column or -1 if the requested column was not found.  
+**Returns**: <code>int</code> - Returns the index of the named column or -1 if the requested column was not found.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -871,32 +897,6 @@ Generate a new series based on the results of the generator function.
 | --- | --- | --- |
 | generator | <code>function</code> | Generator function that may generator 0 or more new index/value pairs from each pair in the series or dataframe. |
 
-<a name="dataForge.Series+thenBy"></a>
-
-#### dataFrame.thenBy(sortSelector) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
-Performs additional sorting (ascending).
-
-**Kind**: instance method of <code>[DataFrame](#dataForge.DataFrame)</code>  
-**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a new series or dataframe that has been sorted by the value returned by the selector.  
-**Access:** public  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| sortSelector | <code>function</code> | Selects the value to sort by. |
-
-<a name="dataForge.Series+thenByDescending"></a>
-
-#### dataFrame.thenByDescending(sortSelector) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
-Performs additional sorting (descending).
-
-**Kind**: instance method of <code>[DataFrame](#dataForge.DataFrame)</code>  
-**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a new series or dataframe that has been sorted by the value returned by the selector.  
-**Access:** public  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| sortSelector | <code>function</code> | Selects the value to sort by. |
-
 <a name="dataForge.Series+orderBy"></a>
 
 #### dataFrame.orderBy(sortSelector) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
@@ -1381,6 +1381,8 @@ Returns the exception of values between two Series or DataFrames.
 
 * [.Series](#dataForge.Series)
     * [new Series(config|values)](#new_dataForge.Series_new)
+    * [.thenBy](#dataForge.Series+thenBy) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.thenByDescending](#dataForge.Series+thenByDescending) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
     * [.getIterator()](#dataForge.Series+getIterator) ⇒ <code>iterator</code>
     * [.getIndex()](#dataForge.Series+getIndex) ⇒ <code>Series</code>
     * [.withIndex(newIndex)](#dataForge.Series+withIndex) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
@@ -1396,8 +1398,6 @@ Returns the exception of values between two Series or DataFrames.
     * [.selectPairs(selector)](#dataForge.Series+selectPairs) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
     * [.selectMany(generator)](#dataForge.Series+selectMany) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
     * [.selectManyPairs(generator)](#dataForge.Series+selectManyPairs) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
-    * [.thenBy(sortSelector)](#dataForge.Series+thenBy) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
-    * [.thenByDescending(sortSelector)](#dataForge.Series+thenByDescending) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
     * [.orderBy(sortSelector)](#dataForge.Series+orderBy) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
     * [.orderByDescending(sortSelector)](#dataForge.Series+orderByDescending) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
     * [.slice(startIndexOrStartPredicate, endIndexOrEndPredicate, [predicate])](#dataForge.Series+slice)
@@ -1465,6 +1465,32 @@ Constructor for Series.
 | Param | Type | Description |
 | --- | --- | --- |
 | config|values | <code>object</code> &#124; <code>array</code> | Specifies content and configuration for the Series. |
+
+<a name="dataForge.Series+thenBy"></a>
+
+#### series.thenBy ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+Performs additional sorting (ascending).
+
+**Kind**: instance property of <code>[Series](#dataForge.Series)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a new series or dataframe that has been sorted by the value returned by the selector.  
+**Access:** public  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| sortSelector | <code>function</code> | Selects the value to sort by. |
+
+<a name="dataForge.Series+thenByDescending"></a>
+
+#### series.thenByDescending ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+Performs additional sorting (descending).
+
+**Kind**: instance property of <code>[Series](#dataForge.Series)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a new series or dataframe that has been sorted by the value returned by the selector.  
+**Access:** public  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| sortSelector | <code>function</code> | Selects the value to sort by. |
 
 <a name="dataForge.Series+getIterator"></a>
 
@@ -1630,32 +1656,6 @@ Generate a new series based on the results of the generator function.
 | Param | Type | Description |
 | --- | --- | --- |
 | generator | <code>function</code> | Generator function that may generator 0 or more new index/value pairs from each pair in the series or dataframe. |
-
-<a name="dataForge.Series+thenBy"></a>
-
-#### series.thenBy(sortSelector) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
-Performs additional sorting (ascending).
-
-**Kind**: instance method of <code>[Series](#dataForge.Series)</code>  
-**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a new series or dataframe that has been sorted by the value returned by the selector.  
-**Access:** public  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| sortSelector | <code>function</code> | Selects the value to sort by. |
-
-<a name="dataForge.Series+thenByDescending"></a>
-
-#### series.thenByDescending(sortSelector) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
-Performs additional sorting (descending).
-
-**Kind**: instance method of <code>[Series](#dataForge.Series)</code>  
-**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a new series or dataframe that has been sorted by the value returned by the selector.  
-**Access:** public  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| sortSelector | <code>function</code> | Selects the value to sort by. |
 
 <a name="dataForge.Series+orderBy"></a>
 

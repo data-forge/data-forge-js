@@ -472,34 +472,6 @@ var orderBy = function (self, sortMethod, sortSelector) {
 	return sortedDataFrame;
 };
 
-/** 
- * Performs additional sorting (ascending).
- * 
- * @public
- * @instance
- * @memberof dataForge.Series
- * @param {function} sortSelector - Selects the value to sort by.
- * 
- * @returns {Series|DataFrame} Returns a new series or dataframe that has been sorted by the value returned by the selector. 
- */
-var thenBy = function () {
-	// Stub for documentation.
-};
-
-/** 
- * Performs additional sorting (descending). 
- * 
- * @public
- * @instance
- * @memberof dataForge.Series
- * @param {function} sortSelector - Selects the value to sort by.
- * 
- * @returns {Series|DataFrame} Returns a new series or dataframe that has been sorted by the value returned by the selector. 
- */
-var thenByDescending = function () {
-	// Stub for documentation.
-};	
-
 //
 // Generates a thenBy function that is attached to already ordered data frames.
 //
@@ -521,9 +493,29 @@ var orderThenBy = function (self, batch, nextSortMethod) {
 
 		var sortedDataFrame = executeOrderBy(self, extendedBatch);
 
+		/** 
+		 * Performs additional sorting (ascending).
+		 * 
+		 * @public
+		 * @instance
+		 * @memberof dataForge.Series
+		 * @param {function} sortSelector - Selects the value to sort by.
+		 * 
+		 * @returns {Series|DataFrame} Returns a new series or dataframe that has been sorted by the value returned by the selector. 
+		 */
 		var thenBy = orderThenBy(self, extendedBatch, 'thenBy');
 		sortedDataFrame.thenBy = thenBy;
 
+		/** 
+		 * Performs additional sorting (descending). 
+		 * 
+		 * @public
+		 * @instance
+		 * @memberof dataForge.Series
+		 * @param {function} sortSelector - Selects the value to sort by.
+		 * 
+		 * @returns {Series|DataFrame} Returns a new series or dataframe that has been sorted by the value returned by the selector. 
+		 */
 		var thenByDescending = orderThenBy(self, extendedBatch, 'thenByDescending');
 		sortedDataFrame.thenByDescending = thenByDescending;
 		return sortedDataFrame;
