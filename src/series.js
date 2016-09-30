@@ -77,7 +77,7 @@ var createValuesIterable = function (values) {
 /**
  * Constructor for Series.
  * @constructor
- * @memberof data-forge
+ * @memberof dataForge
  * @param {object|array} config|values - Specifies content and configuration for the Series.
  */
 var Series = function (config) {
@@ -472,6 +472,32 @@ var orderBy = function (self, sortMethod, sortSelector) {
 	return sortedDataFrame;
 };
 
+/** 
+ * Performs additional sorting (ascending).
+ * 
+ * @public
+ * @memberof dataForge.Series
+ * @param {function} sortSelector - Selects the value to sort by.
+ * 
+ * @returns {Series|DataFrame} Returns a new series or dataframe that has been sorted by the value returned by the selector. 
+ */
+var thenBy = function () {
+	// Stub for documentation.
+};
+
+/** 
+ * Performs additional sorting (descending). 
+ * 
+ * @public
+ * @memberof dataForge.Series
+ * @param {function} sortSelector - Selects the value to sort by.
+ * 
+ * @returns {Series|DataFrame} Returns a new series or dataframe that has been sorted by the value returned by the selector. 
+ */
+var thenByDescending = function () {
+	// Stub for documentation.
+};	
+
 //
 // Generates a thenBy function that is attached to already ordered data frames.
 //
@@ -493,25 +519,11 @@ var orderThenBy = function (self, batch, nextSortMethod) {
 
 		var sortedDataFrame = executeOrderBy(self, extendedBatch);
 
-		/**
-		 * Performs additional sorting (ascending). 
-		 * 
-		 * @memberof Series
-		 * @param {function} sortSelector - Selects the value to sort by.
-		 * 
-		 * @returns {Series|DataFrame} Returns a new series or dataframe that has been sorted by the value returned by the selector. 
-		 */
-		sortedDataFrame.thenBy = orderThenBy(self, extendedBatch, 'thenBy');
+		var thenBy = orderThenBy(self, extendedBatch, 'thenBy');
+		sortedDataFrame.thenBy = thenBy;
 
-		/**
-		 * Performs additional sorting (descending). 
-		 * 
-		 * @memberof Series
-		 * @param {function} sortSelector - Selects the value to sort by.
-		 * 
-		 * @returns {Series|DataFrame} Returns a new series or dataframe that has been sorted by the value returned by the selector. 
-		 */		
-		sortedDataFrame.thenByDescending = orderThenBy(self, extendedBatch, 'thenByDescending');		
+		var thenByDescending = orderThenBy(self, extendedBatch, 'thenByDescending');
+		sortedDataFrame.thenByDescending = thenByDescending;
 		return sortedDataFrame;
 	};	
 };

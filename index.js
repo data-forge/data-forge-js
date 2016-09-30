@@ -33,7 +33,7 @@ var registeredPlugins = {};
  * 
  * 		<script language="javascript" type="text/javascript" src="bower_components/data-forge/data-forge.js"></script>
  *
- * @namespace data-forge
+ * @namespace dataForge
  */
 var dataForge = {
 	
