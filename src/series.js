@@ -476,6 +476,7 @@ var orderBy = function (self, sortMethod, sortSelector) {
  * Performs additional sorting (ascending).
  * 
  * @public
+ * @instance
  * @memberof dataForge.Series
  * @param {function} sortSelector - Selects the value to sort by.
  * 
@@ -489,6 +490,7 @@ var thenBy = function () {
  * Performs additional sorting (descending). 
  * 
  * @public
+ * @instance
  * @memberof dataForge.Series
  * @param {function} sortSelector - Selects the value to sort by.
  * 

@@ -72,6 +72,8 @@ Browser:
         * [.selectPairs(selector)](#dataForge.Series+selectPairs) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
         * [.selectMany(generator)](#dataForge.Series+selectMany) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
         * [.selectManyPairs(generator)](#dataForge.Series+selectManyPairs) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.thenBy(sortSelector)](#dataForge.Series+thenBy) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.thenByDescending(sortSelector)](#dataForge.Series+thenByDescending) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
         * [.orderBy(sortSelector)](#dataForge.Series+orderBy) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
         * [.orderByDescending(sortSelector)](#dataForge.Series+orderByDescending) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
         * [.slice(startIndexOrStartPredicate, endIndexOrEndPredicate, [predicate])](#dataForge.Series+slice)
@@ -120,82 +122,80 @@ Browser:
         * [.except(other, [comparer])](#dataForge.Series+except)
     * [.Series](#dataForge.Series)
         * [new Series(config|values)](#new_dataForge.Series_new)
-        * _instance_
-            * [.getIterator()](#dataForge.Series+getIterator) ⇒ <code>iterator</code>
-            * [.getIndex()](#dataForge.Series+getIndex) ⇒ <code>Series</code>
-            * [.withIndex(newIndex)](#dataForge.Series+withIndex) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
-            * [.resetIndex()](#dataForge.Series+resetIndex) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
-            * [.skip(numRows)](#dataForge.Series+skip) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
-            * [.skipWhile(predicate)](#dataForge.Series+skipWhile) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
-            * [.skipUntil(predicate)](#dataForge.Series+skipUntil) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
-            * [.take(numRows)](#dataForge.Series+take) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
-            * [.takeWhile(predicate)](#dataForge.Series+takeWhile) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
-            * [.takeUntil(predicate)](#dataForge.Series+takeUntil) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
-            * [.where(predicate)](#dataForge.Series+where) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
-            * [.select(selector)](#dataForge.Series+select) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
-            * [.selectPairs(selector)](#dataForge.Series+selectPairs) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
-            * [.selectMany(generator)](#dataForge.Series+selectMany) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
-            * [.selectManyPairs(generator)](#dataForge.Series+selectManyPairs) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
-            * [.orderBy(sortSelector)](#dataForge.Series+orderBy) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
-            * [.orderByDescending(sortSelector)](#dataForge.Series+orderByDescending) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
-            * [.slice(startIndexOrStartPredicate, endIndexOrEndPredicate, [predicate])](#dataForge.Series+slice)
-            * [.window(period)](#dataForge.Series+window)
-            * [.rollingWindow(period)](#dataForge.Series+rollingWindow)
-            * [.toString()](#dataForge.Series+toString)
-            * [.percentChange()](#dataForge.Series+percentChange)
-            * [.parseInts()](#dataForge.Series+parseInts)
-            * [.parseFloats()](#dataForge.Series+parseFloats)
-            * [.parseDates([formatString])](#dataForge.Series+parseDates)
-            * [.toStrings([formatString])](#dataForge.Series+toStrings)
-            * [.detectTypes()](#dataForge.Series+detectTypes)
-            * [.detectValues()](#dataForge.Series+detectValues)
-            * [.truncateStrings(maxLength)](#dataForge.Series+truncateStrings)
-            * [.bake()](#dataForge.Series+bake)
-            * [.toPairs()](#dataForge.Series+toPairs)
-            * [.count()](#dataForge.Series+count)
-            * [.first()](#dataForge.Series+first)
-            * [.last()](#dataForge.Series+last)
-            * [.firstPair()](#dataForge.Series+firstPair)
-            * [.lastPair()](#dataForge.Series+lastPair)
-            * [.firstIndex()](#dataForge.Series+firstIndex)
-            * [.lastIndex()](#dataForge.Series+lastIndex)
-            * [.reverse()](#dataForge.Series+reverse)
-            * [.inflate([selector])](#dataForge.Series+inflate)
-            * [.head(values)](#dataForge.Series+head)
-            * [.tail(values)](#dataForge.Series+tail)
-            * [.sum()](#dataForge.Series+sum)
-            * [.average()](#dataForge.Series+average)
-            * [.min()](#dataForge.Series+min)
-            * [.max()](#dataForge.Series+max)
-            * [.aggregate([seed], selector)](#dataForge.Series+aggregate)
-            * [.toObject(keySelector, keySelector)](#dataForge.Series+toObject)
-            * [.zip(series|dataframe, selector)](#dataForge.Series+zip)
-            * [.forEach(callback)](#dataForge.Series+forEach)
-            * [.all(predicate)](#dataForge.Series+all)
-            * [.any([predicate])](#dataForge.Series+any)
-            * [.none([predicate])](#dataForge.Series+none)
-            * [.sequentialDistinct(selector)](#dataForge.Series+sequentialDistinct)
-            * [.distinct(selector)](#dataForge.Series+distinct)
-            * [.variableWindow(comparer)](#dataForge.Series+variableWindow)
-            * [.insertPair(pair)](#dataForge.Series+insertPair)
-            * [.appendPair(pair)](#dataForge.Series+appendPair)
-            * [.fillGaps(predicate, generator)](#dataForge.Series+fillGaps)
-            * [.groupBy(selector)](#dataForge.Series+groupBy)
-            * [.groupSequentialBy(selector)](#dataForge.Series+groupSequentialBy)
-            * [.at(index)](#dataForge.Series+at)
-            * [.contains(value)](#dataForge.Series+contains)
-            * [.concat(series)](#dataForge.Series+concat)
-            * [.join(self, inner, outerKeySelector, innerKeySelector, resultSelector)](#dataForge.Series+join)
-            * [.joinOuter(self, inner, outerKeySelector, innerKeySelector, outerResultSelector, innerResultSelector, mergeSelector)](#dataForge.Series+joinOuter)
-            * [.joinOuterLeft(self, inner, outerKeySelector, innerKeySelector, outerResultSelector, innerResultSelector, mergeSelector)](#dataForge.Series+joinOuterLeft)
-            * [.joinOuterRight(self, inner, outerKeySelector, innerKeySelector, outerResultSelector, innerResultSelector, mergeSelector)](#dataForge.Series+joinOuterRight)
-            * [.defaultIfEmpty(defaultSequence)](#dataForge.Series+defaultIfEmpty)
-            * [.union(other, [comparer])](#dataForge.Series+union)
-            * [.intersection(other, [comparer])](#dataForge.Series+intersection)
-            * [.except(other, [comparer])](#dataForge.Series+except)
-        * _static_
-            * [.thenBy(sortSelector)](#dataForge.Series.thenBy) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
-            * [.thenByDescending(sortSelector)](#dataForge.Series.thenByDescending) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.getIterator()](#dataForge.Series+getIterator) ⇒ <code>iterator</code>
+        * [.getIndex()](#dataForge.Series+getIndex) ⇒ <code>Series</code>
+        * [.withIndex(newIndex)](#dataForge.Series+withIndex) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.resetIndex()](#dataForge.Series+resetIndex) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.skip(numRows)](#dataForge.Series+skip) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.skipWhile(predicate)](#dataForge.Series+skipWhile) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.skipUntil(predicate)](#dataForge.Series+skipUntil) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.take(numRows)](#dataForge.Series+take) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.takeWhile(predicate)](#dataForge.Series+takeWhile) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.takeUntil(predicate)](#dataForge.Series+takeUntil) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.where(predicate)](#dataForge.Series+where) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.select(selector)](#dataForge.Series+select) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.selectPairs(selector)](#dataForge.Series+selectPairs) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.selectMany(generator)](#dataForge.Series+selectMany) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.selectManyPairs(generator)](#dataForge.Series+selectManyPairs) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.thenBy(sortSelector)](#dataForge.Series+thenBy) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.thenByDescending(sortSelector)](#dataForge.Series+thenByDescending) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.orderBy(sortSelector)](#dataForge.Series+orderBy) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.orderByDescending(sortSelector)](#dataForge.Series+orderByDescending) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.slice(startIndexOrStartPredicate, endIndexOrEndPredicate, [predicate])](#dataForge.Series+slice)
+        * [.window(period)](#dataForge.Series+window)
+        * [.rollingWindow(period)](#dataForge.Series+rollingWindow)
+        * [.toString()](#dataForge.Series+toString)
+        * [.percentChange()](#dataForge.Series+percentChange)
+        * [.parseInts()](#dataForge.Series+parseInts)
+        * [.parseFloats()](#dataForge.Series+parseFloats)
+        * [.parseDates([formatString])](#dataForge.Series+parseDates)
+        * [.toStrings([formatString])](#dataForge.Series+toStrings)
+        * [.detectTypes()](#dataForge.Series+detectTypes)
+        * [.detectValues()](#dataForge.Series+detectValues)
+        * [.truncateStrings(maxLength)](#dataForge.Series+truncateStrings)
+        * [.bake()](#dataForge.Series+bake)
+        * [.toPairs()](#dataForge.Series+toPairs)
+        * [.count()](#dataForge.Series+count)
+        * [.first()](#dataForge.Series+first)
+        * [.last()](#dataForge.Series+last)
+        * [.firstPair()](#dataForge.Series+firstPair)
+        * [.lastPair()](#dataForge.Series+lastPair)
+        * [.firstIndex()](#dataForge.Series+firstIndex)
+        * [.lastIndex()](#dataForge.Series+lastIndex)
+        * [.reverse()](#dataForge.Series+reverse)
+        * [.inflate([selector])](#dataForge.Series+inflate)
+        * [.head(values)](#dataForge.Series+head)
+        * [.tail(values)](#dataForge.Series+tail)
+        * [.sum()](#dataForge.Series+sum)
+        * [.average()](#dataForge.Series+average)
+        * [.min()](#dataForge.Series+min)
+        * [.max()](#dataForge.Series+max)
+        * [.aggregate([seed], selector)](#dataForge.Series+aggregate)
+        * [.toObject(keySelector, keySelector)](#dataForge.Series+toObject)
+        * [.zip(series|dataframe, selector)](#dataForge.Series+zip)
+        * [.forEach(callback)](#dataForge.Series+forEach)
+        * [.all(predicate)](#dataForge.Series+all)
+        * [.any([predicate])](#dataForge.Series+any)
+        * [.none([predicate])](#dataForge.Series+none)
+        * [.sequentialDistinct(selector)](#dataForge.Series+sequentialDistinct)
+        * [.distinct(selector)](#dataForge.Series+distinct)
+        * [.variableWindow(comparer)](#dataForge.Series+variableWindow)
+        * [.insertPair(pair)](#dataForge.Series+insertPair)
+        * [.appendPair(pair)](#dataForge.Series+appendPair)
+        * [.fillGaps(predicate, generator)](#dataForge.Series+fillGaps)
+        * [.groupBy(selector)](#dataForge.Series+groupBy)
+        * [.groupSequentialBy(selector)](#dataForge.Series+groupSequentialBy)
+        * [.at(index)](#dataForge.Series+at)
+        * [.contains(value)](#dataForge.Series+contains)
+        * [.concat(series)](#dataForge.Series+concat)
+        * [.join(self, inner, outerKeySelector, innerKeySelector, resultSelector)](#dataForge.Series+join)
+        * [.joinOuter(self, inner, outerKeySelector, innerKeySelector, outerResultSelector, innerResultSelector, mergeSelector)](#dataForge.Series+joinOuter)
+        * [.joinOuterLeft(self, inner, outerKeySelector, innerKeySelector, outerResultSelector, innerResultSelector, mergeSelector)](#dataForge.Series+joinOuterLeft)
+        * [.joinOuterRight(self, inner, outerKeySelector, innerKeySelector, outerResultSelector, innerResultSelector, mergeSelector)](#dataForge.Series+joinOuterRight)
+        * [.defaultIfEmpty(defaultSequence)](#dataForge.Series+defaultIfEmpty)
+        * [.union(other, [comparer])](#dataForge.Series+union)
+        * [.intersection(other, [comparer])](#dataForge.Series+intersection)
+        * [.except(other, [comparer])](#dataForge.Series+except)
     * [.concatDataFrames](#dataForge.concatDataFrames)
     * [.concatSeries](#dataForge.concatSeries)
     * [.use()](#dataForge.use)
@@ -265,6 +265,8 @@ Browser:
     * [.selectPairs(selector)](#dataForge.Series+selectPairs) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
     * [.selectMany(generator)](#dataForge.Series+selectMany) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
     * [.selectManyPairs(generator)](#dataForge.Series+selectManyPairs) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.thenBy(sortSelector)](#dataForge.Series+thenBy) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.thenByDescending(sortSelector)](#dataForge.Series+thenByDescending) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
     * [.orderBy(sortSelector)](#dataForge.Series+orderBy) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
     * [.orderByDescending(sortSelector)](#dataForge.Series+orderByDescending) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
     * [.slice(startIndexOrStartPredicate, endIndexOrEndPredicate, [predicate])](#dataForge.Series+slice)
@@ -869,6 +871,32 @@ Generate a new series based on the results of the generator function.
 | --- | --- | --- |
 | generator | <code>function</code> | Generator function that may generator 0 or more new index/value pairs from each pair in the series or dataframe. |
 
+<a name="dataForge.Series+thenBy"></a>
+
+#### dataFrame.thenBy(sortSelector) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+Performs additional sorting (ascending).
+
+**Kind**: instance method of <code>[DataFrame](#dataForge.DataFrame)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a new series or dataframe that has been sorted by the value returned by the selector.  
+**Access:** public  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| sortSelector | <code>function</code> | Selects the value to sort by. |
+
+<a name="dataForge.Series+thenByDescending"></a>
+
+#### dataFrame.thenByDescending(sortSelector) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+Performs additional sorting (descending).
+
+**Kind**: instance method of <code>[DataFrame](#dataForge.DataFrame)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a new series or dataframe that has been sorted by the value returned by the selector.  
+**Access:** public  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| sortSelector | <code>function</code> | Selects the value to sort by. |
+
 <a name="dataForge.Series+orderBy"></a>
 
 #### dataFrame.orderBy(sortSelector) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
@@ -1353,82 +1381,80 @@ Returns the exception of values between two Series or DataFrames.
 
 * [.Series](#dataForge.Series)
     * [new Series(config|values)](#new_dataForge.Series_new)
-    * _instance_
-        * [.getIterator()](#dataForge.Series+getIterator) ⇒ <code>iterator</code>
-        * [.getIndex()](#dataForge.Series+getIndex) ⇒ <code>Series</code>
-        * [.withIndex(newIndex)](#dataForge.Series+withIndex) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
-        * [.resetIndex()](#dataForge.Series+resetIndex) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
-        * [.skip(numRows)](#dataForge.Series+skip) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
-        * [.skipWhile(predicate)](#dataForge.Series+skipWhile) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
-        * [.skipUntil(predicate)](#dataForge.Series+skipUntil) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
-        * [.take(numRows)](#dataForge.Series+take) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
-        * [.takeWhile(predicate)](#dataForge.Series+takeWhile) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
-        * [.takeUntil(predicate)](#dataForge.Series+takeUntil) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
-        * [.where(predicate)](#dataForge.Series+where) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
-        * [.select(selector)](#dataForge.Series+select) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
-        * [.selectPairs(selector)](#dataForge.Series+selectPairs) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
-        * [.selectMany(generator)](#dataForge.Series+selectMany) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
-        * [.selectManyPairs(generator)](#dataForge.Series+selectManyPairs) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
-        * [.orderBy(sortSelector)](#dataForge.Series+orderBy) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
-        * [.orderByDescending(sortSelector)](#dataForge.Series+orderByDescending) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
-        * [.slice(startIndexOrStartPredicate, endIndexOrEndPredicate, [predicate])](#dataForge.Series+slice)
-        * [.window(period)](#dataForge.Series+window)
-        * [.rollingWindow(period)](#dataForge.Series+rollingWindow)
-        * [.toString()](#dataForge.Series+toString)
-        * [.percentChange()](#dataForge.Series+percentChange)
-        * [.parseInts()](#dataForge.Series+parseInts)
-        * [.parseFloats()](#dataForge.Series+parseFloats)
-        * [.parseDates([formatString])](#dataForge.Series+parseDates)
-        * [.toStrings([formatString])](#dataForge.Series+toStrings)
-        * [.detectTypes()](#dataForge.Series+detectTypes)
-        * [.detectValues()](#dataForge.Series+detectValues)
-        * [.truncateStrings(maxLength)](#dataForge.Series+truncateStrings)
-        * [.bake()](#dataForge.Series+bake)
-        * [.toPairs()](#dataForge.Series+toPairs)
-        * [.count()](#dataForge.Series+count)
-        * [.first()](#dataForge.Series+first)
-        * [.last()](#dataForge.Series+last)
-        * [.firstPair()](#dataForge.Series+firstPair)
-        * [.lastPair()](#dataForge.Series+lastPair)
-        * [.firstIndex()](#dataForge.Series+firstIndex)
-        * [.lastIndex()](#dataForge.Series+lastIndex)
-        * [.reverse()](#dataForge.Series+reverse)
-        * [.inflate([selector])](#dataForge.Series+inflate)
-        * [.head(values)](#dataForge.Series+head)
-        * [.tail(values)](#dataForge.Series+tail)
-        * [.sum()](#dataForge.Series+sum)
-        * [.average()](#dataForge.Series+average)
-        * [.min()](#dataForge.Series+min)
-        * [.max()](#dataForge.Series+max)
-        * [.aggregate([seed], selector)](#dataForge.Series+aggregate)
-        * [.toObject(keySelector, keySelector)](#dataForge.Series+toObject)
-        * [.zip(series|dataframe, selector)](#dataForge.Series+zip)
-        * [.forEach(callback)](#dataForge.Series+forEach)
-        * [.all(predicate)](#dataForge.Series+all)
-        * [.any([predicate])](#dataForge.Series+any)
-        * [.none([predicate])](#dataForge.Series+none)
-        * [.sequentialDistinct(selector)](#dataForge.Series+sequentialDistinct)
-        * [.distinct(selector)](#dataForge.Series+distinct)
-        * [.variableWindow(comparer)](#dataForge.Series+variableWindow)
-        * [.insertPair(pair)](#dataForge.Series+insertPair)
-        * [.appendPair(pair)](#dataForge.Series+appendPair)
-        * [.fillGaps(predicate, generator)](#dataForge.Series+fillGaps)
-        * [.groupBy(selector)](#dataForge.Series+groupBy)
-        * [.groupSequentialBy(selector)](#dataForge.Series+groupSequentialBy)
-        * [.at(index)](#dataForge.Series+at)
-        * [.contains(value)](#dataForge.Series+contains)
-        * [.concat(series)](#dataForge.Series+concat)
-        * [.join(self, inner, outerKeySelector, innerKeySelector, resultSelector)](#dataForge.Series+join)
-        * [.joinOuter(self, inner, outerKeySelector, innerKeySelector, outerResultSelector, innerResultSelector, mergeSelector)](#dataForge.Series+joinOuter)
-        * [.joinOuterLeft(self, inner, outerKeySelector, innerKeySelector, outerResultSelector, innerResultSelector, mergeSelector)](#dataForge.Series+joinOuterLeft)
-        * [.joinOuterRight(self, inner, outerKeySelector, innerKeySelector, outerResultSelector, innerResultSelector, mergeSelector)](#dataForge.Series+joinOuterRight)
-        * [.defaultIfEmpty(defaultSequence)](#dataForge.Series+defaultIfEmpty)
-        * [.union(other, [comparer])](#dataForge.Series+union)
-        * [.intersection(other, [comparer])](#dataForge.Series+intersection)
-        * [.except(other, [comparer])](#dataForge.Series+except)
-    * _static_
-        * [.thenBy(sortSelector)](#dataForge.Series.thenBy) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
-        * [.thenByDescending(sortSelector)](#dataForge.Series.thenByDescending) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.getIterator()](#dataForge.Series+getIterator) ⇒ <code>iterator</code>
+    * [.getIndex()](#dataForge.Series+getIndex) ⇒ <code>Series</code>
+    * [.withIndex(newIndex)](#dataForge.Series+withIndex) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.resetIndex()](#dataForge.Series+resetIndex) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.skip(numRows)](#dataForge.Series+skip) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.skipWhile(predicate)](#dataForge.Series+skipWhile) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.skipUntil(predicate)](#dataForge.Series+skipUntil) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.take(numRows)](#dataForge.Series+take) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.takeWhile(predicate)](#dataForge.Series+takeWhile) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.takeUntil(predicate)](#dataForge.Series+takeUntil) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.where(predicate)](#dataForge.Series+where) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.select(selector)](#dataForge.Series+select) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.selectPairs(selector)](#dataForge.Series+selectPairs) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.selectMany(generator)](#dataForge.Series+selectMany) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.selectManyPairs(generator)](#dataForge.Series+selectManyPairs) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.thenBy(sortSelector)](#dataForge.Series+thenBy) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.thenByDescending(sortSelector)](#dataForge.Series+thenByDescending) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.orderBy(sortSelector)](#dataForge.Series+orderBy) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.orderByDescending(sortSelector)](#dataForge.Series+orderByDescending) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.slice(startIndexOrStartPredicate, endIndexOrEndPredicate, [predicate])](#dataForge.Series+slice)
+    * [.window(period)](#dataForge.Series+window)
+    * [.rollingWindow(period)](#dataForge.Series+rollingWindow)
+    * [.toString()](#dataForge.Series+toString)
+    * [.percentChange()](#dataForge.Series+percentChange)
+    * [.parseInts()](#dataForge.Series+parseInts)
+    * [.parseFloats()](#dataForge.Series+parseFloats)
+    * [.parseDates([formatString])](#dataForge.Series+parseDates)
+    * [.toStrings([formatString])](#dataForge.Series+toStrings)
+    * [.detectTypes()](#dataForge.Series+detectTypes)
+    * [.detectValues()](#dataForge.Series+detectValues)
+    * [.truncateStrings(maxLength)](#dataForge.Series+truncateStrings)
+    * [.bake()](#dataForge.Series+bake)
+    * [.toPairs()](#dataForge.Series+toPairs)
+    * [.count()](#dataForge.Series+count)
+    * [.first()](#dataForge.Series+first)
+    * [.last()](#dataForge.Series+last)
+    * [.firstPair()](#dataForge.Series+firstPair)
+    * [.lastPair()](#dataForge.Series+lastPair)
+    * [.firstIndex()](#dataForge.Series+firstIndex)
+    * [.lastIndex()](#dataForge.Series+lastIndex)
+    * [.reverse()](#dataForge.Series+reverse)
+    * [.inflate([selector])](#dataForge.Series+inflate)
+    * [.head(values)](#dataForge.Series+head)
+    * [.tail(values)](#dataForge.Series+tail)
+    * [.sum()](#dataForge.Series+sum)
+    * [.average()](#dataForge.Series+average)
+    * [.min()](#dataForge.Series+min)
+    * [.max()](#dataForge.Series+max)
+    * [.aggregate([seed], selector)](#dataForge.Series+aggregate)
+    * [.toObject(keySelector, keySelector)](#dataForge.Series+toObject)
+    * [.zip(series|dataframe, selector)](#dataForge.Series+zip)
+    * [.forEach(callback)](#dataForge.Series+forEach)
+    * [.all(predicate)](#dataForge.Series+all)
+    * [.any([predicate])](#dataForge.Series+any)
+    * [.none([predicate])](#dataForge.Series+none)
+    * [.sequentialDistinct(selector)](#dataForge.Series+sequentialDistinct)
+    * [.distinct(selector)](#dataForge.Series+distinct)
+    * [.variableWindow(comparer)](#dataForge.Series+variableWindow)
+    * [.insertPair(pair)](#dataForge.Series+insertPair)
+    * [.appendPair(pair)](#dataForge.Series+appendPair)
+    * [.fillGaps(predicate, generator)](#dataForge.Series+fillGaps)
+    * [.groupBy(selector)](#dataForge.Series+groupBy)
+    * [.groupSequentialBy(selector)](#dataForge.Series+groupSequentialBy)
+    * [.at(index)](#dataForge.Series+at)
+    * [.contains(value)](#dataForge.Series+contains)
+    * [.concat(series)](#dataForge.Series+concat)
+    * [.join(self, inner, outerKeySelector, innerKeySelector, resultSelector)](#dataForge.Series+join)
+    * [.joinOuter(self, inner, outerKeySelector, innerKeySelector, outerResultSelector, innerResultSelector, mergeSelector)](#dataForge.Series+joinOuter)
+    * [.joinOuterLeft(self, inner, outerKeySelector, innerKeySelector, outerResultSelector, innerResultSelector, mergeSelector)](#dataForge.Series+joinOuterLeft)
+    * [.joinOuterRight(self, inner, outerKeySelector, innerKeySelector, outerResultSelector, innerResultSelector, mergeSelector)](#dataForge.Series+joinOuterRight)
+    * [.defaultIfEmpty(defaultSequence)](#dataForge.Series+defaultIfEmpty)
+    * [.union(other, [comparer])](#dataForge.Series+union)
+    * [.intersection(other, [comparer])](#dataForge.Series+intersection)
+    * [.except(other, [comparer])](#dataForge.Series+except)
 
 <a name="new_dataForge.Series_new"></a>
 
@@ -1604,6 +1630,32 @@ Generate a new series based on the results of the generator function.
 | Param | Type | Description |
 | --- | --- | --- |
 | generator | <code>function</code> | Generator function that may generator 0 or more new index/value pairs from each pair in the series or dataframe. |
+
+<a name="dataForge.Series+thenBy"></a>
+
+#### series.thenBy(sortSelector) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+Performs additional sorting (ascending).
+
+**Kind**: instance method of <code>[Series](#dataForge.Series)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a new series or dataframe that has been sorted by the value returned by the selector.  
+**Access:** public  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| sortSelector | <code>function</code> | Selects the value to sort by. |
+
+<a name="dataForge.Series+thenByDescending"></a>
+
+#### series.thenByDescending(sortSelector) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+Performs additional sorting (descending).
+
+**Kind**: instance method of <code>[Series](#dataForge.Series)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a new series or dataframe that has been sorted by the value returned by the selector.  
+**Access:** public  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| sortSelector | <code>function</code> | Selects the value to sort by. |
 
 <a name="dataForge.Series+orderBy"></a>
 
@@ -2180,32 +2232,6 @@ Returns the exception of values between two Series or DataFrames.
 | --- | --- | --- |
 | other | <code>Series</code> &#124; <code>DataFrame</code> | The other Series or DataFrame to combine. |
 | [comparer] | <code>function</code> | Optional comparer that selects the value to compare. |
-
-<a name="dataForge.Series.thenBy"></a>
-
-#### Series.thenBy(sortSelector) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
-Performs additional sorting (ascending).
-
-**Kind**: static method of <code>[Series](#dataForge.Series)</code>  
-**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a new series or dataframe that has been sorted by the value returned by the selector.  
-**Access:** public  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| sortSelector | <code>function</code> | Selects the value to sort by. |
-
-<a name="dataForge.Series.thenByDescending"></a>
-
-#### Series.thenByDescending(sortSelector) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
-Performs additional sorting (descending).
-
-**Kind**: static method of <code>[Series](#dataForge.Series)</code>  
-**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a new series or dataframe that has been sorted by the value returned by the selector.  
-**Access:** public  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| sortSelector | <code>function</code> | Selects the value to sort by. |
 
 <a name="dataForge.concatDataFrames"></a>
 
