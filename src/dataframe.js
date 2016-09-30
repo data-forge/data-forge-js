@@ -145,7 +145,7 @@ var determineColumnNamesFromPairsIterable = function (iterable, considerAllRows)
 /**
  * Constructor for DataFrame.
  * @constructor
- * @extends Series
+ * @extends dataForge.Series
  * @memberof dataForge
  * @param {object|array} config|values - Specifies content and configuration for the DataFrame.
  */
