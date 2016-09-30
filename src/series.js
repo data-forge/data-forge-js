@@ -556,6 +556,8 @@ Series.prototype.orderByDescending = function (sortSelector) {
  * @param {int|function} startIndexOrStartPredicate - Index where the slice starts or a predicate function that determines where the slice starts.
  * @param {int|function} endIndexOrEndPredicate - Marks the end of the slice, one row past the last row to include. Or a predicate function that determines when the slice has ended.
  * @param {function} [predicate] - Optional predicate to compare index against start/end index. Return true to start or stop the slice.
+ * 
+ * @returns {Series|DataFrame} Returns a new series or dataframe that contains a slice or values from the original.
  */
 Series.prototype.slice = function (startIndexOrStartPredicate, endIndexOrEndPredicate, predicate) {
 
@@ -614,10 +616,12 @@ Series.prototype.slice = function (startIndexOrStartPredicate, endIndexOrEndPred
 };
 
 /**
- * Segment a Series into 'windows'. Returns a new Series. Each value in the new Series contains a 'window' (or segment) of the original Series.
+ * Segment a Series into 'windows'. Returns a new Series. Each value in the new Series contains a 'window' (or segment) of the original series or dataframe.
  * Use select or selectPairs to aggregate.
  *
  * @param {integer} period - The number of values in the window.
+ * 
+ * @returns {Series} Returns a new series, each value of which is a 'window' (or segment) of the original series or dataframe.  
  */
 Series.prototype.window = function (period, obsoleteSelector) {
 
@@ -662,6 +666,8 @@ Series.prototype.window = function (period, obsoleteSelector) {
  * Use select or selectPairs to aggregate.
  *
  * @param {integer} period - The number of values in the window.
+ * 
+ * @returns {Series} Returns a new series, each value of which is a 'window' (or segment) of the original series or dataframe.
  */
 Series.prototype.rollingWindow = function (period, obsoleteSelector) {
 
@@ -704,6 +710,8 @@ Series.prototype.rollingWindow = function (period, obsoleteSelector) {
 
 /** 
  * Format the data frame for display as a string.
+ * 
+ * @returns {string} Generates and returns a string representation of the series or dataframe.
  */
 Series.prototype.toString = function () {
 
@@ -732,6 +740,8 @@ Series.prototype.toString = function () {
 /**
  * Compute the percent change for each row after the first.
  * Percentages are expressed as 0-1 values.
+ * 
+ * @returns {Series} Returns a new series where each value indicates the percent change from the previous number value in the original series.  
  */
 Series.prototype.percentChange = function () {
 
@@ -748,6 +758,8 @@ Series.prototype.percentChange = function () {
 
 /**
  * Parse a series with string values to a series with int values.
+ * 
+ * @returns {Series} Returns a new series where string values from the original series have been parsed to integer values.
  */
 Series.prototype.parseInts = function () {
 
@@ -770,6 +782,8 @@ Series.prototype.parseInts = function () {
 
 /**
  * Parse a series with string values to a series with float values.
+ * 
+ * @returns {Series} Returns a new series where string values from the original series have been parsed to floating-point values.
  */
 Series.prototype.parseFloats = function () {
 
@@ -794,6 +808,8 @@ Series.prototype.parseFloats = function () {
  * Parse a series with string values to a series with date values.
  *
  * @param {string} [formatString] - Optional formatting string for dates.
+ * 
+ * @returns {Series} Returns a new series where string values from the original series have been parsed to Date values.
  */
 Series.prototype.parseDates = function (formatString) {
 
@@ -822,6 +838,8 @@ Series.prototype.parseDates = function (formatString) {
  * Convert a series of values of different types to a series of string values.
  *
  * @param {string} [formatString] - Optional formatting string for dates.
+ * 
+ * @returns {Series} Returns a new series where the values from the original series have been stringified. 
  */
 Series.prototype.toStrings = function (formatString) {
 

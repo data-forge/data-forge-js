@@ -76,10 +76,10 @@ Browser:
         * [.selectManyPairs(generator)](#dataForge.Series+selectManyPairs) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
         * [.orderBy(sortSelector)](#dataForge.Series+orderBy) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
         * [.orderByDescending(sortSelector)](#dataForge.Series+orderByDescending) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
-        * [.slice(startIndexOrStartPredicate, endIndexOrEndPredicate, [predicate])](#dataForge.Series+slice)
-        * [.window(period)](#dataForge.Series+window)
-        * [.rollingWindow(period)](#dataForge.Series+rollingWindow)
-        * [.percentChange()](#dataForge.Series+percentChange)
+        * [.slice(startIndexOrStartPredicate, endIndexOrEndPredicate, [predicate])](#dataForge.Series+slice) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.window(period)](#dataForge.Series+window) ⇒ <code>Series</code>
+        * [.rollingWindow(period)](#dataForge.Series+rollingWindow) ⇒ <code>Series</code>
+        * [.percentChange()](#dataForge.Series+percentChange) ⇒ <code>Series</code>
         * [.bake()](#dataForge.Series+bake)
         * [.toPairs()](#dataForge.Series+toPairs)
         * [.count()](#dataForge.Series+count)
@@ -141,15 +141,15 @@ Browser:
         * [.selectManyPairs(generator)](#dataForge.Series+selectManyPairs) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
         * [.orderBy(sortSelector)](#dataForge.Series+orderBy) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
         * [.orderByDescending(sortSelector)](#dataForge.Series+orderByDescending) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
-        * [.slice(startIndexOrStartPredicate, endIndexOrEndPredicate, [predicate])](#dataForge.Series+slice)
-        * [.window(period)](#dataForge.Series+window)
-        * [.rollingWindow(period)](#dataForge.Series+rollingWindow)
-        * [.toString()](#dataForge.Series+toString)
-        * [.percentChange()](#dataForge.Series+percentChange)
-        * [.parseInts()](#dataForge.Series+parseInts)
-        * [.parseFloats()](#dataForge.Series+parseFloats)
-        * [.parseDates([formatString])](#dataForge.Series+parseDates)
-        * [.toStrings([formatString])](#dataForge.Series+toStrings)
+        * [.slice(startIndexOrStartPredicate, endIndexOrEndPredicate, [predicate])](#dataForge.Series+slice) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.window(period)](#dataForge.Series+window) ⇒ <code>Series</code>
+        * [.rollingWindow(period)](#dataForge.Series+rollingWindow) ⇒ <code>Series</code>
+        * [.toString()](#dataForge.Series+toString) ⇒ <code>string</code>
+        * [.percentChange()](#dataForge.Series+percentChange) ⇒ <code>Series</code>
+        * [.parseInts()](#dataForge.Series+parseInts) ⇒ <code>Series</code>
+        * [.parseFloats()](#dataForge.Series+parseFloats) ⇒ <code>Series</code>
+        * [.parseDates([formatString])](#dataForge.Series+parseDates) ⇒ <code>Series</code>
+        * [.toStrings([formatString])](#dataForge.Series+toStrings) ⇒ <code>Series</code>
         * [.detectTypes()](#dataForge.Series+detectTypes)
         * [.detectValues()](#dataForge.Series+detectValues)
         * [.truncateStrings(maxLength)](#dataForge.Series+truncateStrings)
@@ -269,10 +269,10 @@ Browser:
     * [.selectManyPairs(generator)](#dataForge.Series+selectManyPairs) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
     * [.orderBy(sortSelector)](#dataForge.Series+orderBy) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
     * [.orderByDescending(sortSelector)](#dataForge.Series+orderByDescending) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
-    * [.slice(startIndexOrStartPredicate, endIndexOrEndPredicate, [predicate])](#dataForge.Series+slice)
-    * [.window(period)](#dataForge.Series+window)
-    * [.rollingWindow(period)](#dataForge.Series+rollingWindow)
-    * [.percentChange()](#dataForge.Series+percentChange)
+    * [.slice(startIndexOrStartPredicate, endIndexOrEndPredicate, [predicate])](#dataForge.Series+slice) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.window(period)](#dataForge.Series+window) ⇒ <code>Series</code>
+    * [.rollingWindow(period)](#dataForge.Series+rollingWindow) ⇒ <code>Series</code>
+    * [.percentChange()](#dataForge.Series+percentChange) ⇒ <code>Series</code>
     * [.bake()](#dataForge.Series+bake)
     * [.toPairs()](#dataForge.Series+toPairs)
     * [.count()](#dataForge.Series+count)
@@ -923,10 +923,11 @@ Sorts the series or dataframe (descending).
 
 <a name="dataForge.Series+slice"></a>
 
-#### dataFrame.slice(startIndexOrStartPredicate, endIndexOrEndPredicate, [predicate])
+#### dataFrame.slice(startIndexOrStartPredicate, endIndexOrEndPredicate, [predicate]) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
 Create a new series from a slice of rows.
 
 **Kind**: instance method of <code>[DataFrame](#dataForge.DataFrame)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a new series or dataframe that contains a slice or values from the original.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -936,11 +937,12 @@ Create a new series from a slice of rows.
 
 <a name="dataForge.Series+window"></a>
 
-#### dataFrame.window(period)
-Segment a Series into 'windows'. Returns a new Series. Each value in the new Series contains a 'window' (or segment) of the original Series.
+#### dataFrame.window(period) ⇒ <code>Series</code>
+Segment a Series into 'windows'. Returns a new Series. Each value in the new Series contains a 'window' (or segment) of the original series or dataframe.
 Use select or selectPairs to aggregate.
 
 **Kind**: instance method of <code>[DataFrame](#dataForge.DataFrame)</code>  
+**Returns**: <code>Series</code> - Returns a new series, each value of which is a 'window' (or segment) of the original series or dataframe.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -948,11 +950,12 @@ Use select or selectPairs to aggregate.
 
 <a name="dataForge.Series+rollingWindow"></a>
 
-#### dataFrame.rollingWindow(period)
+#### dataFrame.rollingWindow(period) ⇒ <code>Series</code>
 Segment a Series into 'rolling windows'. Returns a new Series. Each value in the new Series contains a 'window' (or segment) of the original Series.
 Use select or selectPairs to aggregate.
 
 **Kind**: instance method of <code>[DataFrame](#dataForge.DataFrame)</code>  
+**Returns**: <code>Series</code> - Returns a new series, each value of which is a 'window' (or segment) of the original series or dataframe.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -960,11 +963,12 @@ Use select or selectPairs to aggregate.
 
 <a name="dataForge.Series+percentChange"></a>
 
-#### dataFrame.percentChange()
+#### dataFrame.percentChange() ⇒ <code>Series</code>
 Compute the percent change for each row after the first.
 Percentages are expressed as 0-1 values.
 
 **Kind**: instance method of <code>[DataFrame](#dataForge.DataFrame)</code>  
+**Returns**: <code>Series</code> - Returns a new series where each value indicates the percent change from the previous number value in the original series.  
 <a name="dataForge.Series+bake"></a>
 
 #### dataFrame.bake()
@@ -1400,15 +1404,15 @@ Returns the exception of values between two Series or DataFrames.
     * [.selectManyPairs(generator)](#dataForge.Series+selectManyPairs) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
     * [.orderBy(sortSelector)](#dataForge.Series+orderBy) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
     * [.orderByDescending(sortSelector)](#dataForge.Series+orderByDescending) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
-    * [.slice(startIndexOrStartPredicate, endIndexOrEndPredicate, [predicate])](#dataForge.Series+slice)
-    * [.window(period)](#dataForge.Series+window)
-    * [.rollingWindow(period)](#dataForge.Series+rollingWindow)
-    * [.toString()](#dataForge.Series+toString)
-    * [.percentChange()](#dataForge.Series+percentChange)
-    * [.parseInts()](#dataForge.Series+parseInts)
-    * [.parseFloats()](#dataForge.Series+parseFloats)
-    * [.parseDates([formatString])](#dataForge.Series+parseDates)
-    * [.toStrings([formatString])](#dataForge.Series+toStrings)
+    * [.slice(startIndexOrStartPredicate, endIndexOrEndPredicate, [predicate])](#dataForge.Series+slice) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.window(period)](#dataForge.Series+window) ⇒ <code>Series</code>
+    * [.rollingWindow(period)](#dataForge.Series+rollingWindow) ⇒ <code>Series</code>
+    * [.toString()](#dataForge.Series+toString) ⇒ <code>string</code>
+    * [.percentChange()](#dataForge.Series+percentChange) ⇒ <code>Series</code>
+    * [.parseInts()](#dataForge.Series+parseInts) ⇒ <code>Series</code>
+    * [.parseFloats()](#dataForge.Series+parseFloats) ⇒ <code>Series</code>
+    * [.parseDates([formatString])](#dataForge.Series+parseDates) ⇒ <code>Series</code>
+    * [.toStrings([formatString])](#dataForge.Series+toStrings) ⇒ <code>Series</code>
     * [.detectTypes()](#dataForge.Series+detectTypes)
     * [.detectValues()](#dataForge.Series+detectValues)
     * [.truncateStrings(maxLength)](#dataForge.Series+truncateStrings)
@@ -1683,10 +1687,11 @@ Sorts the series or dataframe (descending).
 
 <a name="dataForge.Series+slice"></a>
 
-#### series.slice(startIndexOrStartPredicate, endIndexOrEndPredicate, [predicate])
+#### series.slice(startIndexOrStartPredicate, endIndexOrEndPredicate, [predicate]) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
 Create a new series from a slice of rows.
 
 **Kind**: instance method of <code>[Series](#dataForge.Series)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a new series or dataframe that contains a slice or values from the original.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1696,11 +1701,12 @@ Create a new series from a slice of rows.
 
 <a name="dataForge.Series+window"></a>
 
-#### series.window(period)
-Segment a Series into 'windows'. Returns a new Series. Each value in the new Series contains a 'window' (or segment) of the original Series.
+#### series.window(period) ⇒ <code>Series</code>
+Segment a Series into 'windows'. Returns a new Series. Each value in the new Series contains a 'window' (or segment) of the original series or dataframe.
 Use select or selectPairs to aggregate.
 
 **Kind**: instance method of <code>[Series](#dataForge.Series)</code>  
+**Returns**: <code>Series</code> - Returns a new series, each value of which is a 'window' (or segment) of the original series or dataframe.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1708,11 +1714,12 @@ Use select or selectPairs to aggregate.
 
 <a name="dataForge.Series+rollingWindow"></a>
 
-#### series.rollingWindow(period)
+#### series.rollingWindow(period) ⇒ <code>Series</code>
 Segment a Series into 'rolling windows'. Returns a new Series. Each value in the new Series contains a 'window' (or segment) of the original Series.
 Use select or selectPairs to aggregate.
 
 **Kind**: instance method of <code>[Series](#dataForge.Series)</code>  
+**Returns**: <code>Series</code> - Returns a new series, each value of which is a 'window' (or segment) of the original series or dataframe.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1720,35 +1727,40 @@ Use select or selectPairs to aggregate.
 
 <a name="dataForge.Series+toString"></a>
 
-#### series.toString()
+#### series.toString() ⇒ <code>string</code>
 Format the data frame for display as a string.
 
 **Kind**: instance method of <code>[Series](#dataForge.Series)</code>  
+**Returns**: <code>string</code> - Generates and returns a string representation of the series or dataframe.  
 <a name="dataForge.Series+percentChange"></a>
 
-#### series.percentChange()
+#### series.percentChange() ⇒ <code>Series</code>
 Compute the percent change for each row after the first.
 Percentages are expressed as 0-1 values.
 
 **Kind**: instance method of <code>[Series](#dataForge.Series)</code>  
+**Returns**: <code>Series</code> - Returns a new series where each value indicates the percent change from the previous number value in the original series.  
 <a name="dataForge.Series+parseInts"></a>
 
-#### series.parseInts()
+#### series.parseInts() ⇒ <code>Series</code>
 Parse a series with string values to a series with int values.
 
 **Kind**: instance method of <code>[Series](#dataForge.Series)</code>  
+**Returns**: <code>Series</code> - Returns a new series where string values from the original series have been parsed to integer values.  
 <a name="dataForge.Series+parseFloats"></a>
 
-#### series.parseFloats()
+#### series.parseFloats() ⇒ <code>Series</code>
 Parse a series with string values to a series with float values.
 
 **Kind**: instance method of <code>[Series](#dataForge.Series)</code>  
+**Returns**: <code>Series</code> - Returns a new series where string values from the original series have been parsed to floating-point values.  
 <a name="dataForge.Series+parseDates"></a>
 
-#### series.parseDates([formatString])
+#### series.parseDates([formatString]) ⇒ <code>Series</code>
 Parse a series with string values to a series with date values.
 
 **Kind**: instance method of <code>[Series](#dataForge.Series)</code>  
+**Returns**: <code>Series</code> - Returns a new series where string values from the original series have been parsed to Date values.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1756,10 +1768,11 @@ Parse a series with string values to a series with date values.
 
 <a name="dataForge.Series+toStrings"></a>
 
-#### series.toStrings([formatString])
+#### series.toStrings([formatString]) ⇒ <code>Series</code>
 Convert a series of values of different types to a series of string values.
 
 **Kind**: instance method of <code>[Series](#dataForge.Series)</code>  
+**Returns**: <code>Series</code> - Returns a new series where the values from the original series have been stringified.  
 
 | Param | Type | Description |
 | --- | --- | --- |
