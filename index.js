@@ -70,6 +70,8 @@ var dataForge = {
 	 *
 	 * @param {string} jsonTextString - The JSON text to deserialize.
 	 * @param {config} [config] - Optional configuration option to pass to the DataFrame.
+	 * 
+	 * @returns {DataFrame} Returns a dataframe that has been deserialized from the JSON data.
 	 */
 	fromJSON: function (jsonTextString, config) {
 		
@@ -87,9 +89,14 @@ var dataForge = {
 		return new DataFrame(dataFrameConfig);
 	},
 
-	//
-	// Deserialize a DataFrame from a CSV text string.
-	//
+	/**
+	 * Deserialize a DataFrame from a CSV text string.
+	 *
+	 * @param {string} csvTextString - The CSV text to deserialize.
+	 * @param {config} [config] - Optional configuration option to pass to the DataFrame.
+	 * 
+	 * @returns {DataFrame} Returns a dataframe that has been deserialized from the CSV data.
+	 */
 	fromCSV: function (csvTextString, config) {
 		assert.isString(csvTextString, "Expected 'csvTextString' parameter to 'dataForge.fromCSV' to be a string containing data encoded in the CSV format.");
 

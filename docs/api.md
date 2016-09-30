@@ -199,7 +199,8 @@ Browser:
     * [.concatDataFrames](#dataForge.concatDataFrames)
     * [.concatSeries](#dataForge.concatSeries)
     * [.use()](#dataForge.use)
-    * [.fromJSON(jsonTextString, [config])](#dataForge.fromJSON)
+    * [.fromJSON(jsonTextString, [config])](#dataForge.fromJSON) ⇒ <code>DataFrame</code>
+    * [.fromCSV(csvTextString, [config])](#dataForge.fromCSV) ⇒ <code>DataFrame</code>
     * [.range(start, count)](#dataForge.range)
     * [.matrix(numColumns, numRows, start, increment)](#dataForge.matrix)
     * [.zipSeries(series, selector)](#dataForge.zipSeries)
@@ -2276,14 +2277,28 @@ Install a plugin in the dataForge namespace.
 **Kind**: static method of <code>[dataForge](#dataForge)</code>  
 <a name="dataForge.fromJSON"></a>
 
-### dataForge.fromJSON(jsonTextString, [config])
+### dataForge.fromJSON(jsonTextString, [config]) ⇒ <code>DataFrame</code>
 Deserialize a DataFrame from a JSON text string.
 
 **Kind**: static method of <code>[dataForge](#dataForge)</code>  
+**Returns**: <code>DataFrame</code> - Returns a dataframe that has been deserialized from the JSON data.  
 
 | Param | Type | Description |
 | --- | --- | --- |
 | jsonTextString | <code>string</code> | The JSON text to deserialize. |
+| [config] | <code>config</code> | Optional configuration option to pass to the DataFrame. |
+
+<a name="dataForge.fromCSV"></a>
+
+### dataForge.fromCSV(csvTextString, [config]) ⇒ <code>DataFrame</code>
+Deserialize a DataFrame from a CSV text string.
+
+**Kind**: static method of <code>[dataForge](#dataForge)</code>  
+**Returns**: <code>DataFrame</code> - Returns a dataframe that has been deserialized from the CSV data.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| csvTextString | <code>string</code> | The CSV text to deserialize. |
 | [config] | <code>config</code> | Optional configuration option to pass to the DataFrame. |
 
 <a name="dataForge.range"></a>
