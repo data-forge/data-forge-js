@@ -60,22 +60,22 @@ Browser:
     * [.Series](#data-forge.Series)
         * [new Series(config|values)](#new_data-forge.Series_new)
         * [.getIterator()](#data-forge.Series+getIterator) ⇒ <code>iterator</code>
-        * [.getIndex()](#data-forge.Series+getIndex)
-        * [.withIndex(newIndex)](#data-forge.Series+withIndex)
-        * [.resetIndex()](#data-forge.Series+resetIndex)
-        * [.skip(numRows)](#data-forge.Series+skip)
-        * [.skipWhile(predicate)](#data-forge.Series+skipWhile)
-        * [.skipUntil(predicate)](#data-forge.Series+skipUntil)
-        * [.take(numRows)](#data-forge.Series+take)
-        * [.takeWhile(predicate)](#data-forge.Series+takeWhile)
-        * [.takeUntil(predicate)](#data-forge.Series+takeUntil)
-        * [.where(predicate)](#data-forge.Series+where)
-        * [.select(selector)](#data-forge.Series+select)
-        * [.selectPairs(selector)](#data-forge.Series+selectPairs)
-        * [.selectMany(selector)](#data-forge.Series+selectMany)
-        * [.selectManyPairs(selector)](#data-forge.Series+selectManyPairs)
-        * [.orderBy(sortSelector)](#data-forge.Series+orderBy)
-        * [.orderByDescending(sortSelector)](#data-forge.Series+orderByDescending)
+        * [.getIndex()](#data-forge.Series+getIndex) ⇒ <code>Series</code>
+        * [.withIndex(newIndex)](#data-forge.Series+withIndex) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.resetIndex()](#data-forge.Series+resetIndex) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.skip(numRows)](#data-forge.Series+skip) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.skipWhile(predicate)](#data-forge.Series+skipWhile) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.skipUntil(predicate)](#data-forge.Series+skipUntil) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.take(numRows)](#data-forge.Series+take) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.takeWhile(predicate)](#data-forge.Series+takeWhile) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.takeUntil(predicate)](#data-forge.Series+takeUntil) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.where(predicate)](#data-forge.Series+where) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.select(selector)](#data-forge.Series+select) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.selectPairs(selector)](#data-forge.Series+selectPairs) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.selectMany(generator)](#data-forge.Series+selectMany) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.selectManyPairs(generator)](#data-forge.Series+selectManyPairs) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.orderBy(sortSelector)](#data-forge.Series+orderBy) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.orderByDescending(sortSelector)](#data-forge.Series+orderByDescending) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
         * [.slice(startIndexOrStartPredicate, endIndexOrEndPredicate, [predicate])](#data-forge.Series+slice)
         * [.window(period)](#data-forge.Series+window)
         * [.rollingWindow(period)](#data-forge.Series+rollingWindow)
@@ -566,22 +566,22 @@ Retreive each row of the dataframe as an array (no column names included)
 * [.Series](#data-forge.Series)
     * [new Series(config|values)](#new_data-forge.Series_new)
     * [.getIterator()](#data-forge.Series+getIterator) ⇒ <code>iterator</code>
-    * [.getIndex()](#data-forge.Series+getIndex)
-    * [.withIndex(newIndex)](#data-forge.Series+withIndex)
-    * [.resetIndex()](#data-forge.Series+resetIndex)
-    * [.skip(numRows)](#data-forge.Series+skip)
-    * [.skipWhile(predicate)](#data-forge.Series+skipWhile)
-    * [.skipUntil(predicate)](#data-forge.Series+skipUntil)
-    * [.take(numRows)](#data-forge.Series+take)
-    * [.takeWhile(predicate)](#data-forge.Series+takeWhile)
-    * [.takeUntil(predicate)](#data-forge.Series+takeUntil)
-    * [.where(predicate)](#data-forge.Series+where)
-    * [.select(selector)](#data-forge.Series+select)
-    * [.selectPairs(selector)](#data-forge.Series+selectPairs)
-    * [.selectMany(selector)](#data-forge.Series+selectMany)
-    * [.selectManyPairs(selector)](#data-forge.Series+selectManyPairs)
-    * [.orderBy(sortSelector)](#data-forge.Series+orderBy)
-    * [.orderByDescending(sortSelector)](#data-forge.Series+orderByDescending)
+    * [.getIndex()](#data-forge.Series+getIndex) ⇒ <code>Series</code>
+    * [.withIndex(newIndex)](#data-forge.Series+withIndex) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.resetIndex()](#data-forge.Series+resetIndex) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.skip(numRows)](#data-forge.Series+skip) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.skipWhile(predicate)](#data-forge.Series+skipWhile) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.skipUntil(predicate)](#data-forge.Series+skipUntil) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.take(numRows)](#data-forge.Series+take) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.takeWhile(predicate)](#data-forge.Series+takeWhile) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.takeUntil(predicate)](#data-forge.Series+takeUntil) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.where(predicate)](#data-forge.Series+where) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.select(selector)](#data-forge.Series+select) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.selectPairs(selector)](#data-forge.Series+selectPairs) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.selectMany(generator)](#data-forge.Series+selectMany) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.selectManyPairs(generator)](#data-forge.Series+selectManyPairs) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.orderBy(sortSelector)](#data-forge.Series+orderBy) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.orderByDescending(sortSelector)](#data-forge.Series+orderByDescending) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
     * [.slice(startIndexOrStartPredicate, endIndexOrEndPredicate, [predicate])](#data-forge.Series+slice)
     * [.window(period)](#data-forge.Series+window)
     * [.rollingWindow(period)](#data-forge.Series+rollingWindow)
@@ -657,16 +657,18 @@ Get an iterator for index & values of the series.
 **Returns**: <code>iterator</code> - Returns an iterator that can be used to enumerate and lazily evalute the contents of the series or dataframe.  
 <a name="data-forge.Series+getIndex"></a>
 
-#### series.getIndex()
+#### series.getIndex() ⇒ <code>Series</code>
 Retreive the index of the series.
 
 **Kind**: instance method of <code>[Series](#data-forge.Series)</code>  
+**Returns**: <code>Series</code> - Returns a new series that contains the values of the index for this series.  
 <a name="data-forge.Series+withIndex"></a>
 
-#### series.withIndex(newIndex)
+#### series.withIndex(newIndex) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
 Apply a new index to the Series.
 
 **Kind**: instance method of <code>[Series](#data-forge.Series)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - - Returns a new series or dataframe with the specified index attached.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -674,16 +676,18 @@ Apply a new index to the Series.
 
 <a name="data-forge.Series+resetIndex"></a>
 
-#### series.resetIndex()
+#### series.resetIndex() ⇒ <code>Series</code> &#124; <code>DataFrame</code>
 Reset the index of the data frame back to the default sequential integer index.
 
 **Kind**: instance method of <code>[Series](#data-forge.Series)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - - Returns a new series or dataframe with the index reset to the default zero-based index.  
 <a name="data-forge.Series+skip"></a>
 
-#### series.skip(numRows)
+#### series.skip(numRows) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
 Skip a number of rows in the series.
 
 **Kind**: instance method of <code>[Series](#data-forge.Series)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a new series or dataframe with the specified number of values skipped.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -691,10 +695,11 @@ Skip a number of rows in the series.
 
 <a name="data-forge.Series+skipWhile"></a>
 
-#### series.skipWhile(predicate)
+#### series.skipWhile(predicate) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
 Skips values in the series while a condition is met.
 
 **Kind**: instance method of <code>[Series](#data-forge.Series)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a new series or dataframe with all initial sequential values removed that match the predicate.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -702,10 +707,11 @@ Skips values in the series while a condition is met.
 
 <a name="data-forge.Series+skipUntil"></a>
 
-#### series.skipUntil(predicate)
+#### series.skipUntil(predicate) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
 Skips values in the series until a condition is met.
 
 **Kind**: instance method of <code>[Series](#data-forge.Series)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a new series or dataframe with all initial sequential values removed that don't match the predicate.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -713,10 +719,11 @@ Skips values in the series until a condition is met.
 
 <a name="data-forge.Series+take"></a>
 
-#### series.take(numRows)
+#### series.take(numRows) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
 Take a number of rows in the series.
 
 **Kind**: instance method of <code>[Series](#data-forge.Series)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a new series or dataframe with up to the specified number of values included.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -724,10 +731,11 @@ Take a number of rows in the series.
 
 <a name="data-forge.Series+takeWhile"></a>
 
-#### series.takeWhile(predicate)
+#### series.takeWhile(predicate) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
 Take values from the series while a condition is met.
 
 **Kind**: instance method of <code>[Series](#data-forge.Series)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a new series or dataframe that only includes the initial sequential values that have matched the predicate.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -735,10 +743,11 @@ Take values from the series while a condition is met.
 
 <a name="data-forge.Series+takeUntil"></a>
 
-#### series.takeUntil(predicate)
+#### series.takeUntil(predicate) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
 Take values from the series until a condition is met.
 
 **Kind**: instance method of <code>[Series](#data-forge.Series)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a new series or dataframe that only includes the initial sequential values that have not matched the predicate.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -746,10 +755,11 @@ Take values from the series until a condition is met.
 
 <a name="data-forge.Series+where"></a>
 
-#### series.where(predicate)
+#### series.where(predicate) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
 Filter a series by a predicate selector.
 
 **Kind**: instance method of <code>[Series](#data-forge.Series)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a new series or dataframe containing only the values that match the predicate.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -757,21 +767,23 @@ Filter a series by a predicate selector.
 
 <a name="data-forge.Series+select"></a>
 
-#### series.select(selector)
+#### series.select(selector) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
 Generate a new series based on the results of the selector function.
 
 **Kind**: instance method of <code>[Series](#data-forge.Series)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a new series or dataframe that has been transformed by the selector function.  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| selector | <code>function</code> | Selector function that transforms each value to create a new series. |
+| selector | <code>function</code> | Selector function that transforms each value to create a new series or dataframe. |
 
 <a name="data-forge.Series+selectPairs"></a>
 
-#### series.selectPairs(selector)
+#### series.selectPairs(selector) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
 Generate a new series based on the results of the selector function.
 
 **Kind**: instance method of <code>[Series](#data-forge.Series)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a new series or dataframe with index/value pairs that have been transformed by the selector function.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -779,47 +791,51 @@ Generate a new series based on the results of the selector function.
 
 <a name="data-forge.Series+selectMany"></a>
 
-#### series.selectMany(selector)
+#### series.selectMany(generator) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
 Generate a new series based on the results of the selector function.
 
 **Kind**: instance method of <code>[Series](#data-forge.Series)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a new series or dataframe with values that have been produced by the generator function.  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| selector | <code>function</code> | Selector function that transforms each value to a different data structure. |
+| generator | <code>function</code> | Generator function that may generator 0 or more new values from value in the series or dataframe. |
 
 <a name="data-forge.Series+selectManyPairs"></a>
 
-#### series.selectManyPairs(selector)
-Generate a new series based on the results of the selector function.
+#### series.selectManyPairs(generator) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+Generate a new series based on the results of the generator function.
 
 **Kind**: instance method of <code>[Series](#data-forge.Series)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a new series or dataframe with index/value pairs that have been produced by the generator function.  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| selector | <code>function</code> | Selector function that transforms each value to a different data structure. |
+| generator | <code>function</code> | Generator function that may generator 0 or more new index/value pairs from each pair in the series or dataframe. |
 
 <a name="data-forge.Series+orderBy"></a>
 
-#### series.orderBy(sortSelector)
-Sorts the series by sort selector (ascending).
+#### series.orderBy(sortSelector) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+Sorts the series or dataframe (ascending).
 
 **Kind**: instance method of <code>[Series](#data-forge.Series)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a new series or dataframe that has been sorted by the value returned by the selector.  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| sortSelector | <code>function</code> | An function to select a value to sort by. |
+| sortSelector | <code>function</code> | Selects the value to sort by. |
 
 <a name="data-forge.Series+orderByDescending"></a>
 
-#### series.orderByDescending(sortSelector)
-Sorts the series by sort selector (descending).
+#### series.orderByDescending(sortSelector) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+Sorts the series or dataframe (descending).
 
 **Kind**: instance method of <code>[Series](#data-forge.Series)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a new series or dataframe that has been sorted by the value returned by the selector.  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| sortSelector | <code>function</code> | An function to select a value to sort by. |
+| sortSelector | <code>function</code> | Selects the value to sort by. |
 
 <a name="data-forge.Series+slice"></a>
 

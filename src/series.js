@@ -154,6 +154,8 @@ Series.prototype.getIterator = function () {
 
 /**
  * Retreive the index of the series.
+ * 
+ * @returns {Series} Returns a new series that contains the values of the index for this series.
  */
 Series.prototype.getIndex = function () {
 	var self = this;
@@ -166,6 +168,8 @@ Series.prototype.getIndex = function () {
  * Apply a new index to the Series.
  * 
  * @param {array|Series} newIndex - The new index to apply to the Series.
+ * 
+ * @returns {Series|DataFrame} - Returns a new series or dataframe with the specified index attached.
  */
 Series.prototype.withIndex = function (newIndex) {
 
@@ -191,6 +195,8 @@ Series.prototype.withIndex = function (newIndex) {
 
 /**
  * Reset the index of the data frame back to the default sequential integer index.
+ * 
+ * @returns {Series|DataFrame} - Returns a new series or dataframe with the index reset to the default zero-based index. 
  */
 Series.prototype.resetIndex = function () {
 
@@ -207,6 +213,8 @@ Series.prototype.resetIndex = function () {
  * Skip a number of rows in the series.
  *
  * @param {int} numRows - Number of rows to skip.
+ * 
+ * @returns {Series|DataFrame} Returns a new series or dataframe with the specified number of values skipped. 
  */
 Series.prototype.skip = function (numRows) {
 	assert.isNumber(numRows, "Expected 'numRows' parameter to 'skip' function to be a number.");
@@ -221,6 +229,8 @@ Series.prototype.skip = function (numRows) {
  * Skips values in the series while a condition is met.
  *
  * @param {function} predicate - Return true to indicate the condition met.
+ * 
+ * @returns {Series|DataFrame} Returns a new series or dataframe with all initial sequential values removed that match the predicate.  
  */
 Series.prototype.skipWhile = function (predicate) {
 	assert.isFunction(predicate, "Expected 'predicate' parameter to 'skipWhile' function to be a predicate function that returns true/false.");
@@ -237,6 +247,8 @@ Series.prototype.skipWhile = function (predicate) {
  * Skips values in the series until a condition is met.
  *
  * @param {function} predicate - Return true to indicate the condition met.
+ * 
+ * @returns {Series|DataFrame} Returns a new series or dataframe with all initial sequential values removed that don't match the predicate.
  */
 Series.prototype.skipUntil = function (predicate) {
 	assert.isFunction(predicate, "Expected 'predicate' parameter to 'skipUntil' function to be a predicate function that returns true/false.");
@@ -251,6 +263,8 @@ Series.prototype.skipUntil = function (predicate) {
  * Take a number of rows in the series.
  *
  * @param {int} numRows - Number of rows to take.
+ * 
+ * @returns {Series|DataFrame} Returns a new series or dataframe with up to the specified number of values included.
  */
 Series.prototype.take = function (numRows) {
 	assert.isNumber(numRows, "Expected 'numRows' parameter to 'take' function to be a number.");
@@ -265,6 +279,8 @@ Series.prototype.take = function (numRows) {
  * Take values from the series while a condition is met.
  *
  * @param {function} predicate - Return true to indicate the condition met.
+ * 
+ * @returns {Series|DataFrame} Returns a new series or dataframe that only includes the initial sequential values that have matched the predicate.
  */
 Series.prototype.takeWhile = function (predicate) {
 	assert.isFunction(predicate, "Expected 'predicate' parameter to 'takeWhile' function to be a predicate function that returns true/false.");
@@ -281,6 +297,8 @@ Series.prototype.takeWhile = function (predicate) {
  * Take values from the series until a condition is met.
  *
  * @param {function} predicate - Return true to indicate the condition met.
+ * 
+ * @returns {Series|DataFrame} Returns a new series or dataframe that only includes the initial sequential values that have not matched the predicate.
  */
 Series.prototype.takeUntil = function (predicate) {
 	assert.isFunction(predicate, "Expected 'predicate' parameter to 'takeUntil' function to be a predicate function that returns true/false.");
@@ -295,6 +313,8 @@ Series.prototype.takeUntil = function (predicate) {
  * Filter a series by a predicate selector.
  *
  * @param {function} predicate - Predicte function to filter rows of the series.
+ * 
+ * @returns {Series|DataFrame} Returns a new series or dataframe containing only the values that match the predicate. 
  */
 Series.prototype.where = function (predicate) {
 	assert.isFunction(predicate, "Expected 'predicate' parameter to 'where' function to be a function.");
@@ -311,7 +331,9 @@ Series.prototype.where = function (predicate) {
 /**
  * Generate a new series based on the results of the selector function.
  *
- * @param {function} selector - Selector function that transforms each value to create a new series.
+ * @param {function} selector - Selector function that transforms each value to create a new series or dataframe.
+ * 
+ * @returns {Series|DataFrame} Returns a new series or dataframe that has been transformed by the selector function.
  */
 Series.prototype.select = function (selector) {
 	assert.isFunction(selector, "Expected 'selector' parameter to 'select' function to be a function.");
@@ -326,6 +348,8 @@ Series.prototype.select = function (selector) {
  * Generate a new series based on the results of the selector function.
  *
  * @param {function} selector - Selector function that transforms each index/value to a create a new series.
+ * 
+ * @returns {Series|DataFrame} Returns a new series or dataframe with index/value pairs that have been transformed by the selector function. 
  */
 Series.prototype.selectPairs = function (selector) {
 	assert.isFunction(selector, "Expected 'selector' parameter to 'selectPairs' function to be a function.");
@@ -339,29 +363,33 @@ Series.prototype.selectPairs = function (selector) {
 /**
  * Generate a new series based on the results of the selector function.
  *
- * @param {function} selector - Selector function that transforms each value to a different data structure.
+ * @param {function} generator - Generator function that may generator 0 or more new values from value in the series or dataframe.
+ * 
+ * @returns {Series|DataFrame} Returns a new series or dataframe with values that have been produced by the generator function. 
  */
-Series.prototype.selectMany = function (selector) {
-	assert.isFunction(selector, "Expected 'selector' parameter to 'Series.selectMany' function to be a function.");
+Series.prototype.selectMany = function (generator) {
+	assert.isFunction(generator, "Expected 'generator' parameter to 'Series.selectMany' function to be a function.");
 
 	var self = this;
 	return new self.Constructor({
-		iterable: new SelectManyIterable(self.iterable, selector),
+		iterable: new SelectManyIterable(self.iterable, generator),
 	}); 	
 };
 
 /**
- * Generate a new series based on the results of the selector function.
+ * Generate a new series based on the results of the generator function.
  *
- * @param {function} selector - Selector function that transforms each value to a different data structure.
+ * @param {function} generator -  Generator function that may generator 0 or more new index/value pairs from each pair in the series or dataframe.
+ * 
+ * @returns {Series|DataFrame} Returns a new series or dataframe with index/value pairs that have been produced by the generator function.
  */
-Series.prototype.selectManyPairs = function (selector) {
-	assert.isFunction(selector, "Expected 'selector' parameter to 'Series.selectManyPairs' function to be a function.");
+Series.prototype.selectManyPairs = function (generator) {
+	assert.isFunction(generator, "Expected 'generator' parameter to 'Series.selectManyPairs' function to be a function.");
 
 	var self = this;
 
 	return new self.Constructor({
-		iterable: new SelectManyPairsIterable(self.iterable, selector),
+		iterable: new SelectManyPairsIterable(self.iterable, generator),
 	}); 	
 };
 
@@ -464,16 +492,36 @@ var orderThenBy = function (self, batch, nextSortMethod) {
 		]);
 
 		var sortedDataFrame = executeOrderBy(self, extendedBatch);
+
+		/**
+		 * Performs additional sorting (ascending). 
+		 * 
+		 * @memberof Series
+		 * @param {function} sortSelector - Selects the value to sort by.
+		 * 
+		 * @returns {Series|DataFrame} Returns a new series or dataframe that has been sorted by the value returned by the selector. 
+		 */
 		sortedDataFrame.thenBy = orderThenBy(self, extendedBatch, 'thenBy');
+
+		/**
+		 * Performs additional sorting (descending). 
+		 * 
+		 * @memberof Series
+		 * @param {function} sortSelector - Selects the value to sort by.
+		 * 
+		 * @returns {Series|DataFrame} Returns a new series or dataframe that has been sorted by the value returned by the selector. 
+		 */		
 		sortedDataFrame.thenByDescending = orderThenBy(self, extendedBatch, 'thenByDescending');		
 		return sortedDataFrame;
 	};	
 };
 
 /**
- * Sorts the series by sort selector (ascending). 
+ * Sorts the series or dataframe (ascending). 
  * 
- * @param {function} sortSelector - An function to select a value to sort by.
+ * @param {function} sortSelector - Selects the value to sort by.
+ * 
+ * @returns {Series|DataFrame} Returns a new series or dataframe that has been sorted by the value returned by the selector. 
  */
 Series.prototype.orderBy = function (sortSelector) {
 
@@ -484,9 +532,11 @@ Series.prototype.orderBy = function (sortSelector) {
 };
 
 /**
- * Sorts the series by sort selector (descending). 
+ * Sorts the series or dataframe (descending). 
  * 
- * @param {function} sortSelector - An function to select a value to sort by.
+ * @param {function} sortSelector - Selects the value to sort by.
+ * 
+ * @returns {Series|DataFrame} Returns a new series or dataframe that has been sorted by the value returned by the selector.
  */
 Series.prototype.orderByDescending = function (sortSelector) {
 
