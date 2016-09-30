@@ -74,9 +74,15 @@ var createValuesIterable = function (values) {
 	}
 };
 
-//
-// Represents a time series.
-//
+/**
+ * @module data-forge
+ */
+
+/**
+ * Constructor for Series.
+ * @constructor
+ * @param {object|array} config|values - Specifies content and configuration for the Series.
+ */
 var Series = function (config) {
 
 	var self = this;

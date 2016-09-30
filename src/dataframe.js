@@ -142,9 +142,15 @@ var determineColumnNamesFromPairsIterable = function (iterable, considerAllRows)
 	}
 };
 
-//
-// Constuctor.
-//
+/**
+ * @module data-forge
+ */
+
+/**
+ * Constructor for DataFrame.
+ * @constructor
+ * @param {object|array} config|values - Specifies content and configuration for the DataFrame.
+ */
 var DataFrame = function (config) {
 
 	var self = this;

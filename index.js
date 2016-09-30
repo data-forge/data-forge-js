@@ -19,6 +19,11 @@ var zip = require('./src/zip');
 var registeredPlugins = {};
 
 /**
+ * @module data-forge
+ */
+
+/**
+ * 
  * Main namespace for Data-Forge.
  * 
  * Nodejs:
@@ -35,18 +40,14 @@ var registeredPlugins = {};
  */
 var dataForge = {
 	
-	/**
-	 * Constructor for DataFrame.
-	 *
-	 * @param {object|array} config|values - Specifies content and configuration for the DataFrame.
-	 */
+	//
+	// Constructor for DataFrame.
+	//
 	DataFrame: DataFrame,
 
-	/**
-	 * Constructor for Series.
-	 *
-	 * @param {object|array} config|values - Specifies content and configuration for the Series.
-	 */
+	//
+	// Constructor for Series.
+	//
 	Series: Series,
 
 	/**
