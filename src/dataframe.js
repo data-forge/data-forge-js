@@ -1277,7 +1277,7 @@ DataFrame.prototype.contains = function (row) {
 /**
  * Concatenate multiple other dataframes onto this dataframe.
  * 
- * @param {array|DataFrame*} dataFrames - Multiple arguments. Each can be either a dataframe or an array of dataframe. 
+ * @param {...array|DataFrame} dataFrames - Multiple arguments. Each can be either a dataframe or an array of dataframe. 
  */
 DataFrame.prototype.concat = function () {
 

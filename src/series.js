@@ -1747,7 +1747,7 @@ Series.prototype.contains = function (value) {
 /**
  * Concatenate multiple other series onto this series.
  * 
- * @param {array|Series*} series - Multiple arguments. Each can be either a series or an array of series. 
+ * @param {...array|Series} series - Multiple arguments. Each can be either a series or an array of series. 
  */
 Series.prototype.concat = function () {
 

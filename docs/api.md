@@ -20,16 +20,14 @@ Browser:
 * [dataForge](#dataForge)
     * [.DataFrame](#dataForge.DataFrame)
     * [.Series](#dataForge.Series)
-    * [.Index](#dataForge.Index)
-    * [.merge](#dataForge.merge)
-    * [.mergeSeries](#dataForge.mergeSeries)
-    * [.concat](#dataForge.concat)
-    * [.zipSeries](#dataForge.zipSeries)
-    * [.zip](#dataForge.zip)
+    * [.concatDataFrames](#dataForge.concatDataFrames)
+    * [.concatSeries](#dataForge.concatSeries)
     * [.use()](#dataForge.use)
     * [.fromJSON(jsonTextString, [config])](#dataForge.fromJSON)
     * [.range(start, count)](#dataForge.range)
     * [.matrix(numColumns, numRows, start, increment)](#dataForge.matrix)
+    * [.zipSeries(series, selector)](#dataForge.zipSeries)
+    * [.zipDataFrames(dataFrames, selector)](#dataForge.zipDataFrames)
 
 <a name="dataForge.DataFrame"></a>
 
@@ -40,7 +38,7 @@ Constructor for DataFrame.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| config | <code>object</code> | Specifies content and configuration for the DataFrame. |
+| config|values | <code>object</code> &#124; <code>array</code> | Specifies content and configuration for the DataFrame. |
 
 <a name="dataForge.Series"></a>
 
@@ -51,78 +49,29 @@ Constructor for Series.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| config | <code>object</code> | Specifies content and configuration for the Series. |
+| config|values | <code>object</code> &#124; <code>array</code> | Specifies content and configuration for the Series. |
 
-<a name="dataForge.Index"></a>
+<a name="dataForge.concatDataFrames"></a>
 
-### dataForge.Index
-Constructor for Index.
-
-**Kind**: static property of <code>[dataForge](#dataForge)</code>  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| values | <code>array</code> | Array of values to include in the index. |
-
-<a name="dataForge.merge"></a>
-
-### dataForge.merge
-Merge data-frames by index or a particular column.
+### dataForge.concatDataFrames
+Concatenate multiple dataframes into a single dataframe.
 
 **Kind**: static property of <code>[dataForge](#dataForge)</code>  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| leftDataFrame | <code>DataFrame</code> | One data frame to merge. |
-| rightDataFrame | <code>DataFrame</code> | The other data frame to merge. |
-| [columnName] | <code>string</code> | The name of the column to merge on. Optional, when not specified merge is based on the index. |
+| dataFrames | <code>array</code> | Array of dataframes to concatenate. |
 
-<a name="dataForge.mergeSeries"></a>
+<a name="dataForge.concatSeries"></a>
 
-### dataForge.mergeSeries
-Merge multiple series into a new DataFrame.
+### dataForge.concatSeries
+Concatenate multiple series into a single series.
 
 **Kind**: static property of <code>[dataForge](#dataForge)</code>  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| columnNames | <code>array</code> | Array of strings that defines the column names for the resulting DataFrame. Must have the same number of elements as the 'series' parameter. |
-| series | <code>array</code> | Array of series that defined the values for the columns. Must have the same number of elements as the 'columnNames' parameter. |
-
-<a name="dataForge.concat"></a>
-
-### dataForge.concat
-Concatenate multiple data frames into a single.
-
-**Kind**: static property of <code>[dataForge](#dataForge)</code>  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| dataFrames | <code>array</code> | Array of data frames to concatenate. |
-
-<a name="dataForge.zipSeries"></a>
-
-### dataForge.zipSeries
-Zip together multiple series to create a new series.
-
-**Kind**: static property of <code>[dataForge](#dataForge)</code>  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| series | <code>array</code> | Array of series to zip together. |
-| selector | <code>function</code> | Selector function that produces a new series based on the input series. |
-
-<a name="dataForge.zip"></a>
-
-### dataForge.zip
-Zip together multiple data-frames to create a new data-frame.
-
-**Kind**: static property of <code>[dataForge](#dataForge)</code>  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| dataFrames | <code>array</code> | Array of data-frames to zip together. |
-| selector | <code>function</code> | Selector function that produces a new data-frame based on the input data-frames. |
+| series | <code>array</code> | Array of series to concatenate. |
 
 <a name="dataForge.use"></a>
 
@@ -167,4 +116,28 @@ Generate a data-frame containing a matrix of values.
 | numRows | <code>int</code> | The number of rows in the data-frame. |
 | start | <code>number</code> | The starting value. |
 | increment | <code>number</code> | The value to increment by for each new value. |
+
+<a name="dataForge.zipSeries"></a>
+
+### dataForge.zipSeries(series, selector)
+Zip together multiple series to create a new series.
+
+**Kind**: static method of <code>[dataForge](#dataForge)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| series | <code>array</code> | Array of series to zip together. |
+| selector | <code>function</code> | Selector function that produces a new series based on the input series. |
+
+<a name="dataForge.zipDataFrames"></a>
+
+### dataForge.zipDataFrames(dataFrames, selector)
+Zip together multiple data-frames to create a new data-frame.
+
+**Kind**: static method of <code>[dataForge](#dataForge)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| dataFrames | <code>array</code> | Array of data-frames to zip together. |
+| selector | <code>function</code> | Selector function that produces a new data-frame based on the input data-frames. |
 
