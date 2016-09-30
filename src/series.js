@@ -75,12 +75,9 @@ var createValuesIterable = function (values) {
 };
 
 /**
- * @module data-forge
- */
-
-/**
  * Constructor for Series.
  * @constructor
+ * @memberof data-forge
  * @param {object|array} config|values - Specifies content and configuration for the Series.
  */
 var Series = function (config) {

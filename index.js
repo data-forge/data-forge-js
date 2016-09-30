@@ -19,11 +19,6 @@ var zip = require('./src/zip');
 var registeredPlugins = {};
 
 /**
- * @module data-forge
- */
-
-/**
- * 
  * Main namespace for Data-Forge.
  * 
  * Nodejs:
@@ -37,6 +32,8 @@ var registeredPlugins = {};
  * 		bower install --save data-forge
  * 
  * 		<script language="javascript" type="text/javascript" src="bower_components/data-forge/data-forge.js"></script>
+ *
+ * @namespace data-forge
  */
 var dataForge = {
 	
