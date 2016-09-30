@@ -144,6 +144,8 @@ var SelectManyPairsIterable = require('../src/iterables/select-many-pairs');
 
 /**
  * Get an iterator for index & values of the series.
+ * 
+ * @returns {iterator} Returns an iterator that can be used to enumerate and lazily evalute the contents of the series or dataframe. 
  */
 Series.prototype.getIterator = function () {
 	var self = this;

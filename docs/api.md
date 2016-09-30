@@ -59,7 +59,7 @@ Browser:
         * [.toRows()](#data-forge.DataFrame+toRows)
     * [.Series](#data-forge.Series)
         * [new Series(config|values)](#new_data-forge.Series_new)
-        * [.getIterator()](#data-forge.Series+getIterator)
+        * [.getIterator()](#data-forge.Series+getIterator) ⇒ <code>iterator</code>
         * [.getIndex()](#data-forge.Series+getIndex)
         * [.withIndex(newIndex)](#data-forge.Series+withIndex)
         * [.resetIndex()](#data-forge.Series+resetIndex)
@@ -565,7 +565,7 @@ Retreive each row of the dataframe as an array (no column names included)
 
 * [.Series](#data-forge.Series)
     * [new Series(config|values)](#new_data-forge.Series_new)
-    * [.getIterator()](#data-forge.Series+getIterator)
+    * [.getIterator()](#data-forge.Series+getIterator) ⇒ <code>iterator</code>
     * [.getIndex()](#data-forge.Series+getIndex)
     * [.withIndex(newIndex)](#data-forge.Series+withIndex)
     * [.resetIndex()](#data-forge.Series+resetIndex)
@@ -650,10 +650,11 @@ Constructor for Series.
 
 <a name="data-forge.Series+getIterator"></a>
 
-#### series.getIterator()
+#### series.getIterator() ⇒ <code>iterator</code>
 Get an iterator for index & values of the series.
 
 **Kind**: instance method of <code>[Series](#data-forge.Series)</code>  
+**Returns**: <code>iterator</code> - Returns an iterator that can be used to enumerate and lazily evalute the contents of the series or dataframe.  
 <a name="data-forge.Series+getIndex"></a>
 
 #### series.getIndex()
