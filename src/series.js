@@ -1434,6 +1434,8 @@ Series.prototype.zip = function () {
  * Invoke a callback function for each value in the series.
  *
  * @param {function} callback - The calback to invoke for each value.
+ * 
+ * @returns {Series|DataFrame} Returns the input sequence with no modifications.   
  */
 Series.prototype.forEach = function (callback) {
 	assert.isFunction(callback, "Expected 'callback' parameter to 'forEach' function to be a function.");
@@ -1451,12 +1453,14 @@ Series.prototype.forEach = function (callback) {
 };
 
 /**
- * Determine if the predicate returns truthy for all values.
+ * Determine if the predicate returns truthy for all values in the sequence.
  * Returns false as soon as the predicate evaluates to falsy.
  * Returns true if the predicate returns truthy for all values in the Series.
  * Returns false if the series is empty.
  *
  * @param {function} predicate - Predicate function that receives each value in turn and returns truthy for a match, otherwise falsy.
+ *
+ * @returns {boolean} Returns true if the predicate has returned truthy for every value in the sequence, otherwise returns false. 
  */
 Series.prototype.all = function (predicate) {
 	assert.isFunction(predicate, "Expected 'predicate' parameter to 'all' to be a function.")
@@ -1480,11 +1484,14 @@ Series.prototype.all = function (predicate) {
 };
 
 /**
- * Determine if the predicate returns truthy for any of the values.
+ * Determine if the predicate returns truthy for any of the values in the sequence.
  * Returns true as soon as the predicate returns truthy.
  * Returns false if the predicate never returns truthy.
+ * If no predicate is specified the value itself is checked. 
  *
  * @param {function} [predicate] - Optional predicate function that receives each value in turn and returns truthy for a match, otherwise falsy.
+ *
+ * @returns {boolean} Returns true if the predicate has returned truthy for any value in the sequence, otherwise returns false. 
  */
 Series.prototype.any = function (predicate) {
 	if (predicate) {
@@ -1510,12 +1517,15 @@ Series.prototype.any = function (predicate) {
 };
 
 /**
- * Determine if the predicate returns truthy for none of the values.
+ * Determine if the predicate returns truthy for none of the values in the sequence.
  * Returns true for an empty Series.
  * Returns true if the predicate always returns falsy.
  * Otherwise returns false.
+ * If no predicate is specified the value itself is checked.
  *
  * @param {function} [predicate] - Optional predicate function that receives each value in turn and returns truthy for a match, otherwise falsy.
+ * 
+ * @returns {boolean} Returns true if the predicate has returned truthy for no values in the sequence, otherwise returns false. 
  */
 Series.prototype.none = function (predicate) {
 
@@ -1545,6 +1555,8 @@ Series.prototype.none = function (predicate) {
  * Group sequential duplicate values into a Series of windows.
  *
  * @param {function} selector - Selects the value used to compare for duplicates.
+ * 
+ * @returns {Series|DataFrame} Returns a series of groups. Each group is itself a series or dataframe. 
  */
 Series.prototype.sequentialDistinct = function (selector) {
 	
@@ -1571,6 +1583,8 @@ Series.prototype.sequentialDistinct = function (selector) {
  * Group distinct values in the Series into a Series of windows.
  *
  * @param {function} selector - Selects the value used to compare for duplicates.
+ * 
+ * @returns {Series|DataFrame} Returns a series or dataframe containing only unique values as determined by the 'selector' function. 
  */
 Series.prototype.distinct = function (selector) {
 	
@@ -1646,6 +1660,8 @@ Series.prototype.distinct = function (selector) {
  * Groups sequential values into variable length 'windows'. The windows can then be transformed/transformed using selectPairs or selectManyPairs.
  *
  * @param {function} comparer - Predicate that compares two values and returns true if they should be in the same window.
+ * 
+ * @returns {Series|DataFrame} Returns a series of groups. Each group is itself a series or dataframe that contains the values in the 'window'. 
  */
 Series.prototype.variableWindow = function (comparer, obsoleteSelector) {
 	
@@ -1712,6 +1728,8 @@ Series.prototype.variableWindow = function (comparer, obsoleteSelector) {
  * Insert a pair at the start of a Series.
  *
  * @param {pair} pair - The pair to insert.
+ * 
+ * @returns {Series|DataFrame} Returns a new series or dataframe with the specified pair inserted.
  */
 Series.prototype.insertPair = function (pair) {
 	assert.isArray(pair, "Expected 'pair' parameter to 'Series.insertPair' to be an array.");
@@ -1730,6 +1748,8 @@ Series.prototype.insertPair = function (pair) {
  * Append a pair to the end of a Series.
  *
  * @param {pair} pair - The pair to append.
+ * 
+ * @returns {Series|DataFrame} Returns a new series or dataframe with the specified pair appended.
  */
 Series.prototype.appendPair = function (pair) {
 	assert.isArray(pair, "Expected 'pair' parameter to 'Series.appendPair' to be an array.");
@@ -1751,6 +1771,8 @@ Series.prototype.appendPair = function (pair) {
  *
  * @param {function} predicate - Predicate that is passed pairA and pairB, two consecutive rows, return truthy if there is a gap between the rows, or falsey if there is no gap.
  * @param {function} generator - Generator that is passed pairA and pairB, two consecutive rows, returns an array of pairs that fills the gap between the rows.
+ *
+ * @returns {Series} Returns a new series with gaps filled in.
  */
 Series.prototype.fillGaps = function (predicate, generator) {
 	assert.isFunction(predicate, "Expected 'predicate' parameter to 'Series.fillGaps' to be a predicate function that returns a boolean.")
@@ -1779,6 +1801,8 @@ Series.prototype.fillGaps = function (predicate, generator) {
  * Group the series according to the selector.
  *
  * @param {function} selector - Selector that defines the value to group by.
+ *
+ * @returns {Series} Returns a series of groups. Each group is a series with values that have been grouped by the 'selector' function.
  */
 Series.prototype.groupBy = function (selector) {
 
@@ -1805,9 +1829,11 @@ Series.prototype.groupBy = function (selector) {
 };
 
 /**
- * Group sequential duplicate values into a Series of windows.
+ * Group sequential values into a Series of windows.
  *
  * @param {function} selector - Selector that defines the value to group by.
+ *
+ * @returns {Series} Returns a series of groups. Each group is a series with values that have been grouped by the 'selector' function.
  */
 Series.prototype.groupSequentialBy = function (selector) {
 
@@ -1831,6 +1857,8 @@ Series.prototype.groupSequentialBy = function (selector) {
  * Get the value at a specified index.
  *
  * @param {function} index - Index to for which to retreive the value.
+ *
+ * @returns {value} Returns the value from the specified index in the sequence. 
  */
 Series.prototype.at = function (index) {
 

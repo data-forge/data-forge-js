@@ -99,19 +99,19 @@ Browser:
         * [.max()](#dataForge.Series+max) ⇒ <code>number</code>
         * [.toObject(keySelector, keySelector)](#dataForge.Series+toObject) ⇒ <code>object</code>
         * [.zip(sequence, selector)](#dataForge.Series+zip) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
-        * [.forEach(callback)](#dataForge.Series+forEach)
-        * [.all(predicate)](#dataForge.Series+all)
-        * [.any([predicate])](#dataForge.Series+any)
-        * [.none([predicate])](#dataForge.Series+none)
-        * [.sequentialDistinct(selector)](#dataForge.Series+sequentialDistinct)
-        * [.distinct(selector)](#dataForge.Series+distinct)
-        * [.variableWindow(comparer)](#dataForge.Series+variableWindow)
-        * [.insertPair(pair)](#dataForge.Series+insertPair)
-        * [.appendPair(pair)](#dataForge.Series+appendPair)
-        * [.fillGaps(predicate, generator)](#dataForge.Series+fillGaps)
-        * [.groupBy(selector)](#dataForge.Series+groupBy)
-        * [.groupSequentialBy(selector)](#dataForge.Series+groupSequentialBy)
-        * [.at(index)](#dataForge.Series+at)
+        * [.forEach(callback)](#dataForge.Series+forEach) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.all(predicate)](#dataForge.Series+all) ⇒ <code>boolean</code>
+        * [.any([predicate])](#dataForge.Series+any) ⇒ <code>boolean</code>
+        * [.none([predicate])](#dataForge.Series+none) ⇒ <code>boolean</code>
+        * [.sequentialDistinct(selector)](#dataForge.Series+sequentialDistinct) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.distinct(selector)](#dataForge.Series+distinct) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.variableWindow(comparer)](#dataForge.Series+variableWindow) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.insertPair(pair)](#dataForge.Series+insertPair) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.appendPair(pair)](#dataForge.Series+appendPair) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.fillGaps(predicate, generator)](#dataForge.Series+fillGaps) ⇒ <code>Series</code>
+        * [.groupBy(selector)](#dataForge.Series+groupBy) ⇒ <code>Series</code>
+        * [.groupSequentialBy(selector)](#dataForge.Series+groupSequentialBy) ⇒ <code>Series</code>
+        * [.at(index)](#dataForge.Series+at) ⇒ <code>value</code>
         * [.join(self, inner, outerKeySelector, innerKeySelector, resultSelector)](#dataForge.Series+join)
         * [.joinOuter(self, inner, outerKeySelector, innerKeySelector, outerResultSelector, innerResultSelector, mergeSelector)](#dataForge.Series+joinOuter)
         * [.joinOuterLeft(self, inner, outerKeySelector, innerKeySelector, outerResultSelector, innerResultSelector, mergeSelector)](#dataForge.Series+joinOuterLeft)
@@ -173,19 +173,19 @@ Browser:
         * [.aggregate([seed], selector)](#dataForge.Series+aggregate) ⇒ <code>value</code>
         * [.toObject(keySelector, keySelector)](#dataForge.Series+toObject) ⇒ <code>object</code>
         * [.zip(sequence, selector)](#dataForge.Series+zip) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
-        * [.forEach(callback)](#dataForge.Series+forEach)
-        * [.all(predicate)](#dataForge.Series+all)
-        * [.any([predicate])](#dataForge.Series+any)
-        * [.none([predicate])](#dataForge.Series+none)
-        * [.sequentialDistinct(selector)](#dataForge.Series+sequentialDistinct)
-        * [.distinct(selector)](#dataForge.Series+distinct)
-        * [.variableWindow(comparer)](#dataForge.Series+variableWindow)
-        * [.insertPair(pair)](#dataForge.Series+insertPair)
-        * [.appendPair(pair)](#dataForge.Series+appendPair)
-        * [.fillGaps(predicate, generator)](#dataForge.Series+fillGaps)
-        * [.groupBy(selector)](#dataForge.Series+groupBy)
-        * [.groupSequentialBy(selector)](#dataForge.Series+groupSequentialBy)
-        * [.at(index)](#dataForge.Series+at)
+        * [.forEach(callback)](#dataForge.Series+forEach) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.all(predicate)](#dataForge.Series+all) ⇒ <code>boolean</code>
+        * [.any([predicate])](#dataForge.Series+any) ⇒ <code>boolean</code>
+        * [.none([predicate])](#dataForge.Series+none) ⇒ <code>boolean</code>
+        * [.sequentialDistinct(selector)](#dataForge.Series+sequentialDistinct) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.distinct(selector)](#dataForge.Series+distinct) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.variableWindow(comparer)](#dataForge.Series+variableWindow) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.insertPair(pair)](#dataForge.Series+insertPair) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.appendPair(pair)](#dataForge.Series+appendPair) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.fillGaps(predicate, generator)](#dataForge.Series+fillGaps) ⇒ <code>Series</code>
+        * [.groupBy(selector)](#dataForge.Series+groupBy) ⇒ <code>Series</code>
+        * [.groupSequentialBy(selector)](#dataForge.Series+groupSequentialBy) ⇒ <code>Series</code>
+        * [.at(index)](#dataForge.Series+at) ⇒ <code>value</code>
         * [.contains(value)](#dataForge.Series+contains)
         * [.concat(series)](#dataForge.Series+concat)
         * [.join(self, inner, outerKeySelector, innerKeySelector, resultSelector)](#dataForge.Series+join)
@@ -293,19 +293,19 @@ Browser:
     * [.max()](#dataForge.Series+max) ⇒ <code>number</code>
     * [.toObject(keySelector, keySelector)](#dataForge.Series+toObject) ⇒ <code>object</code>
     * [.zip(sequence, selector)](#dataForge.Series+zip) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
-    * [.forEach(callback)](#dataForge.Series+forEach)
-    * [.all(predicate)](#dataForge.Series+all)
-    * [.any([predicate])](#dataForge.Series+any)
-    * [.none([predicate])](#dataForge.Series+none)
-    * [.sequentialDistinct(selector)](#dataForge.Series+sequentialDistinct)
-    * [.distinct(selector)](#dataForge.Series+distinct)
-    * [.variableWindow(comparer)](#dataForge.Series+variableWindow)
-    * [.insertPair(pair)](#dataForge.Series+insertPair)
-    * [.appendPair(pair)](#dataForge.Series+appendPair)
-    * [.fillGaps(predicate, generator)](#dataForge.Series+fillGaps)
-    * [.groupBy(selector)](#dataForge.Series+groupBy)
-    * [.groupSequentialBy(selector)](#dataForge.Series+groupSequentialBy)
-    * [.at(index)](#dataForge.Series+at)
+    * [.forEach(callback)](#dataForge.Series+forEach) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.all(predicate)](#dataForge.Series+all) ⇒ <code>boolean</code>
+    * [.any([predicate])](#dataForge.Series+any) ⇒ <code>boolean</code>
+    * [.none([predicate])](#dataForge.Series+none) ⇒ <code>boolean</code>
+    * [.sequentialDistinct(selector)](#dataForge.Series+sequentialDistinct) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.distinct(selector)](#dataForge.Series+distinct) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.variableWindow(comparer)](#dataForge.Series+variableWindow) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.insertPair(pair)](#dataForge.Series+insertPair) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.appendPair(pair)](#dataForge.Series+appendPair) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.fillGaps(predicate, generator)](#dataForge.Series+fillGaps) ⇒ <code>Series</code>
+    * [.groupBy(selector)](#dataForge.Series+groupBy) ⇒ <code>Series</code>
+    * [.groupSequentialBy(selector)](#dataForge.Series+groupSequentialBy) ⇒ <code>Series</code>
+    * [.at(index)](#dataForge.Series+at) ⇒ <code>value</code>
     * [.join(self, inner, outerKeySelector, innerKeySelector, resultSelector)](#dataForge.Series+join)
     * [.joinOuter(self, inner, outerKeySelector, innerKeySelector, outerResultSelector, innerResultSelector, mergeSelector)](#dataForge.Series+joinOuter)
     * [.joinOuterLeft(self, inner, outerKeySelector, innerKeySelector, outerResultSelector, innerResultSelector, mergeSelector)](#dataForge.Series+joinOuterLeft)
@@ -1132,10 +1132,11 @@ Zip together multiple series or dataframes to produce a new series or dataframe.
 
 <a name="dataForge.Series+forEach"></a>
 
-#### dataFrame.forEach(callback)
+#### dataFrame.forEach(callback) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
 Invoke a callback function for each value in the series.
 
 **Kind**: instance method of <code>[DataFrame](#dataForge.DataFrame)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns the input sequence with no modifications.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1143,13 +1144,14 @@ Invoke a callback function for each value in the series.
 
 <a name="dataForge.Series+all"></a>
 
-#### dataFrame.all(predicate)
-Determine if the predicate returns truthy for all values.
+#### dataFrame.all(predicate) ⇒ <code>boolean</code>
+Determine if the predicate returns truthy for all values in the sequence.
 Returns false as soon as the predicate evaluates to falsy.
 Returns true if the predicate returns truthy for all values in the Series.
 Returns false if the series is empty.
 
 **Kind**: instance method of <code>[DataFrame](#dataForge.DataFrame)</code>  
+**Returns**: <code>boolean</code> - Returns true if the predicate has returned truthy for every value in the sequence, otherwise returns false.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1157,12 +1159,14 @@ Returns false if the series is empty.
 
 <a name="dataForge.Series+any"></a>
 
-#### dataFrame.any([predicate])
-Determine if the predicate returns truthy for any of the values.
+#### dataFrame.any([predicate]) ⇒ <code>boolean</code>
+Determine if the predicate returns truthy for any of the values in the sequence.
 Returns true as soon as the predicate returns truthy.
 Returns false if the predicate never returns truthy.
+If no predicate is specified the value itself is checked.
 
 **Kind**: instance method of <code>[DataFrame](#dataForge.DataFrame)</code>  
+**Returns**: <code>boolean</code> - Returns true if the predicate has returned truthy for any value in the sequence, otherwise returns false.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1170,13 +1174,15 @@ Returns false if the predicate never returns truthy.
 
 <a name="dataForge.Series+none"></a>
 
-#### dataFrame.none([predicate])
-Determine if the predicate returns truthy for none of the values.
+#### dataFrame.none([predicate]) ⇒ <code>boolean</code>
+Determine if the predicate returns truthy for none of the values in the sequence.
 Returns true for an empty Series.
 Returns true if the predicate always returns falsy.
 Otherwise returns false.
+If no predicate is specified the value itself is checked.
 
 **Kind**: instance method of <code>[DataFrame](#dataForge.DataFrame)</code>  
+**Returns**: <code>boolean</code> - Returns true if the predicate has returned truthy for no values in the sequence, otherwise returns false.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1184,10 +1190,11 @@ Otherwise returns false.
 
 <a name="dataForge.Series+sequentialDistinct"></a>
 
-#### dataFrame.sequentialDistinct(selector)
+#### dataFrame.sequentialDistinct(selector) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
 Group sequential duplicate values into a Series of windows.
 
 **Kind**: instance method of <code>[DataFrame](#dataForge.DataFrame)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a series of groups. Each group is itself a series or dataframe.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1195,10 +1202,11 @@ Group sequential duplicate values into a Series of windows.
 
 <a name="dataForge.Series+distinct"></a>
 
-#### dataFrame.distinct(selector)
+#### dataFrame.distinct(selector) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
 Group distinct values in the Series into a Series of windows.
 
 **Kind**: instance method of <code>[DataFrame](#dataForge.DataFrame)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a series or dataframe containing only unique values as determined by the 'selector' function.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1206,10 +1214,11 @@ Group distinct values in the Series into a Series of windows.
 
 <a name="dataForge.Series+variableWindow"></a>
 
-#### dataFrame.variableWindow(comparer)
+#### dataFrame.variableWindow(comparer) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
 Groups sequential values into variable length 'windows'. The windows can then be transformed/transformed using selectPairs or selectManyPairs.
 
 **Kind**: instance method of <code>[DataFrame](#dataForge.DataFrame)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a series of groups. Each group is itself a series or dataframe that contains the values in the 'window'.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1217,10 +1226,11 @@ Groups sequential values into variable length 'windows'. The windows can then be
 
 <a name="dataForge.Series+insertPair"></a>
 
-#### dataFrame.insertPair(pair)
+#### dataFrame.insertPair(pair) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
 Insert a pair at the start of a Series.
 
 **Kind**: instance method of <code>[DataFrame](#dataForge.DataFrame)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a new series or dataframe with the specified pair inserted.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1228,10 +1238,11 @@ Insert a pair at the start of a Series.
 
 <a name="dataForge.Series+appendPair"></a>
 
-#### dataFrame.appendPair(pair)
+#### dataFrame.appendPair(pair) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
 Append a pair to the end of a Series.
 
 **Kind**: instance method of <code>[DataFrame](#dataForge.DataFrame)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a new series or dataframe with the specified pair appended.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1239,10 +1250,11 @@ Append a pair to the end of a Series.
 
 <a name="dataForge.Series+fillGaps"></a>
 
-#### dataFrame.fillGaps(predicate, generator)
+#### dataFrame.fillGaps(predicate, generator) ⇒ <code>Series</code>
 Fill gaps in a series.
 
 **Kind**: instance method of <code>[DataFrame](#dataForge.DataFrame)</code>  
+**Returns**: <code>Series</code> - Returns a new series with gaps filled in.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1251,10 +1263,11 @@ Fill gaps in a series.
 
 <a name="dataForge.Series+groupBy"></a>
 
-#### dataFrame.groupBy(selector)
+#### dataFrame.groupBy(selector) ⇒ <code>Series</code>
 Group the series according to the selector.
 
 **Kind**: instance method of <code>[DataFrame](#dataForge.DataFrame)</code>  
+**Returns**: <code>Series</code> - Returns a series of groups. Each group is a series with values that have been grouped by the 'selector' function.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1262,10 +1275,11 @@ Group the series according to the selector.
 
 <a name="dataForge.Series+groupSequentialBy"></a>
 
-#### dataFrame.groupSequentialBy(selector)
-Group sequential duplicate values into a Series of windows.
+#### dataFrame.groupSequentialBy(selector) ⇒ <code>Series</code>
+Group sequential values into a Series of windows.
 
 **Kind**: instance method of <code>[DataFrame](#dataForge.DataFrame)</code>  
+**Returns**: <code>Series</code> - Returns a series of groups. Each group is a series with values that have been grouped by the 'selector' function.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1273,10 +1287,11 @@ Group sequential duplicate values into a Series of windows.
 
 <a name="dataForge.Series+at"></a>
 
-#### dataFrame.at(index)
+#### dataFrame.at(index) ⇒ <code>value</code>
 Get the value at a specified index.
 
 **Kind**: instance method of <code>[DataFrame](#dataForge.DataFrame)</code>  
+**Returns**: <code>value</code> - Returns the value from the specified index in the sequence.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1456,19 +1471,19 @@ Returns the exception of values between two Series or DataFrames.
     * [.aggregate([seed], selector)](#dataForge.Series+aggregate) ⇒ <code>value</code>
     * [.toObject(keySelector, keySelector)](#dataForge.Series+toObject) ⇒ <code>object</code>
     * [.zip(sequence, selector)](#dataForge.Series+zip) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
-    * [.forEach(callback)](#dataForge.Series+forEach)
-    * [.all(predicate)](#dataForge.Series+all)
-    * [.any([predicate])](#dataForge.Series+any)
-    * [.none([predicate])](#dataForge.Series+none)
-    * [.sequentialDistinct(selector)](#dataForge.Series+sequentialDistinct)
-    * [.distinct(selector)](#dataForge.Series+distinct)
-    * [.variableWindow(comparer)](#dataForge.Series+variableWindow)
-    * [.insertPair(pair)](#dataForge.Series+insertPair)
-    * [.appendPair(pair)](#dataForge.Series+appendPair)
-    * [.fillGaps(predicate, generator)](#dataForge.Series+fillGaps)
-    * [.groupBy(selector)](#dataForge.Series+groupBy)
-    * [.groupSequentialBy(selector)](#dataForge.Series+groupSequentialBy)
-    * [.at(index)](#dataForge.Series+at)
+    * [.forEach(callback)](#dataForge.Series+forEach) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.all(predicate)](#dataForge.Series+all) ⇒ <code>boolean</code>
+    * [.any([predicate])](#dataForge.Series+any) ⇒ <code>boolean</code>
+    * [.none([predicate])](#dataForge.Series+none) ⇒ <code>boolean</code>
+    * [.sequentialDistinct(selector)](#dataForge.Series+sequentialDistinct) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.distinct(selector)](#dataForge.Series+distinct) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.variableWindow(comparer)](#dataForge.Series+variableWindow) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.insertPair(pair)](#dataForge.Series+insertPair) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.appendPair(pair)](#dataForge.Series+appendPair) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.fillGaps(predicate, generator)](#dataForge.Series+fillGaps) ⇒ <code>Series</code>
+    * [.groupBy(selector)](#dataForge.Series+groupBy) ⇒ <code>Series</code>
+    * [.groupSequentialBy(selector)](#dataForge.Series+groupSequentialBy) ⇒ <code>Series</code>
+    * [.at(index)](#dataForge.Series+at) ⇒ <code>value</code>
     * [.contains(value)](#dataForge.Series+contains)
     * [.concat(series)](#dataForge.Series+concat)
     * [.join(self, inner, outerKeySelector, innerKeySelector, resultSelector)](#dataForge.Series+join)
@@ -2001,10 +2016,11 @@ Zip together multiple series or dataframes to produce a new series or dataframe.
 
 <a name="dataForge.Series+forEach"></a>
 
-#### series.forEach(callback)
+#### series.forEach(callback) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
 Invoke a callback function for each value in the series.
 
 **Kind**: instance method of <code>[Series](#dataForge.Series)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns the input sequence with no modifications.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -2012,13 +2028,14 @@ Invoke a callback function for each value in the series.
 
 <a name="dataForge.Series+all"></a>
 
-#### series.all(predicate)
-Determine if the predicate returns truthy for all values.
+#### series.all(predicate) ⇒ <code>boolean</code>
+Determine if the predicate returns truthy for all values in the sequence.
 Returns false as soon as the predicate evaluates to falsy.
 Returns true if the predicate returns truthy for all values in the Series.
 Returns false if the series is empty.
 
 **Kind**: instance method of <code>[Series](#dataForge.Series)</code>  
+**Returns**: <code>boolean</code> - Returns true if the predicate has returned truthy for every value in the sequence, otherwise returns false.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -2026,12 +2043,14 @@ Returns false if the series is empty.
 
 <a name="dataForge.Series+any"></a>
 
-#### series.any([predicate])
-Determine if the predicate returns truthy for any of the values.
+#### series.any([predicate]) ⇒ <code>boolean</code>
+Determine if the predicate returns truthy for any of the values in the sequence.
 Returns true as soon as the predicate returns truthy.
 Returns false if the predicate never returns truthy.
+If no predicate is specified the value itself is checked.
 
 **Kind**: instance method of <code>[Series](#dataForge.Series)</code>  
+**Returns**: <code>boolean</code> - Returns true if the predicate has returned truthy for any value in the sequence, otherwise returns false.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -2039,13 +2058,15 @@ Returns false if the predicate never returns truthy.
 
 <a name="dataForge.Series+none"></a>
 
-#### series.none([predicate])
-Determine if the predicate returns truthy for none of the values.
+#### series.none([predicate]) ⇒ <code>boolean</code>
+Determine if the predicate returns truthy for none of the values in the sequence.
 Returns true for an empty Series.
 Returns true if the predicate always returns falsy.
 Otherwise returns false.
+If no predicate is specified the value itself is checked.
 
 **Kind**: instance method of <code>[Series](#dataForge.Series)</code>  
+**Returns**: <code>boolean</code> - Returns true if the predicate has returned truthy for no values in the sequence, otherwise returns false.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -2053,10 +2074,11 @@ Otherwise returns false.
 
 <a name="dataForge.Series+sequentialDistinct"></a>
 
-#### series.sequentialDistinct(selector)
+#### series.sequentialDistinct(selector) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
 Group sequential duplicate values into a Series of windows.
 
 **Kind**: instance method of <code>[Series](#dataForge.Series)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a series of groups. Each group is itself a series or dataframe.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -2064,10 +2086,11 @@ Group sequential duplicate values into a Series of windows.
 
 <a name="dataForge.Series+distinct"></a>
 
-#### series.distinct(selector)
+#### series.distinct(selector) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
 Group distinct values in the Series into a Series of windows.
 
 **Kind**: instance method of <code>[Series](#dataForge.Series)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a series or dataframe containing only unique values as determined by the 'selector' function.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -2075,10 +2098,11 @@ Group distinct values in the Series into a Series of windows.
 
 <a name="dataForge.Series+variableWindow"></a>
 
-#### series.variableWindow(comparer)
+#### series.variableWindow(comparer) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
 Groups sequential values into variable length 'windows'. The windows can then be transformed/transformed using selectPairs or selectManyPairs.
 
 **Kind**: instance method of <code>[Series](#dataForge.Series)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a series of groups. Each group is itself a series or dataframe that contains the values in the 'window'.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -2086,10 +2110,11 @@ Groups sequential values into variable length 'windows'. The windows can then be
 
 <a name="dataForge.Series+insertPair"></a>
 
-#### series.insertPair(pair)
+#### series.insertPair(pair) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
 Insert a pair at the start of a Series.
 
 **Kind**: instance method of <code>[Series](#dataForge.Series)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a new series or dataframe with the specified pair inserted.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -2097,10 +2122,11 @@ Insert a pair at the start of a Series.
 
 <a name="dataForge.Series+appendPair"></a>
 
-#### series.appendPair(pair)
+#### series.appendPair(pair) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
 Append a pair to the end of a Series.
 
 **Kind**: instance method of <code>[Series](#dataForge.Series)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a new series or dataframe with the specified pair appended.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -2108,10 +2134,11 @@ Append a pair to the end of a Series.
 
 <a name="dataForge.Series+fillGaps"></a>
 
-#### series.fillGaps(predicate, generator)
+#### series.fillGaps(predicate, generator) ⇒ <code>Series</code>
 Fill gaps in a series.
 
 **Kind**: instance method of <code>[Series](#dataForge.Series)</code>  
+**Returns**: <code>Series</code> - Returns a new series with gaps filled in.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -2120,10 +2147,11 @@ Fill gaps in a series.
 
 <a name="dataForge.Series+groupBy"></a>
 
-#### series.groupBy(selector)
+#### series.groupBy(selector) ⇒ <code>Series</code>
 Group the series according to the selector.
 
 **Kind**: instance method of <code>[Series](#dataForge.Series)</code>  
+**Returns**: <code>Series</code> - Returns a series of groups. Each group is a series with values that have been grouped by the 'selector' function.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -2131,10 +2159,11 @@ Group the series according to the selector.
 
 <a name="dataForge.Series+groupSequentialBy"></a>
 
-#### series.groupSequentialBy(selector)
-Group sequential duplicate values into a Series of windows.
+#### series.groupSequentialBy(selector) ⇒ <code>Series</code>
+Group sequential values into a Series of windows.
 
 **Kind**: instance method of <code>[Series](#dataForge.Series)</code>  
+**Returns**: <code>Series</code> - Returns a series of groups. Each group is a series with values that have been grouped by the 'selector' function.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -2142,10 +2171,11 @@ Group sequential duplicate values into a Series of windows.
 
 <a name="dataForge.Series+at"></a>
 
-#### series.at(index)
+#### series.at(index) ⇒ <code>value</code>
 Get the value at a specified index.
 
 **Kind**: instance method of <code>[Series](#dataForge.Series)</code>  
+**Returns**: <code>value</code> - Returns the value from the specified index in the sequence.  
 
 | Param | Type | Description |
 | --- | --- | --- |
