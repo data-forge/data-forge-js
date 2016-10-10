@@ -80,25 +80,25 @@ Browser:
         * [.window(period)](#dataForge.Series+window) ⇒ <code>Series</code>
         * [.rollingWindow(period)](#dataForge.Series+rollingWindow) ⇒ <code>Series</code>
         * [.percentChange()](#dataForge.Series+percentChange) ⇒ <code>Series</code>
-        * [.bake()](#dataForge.Series+bake)
-        * [.toPairs()](#dataForge.Series+toPairs)
-        * [.count()](#dataForge.Series+count)
-        * [.first()](#dataForge.Series+first)
-        * [.last()](#dataForge.Series+last)
-        * [.firstPair()](#dataForge.Series+firstPair)
-        * [.lastPair()](#dataForge.Series+lastPair)
-        * [.firstIndex()](#dataForge.Series+firstIndex)
-        * [.lastIndex()](#dataForge.Series+lastIndex)
-        * [.reverse()](#dataForge.Series+reverse)
-        * [.inflate([selector])](#dataForge.Series+inflate)
-        * [.head(values)](#dataForge.Series+head)
-        * [.tail(values)](#dataForge.Series+tail)
-        * [.sum()](#dataForge.Series+sum)
-        * [.average()](#dataForge.Series+average)
-        * [.min()](#dataForge.Series+min)
-        * [.max()](#dataForge.Series+max)
-        * [.toObject(keySelector, keySelector)](#dataForge.Series+toObject)
-        * [.zip(series|dataframe, selector)](#dataForge.Series+zip)
+        * [.bake()](#dataForge.Series+bake) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.toPairs()](#dataForge.Series+toPairs) ⇒ <code>array</code>
+        * [.count()](#dataForge.Series+count) ⇒ <code>array</code>
+        * [.first()](#dataForge.Series+first) ⇒ <code>value</code>
+        * [.last()](#dataForge.Series+last) ⇒ <code>value</code>
+        * [.firstPair()](#dataForge.Series+firstPair) ⇒ <code>pair</code>
+        * [.lastPair()](#dataForge.Series+lastPair) ⇒ <code>pair</code>
+        * [.firstIndex()](#dataForge.Series+firstIndex) ⇒ <code>index-value</code>
+        * [.lastIndex()](#dataForge.Series+lastIndex) ⇒ <code>index-value</code>
+        * [.reverse()](#dataForge.Series+reverse) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.inflate([selector])](#dataForge.Series+inflate) ⇒ <code>DataFrame</code>
+        * [.head(values)](#dataForge.Series+head) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.tail(values)](#dataForge.Series+tail) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.sum()](#dataForge.Series+sum) ⇒ <code>number</code>
+        * [.average()](#dataForge.Series+average) ⇒ <code>number</code>
+        * [.min()](#dataForge.Series+min) ⇒ <code>number</code>
+        * [.max()](#dataForge.Series+max) ⇒ <code>number</code>
+        * [.toObject(keySelector, keySelector)](#dataForge.Series+toObject) ⇒ <code>object</code>
+        * [.zip(sequence, selector)](#dataForge.Series+zip) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
         * [.forEach(callback)](#dataForge.Series+forEach)
         * [.all(predicate)](#dataForge.Series+all)
         * [.any([predicate])](#dataForge.Series+any)
@@ -150,29 +150,29 @@ Browser:
         * [.parseFloats()](#dataForge.Series+parseFloats) ⇒ <code>Series</code>
         * [.parseDates([formatString])](#dataForge.Series+parseDates) ⇒ <code>Series</code>
         * [.toStrings([formatString])](#dataForge.Series+toStrings) ⇒ <code>Series</code>
-        * [.detectTypes()](#dataForge.Series+detectTypes)
-        * [.detectValues()](#dataForge.Series+detectValues)
-        * [.truncateStrings(maxLength)](#dataForge.Series+truncateStrings)
-        * [.bake()](#dataForge.Series+bake)
-        * [.toPairs()](#dataForge.Series+toPairs)
-        * [.count()](#dataForge.Series+count)
-        * [.first()](#dataForge.Series+first)
-        * [.last()](#dataForge.Series+last)
-        * [.firstPair()](#dataForge.Series+firstPair)
-        * [.lastPair()](#dataForge.Series+lastPair)
-        * [.firstIndex()](#dataForge.Series+firstIndex)
-        * [.lastIndex()](#dataForge.Series+lastIndex)
-        * [.reverse()](#dataForge.Series+reverse)
-        * [.inflate([selector])](#dataForge.Series+inflate)
-        * [.head(values)](#dataForge.Series+head)
-        * [.tail(values)](#dataForge.Series+tail)
-        * [.sum()](#dataForge.Series+sum)
-        * [.average()](#dataForge.Series+average)
-        * [.min()](#dataForge.Series+min)
-        * [.max()](#dataForge.Series+max)
-        * [.aggregate([seed], selector)](#dataForge.Series+aggregate)
-        * [.toObject(keySelector, keySelector)](#dataForge.Series+toObject)
-        * [.zip(series|dataframe, selector)](#dataForge.Series+zip)
+        * [.detectTypes()](#dataForge.Series+detectTypes) ⇒ <code>DataFrame</code>
+        * [.detectValues()](#dataForge.Series+detectValues) ⇒ <code>DataFrame</code>
+        * [.truncateStrings(maxLength)](#dataForge.Series+truncateStrings) ⇒ <code>Series</code>
+        * [.bake()](#dataForge.Series+bake) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.toPairs()](#dataForge.Series+toPairs) ⇒ <code>array</code>
+        * [.count()](#dataForge.Series+count) ⇒ <code>array</code>
+        * [.first()](#dataForge.Series+first) ⇒ <code>value</code>
+        * [.last()](#dataForge.Series+last) ⇒ <code>value</code>
+        * [.firstPair()](#dataForge.Series+firstPair) ⇒ <code>pair</code>
+        * [.lastPair()](#dataForge.Series+lastPair) ⇒ <code>pair</code>
+        * [.firstIndex()](#dataForge.Series+firstIndex) ⇒ <code>index-value</code>
+        * [.lastIndex()](#dataForge.Series+lastIndex) ⇒ <code>index-value</code>
+        * [.reverse()](#dataForge.Series+reverse) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.inflate([selector])](#dataForge.Series+inflate) ⇒ <code>DataFrame</code>
+        * [.head(values)](#dataForge.Series+head) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.tail(values)](#dataForge.Series+tail) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.sum()](#dataForge.Series+sum) ⇒ <code>number</code>
+        * [.average()](#dataForge.Series+average) ⇒ <code>number</code>
+        * [.min()](#dataForge.Series+min) ⇒ <code>number</code>
+        * [.max()](#dataForge.Series+max) ⇒ <code>number</code>
+        * [.aggregate([seed], selector)](#dataForge.Series+aggregate) ⇒ <code>value</code>
+        * [.toObject(keySelector, keySelector)](#dataForge.Series+toObject) ⇒ <code>object</code>
+        * [.zip(sequence, selector)](#dataForge.Series+zip) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
         * [.forEach(callback)](#dataForge.Series+forEach)
         * [.all(predicate)](#dataForge.Series+all)
         * [.any([predicate])](#dataForge.Series+any)
@@ -274,25 +274,25 @@ Browser:
     * [.window(period)](#dataForge.Series+window) ⇒ <code>Series</code>
     * [.rollingWindow(period)](#dataForge.Series+rollingWindow) ⇒ <code>Series</code>
     * [.percentChange()](#dataForge.Series+percentChange) ⇒ <code>Series</code>
-    * [.bake()](#dataForge.Series+bake)
-    * [.toPairs()](#dataForge.Series+toPairs)
-    * [.count()](#dataForge.Series+count)
-    * [.first()](#dataForge.Series+first)
-    * [.last()](#dataForge.Series+last)
-    * [.firstPair()](#dataForge.Series+firstPair)
-    * [.lastPair()](#dataForge.Series+lastPair)
-    * [.firstIndex()](#dataForge.Series+firstIndex)
-    * [.lastIndex()](#dataForge.Series+lastIndex)
-    * [.reverse()](#dataForge.Series+reverse)
-    * [.inflate([selector])](#dataForge.Series+inflate)
-    * [.head(values)](#dataForge.Series+head)
-    * [.tail(values)](#dataForge.Series+tail)
-    * [.sum()](#dataForge.Series+sum)
-    * [.average()](#dataForge.Series+average)
-    * [.min()](#dataForge.Series+min)
-    * [.max()](#dataForge.Series+max)
-    * [.toObject(keySelector, keySelector)](#dataForge.Series+toObject)
-    * [.zip(series|dataframe, selector)](#dataForge.Series+zip)
+    * [.bake()](#dataForge.Series+bake) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.toPairs()](#dataForge.Series+toPairs) ⇒ <code>array</code>
+    * [.count()](#dataForge.Series+count) ⇒ <code>array</code>
+    * [.first()](#dataForge.Series+first) ⇒ <code>value</code>
+    * [.last()](#dataForge.Series+last) ⇒ <code>value</code>
+    * [.firstPair()](#dataForge.Series+firstPair) ⇒ <code>pair</code>
+    * [.lastPair()](#dataForge.Series+lastPair) ⇒ <code>pair</code>
+    * [.firstIndex()](#dataForge.Series+firstIndex) ⇒ <code>index-value</code>
+    * [.lastIndex()](#dataForge.Series+lastIndex) ⇒ <code>index-value</code>
+    * [.reverse()](#dataForge.Series+reverse) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.inflate([selector])](#dataForge.Series+inflate) ⇒ <code>DataFrame</code>
+    * [.head(values)](#dataForge.Series+head) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.tail(values)](#dataForge.Series+tail) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.sum()](#dataForge.Series+sum) ⇒ <code>number</code>
+    * [.average()](#dataForge.Series+average) ⇒ <code>number</code>
+    * [.min()](#dataForge.Series+min) ⇒ <code>number</code>
+    * [.max()](#dataForge.Series+max) ⇒ <code>number</code>
+    * [.toObject(keySelector, keySelector)](#dataForge.Series+toObject) ⇒ <code>object</code>
+    * [.zip(sequence, selector)](#dataForge.Series+zip) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
     * [.forEach(callback)](#dataForge.Series+forEach)
     * [.all(predicate)](#dataForge.Series+all)
     * [.any([predicate])](#dataForge.Series+any)
@@ -753,7 +753,7 @@ Retreive the index of the series.
 Apply a new index to the Series.
 
 **Kind**: instance method of <code>[DataFrame](#dataForge.DataFrame)</code>  
-**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - - Returns a new series or dataframe with the specified index attached.  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a new series or dataframe with the specified index attached.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -765,7 +765,7 @@ Apply a new index to the Series.
 Reset the index of the data frame back to the default sequential integer index.
 
 **Kind**: instance method of <code>[DataFrame](#dataForge.DataFrame)</code>  
-**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - - Returns a new series or dataframe with the index reset to the default zero-based index.  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a new series or dataframe with the index reset to the default zero-based index.  
 <a name="dataForge.Series+skip"></a>
 
 #### dataFrame.skip(numRows) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
@@ -972,70 +972,81 @@ Percentages are expressed as 0-1 values.
 **Returns**: <code>Series</code> - Returns a new series where each value indicates the percent change from the previous number value in the original series.  
 <a name="dataForge.Series+bake"></a>
 
-#### dataFrame.bake()
+#### dataFrame.bake() ⇒ <code>Series</code> &#124; <code>DataFrame</code>
 Forces lazy evaluation to complete and 'bakes' the series into memory.
 
 **Kind**: instance method of <code>[DataFrame](#dataForge.DataFrame)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a series or dataframe that has been 'baked', all lazy evaluation has completed.  
 <a name="dataForge.Series+toPairs"></a>
 
-#### dataFrame.toPairs()
+#### dataFrame.toPairs() ⇒ <code>array</code>
 Retreive the data as pairs of [index, value].
 
 **Kind**: instance method of <code>[DataFrame](#dataForge.DataFrame)</code>  
+**Returns**: <code>array</code> - Returns an array of pairs for the content of the series or dataframe. Each pair is a two element array that contains an index and a value.  
 <a name="dataForge.Series+count"></a>
 
-#### dataFrame.count()
+#### dataFrame.count() ⇒ <code>array</code>
 Count the number of rows in the series.
 
 **Kind**: instance method of <code>[DataFrame](#dataForge.DataFrame)</code>  
+**Returns**: <code>array</code> - Returns the count of all values in the series or dataframes.  
 <a name="dataForge.Series+first"></a>
 
-#### dataFrame.first()
-Get the first value of the Series.
+#### dataFrame.first() ⇒ <code>value</code>
+Get the first value of the series or dataframe.
 
 **Kind**: instance method of <code>[DataFrame](#dataForge.DataFrame)</code>  
+**Returns**: <code>value</code> - Returns the first value of the series or dataframe.  
 <a name="dataForge.Series+last"></a>
 
-#### dataFrame.last()
-Get the last value of the Series.
+#### dataFrame.last() ⇒ <code>value</code>
+Get the last value of the series or dataframe.
 
 **Kind**: instance method of <code>[DataFrame](#dataForge.DataFrame)</code>  
+**Returns**: <code>value</code> - Returns the last value of the series or dataframe.  
 <a name="dataForge.Series+firstPair"></a>
 
-#### dataFrame.firstPair()
-Get the first index/value pair of the Series.
+#### dataFrame.firstPair() ⇒ <code>pair</code>
+Get the first [index, value] pair of the series or dataframe.
 
 **Kind**: instance method of <code>[DataFrame](#dataForge.DataFrame)</code>  
+**Returns**: <code>pair</code> - Returns the first [index, value] pair of the series or dataframe.  
 <a name="dataForge.Series+lastPair"></a>
 
-#### dataFrame.lastPair()
-Get the last index/value pair of the Series.
+#### dataFrame.lastPair() ⇒ <code>pair</code>
+Get the last [index, value] pair of the series or dataframe.
 
 **Kind**: instance method of <code>[DataFrame](#dataForge.DataFrame)</code>  
+**Returns**: <code>pair</code> - Returns the last [index, value] pair of the series or dataframe.  
 <a name="dataForge.Series+firstIndex"></a>
 
-#### dataFrame.firstIndex()
-Get the first index of the Series.
+#### dataFrame.firstIndex() ⇒ <code>index-value</code>
+Get the first index of the series or dataframe.
 
 **Kind**: instance method of <code>[DataFrame](#dataForge.DataFrame)</code>  
+**Returns**: <code>index-value</code> - Returns the first index of the series or dataframe.  
 <a name="dataForge.Series+lastIndex"></a>
 
-#### dataFrame.lastIndex()
-Get the last index of the Series.
+#### dataFrame.lastIndex() ⇒ <code>index-value</code>
+Get the last index of the series or dataframe.
 
 **Kind**: instance method of <code>[DataFrame](#dataForge.DataFrame)</code>  
+**Returns**: <code>index-value</code> - Returns the last index of the series or dataframe.  
 <a name="dataForge.Series+reverse"></a>
 
-#### dataFrame.reverse()
-Reverse the series.
+#### dataFrame.reverse() ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+Reverse the series or dataframe.
 
 **Kind**: instance method of <code>[DataFrame](#dataForge.DataFrame)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a new series or dataframe that is the reverse of the input.  
 <a name="dataForge.Series+inflate"></a>
 
-#### dataFrame.inflate([selector])
+#### dataFrame.inflate([selector]) ⇒ <code>DataFrame</code>
 Inflate a series to a data-frame.
 
 **Kind**: instance method of <code>[DataFrame](#dataForge.DataFrame)</code>  
+**Returns**: <code>DataFrame</code> - Returns a new dataframe that has been created from the input series via the 'selector' function.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1043,10 +1054,11 @@ Inflate a series to a data-frame.
 
 <a name="dataForge.Series+head"></a>
 
-#### dataFrame.head(values)
-Get X values from the head of the series.
+#### dataFrame.head(values) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+Get X values from the start of the series or dataframe.
 
 **Kind**: instance method of <code>[DataFrame](#dataForge.DataFrame)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a new series or dataframe that has only the specified number of values taken from the start of the input sequence.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1054,10 +1066,11 @@ Get X values from the head of the series.
 
 <a name="dataForge.Series+tail"></a>
 
-#### dataFrame.tail(values)
-Get X values from the tail of the series.
+#### dataFrame.tail(values) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+Get X values from the end of the series or dataframe.
 
 **Kind**: instance method of <code>[DataFrame](#dataForge.DataFrame)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a new series or dataframe that has only the specified number of values taken from the end of the input sequence.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1065,34 +1078,39 @@ Get X values from the tail of the series.
 
 <a name="dataForge.Series+sum"></a>
 
-#### dataFrame.sum()
+#### dataFrame.sum() ⇒ <code>number</code>
 Sum the values in a series.
 
 **Kind**: instance method of <code>[DataFrame](#dataForge.DataFrame)</code>  
+**Returns**: <code>number</code> - Returns the sum of the number values in the series.  
 <a name="dataForge.Series+average"></a>
 
-#### dataFrame.average()
+#### dataFrame.average() ⇒ <code>number</code>
 Average the values in a series.
 
 **Kind**: instance method of <code>[DataFrame](#dataForge.DataFrame)</code>  
+**Returns**: <code>number</code> - Returns the average of the number values in the series.  
 <a name="dataForge.Series+min"></a>
 
-#### dataFrame.min()
+#### dataFrame.min() ⇒ <code>number</code>
 Get the min value in the series.
 
 **Kind**: instance method of <code>[DataFrame](#dataForge.DataFrame)</code>  
+**Returns**: <code>number</code> - Returns the minimum of the number values in the series.  
 <a name="dataForge.Series+max"></a>
 
-#### dataFrame.max()
+#### dataFrame.max() ⇒ <code>number</code>
 Get the max value in the series.
 
 **Kind**: instance method of <code>[DataFrame](#dataForge.DataFrame)</code>  
+**Returns**: <code>number</code> - Returns the maximum of the number values in the series.  
 <a name="dataForge.Series+toObject"></a>
 
-#### dataFrame.toObject(keySelector, keySelector)
+#### dataFrame.toObject(keySelector, keySelector) ⇒ <code>object</code>
 Convert the series to a JavaScript object.
 
 **Kind**: instance method of <code>[DataFrame](#dataForge.DataFrame)</code>  
+**Returns**: <code>object</code> - Returns a JavaScript object generated from the input sequence by the key and value selector funtions.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1101,14 +1119,15 @@ Convert the series to a JavaScript object.
 
 <a name="dataForge.Series+zip"></a>
 
-#### dataFrame.zip(series|dataframe, selector)
+#### dataFrame.zip(sequence, selector) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
 Zip together multiple series or dataframes to produce a new series or dataframe.
 
 **Kind**: instance method of <code>[DataFrame](#dataForge.DataFrame)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a single series or dataframe that is the combination of multiple input sequences that have been 'zipped' together by the 'selector' function.  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| series|dataframe | <code>series</code> &#124; <code>dataframe</code> | Each series or dataframe that is to be zipped. |
+| sequence | <code>Series</code> &#124; <code>DataFrame</code> | Multiple parameters, one for each sequence to be zipped. |
 | selector | <code>function</code> | Selector function that produces a new series or dataframe based on the inputs. |
 
 <a name="dataForge.Series+forEach"></a>
@@ -1414,29 +1433,29 @@ Returns the exception of values between two Series or DataFrames.
     * [.parseFloats()](#dataForge.Series+parseFloats) ⇒ <code>Series</code>
     * [.parseDates([formatString])](#dataForge.Series+parseDates) ⇒ <code>Series</code>
     * [.toStrings([formatString])](#dataForge.Series+toStrings) ⇒ <code>Series</code>
-    * [.detectTypes()](#dataForge.Series+detectTypes)
-    * [.detectValues()](#dataForge.Series+detectValues)
-    * [.truncateStrings(maxLength)](#dataForge.Series+truncateStrings)
-    * [.bake()](#dataForge.Series+bake)
-    * [.toPairs()](#dataForge.Series+toPairs)
-    * [.count()](#dataForge.Series+count)
-    * [.first()](#dataForge.Series+first)
-    * [.last()](#dataForge.Series+last)
-    * [.firstPair()](#dataForge.Series+firstPair)
-    * [.lastPair()](#dataForge.Series+lastPair)
-    * [.firstIndex()](#dataForge.Series+firstIndex)
-    * [.lastIndex()](#dataForge.Series+lastIndex)
-    * [.reverse()](#dataForge.Series+reverse)
-    * [.inflate([selector])](#dataForge.Series+inflate)
-    * [.head(values)](#dataForge.Series+head)
-    * [.tail(values)](#dataForge.Series+tail)
-    * [.sum()](#dataForge.Series+sum)
-    * [.average()](#dataForge.Series+average)
-    * [.min()](#dataForge.Series+min)
-    * [.max()](#dataForge.Series+max)
-    * [.aggregate([seed], selector)](#dataForge.Series+aggregate)
-    * [.toObject(keySelector, keySelector)](#dataForge.Series+toObject)
-    * [.zip(series|dataframe, selector)](#dataForge.Series+zip)
+    * [.detectTypes()](#dataForge.Series+detectTypes) ⇒ <code>DataFrame</code>
+    * [.detectValues()](#dataForge.Series+detectValues) ⇒ <code>DataFrame</code>
+    * [.truncateStrings(maxLength)](#dataForge.Series+truncateStrings) ⇒ <code>Series</code>
+    * [.bake()](#dataForge.Series+bake) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.toPairs()](#dataForge.Series+toPairs) ⇒ <code>array</code>
+    * [.count()](#dataForge.Series+count) ⇒ <code>array</code>
+    * [.first()](#dataForge.Series+first) ⇒ <code>value</code>
+    * [.last()](#dataForge.Series+last) ⇒ <code>value</code>
+    * [.firstPair()](#dataForge.Series+firstPair) ⇒ <code>pair</code>
+    * [.lastPair()](#dataForge.Series+lastPair) ⇒ <code>pair</code>
+    * [.firstIndex()](#dataForge.Series+firstIndex) ⇒ <code>index-value</code>
+    * [.lastIndex()](#dataForge.Series+lastIndex) ⇒ <code>index-value</code>
+    * [.reverse()](#dataForge.Series+reverse) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.inflate([selector])](#dataForge.Series+inflate) ⇒ <code>DataFrame</code>
+    * [.head(values)](#dataForge.Series+head) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.tail(values)](#dataForge.Series+tail) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.sum()](#dataForge.Series+sum) ⇒ <code>number</code>
+    * [.average()](#dataForge.Series+average) ⇒ <code>number</code>
+    * [.min()](#dataForge.Series+min) ⇒ <code>number</code>
+    * [.max()](#dataForge.Series+max) ⇒ <code>number</code>
+    * [.aggregate([seed], selector)](#dataForge.Series+aggregate) ⇒ <code>value</code>
+    * [.toObject(keySelector, keySelector)](#dataForge.Series+toObject) ⇒ <code>object</code>
+    * [.zip(sequence, selector)](#dataForge.Series+zip) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
     * [.forEach(callback)](#dataForge.Series+forEach)
     * [.all(predicate)](#dataForge.Series+all)
     * [.any([predicate])](#dataForge.Series+any)
@@ -1517,7 +1536,7 @@ Retreive the index of the series.
 Apply a new index to the Series.
 
 **Kind**: instance method of <code>[Series](#dataForge.Series)</code>  
-**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - - Returns a new series or dataframe with the specified index attached.  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a new series or dataframe with the specified index attached.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1529,7 +1548,7 @@ Apply a new index to the Series.
 Reset the index of the data frame back to the default sequential integer index.
 
 **Kind**: instance method of <code>[Series](#dataForge.Series)</code>  
-**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - - Returns a new series or dataframe with the index reset to the default zero-based index.  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a new series or dataframe with the index reset to the default zero-based index.  
 <a name="dataForge.Series+skip"></a>
 
 #### series.skip(numRows) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
@@ -1781,24 +1800,27 @@ Convert a series of values of different types to a series of string values.
 
 <a name="dataForge.Series+detectTypes"></a>
 
-#### series.detectTypes()
+#### series.detectTypes() ⇒ <code>DataFrame</code>
 Detect the actual types of the values that comprised the series and their frequency.
 Returns a new series containing the type information.
 
 **Kind**: instance method of <code>[Series](#dataForge.Series)</code>  
+**Returns**: <code>DataFrame</code> - Returns a dataframe that detects and describes the data types contained in a series or dataframe.  
 <a name="dataForge.Series+detectValues"></a>
 
-#### series.detectValues()
+#### series.detectValues() ⇒ <code>DataFrame</code>
 Detect the frequency of values in the series.
 Returns a new series containing the information.
 
 **Kind**: instance method of <code>[Series](#dataForge.Series)</code>  
+**Returns**: <code>DataFrame</code> - Returns a dataframe that detects and describes the values contained in a series or dataframe.  
 <a name="dataForge.Series+truncateStrings"></a>
 
-#### series.truncateStrings(maxLength)
+#### series.truncateStrings(maxLength) ⇒ <code>Series</code>
 Produces a new series with all string values truncated to the requested maximum length.
 
 **Kind**: instance method of <code>[Series](#dataForge.Series)</code>  
+**Returns**: <code>Series</code> - Returns a new series with strings that are truncated to the specified maximum length.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1806,70 +1828,81 @@ Produces a new series with all string values truncated to the requested maximum 
 
 <a name="dataForge.Series+bake"></a>
 
-#### series.bake()
+#### series.bake() ⇒ <code>Series</code> &#124; <code>DataFrame</code>
 Forces lazy evaluation to complete and 'bakes' the series into memory.
 
 **Kind**: instance method of <code>[Series](#dataForge.Series)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a series or dataframe that has been 'baked', all lazy evaluation has completed.  
 <a name="dataForge.Series+toPairs"></a>
 
-#### series.toPairs()
+#### series.toPairs() ⇒ <code>array</code>
 Retreive the data as pairs of [index, value].
 
 **Kind**: instance method of <code>[Series](#dataForge.Series)</code>  
+**Returns**: <code>array</code> - Returns an array of pairs for the content of the series or dataframe. Each pair is a two element array that contains an index and a value.  
 <a name="dataForge.Series+count"></a>
 
-#### series.count()
+#### series.count() ⇒ <code>array</code>
 Count the number of rows in the series.
 
 **Kind**: instance method of <code>[Series](#dataForge.Series)</code>  
+**Returns**: <code>array</code> - Returns the count of all values in the series or dataframes.  
 <a name="dataForge.Series+first"></a>
 
-#### series.first()
-Get the first value of the Series.
+#### series.first() ⇒ <code>value</code>
+Get the first value of the series or dataframe.
 
 **Kind**: instance method of <code>[Series](#dataForge.Series)</code>  
+**Returns**: <code>value</code> - Returns the first value of the series or dataframe.  
 <a name="dataForge.Series+last"></a>
 
-#### series.last()
-Get the last value of the Series.
+#### series.last() ⇒ <code>value</code>
+Get the last value of the series or dataframe.
 
 **Kind**: instance method of <code>[Series](#dataForge.Series)</code>  
+**Returns**: <code>value</code> - Returns the last value of the series or dataframe.  
 <a name="dataForge.Series+firstPair"></a>
 
-#### series.firstPair()
-Get the first index/value pair of the Series.
+#### series.firstPair() ⇒ <code>pair</code>
+Get the first [index, value] pair of the series or dataframe.
 
 **Kind**: instance method of <code>[Series](#dataForge.Series)</code>  
+**Returns**: <code>pair</code> - Returns the first [index, value] pair of the series or dataframe.  
 <a name="dataForge.Series+lastPair"></a>
 
-#### series.lastPair()
-Get the last index/value pair of the Series.
+#### series.lastPair() ⇒ <code>pair</code>
+Get the last [index, value] pair of the series or dataframe.
 
 **Kind**: instance method of <code>[Series](#dataForge.Series)</code>  
+**Returns**: <code>pair</code> - Returns the last [index, value] pair of the series or dataframe.  
 <a name="dataForge.Series+firstIndex"></a>
 
-#### series.firstIndex()
-Get the first index of the Series.
+#### series.firstIndex() ⇒ <code>index-value</code>
+Get the first index of the series or dataframe.
 
 **Kind**: instance method of <code>[Series](#dataForge.Series)</code>  
+**Returns**: <code>index-value</code> - Returns the first index of the series or dataframe.  
 <a name="dataForge.Series+lastIndex"></a>
 
-#### series.lastIndex()
-Get the last index of the Series.
+#### series.lastIndex() ⇒ <code>index-value</code>
+Get the last index of the series or dataframe.
 
 **Kind**: instance method of <code>[Series](#dataForge.Series)</code>  
+**Returns**: <code>index-value</code> - Returns the last index of the series or dataframe.  
 <a name="dataForge.Series+reverse"></a>
 
-#### series.reverse()
-Reverse the series.
+#### series.reverse() ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+Reverse the series or dataframe.
 
 **Kind**: instance method of <code>[Series](#dataForge.Series)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a new series or dataframe that is the reverse of the input.  
 <a name="dataForge.Series+inflate"></a>
 
-#### series.inflate([selector])
+#### series.inflate([selector]) ⇒ <code>DataFrame</code>
 Inflate a series to a data-frame.
 
 **Kind**: instance method of <code>[Series](#dataForge.Series)</code>  
+**Returns**: <code>DataFrame</code> - Returns a new dataframe that has been created from the input series via the 'selector' function.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1877,10 +1910,11 @@ Inflate a series to a data-frame.
 
 <a name="dataForge.Series+head"></a>
 
-#### series.head(values)
-Get X values from the head of the series.
+#### series.head(values) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+Get X values from the start of the series or dataframe.
 
 **Kind**: instance method of <code>[Series](#dataForge.Series)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a new series or dataframe that has only the specified number of values taken from the start of the input sequence.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1888,10 +1922,11 @@ Get X values from the head of the series.
 
 <a name="dataForge.Series+tail"></a>
 
-#### series.tail(values)
-Get X values from the tail of the series.
+#### series.tail(values) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+Get X values from the end of the series or dataframe.
 
 **Kind**: instance method of <code>[Series](#dataForge.Series)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a new series or dataframe that has only the specified number of values taken from the end of the input sequence.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1899,34 +1934,39 @@ Get X values from the tail of the series.
 
 <a name="dataForge.Series+sum"></a>
 
-#### series.sum()
+#### series.sum() ⇒ <code>number</code>
 Sum the values in a series.
 
 **Kind**: instance method of <code>[Series](#dataForge.Series)</code>  
+**Returns**: <code>number</code> - Returns the sum of the number values in the series.  
 <a name="dataForge.Series+average"></a>
 
-#### series.average()
+#### series.average() ⇒ <code>number</code>
 Average the values in a series.
 
 **Kind**: instance method of <code>[Series](#dataForge.Series)</code>  
+**Returns**: <code>number</code> - Returns the average of the number values in the series.  
 <a name="dataForge.Series+min"></a>
 
-#### series.min()
+#### series.min() ⇒ <code>number</code>
 Get the min value in the series.
 
 **Kind**: instance method of <code>[Series](#dataForge.Series)</code>  
+**Returns**: <code>number</code> - Returns the minimum of the number values in the series.  
 <a name="dataForge.Series+max"></a>
 
-#### series.max()
+#### series.max() ⇒ <code>number</code>
 Get the max value in the series.
 
 **Kind**: instance method of <code>[Series](#dataForge.Series)</code>  
+**Returns**: <code>number</code> - Returns the maximum of the number values in the series.  
 <a name="dataForge.Series+aggregate"></a>
 
-#### series.aggregate([seed], selector)
+#### series.aggregate([seed], selector) ⇒ <code>value</code>
 Aggregate the values in the series.
 
 **Kind**: instance method of <code>[Series](#dataForge.Series)</code>  
+**Returns**: <code>value</code> - Returns a new value that has been aggregated from the input sequence by the 'selector' function.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1935,10 +1975,11 @@ Aggregate the values in the series.
 
 <a name="dataForge.Series+toObject"></a>
 
-#### series.toObject(keySelector, keySelector)
+#### series.toObject(keySelector, keySelector) ⇒ <code>object</code>
 Convert the series to a JavaScript object.
 
 **Kind**: instance method of <code>[Series](#dataForge.Series)</code>  
+**Returns**: <code>object</code> - Returns a JavaScript object generated from the input sequence by the key and value selector funtions.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1947,14 +1988,15 @@ Convert the series to a JavaScript object.
 
 <a name="dataForge.Series+zip"></a>
 
-#### series.zip(series|dataframe, selector)
+#### series.zip(sequence, selector) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
 Zip together multiple series or dataframes to produce a new series or dataframe.
 
 **Kind**: instance method of <code>[Series](#dataForge.Series)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a single series or dataframe that is the combination of multiple input sequences that have been 'zipped' together by the 'selector' function.  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| series|dataframe | <code>series</code> &#124; <code>dataframe</code> | Each series or dataframe that is to be zipped. |
+| sequence | <code>Series</code> &#124; <code>DataFrame</code> | Multiple parameters, one for each sequence to be zipped. |
 | selector | <code>function</code> | Selector function that produces a new series or dataframe based on the inputs. |
 
 <a name="dataForge.Series+forEach"></a>

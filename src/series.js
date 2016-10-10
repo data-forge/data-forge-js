@@ -169,7 +169,7 @@ Series.prototype.getIndex = function () {
  * 
  * @param {array|Series} newIndex - The new index to apply to the Series.
  * 
- * @returns {Series|DataFrame} - Returns a new series or dataframe with the specified index attached.
+ * @returns {Series|DataFrame} Returns a new series or dataframe with the specified index attached.
  */
 Series.prototype.withIndex = function (newIndex) {
 
@@ -196,7 +196,7 @@ Series.prototype.withIndex = function (newIndex) {
 /**
  * Reset the index of the data frame back to the default sequential integer index.
  * 
- * @returns {Series|DataFrame} - Returns a new series or dataframe with the index reset to the default zero-based index. 
+ * @returns {Series|DataFrame} Returns a new series or dataframe with the index reset to the default zero-based index. 
  */
 Series.prototype.resetIndex = function () {
 
@@ -870,6 +870,8 @@ Series.prototype.toStrings = function (formatString) {
 /** 
   * Detect the actual types of the values that comprised the series and their frequency.
   * Returns a new series containing the type information.
+  *
+  * @returns {DataFrame} Returns a dataframe that detects and describes the data types contained in a series or dataframe.
   */
 Series.prototype.detectTypes = function () {
 
@@ -920,6 +922,8 @@ Series.prototype.detectTypes = function () {
 /** 
   * Detect the frequency of values in the series.
   * Returns a new series containing the information.
+  *
+  * @returns {DataFrame} Returns a dataframe that detects and describes the values contained in a series or dataframe.
   */
 Series.prototype.detectValues = function () {
 
@@ -965,6 +969,8 @@ Series.prototype.detectValues = function () {
  * Produces a new series with all string values truncated to the requested maximum length.
  *
  * @param {int} maxLength - The maximum length of the string values after truncation.
+ * 
+ * @returns {Series} Returns a new series with strings that are truncated to the specified maximum length. 
  */
 Series.prototype.truncateStrings = function (maxLength) {
 	assert.isNumber(maxLength, "Expected 'maxLength' parameter to 'truncateStrings' to be an integer.");
@@ -984,6 +990,8 @@ Series.prototype.truncateStrings = function (maxLength) {
 
 /*
  * Extract values from the series. This forces lazy evaluation to complete.
+ * 
+ * @returns {array} Returns an array of values contained within the series or dataframe.  
  */
 Series.prototype.toValues = function () {
 
@@ -1005,6 +1013,8 @@ Series.prototype.toValues = function () {
 
 /**
  * Forces lazy evaluation to complete and 'bakes' the series into memory.
+ * 
+ * @returns {Series|DataFrame} Returns a series or dataframe that has been 'baked', all lazy evaluation has completed.  
  */
 Series.prototype.bake = function () {
 
@@ -1032,6 +1042,8 @@ Series.prototype.bake = function () {
 
 /**
  * Retreive the data as pairs of [index, value].
+ * 
+ * @returns {array} Returns an array of pairs for the content of the series or dataframe. Each pair is a two element array that contains an index and a value.  
  */
 Series.prototype.toPairs = function () {
 
@@ -1053,6 +1065,8 @@ Series.prototype.toPairs = function () {
 
 /**
  * Count the number of rows in the series.
+ *
+ * @returns {array} Returns the count of all values in the series or dataframes.   
  */
 Series.prototype.count = function () {
 
@@ -1068,7 +1082,9 @@ Series.prototype.count = function () {
 };
 
 /**
- * Get the first value of the Series.
+ * Get the first value of the series or dataframe.
+ *
+ * @returns {value} Returns the first value of the series or dataframe.   
  */
 Series.prototype.first = function () {
 
@@ -1083,7 +1099,9 @@ Series.prototype.first = function () {
 };
 
 /**
- * Get the last value of the Series.
+ * Get the last value of the series or dataframe.
+ *
+ * @returns {value} Returns the last value of the series or dataframe.   
  */
 Series.prototype.last = function () {
 
@@ -1102,7 +1120,9 @@ Series.prototype.last = function () {
 };
 
 /**
- * Get the first index/value pair of the Series.
+ * Get the first [index, value] pair of the series or dataframe.
+ *
+ * @returns {pair} Returns the first [index, value] pair of the series or dataframe.   
  */
 Series.prototype.firstPair = function () {
 
@@ -1117,7 +1137,9 @@ Series.prototype.firstPair = function () {
 };
 
 /**
- * Get the last index/value pair of the Series.
+ * Get the last [index, value] pair of the series or dataframe.
+ *
+ * @returns {pair} Returns the last [index, value] pair of the series or dataframe.   
  */
 Series.prototype.lastPair = function () {
 
@@ -1136,7 +1158,9 @@ Series.prototype.lastPair = function () {
 };
 
 /**
- * Get the first index of the Series.
+ * Get the first index of the series or dataframe.
+ *
+ * @returns {index-value} Returns the first index of the series or dataframe.   
  */
 Series.prototype.firstIndex = function () {
 
@@ -1151,7 +1175,9 @@ Series.prototype.firstIndex = function () {
 };
 
 /**
- * Get the last index of the Series.
+ * Get the last index of the series or dataframe.
+ *
+ * @returns {index-value} Returns the last index of the series or dataframe.   
  */
 Series.prototype.lastIndex = function () {
 
@@ -1170,7 +1196,9 @@ Series.prototype.lastIndex = function () {
 };
 
 /** 
- * Reverse the series.
+ * Reverse the series or dataframe.
+ * 
+ * @returns {Series|DataFrame} Returns a new series or dataframe that is the reverse of the input.
  */
 Series.prototype.reverse = function () {
 
@@ -1199,6 +1227,8 @@ Series.prototype.reverse = function () {
  * Inflate a series to a data-frame.
  *
  * @param {function} [selector] - Optional selector function that transforms each value in the series to a row in the new data-frame.
+ *
+ * @returns {DataFrame} Returns a new dataframe that has been created from the input series via the 'selector' function.
  */
 Series.prototype.inflate = function (selector) {
 
@@ -1219,9 +1249,11 @@ Series.prototype.inflate = function (selector) {
 };
 
 /** 
- * Get X values from the head of the series.
+ * Get X values from the start of the series or dataframe.
  *
  * @param {int} values - Number of values to take.
+ * 
+ * @returns {Series|DataFrame} Returns a new series or dataframe that has only the specified number of values taken from the start of the input sequence.  
  */
 Series.prototype.head = function (values) {
 
@@ -1232,9 +1264,11 @@ Series.prototype.head = function (values) {
 };
 
 /** 
- * Get X values from the tail of the series.
+ * Get X values from the end of the series or dataframe.
  *
  * @param {int} values - Number of values to take.
+ * 
+ * @returns {Series|DataFrame} Returns a new series or dataframe that has only the specified number of values taken from the end of the input sequence.  
  */
 Series.prototype.tail = function (values) {
 
@@ -1246,6 +1280,8 @@ Series.prototype.tail = function (values) {
 
 /**
  * Sum the values in a series.
+ * 
+ * @returns {number} Returns the sum of the number values in the series.
  */
 Series.prototype.sum = function () {
 
@@ -1263,6 +1299,8 @@ Series.prototype.sum = function () {
 
 /**
  * Average the values in a series.
+ * 
+ * @returns {number} Returns the average of the number values in the series.
  */
 Series.prototype.average = function () {
 
@@ -1278,6 +1316,8 @@ Series.prototype.average = function () {
 
 /**
  * Get the min value in the series.
+ * 
+ * @returns {number} Returns the minimum of the number values in the series.
  */
 Series.prototype.min = function () {
 
@@ -1291,6 +1331,8 @@ Series.prototype.min = function () {
 
 /**
  * Get the max value in the series.
+ * 
+ * @returns {number} Returns the maximum of the number values in the series.
  */
 Series.prototype.max = function () {
 
@@ -1307,6 +1349,8 @@ Series.prototype.max = function () {
  *
  * @param {object} [seed] - The seed value for producing the aggregation.
  * @param {function} selector - Function that takes the seed and then each value in the series and produces the aggregate value.
+ * 
+ * @returns {value} Returns a new value that has been aggregated from the input sequence by the 'selector' function. 
  */
 Series.prototype.aggregate = function (seedOrSelector, selector) {
 
@@ -1334,6 +1378,8 @@ Series.prototype.aggregate = function (seedOrSelector, selector) {
  *
  * @param {function} keySelector - Function that selects keys for the resulting object.
  * @param {valueSelector} keySelector - Function that selects values for the resulting object.
+ * 
+ * @returns {object} Returns a JavaScript object generated from the input sequence by the key and value selector funtions. 
  */
 Series.prototype.toObject = function (keySelector, valueSelector) {
 
@@ -1348,8 +1394,10 @@ Series.prototype.toObject = function (keySelector, valueSelector) {
 /**
  * Zip together multiple series or dataframes to produce a new series or dataframe.
  *
- * @param {...series|dataframe} series|dataframe - Each series or dataframe that is to be zipped.
+ * @param {...Series|DataFrame} sequence - Multiple parameters, one for each sequence to be zipped.
  * @param {function} selector - Selector function that produces a new series or dataframe based on the inputs.
+ * 
+ * @returns {Series|DataFrame} Returns a single series or dataframe that is the combination of multiple input sequences that have been 'zipped' together by the 'selector' function.
  */
 Series.prototype.zip = function () {
 
