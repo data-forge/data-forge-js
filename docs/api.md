@@ -44,7 +44,6 @@ Browser:
         * [.truncateStrings(maxLength)](#dataForge.DataFrame+truncateStrings) ⇒ <code>DataFrame</code>
         * [.remapColumns(columnNames)](#dataForge.DataFrame+remapColumns) ⇒ <code>DataFrame</code>
         * [.renameSeries(newColumnNames|columnsMap)](#dataForge.DataFrame+renameSeries) ⇒ <code>DataFrame</code>
-        * [.toRows()](#dataForge.DataFrame+toRows) ⇒ <code>array</code>
         * [.toJSON()](#dataForge.DataFrame+toJSON) ⇒ <code>string</code>
         * [.toCSV()](#dataForge.DataFrame+toCSV) ⇒ <code>string</code>
         * [.transformSeries(columnSelectors)](#dataForge.DataFrame+transformSeries) ⇒ <code>DataFrame</code>
@@ -55,10 +54,9 @@ Browser:
         * [.bringToFront(columnOrColumns)](#dataForge.DataFrame+bringToFront) ⇒ <code>DataFrame</code>
         * [.bringToBack(columnOrColumns)](#dataForge.DataFrame+bringToBack) ⇒ <code>DataFrame</code>
         * [.pivot(column, value)](#dataForge.DataFrame+pivot) ⇒ <code>DataFrame</code>
-        * [.merge(otherDataFrame, [columnName])](#dataForge.DataFrame+merge)
         * [.contains(row)](#dataForge.DataFrame+contains)
-        * [.concat(dataFrames)](#dataForge.DataFrame+concat)
-        * [.toRows()](#dataForge.DataFrame+toRows)
+        * [.concat(dataFrames)](#dataForge.DataFrame+concat) ⇒ <code>DataFrame</code>
+        * [.toRows()](#dataForge.DataFrame+toRows) ⇒ <code>array</code>
         * [.getIterator()](#dataForge.Series+getIterator) ⇒ <code>iterator</code>
         * [.getIndex()](#dataForge.Series+getIndex) ⇒ <code>Series</code>
         * [.withIndex(newIndex)](#dataForge.Series+withIndex) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
@@ -238,7 +236,6 @@ Browser:
     * [.truncateStrings(maxLength)](#dataForge.DataFrame+truncateStrings) ⇒ <code>DataFrame</code>
     * [.remapColumns(columnNames)](#dataForge.DataFrame+remapColumns) ⇒ <code>DataFrame</code>
     * [.renameSeries(newColumnNames|columnsMap)](#dataForge.DataFrame+renameSeries) ⇒ <code>DataFrame</code>
-    * [.toRows()](#dataForge.DataFrame+toRows) ⇒ <code>array</code>
     * [.toJSON()](#dataForge.DataFrame+toJSON) ⇒ <code>string</code>
     * [.toCSV()](#dataForge.DataFrame+toCSV) ⇒ <code>string</code>
     * [.transformSeries(columnSelectors)](#dataForge.DataFrame+transformSeries) ⇒ <code>DataFrame</code>
@@ -249,10 +246,9 @@ Browser:
     * [.bringToFront(columnOrColumns)](#dataForge.DataFrame+bringToFront) ⇒ <code>DataFrame</code>
     * [.bringToBack(columnOrColumns)](#dataForge.DataFrame+bringToBack) ⇒ <code>DataFrame</code>
     * [.pivot(column, value)](#dataForge.DataFrame+pivot) ⇒ <code>DataFrame</code>
-    * [.merge(otherDataFrame, [columnName])](#dataForge.DataFrame+merge)
     * [.contains(row)](#dataForge.DataFrame+contains)
-    * [.concat(dataFrames)](#dataForge.DataFrame+concat)
-    * [.toRows()](#dataForge.DataFrame+toRows)
+    * [.concat(dataFrames)](#dataForge.DataFrame+concat) ⇒ <code>DataFrame</code>
+    * [.toRows()](#dataForge.DataFrame+toRows) ⇒ <code>array</code>
     * [.getIterator()](#dataForge.Series+getIterator) ⇒ <code>iterator</code>
     * [.getIndex()](#dataForge.Series+getIndex) ⇒ <code>Series</code>
     * [.withIndex(newIndex)](#dataForge.Series+withIndex) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
@@ -598,13 +594,6 @@ Create a new data-frame with renamed series.
 | --- | --- | --- |
 | newColumnNames|columnsMap | <code>array</code> &#124; <code>object</code> | Array of strings, with an element for each existing column that specifies the new name of that column. Or, a hash that maps old column name to new column name. |
 
-<a name="dataForge.DataFrame+toRows"></a>
-
-#### dataFrame.toRows() ⇒ <code>array</code>
-Bake the data frame to an array of rows.
-
-**Kind**: instance method of <code>[DataFrame](#dataForge.DataFrame)</code>  
-**Returns**: <code>array</code> - Returns an array of rows. Each row is an array of values in column order.  
 <a name="dataForge.DataFrame+toJSON"></a>
 
 #### dataFrame.toJSON() ⇒ <code>string</code>
@@ -719,18 +708,6 @@ Reshape (or pivot) a table based on column values.
 | column | <code>string</code> | Column name whose values make the new DataFrame's columns. |
 | value | <code>string</code> | Column name whose values populate the new DataFrame's values. |
 
-<a name="dataForge.DataFrame+merge"></a>
-
-#### dataFrame.merge(otherDataFrame, [columnName])
-Merge this DataFrame with another.
-
-**Kind**: instance method of <code>[DataFrame](#dataForge.DataFrame)</code>  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| otherDataFrame | <code>DataFrame</code> | The other DataFrame to merge in. |
-| [columnName] | <code>string</code> | Optional column name used to join the DataFrames. Omit to merge on index. |
-
 <a name="dataForge.DataFrame+contains"></a>
 
 #### dataFrame.contains(row)
@@ -745,11 +722,12 @@ Returns true if the DataFrame contains the specified row.
 
 <a name="dataForge.DataFrame+concat"></a>
 
-#### dataFrame.concat(dataFrames)
+#### dataFrame.concat(dataFrames) ⇒ <code>DataFrame</code>
 Concatenate multiple other dataframes onto this dataframe.
 
 **Kind**: instance method of <code>[DataFrame](#dataForge.DataFrame)</code>  
 **Overrides:** <code>[concat](#dataForge.Series+concat)</code>  
+**Returns**: <code>DataFrame</code> - Returns a single dataframe concatenated from multiple input dataframes.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -757,10 +735,11 @@ Concatenate multiple other dataframes onto this dataframe.
 
 <a name="dataForge.DataFrame+toRows"></a>
 
-#### dataFrame.toRows()
-Retreive each row of the dataframe as an array (no column names included)
+#### dataFrame.toRows() ⇒ <code>array</code>
+Bake the data frame to an array of rows.
 
 **Kind**: instance method of <code>[DataFrame](#dataForge.DataFrame)</code>  
+**Returns**: <code>array</code> - Returns an array of rows. Each row is an array of values in column order.  
 <a name="dataForge.Series+getIterator"></a>
 
 #### dataFrame.getIterator() ⇒ <code>iterator</code>
