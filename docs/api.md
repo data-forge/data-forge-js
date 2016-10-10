@@ -196,15 +196,15 @@ Browser:
         * [.union(other, [comparer])](#dataForge.Series+union)
         * [.intersection(other, [comparer])](#dataForge.Series+intersection)
         * [.except(other, [comparer])](#dataForge.Series+except)
-    * [.concatDataFrames](#dataForge.concatDataFrames)
-    * [.concatSeries](#dataForge.concatSeries)
-    * [.use()](#dataForge.use)
+    * [.concatDataFrames](#dataForge.concatDataFrames) ⇒ <code>DataFrame</code>
+    * [.concatSeries](#dataForge.concatSeries) ⇒ <code>Series</code>
+    * [.use(plugin)](#dataForge.use) ⇒ <code>[dataForge](#dataForge)</code>
     * [.fromJSON(jsonTextString, [config])](#dataForge.fromJSON) ⇒ <code>DataFrame</code>
     * [.fromCSV(csvTextString, [config])](#dataForge.fromCSV) ⇒ <code>DataFrame</code>
-    * [.range(start, count)](#dataForge.range)
-    * [.matrix(numColumns, numRows, start, increment)](#dataForge.matrix)
-    * [.zipSeries(series, selector)](#dataForge.zipSeries)
-    * [.zipDataFrames(dataFrames, selector)](#dataForge.zipDataFrames)
+    * [.range(start, count)](#dataForge.range) ⇒ <code>Series</code>
+    * [.matrix(numColumns, numRows, start, increment)](#dataForge.matrix) ⇒ <code>DataFrame</code>
+    * [.zipSeries(series, selector)](#dataForge.zipSeries) ⇒ <code>Series</code>
+    * [.zipDataFrames(dataFrames, selector)](#dataForge.zipDataFrames) ⇒ <code>DataFrame</code>
 
 <a name="dataForge.DataFrame"></a>
 
@@ -2249,10 +2249,11 @@ Returns the exception of values between two Series or DataFrames.
 
 <a name="dataForge.concatDataFrames"></a>
 
-### dataForge.concatDataFrames
+### dataForge.concatDataFrames ⇒ <code>DataFrame</code>
 Concatenate multiple dataframes into a single dataframe.
 
 **Kind**: static property of <code>[dataForge](#dataForge)</code>  
+**Returns**: <code>DataFrame</code> - Returns the single concatendated dataframe.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -2260,10 +2261,11 @@ Concatenate multiple dataframes into a single dataframe.
 
 <a name="dataForge.concatSeries"></a>
 
-### dataForge.concatSeries
+### dataForge.concatSeries ⇒ <code>Series</code>
 Concatenate multiple series into a single series.
 
 **Kind**: static property of <code>[dataForge](#dataForge)</code>  
+**Returns**: <code>Series</code> - - Returns the single concatendated series.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -2271,10 +2273,16 @@ Concatenate multiple series into a single series.
 
 <a name="dataForge.use"></a>
 
-### dataForge.use()
+### dataForge.use(plugin) ⇒ <code>[dataForge](#dataForge)</code>
 Install a plugin in the dataForge namespace.
 
 **Kind**: static method of <code>[dataForge](#dataForge)</code>  
+**Returns**: <code>[dataForge](#dataForge)</code> - Returns the dataForge API object so that calls to 'use' can be chained.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| plugin | <code>plugin-object</code> | The plugin to add to data-forge. |
+
 <a name="dataForge.fromJSON"></a>
 
 ### dataForge.fromJSON(jsonTextString, [config]) ⇒ <code>DataFrame</code>
@@ -2303,10 +2311,11 @@ Deserialize a DataFrame from a CSV text string.
 
 <a name="dataForge.range"></a>
 
-### dataForge.range(start, count)
+### dataForge.range(start, count) ⇒ <code>Series</code>
 Generate a series from a range of numbers.
 
 **Kind**: static method of <code>[dataForge](#dataForge)</code>  
+**Returns**: <code>Series</code> - Returns a series with a sequence of generated values. The series contains 'count' values beginning at 'start'.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -2315,10 +2324,11 @@ Generate a series from a range of numbers.
 
 <a name="dataForge.matrix"></a>
 
-### dataForge.matrix(numColumns, numRows, start, increment)
+### dataForge.matrix(numColumns, numRows, start, increment) ⇒ <code>DataFrame</code>
 Generate a data-frame containing a matrix of values.
 
 **Kind**: static method of <code>[dataForge](#dataForge)</code>  
+**Returns**: <code>DataFrame</code> - Returns a dataframe that contains a matrix of generated values.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -2329,10 +2339,11 @@ Generate a data-frame containing a matrix of values.
 
 <a name="dataForge.zipSeries"></a>
 
-### dataForge.zipSeries(series, selector)
+### dataForge.zipSeries(series, selector) ⇒ <code>Series</code>
 Zip together multiple series to create a new series.
 
 **Kind**: static method of <code>[dataForge](#dataForge)</code>  
+**Returns**: <code>Series</code> - Returns a single series that is the combination of multiple input series that have been 'zipped' together by the 'selector' function.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -2341,10 +2352,11 @@ Zip together multiple series to create a new series.
 
 <a name="dataForge.zipDataFrames"></a>
 
-### dataForge.zipDataFrames(dataFrames, selector)
+### dataForge.zipDataFrames(dataFrames, selector) ⇒ <code>DataFrame</code>
 Zip together multiple data-frames to create a new data-frame.
 
 **Kind**: static method of <code>[dataForge](#dataForge)</code>  
+**Returns**: <code>DataFrame</code> - Returns a single dataframe that is the combination of multiple input dataframes that have been 'zipped' together by the 'selector' function.  
 
 | Param | Type | Description |
 | --- | --- | --- |

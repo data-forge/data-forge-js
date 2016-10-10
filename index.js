@@ -49,6 +49,10 @@ var dataForge = {
 
 	/**
 	 * Install a plugin in the dataForge namespace.
+	 * 
+	 * @param {plugin-object} plugin - The plugin to add to data-forge.
+	 * 
+	 * @returns {dataForge} Returns the dataForge API object so that calls to 'use' can be chained.
 	 */
 	use: function (plugin) {
 
@@ -62,6 +66,7 @@ var dataForge = {
 
 		var self = this;
 		plugin(self);
+		return self;
 	},
 
 
@@ -166,14 +171,18 @@ var dataForge = {
 	/**
 	 * Concatenate multiple dataframes into a single dataframe.
 	 *
-	 * @param {array} dataFrames - Array of dataframes to concatenate. 
+	 * @param {array} dataFrames - Array of dataframes to concatenate.
+	 * 
+	 * @returns {DataFrame} Returns the single concatendated dataframe. 
 	 */
 	concatDataFrames: require('./src/concat-dataframes'),
 
 	/**
 	 * Concatenate multiple series into a single series.
 	 * 
-	 * @param {array} series - Array of series to concatenate. 
+	 * @param {array} series - Array of series to concatenate.
+	 *
+	 * @returns {Series} - Returns the single concatendated series.  
 	 */
 	concatSeries: require('./src/concat-series'),
 
@@ -182,6 +191,8 @@ var dataForge = {
 	 *
 	 * @param {int} start - The value of the first number in the range.
 	 * @param {int} count - The number of sequential values in the range.
+	 * 
+	 * @returns {Series} Returns a series with a sequence of generated values. The series contains 'count' values beginning at 'start'. 
 	 */
 	range: function (start, count) {
 
@@ -214,6 +225,8 @@ var dataForge = {
 	 * @param {int} numRows - The number of rows in the data-frame.
 	 * @param {number} start - The starting value.
 	 * @param {number} increment - The value to increment by for each new value.
+	 * 
+	 * @returns {DataFrame} Returns a dataframe that contains a matrix of generated values.
 	 */
 	matrix: function (numColumns, numRows, start, increment) {
 		return new DataFrame({
@@ -256,6 +269,8 @@ var dataForge = {
 	 *
 	 * @param {array} series - Array of series to zip together.
 	 * @param {function} selector - Selector function that produces a new series based on the input series.
+	 * 
+	 * @returns {Series} Returns a single series that is the combination of multiple input series that have been 'zipped' together by the 'selector' function.
 	 */
 	zipSeries: function (series, selector) {
 		return zip(series, selector, Series);
@@ -266,6 +281,8 @@ var dataForge = {
 	 *
 	 * @param {array} dataFrames - Array of data-frames to zip together.
 	 * @param {function} selector - Selector function that produces a new data-frame based on the input data-frames.
+	 * 
+	 * @returns {DataFrame} Returns a single dataframe that is the combination of multiple input dataframes that have been 'zipped' together by the 'selector' function.
 	 */
 	zipDataFrames: function (dataFrames, selector) {
 		return zip(dataFrames, selector, DataFrame);
