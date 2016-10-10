@@ -868,10 +868,9 @@ Series.prototype.toStrings = function (formatString) {
 };
 
 /** 
-  * Detect the actual types of the values that comprised the series and their frequency.
-  * Returns a new series containing the type information.
+  * Detect the types of the values in the sequence.
   *
-  * @returns {DataFrame} Returns a dataframe that detects and describes the data types contained in a series or dataframe.
+  * @returns {DataFrame} Returns a dataframe that describes the data types contained in the input series or dataframe.
   */
 Series.prototype.detectTypes = function () {
 
@@ -920,10 +919,9 @@ Series.prototype.detectTypes = function () {
 };
 
 /** 
-  * Detect the frequency of values in the series.
-  * Returns a new series containing the information.
+  * Detect the frequency of values in the sequence.
   *
-  * @returns {DataFrame} Returns a dataframe that detects and describes the values contained in a series or dataframe.
+  * @returns {DataFrame} Returns a dataframe that describes the values contained in the input sequence.
   */
 Series.prototype.detectValues = function () {
 

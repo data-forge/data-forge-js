@@ -301,6 +301,8 @@ var ArrayIterable = require('./iterables/array');
 
 /**
  * Get the names of the columns in the data frame.
+ * 
+ * @returns {array} Returns an array of the column names in the dataframe.  
  */
 DataFrame.prototype.getColumnNames = function () {
 	var self = this;
@@ -400,6 +402,8 @@ DataFrame.prototype.expectSeries = function (columnName) {
 
 /** 
  * Retreive a collection of all columns.
+ * 
+ * @returns {array} Returns an array of the columns in the dataframe.  
  */
 DataFrame.prototype.getColumns = function () {
 
@@ -419,6 +423,8 @@ DataFrame.prototype.getColumns = function () {
  * Create a new data-frame from a subset of columns.
  *
  * @param {array} columnNames - Array of column names to include in the new data-frame.
+ * 
+ * @returns {DataFrame} Returns a dataframe with a subset of columns from the input dataframe.
  */
 DataFrame.prototype.subset = function (columnNames) {
 
@@ -459,6 +465,8 @@ DataFrame.prototype.subset = function (columnNames) {
  * Create a new data frame with the requested column or columns dropped.
  *
  * @param {string|array} columnOrColumns - Specifies the column name (a string) or columns (array of column names) to drop.
+ * 
+ * @returns {DataFrame} Returns a new dataframe with a particular name column or columns removed.
  */
 DataFrame.prototype.dropSeries = function (columnOrColumns) {
 
@@ -505,6 +513,8 @@ DataFrame.prototype.dropSeries = function (columnOrColumns) {
  * Create a new data frame with only the requested column or columns dropped, other columns are dropped.
  *
  * @param {string|array} columnOrColumns - Specifies the column name (a string) or columns (array of column names) to keep.
+ * 
+ * @returns {DataFrame} Returns a new dataframe only preserving a particular named column or columns.
  */
 DataFrame.prototype.keepSeries = function (columnOrColumns) {
 
@@ -548,6 +558,8 @@ DataFrame.prototype.keepSeries = function (columnOrColumns) {
  *
  * @param {string} columnName - The name of the column to add or replace.
  * @param {Series} series - Series to add to the data-frame.
+ *
+ * @returns {DataFrame} Returns a new dataframe replacing or adding a particular named column.
  */
 DataFrame.prototype.withSeries = function (columnName, series) {
 
@@ -594,6 +606,8 @@ DataFrame.prototype.withSeries = function (columnName, series) {
  * Set a named column as the index of the data-frame.
  *
  * @param {string} columnName - Name or index of the column to set as the index.
+ *
+ * @returns {DataFrame} Returns a new dataframe with the values of a particular named column as the index.  
  */
 DataFrame.prototype.setIndex = function (columnName) {
 
@@ -603,6 +617,8 @@ DataFrame.prototype.setIndex = function (columnName) {
 
 /** 
  * Format the data frame for display as a string.
+ * 
+ * @returns {string} Returns a string representation of the dataframe for logging.  
  */
 DataFrame.prototype.toString = function () {
 
@@ -638,6 +654,8 @@ DataFrame.prototype.toString = function () {
  * Parse a column with string values to a column with int values.
  *
  * @param {string|array} columnNameOrNames - Specifies the column name or array of column names to parse.
+ * 
+ * @returns {DataFrame} Returns a new dataframe with a particular named column parsed as ints.  
  */
 DataFrame.prototype.parseInts = function (columnNameOrNames) {
 
@@ -657,6 +675,8 @@ DataFrame.prototype.parseInts = function (columnNameOrNames) {
  * Parse a column with string values to a column with float values.
  *
  * @param {string|array} columnNameOrNames - Specifies the column name or array of column names to parse.
+ * 
+ * @returns {DataFrame} Returns a new dataframe with a particular named column parsed as floats.  
  */
 DataFrame.prototype.parseFloats = function (columnNameOrNames) {
 
@@ -677,6 +697,8 @@ DataFrame.prototype.parseFloats = function (columnNameOrNames) {
  *
  * @param {string|array} columnNameOrNames - Specifies the column name or array of column names to parse.
  * @param {string} [formatString] - Optional formatting string for dates.
+ * 
+ * @returns {DataFrame} Returns a new dataframe with a particular named column parsed as dates.  
  */
 DataFrame.prototype.parseDates = function (columnNameOrNames, formatString) {
 
@@ -701,6 +723,8 @@ DataFrame.prototype.parseDates = function (columnNameOrNames, formatString) {
  *
  * @param {string|array} columnNameOrNames - Specifies the column name or array of column names to convert to strings.
  * @param {string} [formatString] - Optional formatting string for dates.
+ * 
+ * @returns {DataFrame} Returns a new dataframe with a particular named column convert to strings.  
  */
 DataFrame.prototype.toStrings = function (columnNameOrNames, formatString) {
 
@@ -721,8 +745,10 @@ DataFrame.prototype.toStrings = function (columnNameOrNames, formatString) {
 };
 
 /**
- * Detect actual types and their frequencies contained within columns in the data frame.
- */
+  * Detect the types of the values in the sequence.
+  *
+  * @returns {DataFrame} Returns a dataframe that describes the data types contained in the input series or dataframe.
+  */
 DataFrame.prototype.detectTypes = function () {
 
 	var self = this;
@@ -748,8 +774,11 @@ DataFrame.prototype.detectTypes = function () {
 };
 
 /**
- * Detect values and their frequencies contained within columns in the data frame.
- */
+  * Detect values and their frequencies contained within columns in the data frame.
+  * Detect the frequency of values in the sequence.
+  *
+  * @returns {DataFrame} Returns a dataframe that describes the values contained in the input sequence.
+  */
 DataFrame.prototype.detectValues = function () {
 
 	var self = this;
@@ -770,10 +799,13 @@ DataFrame.prototype.detectValues = function () {
 		.toArray();
 	return concatDataFrames(dataFrames).resetIndex();
 };
+
 /**
  * Produces a new data frame with all string values truncated to the requested maximum length.
  *
  * @param {int} maxLength - The maximum length of the string values after truncation.
+ * 
+ * @returns {DataFrame} Returns a new dataframe with all strings truncated to the specified maximum length.
  */
 DataFrame.prototype.truncateStrings = function (maxLength) {
 	assert.isNumber(maxLength, "Expected 'maxLength' parameter to 'truncateStrings' to be an integer.");
@@ -805,7 +837,9 @@ DataFrame.prototype.truncateStrings = function (maxLength) {
  * Create a new data frame with columns reordered.
  * New column names create new columns (with undefined values), omitting existing column names causes those columns to be dropped.
  * 
- * @param {array} columnNames - The new order for columns. 
+ * @param {array} columnNames - The new order for columns.
+ * 
+ * @returns {DataFrame} Returns a new dataframe with columns remapped according to the specified column layout.   
  */
 DataFrame.prototype.remapColumns = function (columnNames) {
 
@@ -846,6 +880,8 @@ DataFrame.prototype.remapColumns = function (columnNames) {
  * Create a new data-frame with renamed series.
  *
  * @param {array|object} newColumnNames|columnsMap - Array of strings, with an element for each existing column that specifies the new name of that column. Or, a hash that maps old column name to new column name.
+ * 
+ * @returns {DataFrame} Returns a new dataframe with columns renamed.   
  */
 DataFrame.prototype.renameSeries = function (newColumnNames) {
 
@@ -910,6 +946,8 @@ DataFrame.prototype.renameSeries = function (newColumnNames) {
 
 /**
  * Bake the data frame to an array of rows.
+ * 
+ *  @returns {array} Returns an array of rows. Each row is an array of values in column order.   
  */
 DataFrame.prototype.toRows = function () {
 
@@ -937,6 +975,8 @@ DataFrame.prototype.toRows = function () {
 
 /**
  * Serialize the data frame to JSON.
+ * 
+ *  @returns {string} Returns a JSON format string representing the dataframe.   
  */
 DataFrame.prototype.toJSON = function () {
 	var self = this;
@@ -945,6 +985,8 @@ DataFrame.prototype.toJSON = function () {
 
 /**
  * Serialize the data frame to CSV.
+ * 
+ *  @returns {string} Returns a CSV format string representing the dataframe.   
  */
 DataFrame.prototype.toCSV = function () {
 
@@ -977,6 +1019,7 @@ DataFrame.prototype.toCSV = function () {
  *
  * @param {object} columnSelectors - Object with field names for each column to be transformed. Each field you be a selector that transforms that column.
  * 
+ * @returns {DataFrame} Returns a new dataframe with 1 or more columns transformed.   
  */
 DataFrame.prototype.transformSeries = function (columnSelectors) {
 
@@ -1002,6 +1045,8 @@ DataFrame.prototype.transformSeries = function (columnSelectors) {
  * Generate new columns based on existing rows.
  *
  * @param {function|object} generator - Generator function that transforms each row to a new set of columns.
+ * 
+ * @returns {DataFrame} Returns a new dataframe with 1 or more new columns.
  */
 DataFrame.prototype.generateSeries = function (generator) {
 
@@ -1038,6 +1083,8 @@ DataFrame.prototype.generateSeries = function (generator) {
  * Deflate a data-frame to a series.
  *
  * @param {function} selector - Selector function that transforms each row to a new sequence of values.
+ *
+ * @returns {Series} Returns a series that was created from the input dataframe.
  */
 DataFrame.prototype.deflate = function (selector) {
 
@@ -1068,6 +1115,8 @@ DataFrame.prototype.deflate = function (selector) {
  *
  * @param {string|int} columnNameOrIndex - Name or index of the column to retreive.
  * @param {function} [selector] - Selector function that transforms each value in the column to new columns.
+ * 
+ * @returns {DataFrame} Returns a new dataframe with a column inflated to 1 or more new columns.
  */
 DataFrame.prototype.inflateColumn = function (columnNameOrIndex, selector) {
 
@@ -1085,6 +1134,8 @@ DataFrame.prototype.inflateColumn = function (columnNameOrIndex, selector) {
  *
  * @param {object} [seed] - The seed value for producing the aggregation.
  * @param {function} selector - Function that takes the seed and then each row in the data-frame and produces the aggregate value.
+ *
+ * @returns {DataFrame} Returns a new dataframe with a column inflated to 1 or more new columns.
  */
 DataFrame.prototype.aggregate = function (seedOrSelector, selector) {
 
@@ -1129,6 +1180,8 @@ DataFrame.prototype.aggregate = function (seedOrSelector, selector) {
  * Bring the name column to the front, making it the first column in the data-frame.
  *
  * @param {string|array} columnOrColumns - Specifies the column or columns to bring to the front.
+ *
+ * @returns {DataFrame} Returns a new dataframe with 1 or more columns bought to the front of the column ordering.
  */
 DataFrame.prototype.bringToFront = function (columnOrColumns) {
 
@@ -1165,6 +1218,8 @@ DataFrame.prototype.bringToFront = function (columnOrColumns) {
  * Bring the name column to the back, making it the last column in the data-frame.
  *
  * @param {string|array} columnOrColumns - Specifies the column or columns to bring to the back.
+ *
+ * @returns {DataFrame} Returns a new dataframe with 1 or more columns bought to the back of the column ordering.
  */
 DataFrame.prototype.bringToBack = function (columnOrColumns) {
 
@@ -1202,6 +1257,8 @@ DataFrame.prototype.bringToBack = function (columnOrColumns) {
  *
  * @param {string} column - Column name whose values make the new DataFrame's columns.
  * @param {string} value - Column name whose values populate the new DataFrame's values.
+ *
+ * @returns {DataFrame} Returns a new dataframe that has been pivoted based on a particular column's values. 
  */
 DataFrame.prototype.pivot = function (column, value) {
 	var self = this;
