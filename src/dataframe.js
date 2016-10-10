@@ -1305,22 +1305,6 @@ DataFrame.prototype.pivot = function (column, value) {
 };
 
 /**
- * Merge this DataFrame with another.
- *
- * @param {DataFrame} otherDataFrame - The other DataFrame to merge in.
- * @param {string} [columnName] - Optional column name used to join the DataFrames. Omit to merge on index.
- */
-DataFrame.prototype.merge = function (otherDataFrame, columnName) {
-	assert.instanceOf(otherDataFrame, DataFrame, "Expected 'otherDataFrame' parameter of DataFrame.merge to be a DataFrame.");
-	if (columnName) {
-		assert.isString(columnName, "Expected optional 'columnName' parameter of DataFrame.merge to be a string that specifies the column to join the DataFrame on.");
-	}
-
-	var self = this;
-	return mergeDataFrames(self, otherDataFrame, columnName);
-};
-
-/**
  * Returns true if the DataFrame contains the specified row.
  *
  * @param {function} row - The row to check for in the DataFrame.
