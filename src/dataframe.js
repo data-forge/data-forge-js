@@ -945,35 +945,6 @@ DataFrame.prototype.renameSeries = function (newColumnNames) {
 };
 
 /**
- * Bake the data frame to an array of rows.
- * 
- *  @returns {array} Returns an array of rows. Each row is an array of values in column order.   
- */
-DataFrame.prototype.toRows = function () {
-
-	var self = this;
-
-	var iterator = self.iterable.getIterator();
-	validateIterator(iterator);
-
-	var values = [];
-	var columnNames = self.iterable.getColumnNames();
-
-	while (iterator.moveNext()) {
-		var curRow = iterator.getCurrent()[1];  // Extract value.
-
-		var asArray = [];
-		for (var columnIndex = 0; columnIndex < columnNames.length; ++columnIndex) {
-			asArray.push(curRow[columnNames[columnIndex]]);
-		}
-
-		values.push(asArray);
-	}
-
-	return values;
-};
-
-/**
  * Serialize the data frame to JSON.
  * 
  *  @returns {string} Returns a JSON format string representing the dataframe.   
@@ -1322,7 +1293,9 @@ DataFrame.prototype.contains = function (row) {
 /**
  * Concatenate multiple other dataframes onto this dataframe.
  * 
- * @param {...array|DataFrame} dataFrames - Multiple arguments. Each can be either a dataframe or an array of dataframe. 
+ * @param {...array|DataFrame} dataFrames - Multiple arguments. Each can be either a dataframe or an array of dataframe.
+ *  
+ * @returns {DataFrame} Returns a single dataframe concatenated from multiple input dataframes. 
  */
 DataFrame.prototype.concat = function () {
 
@@ -1344,27 +1317,30 @@ DataFrame.prototype.concat = function () {
 };
 
 /**
- * Retreive each row of the dataframe as an array (no column names included)
+ * Bake the data frame to an array of rows.
+ * 
+ *  @returns {array} Returns an array of rows. Each row is an array of values in column order.   
  */
 DataFrame.prototype.toRows = function () {
 
 	var self = this;
-	var iterator = self.getIterator();
+
+	var iterator = self.iterable.getIterator();
 	validateIterator(iterator);
 
-	var rows = [];
-	var columnNames = self.getColumnNames();
+	var values = [];
+	var columnNames = self.iterable.getColumnNames();
 
 	while (iterator.moveNext()) {
-		var pair = iterator.getCurrent();
-		var value = pair[1];
-		var row = E.from(columnNames)
-			.select(function (columnName) {
-				return value[columnName];
-			})
-			.toArray();
-		rows.push(row);
+		var curRow = iterator.getCurrent()[1];  // Extract value.
+
+		var asArray = [];
+		for (var columnIndex = 0; columnIndex < columnNames.length; ++columnIndex) {
+			asArray.push(curRow[columnNames[columnIndex]]);
+		}
+
+		values.push(asArray);
 	}
 
-	return rows;
+	return values;
 };
