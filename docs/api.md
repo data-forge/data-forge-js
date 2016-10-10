@@ -112,14 +112,14 @@ Browser:
         * [.groupBy(selector)](#dataForge.Series+groupBy) ⇒ <code>Series</code>
         * [.groupSequentialBy(selector)](#dataForge.Series+groupSequentialBy) ⇒ <code>Series</code>
         * [.at(index)](#dataForge.Series+at) ⇒ <code>value</code>
-        * [.join(self, inner, outerKeySelector, innerKeySelector, resultSelector)](#dataForge.Series+join)
-        * [.joinOuter(self, inner, outerKeySelector, innerKeySelector, outerResultSelector, innerResultSelector, mergeSelector)](#dataForge.Series+joinOuter)
-        * [.joinOuterLeft(self, inner, outerKeySelector, innerKeySelector, outerResultSelector, innerResultSelector, mergeSelector)](#dataForge.Series+joinOuterLeft)
-        * [.joinOuterRight(self, inner, outerKeySelector, innerKeySelector, outerResultSelector, innerResultSelector, mergeSelector)](#dataForge.Series+joinOuterRight)
-        * [.defaultIfEmpty(defaultSequence)](#dataForge.Series+defaultIfEmpty)
-        * [.union(other, [comparer])](#dataForge.Series+union)
-        * [.intersection(other, [comparer])](#dataForge.Series+intersection)
-        * [.except(other, [comparer])](#dataForge.Series+except)
+        * [.join(self, inner, outerKeySelector, innerKeySelector, resultSelector)](#dataForge.Series+join) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.joinOuter(self, inner, outerKeySelector, innerKeySelector, outerResultSelector, innerResultSelector, mergeSelector)](#dataForge.Series+joinOuter) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.joinOuterLeft(self, inner, outerKeySelector, innerKeySelector, outerResultSelector, innerResultSelector, mergeSelector)](#dataForge.Series+joinOuterLeft) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.joinOuterRight(self, inner, outerKeySelector, innerKeySelector, outerResultSelector, innerResultSelector, mergeSelector)](#dataForge.Series+joinOuterRight) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.defaultIfEmpty(defaultSequence)](#dataForge.Series+defaultIfEmpty) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.union(other, [comparer])](#dataForge.Series+union) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.intersection(other, [comparer])](#dataForge.Series+intersection) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.except(other, [comparer])](#dataForge.Series+except) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
     * [.Series](#dataForge.Series)
         * [new Series(config|values)](#new_dataForge.Series_new)
         * [.thenBy](#dataForge.Series+thenBy) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
@@ -186,16 +186,16 @@ Browser:
         * [.groupBy(selector)](#dataForge.Series+groupBy) ⇒ <code>Series</code>
         * [.groupSequentialBy(selector)](#dataForge.Series+groupSequentialBy) ⇒ <code>Series</code>
         * [.at(index)](#dataForge.Series+at) ⇒ <code>value</code>
-        * [.contains(value)](#dataForge.Series+contains)
-        * [.concat(series)](#dataForge.Series+concat)
-        * [.join(self, inner, outerKeySelector, innerKeySelector, resultSelector)](#dataForge.Series+join)
-        * [.joinOuter(self, inner, outerKeySelector, innerKeySelector, outerResultSelector, innerResultSelector, mergeSelector)](#dataForge.Series+joinOuter)
-        * [.joinOuterLeft(self, inner, outerKeySelector, innerKeySelector, outerResultSelector, innerResultSelector, mergeSelector)](#dataForge.Series+joinOuterLeft)
-        * [.joinOuterRight(self, inner, outerKeySelector, innerKeySelector, outerResultSelector, innerResultSelector, mergeSelector)](#dataForge.Series+joinOuterRight)
-        * [.defaultIfEmpty(defaultSequence)](#dataForge.Series+defaultIfEmpty)
-        * [.union(other, [comparer])](#dataForge.Series+union)
-        * [.intersection(other, [comparer])](#dataForge.Series+intersection)
-        * [.except(other, [comparer])](#dataForge.Series+except)
+        * [.contains(value)](#dataForge.Series+contains) ⇒ <code>boolean</code>
+        * [.concat(series)](#dataForge.Series+concat) ⇒ <code>Series</code>
+        * [.join(self, inner, outerKeySelector, innerKeySelector, resultSelector)](#dataForge.Series+join) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.joinOuter(self, inner, outerKeySelector, innerKeySelector, outerResultSelector, innerResultSelector, mergeSelector)](#dataForge.Series+joinOuter) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.joinOuterLeft(self, inner, outerKeySelector, innerKeySelector, outerResultSelector, innerResultSelector, mergeSelector)](#dataForge.Series+joinOuterLeft) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.joinOuterRight(self, inner, outerKeySelector, innerKeySelector, outerResultSelector, innerResultSelector, mergeSelector)](#dataForge.Series+joinOuterRight) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.defaultIfEmpty(defaultSequence)](#dataForge.Series+defaultIfEmpty) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.union(other, [comparer])](#dataForge.Series+union) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.intersection(other, [comparer])](#dataForge.Series+intersection) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.except(other, [comparer])](#dataForge.Series+except) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
     * [.concatDataFrames](#dataForge.concatDataFrames) ⇒ <code>DataFrame</code>
     * [.concatSeries](#dataForge.concatSeries) ⇒ <code>Series</code>
     * [.use(plugin)](#dataForge.use) ⇒ <code>[dataForge](#dataForge)</code>
@@ -306,14 +306,14 @@ Browser:
     * [.groupBy(selector)](#dataForge.Series+groupBy) ⇒ <code>Series</code>
     * [.groupSequentialBy(selector)](#dataForge.Series+groupSequentialBy) ⇒ <code>Series</code>
     * [.at(index)](#dataForge.Series+at) ⇒ <code>value</code>
-    * [.join(self, inner, outerKeySelector, innerKeySelector, resultSelector)](#dataForge.Series+join)
-    * [.joinOuter(self, inner, outerKeySelector, innerKeySelector, outerResultSelector, innerResultSelector, mergeSelector)](#dataForge.Series+joinOuter)
-    * [.joinOuterLeft(self, inner, outerKeySelector, innerKeySelector, outerResultSelector, innerResultSelector, mergeSelector)](#dataForge.Series+joinOuterLeft)
-    * [.joinOuterRight(self, inner, outerKeySelector, innerKeySelector, outerResultSelector, innerResultSelector, mergeSelector)](#dataForge.Series+joinOuterRight)
-    * [.defaultIfEmpty(defaultSequence)](#dataForge.Series+defaultIfEmpty)
-    * [.union(other, [comparer])](#dataForge.Series+union)
-    * [.intersection(other, [comparer])](#dataForge.Series+intersection)
-    * [.except(other, [comparer])](#dataForge.Series+except)
+    * [.join(self, inner, outerKeySelector, innerKeySelector, resultSelector)](#dataForge.Series+join) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.joinOuter(self, inner, outerKeySelector, innerKeySelector, outerResultSelector, innerResultSelector, mergeSelector)](#dataForge.Series+joinOuter) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.joinOuterLeft(self, inner, outerKeySelector, innerKeySelector, outerResultSelector, innerResultSelector, mergeSelector)](#dataForge.Series+joinOuterLeft) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.joinOuterRight(self, inner, outerKeySelector, innerKeySelector, outerResultSelector, innerResultSelector, mergeSelector)](#dataForge.Series+joinOuterRight) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.defaultIfEmpty(defaultSequence)](#dataForge.Series+defaultIfEmpty) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.union(other, [comparer])](#dataForge.Series+union) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.intersection(other, [comparer])](#dataForge.Series+intersection) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.except(other, [comparer])](#dataForge.Series+except) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
 
 <a name="new_dataForge.DataFrame_new"></a>
 
@@ -1299,10 +1299,11 @@ Get the value at a specified index.
 
 <a name="dataForge.Series+join"></a>
 
-#### dataFrame.join(self, inner, outerKeySelector, innerKeySelector, resultSelector)
+#### dataFrame.join(self, inner, outerKeySelector, innerKeySelector, resultSelector) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
 Correlates the elements of two Series or DataFrames based on matching keys.
 
 **Kind**: instance method of <code>[DataFrame](#dataForge.DataFrame)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns the joined series or dataframe.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1314,11 +1315,12 @@ Correlates the elements of two Series or DataFrames based on matching keys.
 
 <a name="dataForge.Series+joinOuter"></a>
 
-#### dataFrame.joinOuter(self, inner, outerKeySelector, innerKeySelector, outerResultSelector, innerResultSelector, mergeSelector)
+#### dataFrame.joinOuter(self, inner, outerKeySelector, innerKeySelector, outerResultSelector, innerResultSelector, mergeSelector) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
 Performs an outer join on two Series or DataFrames. Correlates the elements based on matching keys.
 Includes elements that have no correlation.
 
 **Kind**: instance method of <code>[DataFrame](#dataForge.DataFrame)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns the joined series or dataframe.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1332,11 +1334,12 @@ Includes elements that have no correlation.
 
 <a name="dataForge.Series+joinOuterLeft"></a>
 
-#### dataFrame.joinOuterLeft(self, inner, outerKeySelector, innerKeySelector, outerResultSelector, innerResultSelector, mergeSelector)
+#### dataFrame.joinOuterLeft(self, inner, outerKeySelector, innerKeySelector, outerResultSelector, innerResultSelector, mergeSelector) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
 Performs a left outer join on two Series or DataFrames. Correlates the elements based on matching keys.
 Includes left elements that have no correlation.
 
 **Kind**: instance method of <code>[DataFrame](#dataForge.DataFrame)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns the joined series or dataframe.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1350,11 +1353,12 @@ Includes left elements that have no correlation.
 
 <a name="dataForge.Series+joinOuterRight"></a>
 
-#### dataFrame.joinOuterRight(self, inner, outerKeySelector, innerKeySelector, outerResultSelector, innerResultSelector, mergeSelector)
+#### dataFrame.joinOuterRight(self, inner, outerKeySelector, innerKeySelector, outerResultSelector, innerResultSelector, mergeSelector) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
 Performs a right outer join on two Series or DataFrames. Correlates the elements based on matching keys.
 Includes right elements that have no correlation.
 
 **Kind**: instance method of <code>[DataFrame](#dataForge.DataFrame)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns the joined series or dataframe.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1368,10 +1372,11 @@ Includes right elements that have no correlation.
 
 <a name="dataForge.Series+defaultIfEmpty"></a>
 
-#### dataFrame.defaultIfEmpty(defaultSequence)
+#### dataFrame.defaultIfEmpty(defaultSequence) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
 Returns the specified default sequence if the Series or DataFrame is empty.
 
 **Kind**: instance method of <code>[DataFrame](#dataForge.DataFrame)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns 'defaultSequence' if the input sequence is empty.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1379,10 +1384,11 @@ Returns the specified default sequence if the Series or DataFrame is empty.
 
 <a name="dataForge.Series+union"></a>
 
-#### dataFrame.union(other, [comparer])
+#### dataFrame.union(other, [comparer]) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
 Returns the unique union of values between two Series or DataFrames.
 
 **Kind**: instance method of <code>[DataFrame](#dataForge.DataFrame)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns the union of two sequences.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1391,10 +1397,11 @@ Returns the unique union of values between two Series or DataFrames.
 
 <a name="dataForge.Series+intersection"></a>
 
-#### dataFrame.intersection(other, [comparer])
+#### dataFrame.intersection(other, [comparer]) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
 Returns the intersection of values between two Series or DataFrames.
 
 **Kind**: instance method of <code>[DataFrame](#dataForge.DataFrame)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns the intersection of two sequences.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1403,10 +1410,11 @@ Returns the intersection of values between two Series or DataFrames.
 
 <a name="dataForge.Series+except"></a>
 
-#### dataFrame.except(other, [comparer])
+#### dataFrame.except(other, [comparer]) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
 Returns the exception of values between two Series or DataFrames.
 
 **Kind**: instance method of <code>[DataFrame](#dataForge.DataFrame)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns the difference of one sequence to another.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1484,16 +1492,16 @@ Returns the exception of values between two Series or DataFrames.
     * [.groupBy(selector)](#dataForge.Series+groupBy) ⇒ <code>Series</code>
     * [.groupSequentialBy(selector)](#dataForge.Series+groupSequentialBy) ⇒ <code>Series</code>
     * [.at(index)](#dataForge.Series+at) ⇒ <code>value</code>
-    * [.contains(value)](#dataForge.Series+contains)
-    * [.concat(series)](#dataForge.Series+concat)
-    * [.join(self, inner, outerKeySelector, innerKeySelector, resultSelector)](#dataForge.Series+join)
-    * [.joinOuter(self, inner, outerKeySelector, innerKeySelector, outerResultSelector, innerResultSelector, mergeSelector)](#dataForge.Series+joinOuter)
-    * [.joinOuterLeft(self, inner, outerKeySelector, innerKeySelector, outerResultSelector, innerResultSelector, mergeSelector)](#dataForge.Series+joinOuterLeft)
-    * [.joinOuterRight(self, inner, outerKeySelector, innerKeySelector, outerResultSelector, innerResultSelector, mergeSelector)](#dataForge.Series+joinOuterRight)
-    * [.defaultIfEmpty(defaultSequence)](#dataForge.Series+defaultIfEmpty)
-    * [.union(other, [comparer])](#dataForge.Series+union)
-    * [.intersection(other, [comparer])](#dataForge.Series+intersection)
-    * [.except(other, [comparer])](#dataForge.Series+except)
+    * [.contains(value)](#dataForge.Series+contains) ⇒ <code>boolean</code>
+    * [.concat(series)](#dataForge.Series+concat) ⇒ <code>Series</code>
+    * [.join(self, inner, outerKeySelector, innerKeySelector, resultSelector)](#dataForge.Series+join) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.joinOuter(self, inner, outerKeySelector, innerKeySelector, outerResultSelector, innerResultSelector, mergeSelector)](#dataForge.Series+joinOuter) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.joinOuterLeft(self, inner, outerKeySelector, innerKeySelector, outerResultSelector, innerResultSelector, mergeSelector)](#dataForge.Series+joinOuterLeft) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.joinOuterRight(self, inner, outerKeySelector, innerKeySelector, outerResultSelector, innerResultSelector, mergeSelector)](#dataForge.Series+joinOuterRight) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.defaultIfEmpty(defaultSequence)](#dataForge.Series+defaultIfEmpty) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.union(other, [comparer])](#dataForge.Series+union) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.intersection(other, [comparer])](#dataForge.Series+intersection) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.except(other, [comparer])](#dataForge.Series+except) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
 
 <a name="new_dataForge.Series_new"></a>
 
@@ -2183,10 +2191,11 @@ Get the value at a specified index.
 
 <a name="dataForge.Series+contains"></a>
 
-#### series.contains(value)
+#### series.contains(value) ⇒ <code>boolean</code>
 Returns true if the Series contains the specified value.
 
 **Kind**: instance method of <code>[Series](#dataForge.Series)</code>  
+**Returns**: <code>boolean</code> - Returns true if the sequence contains the specified value, false otherwise.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -2194,10 +2203,11 @@ Returns true if the Series contains the specified value.
 
 <a name="dataForge.Series+concat"></a>
 
-#### series.concat(series)
+#### series.concat(series) ⇒ <code>Series</code>
 Concatenate multiple other series onto this series.
 
 **Kind**: instance method of <code>[Series](#dataForge.Series)</code>  
+**Returns**: <code>Series</code> - Returns a single series concatenated from multiple input series.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -2205,10 +2215,11 @@ Concatenate multiple other series onto this series.
 
 <a name="dataForge.Series+join"></a>
 
-#### series.join(self, inner, outerKeySelector, innerKeySelector, resultSelector)
+#### series.join(self, inner, outerKeySelector, innerKeySelector, resultSelector) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
 Correlates the elements of two Series or DataFrames based on matching keys.
 
 **Kind**: instance method of <code>[Series](#dataForge.Series)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns the joined series or dataframe.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -2220,11 +2231,12 @@ Correlates the elements of two Series or DataFrames based on matching keys.
 
 <a name="dataForge.Series+joinOuter"></a>
 
-#### series.joinOuter(self, inner, outerKeySelector, innerKeySelector, outerResultSelector, innerResultSelector, mergeSelector)
+#### series.joinOuter(self, inner, outerKeySelector, innerKeySelector, outerResultSelector, innerResultSelector, mergeSelector) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
 Performs an outer join on two Series or DataFrames. Correlates the elements based on matching keys.
 Includes elements that have no correlation.
 
 **Kind**: instance method of <code>[Series](#dataForge.Series)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns the joined series or dataframe.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -2238,11 +2250,12 @@ Includes elements that have no correlation.
 
 <a name="dataForge.Series+joinOuterLeft"></a>
 
-#### series.joinOuterLeft(self, inner, outerKeySelector, innerKeySelector, outerResultSelector, innerResultSelector, mergeSelector)
+#### series.joinOuterLeft(self, inner, outerKeySelector, innerKeySelector, outerResultSelector, innerResultSelector, mergeSelector) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
 Performs a left outer join on two Series or DataFrames. Correlates the elements based on matching keys.
 Includes left elements that have no correlation.
 
 **Kind**: instance method of <code>[Series](#dataForge.Series)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns the joined series or dataframe.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -2256,11 +2269,12 @@ Includes left elements that have no correlation.
 
 <a name="dataForge.Series+joinOuterRight"></a>
 
-#### series.joinOuterRight(self, inner, outerKeySelector, innerKeySelector, outerResultSelector, innerResultSelector, mergeSelector)
+#### series.joinOuterRight(self, inner, outerKeySelector, innerKeySelector, outerResultSelector, innerResultSelector, mergeSelector) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
 Performs a right outer join on two Series or DataFrames. Correlates the elements based on matching keys.
 Includes right elements that have no correlation.
 
 **Kind**: instance method of <code>[Series](#dataForge.Series)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns the joined series or dataframe.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -2274,10 +2288,11 @@ Includes right elements that have no correlation.
 
 <a name="dataForge.Series+defaultIfEmpty"></a>
 
-#### series.defaultIfEmpty(defaultSequence)
+#### series.defaultIfEmpty(defaultSequence) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
 Returns the specified default sequence if the Series or DataFrame is empty.
 
 **Kind**: instance method of <code>[Series](#dataForge.Series)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns 'defaultSequence' if the input sequence is empty.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -2285,10 +2300,11 @@ Returns the specified default sequence if the Series or DataFrame is empty.
 
 <a name="dataForge.Series+union"></a>
 
-#### series.union(other, [comparer])
+#### series.union(other, [comparer]) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
 Returns the unique union of values between two Series or DataFrames.
 
 **Kind**: instance method of <code>[Series](#dataForge.Series)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns the union of two sequences.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -2297,10 +2313,11 @@ Returns the unique union of values between two Series or DataFrames.
 
 <a name="dataForge.Series+intersection"></a>
 
-#### series.intersection(other, [comparer])
+#### series.intersection(other, [comparer]) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
 Returns the intersection of values between two Series or DataFrames.
 
 **Kind**: instance method of <code>[Series](#dataForge.Series)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns the intersection of two sequences.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -2309,10 +2326,11 @@ Returns the intersection of values between two Series or DataFrames.
 
 <a name="dataForge.Series+except"></a>
 
-#### series.except(other, [comparer])
+#### series.except(other, [comparer]) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
 Returns the exception of values between two Series or DataFrames.
 
 **Kind**: instance method of <code>[Series](#dataForge.Series)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns the difference of one sequence to another.  
 
 | Param | Type | Description |
 | --- | --- | --- |

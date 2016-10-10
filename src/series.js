@@ -1890,6 +1890,8 @@ Series.prototype.at = function (index) {
  * Returns true if the Series contains the specified value.
  *
  * @param {function} value - The value to check for in the Series.
+ *
+ * @returns {boolean} Returns true if the sequence contains the specified value, false otherwise. 
  */
 Series.prototype.contains = function (value) {
 
@@ -1902,7 +1904,9 @@ Series.prototype.contains = function (value) {
 /**
  * Concatenate multiple other series onto this series.
  * 
- * @param {...array|Series} series - Multiple arguments. Each can be either a series or an array of series. 
+ * @param {...array|Series} series - Multiple arguments. Each can be either a series or an array of series.
+ * 
+ * @returns {Series} Returns a single series concatenated from multiple input series. 
  */
 Series.prototype.concat = function () {
 
@@ -1930,7 +1934,9 @@ Series.prototype.concat = function () {
  * @param {Series|DataFrame} inner - The inner Series or DataFrame to join.
  * @param {function} outerKeySelector - Selector that chooses the join key from the outer sequence.
  * @param {function} innerKeySelector - Selector that chooses the join key from the inner sequence.
- * @param {function} resultSelector - Selector that defines how to merge outer and inner values. 
+ * @param {function} resultSelector - Selector that defines how to merge outer and inner values.
+ * 
+ * @returns {Series|DataFrame} Returns the joined series or dataframe. 
  */
 Series.prototype.join = function (inner, outerKeySelector, innerKeySelector, resultSelector) {
 
@@ -1975,6 +1981,8 @@ Series.prototype.join = function (inner, outerKeySelector, innerKeySelector, res
  * Implementation from here:
  * 
  * 	http://blogs.geniuscode.net/RyanDHatch/?p=116
+ * 
+ * @returns {Series|DataFrame} Returns the joined series or dataframe. 
  */
 Series.prototype.joinOuter = function (rightSeries, outerKeySelector, innerKeySelector, resultSelector) {
 
@@ -2025,6 +2033,8 @@ Series.prototype.joinOuter = function (rightSeries, outerKeySelector, innerKeySe
  * Implementation from here:
  * 
  * 	http://blogs.geniuscode.net/RyanDHatch/?p=116
+ * 
+ * @returns {Series|DataFrame} Returns the joined series or dataframe. 
  */
 Series.prototype.joinOuterLeft = function (rightSeries, outerKeySelector, innerKeySelector, resultSelector) {
 
@@ -2066,6 +2076,8 @@ Series.prototype.joinOuterLeft = function (rightSeries, outerKeySelector, innerK
  * Implementation from here:
  * 
  * 	http://blogs.geniuscode.net/RyanDHatch/?p=116
+ * 
+ * @returns {Series|DataFrame} Returns the joined series or dataframe. 
  */
 Series.prototype.joinOuterRight = function (rightSeries, outerKeySelector, innerKeySelector, resultSelector) {
 
@@ -2096,6 +2108,8 @@ Series.prototype.joinOuterRight = function (rightSeries, outerKeySelector, inner
  * Returns the specified default sequence if the Series or DataFrame is empty. 
  *
  * @param {array|Series|DataFrame} defaultSequence - Default sequence to return if the Series or DataFrame is empty.
+ * 
+ * @returns {Series|DataFrame} Returns 'defaultSequence' if the input sequence is empty. 
  */
 Series.prototype.defaultIfEmpty = function (defaultSequence) {
 
@@ -2123,7 +2137,9 @@ Series.prototype.defaultIfEmpty = function (defaultSequence) {
  * Returns the unique union of values between two Series or DataFrames.
  *
  * @param {Series|DataFrame} other - The other Series or DataFrame to combine.
- * @param {function} [comparer] - Optional comparer that selects the value to compare.  
+ * @param {function} [comparer] - Optional comparer that selects the value to compare.
+ * 
+ * @returns {Series|DataFrame} Returns the union of two sequences.
  */
 Series.prototype.union = function (other, selector) {
 
@@ -2144,6 +2160,8 @@ Series.prototype.union = function (other, selector) {
  *
  * @param {Series|DataFrame} other - The other Series or DataFrame to combine.
  * @param {function} [comparer] - Optional comparer that selects the value to compare.  
+ * 
+ * @returns {Series|DataFrame} Returns the intersection of two sequences.
  */
 Series.prototype.intersection = function (other, comparer) {
 
@@ -2175,6 +2193,8 @@ Series.prototype.intersection = function (other, comparer) {
  *
  * @param {Series|DataFrame} other - The other Series or DataFrame to combine.
  * @param {function} [comparer] - Optional comparer that selects the value to compare.  
+ * 
+ * @returns {Series|DataFrame} Returns the difference of one sequence to another.
  */
 Series.prototype.except = function (other, comparer) {
 
