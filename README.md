@@ -28,43 +28,20 @@ Examples and some tests have been removed to a [separate repository](https://git
 
 - [Project Overview](#project-overview)
 - [Installation](#installation)
-  - [NodeJS installation and setup](#nodejs-installation-and-setup)
 - [Key Concepts](#key-concepts)
 - [Basic Usage](#basic-usage)
-- [Working with data](#working-with-data)
-  - [CSV](#csv)
-  - [JSON](#json)
-  - [XML](#xml)
-  - [YAML](#yaml)
-  - [Reading and writing files in Node.js](#reading-and-writing-files-in-nodejs)
-  - [Extracting rows from a data frame](#extracting-rows-from-a-data-frame)
-  - [Extracting columns and series from a data frame](#extracting-columns-and-series-from-a-data-frame)
-  - [Enumerating a series](#enumerating-a-series)
-  - [Enumerating an index](#enumerating-an-index)
-  - [Adding a column](#adding-a-column)
-  - [Replacing a column](#replacing-a-column)
-  - [Removing columns](#removing-columns)
 - [Immutability and Chained Functions](#immutability-and-chained-functions)
+- [Lazy Evaluation](#lazy-evaluation-1)
+- [Working with data](#working-with-data)
 - [Data exploration and visualization](#data-exploration-and-visualization)
 - [Data transformation](#data-transformation)
-  - [Data frame transformation](#data-frame-transformation)
-  - [Series transformation](#series-transformation)
-  - [Data frame and series filtering](#data-frame-and-series-filtering)
-  - [LINQ/PANDAS-style functions](#linq-pandas-style-functions)
-  - [Aggregation](#aggregation)
-  - [Rolling window](#rolling-window)
+- [LINQ/PANDAS-style functions](#linqpandas-style-functions)
+- [Collapsing unique values](#collapsing-unique-values)
+- [Groups and windows](#groups-and-windows)
+- [Summarization and Aggregation](#summarization-and-aggregation)
+- [Filling gaps and missing data](#filling-gaps-and-missing-data)
 - [Node.js examples](#nodejs-examples)
-  - [Working with CSV files](#working-with-csv-files)
-  - [Working with JSON files](#working-with-json-files)
-  - [Working a massive CSV file](#working-a-massive-csv-file)
-  - [Working with a MongoDB collection](#working-with-a-mongodb-collection)
-  - [Working with a massive MongoDB collection](#working-with-a-massive-mongodb-collection)
-  - [Working with HTTP](#working-with-http)
 - [Browser examples](#browser-examples)
-  - [Working with HTTP in the browser](#working-with-http-in-the-browser)
-  - [Working with HTTP in AngularJS](#working-with-http-in-angularjs)
-  - [Visualisation with Flot](#visualisation-with-flot)
-  - [Visualisation with Highstock](#visualisation-with-highstock)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -99,11 +76,6 @@ General implementation goals:
 - Lazy evaluation, to make the performance of immutability acceptable.
 - Should be easily extensible.
 - All the core code is created through test driven development.
-
-
-----------
-
-The rest of the README defines the setup and usage of Data-Forge. Certain features described here are not implemented yet. 
 
 # Installation
 
@@ -168,10 +140,6 @@ Use functions defined by the plugin, eg:
 		.then(function (dataFrame) {
 			// ... use the data returned from Yahoo ...
 		}); 
-
-## Meteor installation and setup
-
-Coming in the future. Can anyone help with that?
 
 ## Getting the code
 
@@ -494,6 +462,30 @@ Be aware that promoting a column to an index in Data-Forge doesn't remove the co
 
 An index is required for certain operations like `merge`.
 
+## Reading CSV files
+
+	var fs = require('fs');
+	var inputCsvData = fs.readFileSync('some-csv-file.csv', 'utf8');
+	var dataFrame = dataForge.fromCSV(inputCsvData );
+
+## Writing CSV files
+
+	var fs = require('fs');
+	var outputCsvData = dataFrame.toCSV();
+	fs.writeFileSync('some-other-csv-file.csv', outputCsvData);
+
+## Reading JSON files
+
+	var fs = require('fs');
+	var inputJsonData = fs.readFileSync('some-json-file.json', 'utf8');
+	var dataFrame = dataForge.fromJSON(inputJsonData);
+
+## Writing CSV files
+
+	var fs = require('fs');
+	var outputJsonData = dataFrame.toJSON();
+	fs.writeFileSync('some-other-json-file.json', outputJsonData);
+
 # Immutability and Chained Functions
 
 You may have noticed in previous examples that multiple functions have been chained.
@@ -512,47 +504,49 @@ Consider an alternate structure:
 
 Here *df1*, *df2* and *df3* are separate data-frames with the results of the previous operations applied. These data-frames are all immutable and cannot be changed. Any function that transforms a data-frame returns a new and independent data frame. If you are not used to this sort of thing, it may require some getting used to!
 
+# Lazy Evaluation
+
+Lazy evaluation in Data-Forge is implemented through *iterators*. 
+
+An iterator is retrieved from a data-frame, series or index by calling `getIterator`. A new and distinct iterator is created each time `getIterator` is called.
+
+For example:
+
+	var iterator = dataFrame.getIterator();
+
+Or
+
+	var iterator = series.getIterator();
+
+Or 
+
+	var iterator = index.getIterator();
+
+An iterator can be used to traverse a sequence and extract each index+value pair in turn.
+
+	var iterator = something.getIterator();
+	while (iterator.moveNext()) {
+		var pair = iterator.getCurrent();
+		// do something with the pair.
+	}
+
+A data-frame can be created from a function that returns an iterator. This is the primary mechanism that supports creation of a pipeline of lazy DataFrames. 
+
+	var df = new dataForge.DataFrame({ 
+		iterable: function () {
+			return ... some iterator ...
+		},
+	});
+
+A series can also be created from a function that returns an iterator:
+
+	var series = new dataForge.Series({ 
+		iterable: function () {
+			return ... some iterator ...
+		},
+	});
+
 # Working with data
-
-Data-Forge has built-in support for serializing and deserializing common data formats.
-
-## CSV 
-
-	var dataFrame = dataForge.fromCSV("<csv-string-data>");
-
-	var csvTextData = dataFrame.toCSV();
-
-## JSON
-
-	var dataFrame = dataForge.fromJSON("<json-string-data>");
-
-	var jsonTextData = dataFrame.toJSON();
-
-## XML
-
-	var dataFrame = dataForge.fromXML("<xml-string-data>");
-
-	var xmlTextData = dataFrame.toXML();
-
-## YAML
-
-	var dataFrame = dataForge.fromYAML("<yaml-string-data>");
-
-	var yamlTextData = dataFrame.toYAML();
-
-## Reading and writing files in Node.js
-
-The *from* and *to* functions can be used in combination with Node.js `fs` functions for reading and writing files, eg:
-
-	var fs = require('fs');
-
-	var inputCsvData = fs.readFileSync('some-csv-file.csv', 'utf8');
-	var dataFrame = dataForge.fromCSV(inputCsvData );
-
-	var outputCsvData = dataFrame.toCSV();
-	fs.writeFileSync('some-other-csv-file.csv', outputCsvData);
-
-See the [examples section](#examples) for more examples of loading various data sources and formats.
 
 ## Extracting rows from a data-frame
 
@@ -698,48 +692,6 @@ A particular value of a Series or a row of DataFrame can be set by specifying th
 
 Series and DataFrame are immutable, so the set operation does not modify in place, it returns a new Series or DataFrame.
 
-# Lazy Evaluation
-
-Lazy evaluation in Data-Forge is implemented through *iterators*. 
-
-An iterator is retrieved from a data-frame, series or index by calling `getIterator`. A new and distinct iterator is created each time `getIterator` is called.
-
-For example:
-
-	var iterator = dataFrame.getIterator();
-
-Or
-
-	var iterator = series.getIterator();
-
-Or 
-
-	var iterator = index.getIterator();
-
-An iterator can be used to traverse a sequence and extract each index+value pair in turn.
-
-	var iterator = something.getIterator();
-	while (iterator.moveNext()) {
-		var pair = iterator.getCurrent();
-		// do something with the pair.
-	}
-
-A data-frame can be created from a function that returns an iterator. This is the primary mechanism that supports creation of a pipeline of lazy DataFrames. 
-
-	var df = new dataForge.DataFrame({ 
-		iterable: function () {
-			return ... some iterator ...
-		},
-	});
-
-A series can also be created from a function that returns an iterator:
-
-	var series = new dataForge.Series({ 
-		iterable: function () {
-			return ... some iterator ...
-		},
-	});
-  
 # Data exploration and visualization
 
 In order to understand the data we are working with we must explore it, understand the data types involved and the composition of the values.
