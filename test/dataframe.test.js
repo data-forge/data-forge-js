@@ -1378,34 +1378,6 @@ describe('DataFrame', function () {
 		]);
 	});
 
-	it('checking if an empty dataFrame contains a row returns false', function () {
-
-		var dataFrame = new DataFrame();
-		expect(dataFrame.contains({ Column1: 10 })).to.eql(false);
-	});
-
-	it('can check if dataFrame contains a particular row', function () {
-
-		var dataFrame = new DataFrame({ 
-			columnNames: ["Column1"],
-			index:  [100, 200, 300],
-			values:   [[10], [20], [30]],
-		});
-
-		expect(dataFrame.contains({ Column1: 20 })).to.eql(true);
-	});
-
-	it('can check if dataFrame does not contain a particular row', function () {
-
-		var dataFrame = new DataFrame({ 
-			columnNames: ["Column1"],
-			index:  [100, 200, 300],
-			values:   [[10], [20], [30]],
-		});
-
-		expect(dataFrame.contains({ Column1: 3000 })).to.eql(false);
-	});
-
 	it('can parse single columns', function () {
 
 		var df = new DataFrame({

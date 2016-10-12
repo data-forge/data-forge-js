@@ -1278,21 +1278,6 @@ DataFrame.prototype.pivot = function (column, value) {
 };
 
 /**
- * Returns true if the DataFrame contains the specified row.
- *
- * @param {function} row - The row to check for in the DataFrame.
- */
-DataFrame.prototype.contains = function (row) {
-
-	var self = this;
-	var json = JSON.stringify(row); //todo: This feels somewhat dodgey.
-
-	return self.any(function (searchRow) {
-			return JSON.stringify(searchRow) === json;
-		});
-};
-
-/**
  * Concatenate multiple other dataframes onto this dataframe.
  * 
  * @param {...array|DataFrame} dataFrames - Multiple arguments. Each can be either a dataframe or an array of dataframe.

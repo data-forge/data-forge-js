@@ -1885,21 +1885,6 @@ Series.prototype.at = function (index) {
 };
 
 /**
- * Returns true if the Series contains the specified value.
- *
- * @param {function} value - The value to check for in the Series.
- *
- * @returns {boolean} Returns true if the sequence contains the specified value, false otherwise. 
- */
-Series.prototype.contains = function (value) {
-
-	var self = this;
-	return self.any(function (searchValue) {
-			return searchValue === value;
-		});
-};
-
-/**
  * Concatenate multiple other series onto this series.
  * 
  * @param {...array|Series} series - Multiple arguments. Each can be either a series or an array of series.
