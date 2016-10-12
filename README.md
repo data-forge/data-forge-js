@@ -29,6 +29,7 @@ Examples and some tests have been removed to a [separate repository](https://git
 - [Project Overview](#project-overview)
 - [Installation](#installation)
 - [Key Concepts](#key-concepts)
+- [A note about JavaScript anonymous functions](#a-note-about-javascript-anonymous-functions)
 - [Basic Usage](#basic-usage)
 - [Immutability and Chained Functions](#immutability-and-chained-functions)
 - [Lazy Evaluation](#lazy-evaluation-1)
@@ -277,13 +278,11 @@ An example:
 
 ## Generator
 
-todo: Review and revise this section.
-
 A generator is a function that produces zero or more values to be inserted into a Series or DataFrame.
 
 A generator may take arguments and it can return an array of values or rows:
 
-	function myGenerator = function (... appropriate arguments ...) {
+	var myGenerator = function (... appropriate arguments ...) {
 		return [
 			[ .. generated row 1 .. ],
 			[ .. row 2 .. ],
@@ -294,14 +293,28 @@ A generator may take arguments and it can return an array of values or rows:
 
 Alternatively (to support lazy evaluation) a generator may return a lazily evaluated *iterable*, that is a function that returns an iterator for a sequence of values or rows:
 
-
-	function myGenerator = function (... appropriate arguments ...) {
+	var myGenerator = function (... appropriate arguments ...) {
 		return function () {
 			var myIterator = ... some iterator for a sequence of values or rows ...
 			return myIterator;
 		};
 	};
 
+# A note about JavaScript anonymous functions
+
+Use of DataForge relies heavily on the use of JavaScript anonymous functions. Note that for some of the examples I use the new [arrow syntax](https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Functions/Arrow_functions) that was introduced in [ES6](https://en.wikipedia.org/wiki/ECMAScript#ES6).
+
+An example of an arrow syntax anonymous function:
+
+	(param1, param2) => 1 + 1
+
+Most times however in the examples I have used the traditional syntax:
+
+	function (param1, param2) {
+		return 1 + 1;
+	}
+
+Even though I haven't used it much in this readme, I prefer the new syntax as it is more concise and the code flows better when multiple are chained together.
 
 # Basic Usage 
 
@@ -533,7 +546,7 @@ An iterator can be used to traverse a sequence and extract each index+value pair
 A data-frame can be created from a function that returns an iterator. This is the primary mechanism that supports creation of a pipeline of lazy DataFrames. 
 
 	var df = new dataForge.DataFrame({ 
-		iterable: function () {
+		iterable: () => 
 			return ... some iterator ...
 		},
 	});
