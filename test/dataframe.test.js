@@ -166,15 +166,15 @@ describe('DataFrame', function () {
 			[5, 6]
 		);
 		var columns = dataFrame.getColumns();
-		expect(columns.length).to.eql(4);
+		expect(columns.count()).to.eql(4);
 
-		expect(columns[0].name).to.eql('Date');
-		expect(columns[0].series.toValues()).to.eql([new Date(1975, 24, 2), new Date(2015, 24, 2)]);
+		expect(columns.at(0).name).to.eql('Date');
+		expect(columns.at(0).series.toValues()).to.eql([new Date(1975, 24, 2), new Date(2015, 24, 2)]);
 
-		expect(columns[2].name).to.eql('Value2');
-		expect(columns[2].series.toValues()).to.eql(['foo', 'bar']);
+		expect(columns.at(2).name).to.eql('Value2');
+		expect(columns.at(2).series.toValues()).to.eql(['foo', 'bar']);
 	});
-	
+
 	it('can retreive column subset as new dataframe', function () 
 	{
 		var dataFrame = initDataFrame(
@@ -594,10 +594,10 @@ describe('DataFrame', function () {
 		var renamed = dataFrame.renameSeries(newColumnNames);
 		expect(renamed.getColumnNames()).to.eql(newColumnNames);
 		var columns = renamed.getColumns();
-		expect(columns.length).to.eql(3);
-		expect(columns[0].series.toValues()).to.eql([300, 200]);
-		expect(columns[1].series.toValues()).to.eql(['c', 'b']);
-		expect(columns[2].series.toValues()).to.eql([3, 1]);
+		expect(columns.count()).to.eql(3);
+		expect(columns.at(0).series.toValues()).to.eql([300, 200]);
+		expect(columns.at(1).series.toValues()).to.eql(['c', 'b']);
+		expect(columns.at(2).series.toValues()).to.eql([3, 1]);
 	});
 
 	it('can extract values as array objects', function () {
@@ -1100,7 +1100,7 @@ describe('DataFrame', function () {
 		
 		var dataFrame = new dataForge.DataFrame();
 		expect(dataFrame.getColumnNames()).to.eql([]);
-		expect(dataFrame.getColumns()).to.eql([]);
+		expect(dataFrame.getColumns().count()).to.eql(0);
 		expect(dataFrame.toRows()).to.eql([]);
 	})
 
@@ -1108,7 +1108,7 @@ describe('DataFrame', function () {
 		
 		var dataFrame = new dataForge.DataFrame({});
 		expect(dataFrame.getColumnNames()).to.eql([]);
-		expect(dataFrame.getColumns()).to.eql([]);
+		expect(dataFrame.getColumns().count()).to.eql(0);
 		expect(dataFrame.toRows()).to.eql([]);
 	})
 
@@ -1134,13 +1134,13 @@ describe('DataFrame', function () {
 		])
 		
 		var columns = dataFrame.getColumns();
-		expect(columns.length).to.eql(2);
+		expect(columns.count()).to.eql(2);
 
-		expect(columns[0].name).to.eql("Col1");
-		expect(columns[0].series.toValues()).to.eql([1, 10]);
+		expect(columns.at(0).name).to.eql("Col1");
+		expect(columns.at(0).series.toValues()).to.eql([1, 10]);
 
-		expect(columns[1].name).to.eql("Col2");
-		expect(columns[1].series.toValues()).to.eql(["hello", "computer"]);
+		expect(columns.at(1).name).to.eql("Col2");
+		expect(columns.at(1).series.toValues()).to.eql(["hello", "computer"]);
 	});
 
 	/*todo: Would like to enable this feature again one day.
@@ -1168,19 +1168,19 @@ describe('DataFrame', function () {
 		]);
 		
 		var columns = dataFrame.getColumns();
-		expect(columns.length).to.eql(4);
+		expect(columns.count()).to.eql(4);
 
-		expect(columns[0].name).to.eql("Col1");
-		expect(columns[0].series.toValues()).to.eql([1]);
+		expect(columns.at(0).name).to.eql("Col1");
+		expect(columns.at(0).series.toValues()).to.eql([1]);
 
-		expect(columns[1].name).to.eql("Col2");
-		expect(columns[1].series.toValues()).to.eql(["hello"]);
+		expect(columns.at(1).name).to.eql("Col2");
+		expect(columns.at(1).series.toValues()).to.eql(["hello"]);
 
-		expect(columns[2].name).to.eql("Col3");
-		expect(columns[2].series.toValues()).to.eql([10]);
+		expect(columns.at(2).name).to.eql("Col3");
+		expect(columns.at(2).series.toValues()).to.eql([10]);
 
-		expect(columns[3].name).to.eql("Col4");
-		expect(columns[3].series.toValues()).to.eql(["computer"]);
+		expect(columns.at(3).name).to.eql("Col4");
+		expect(columns.at(3).series.toValues()).to.eql(["computer"]);
 	});
 	*/	
 
@@ -1194,7 +1194,7 @@ describe('DataFrame', function () {
 			});
 
 		expect(dataFrame.getColumnNames()).to.eql([]);
-		expect(dataFrame.getColumns()).to.eql([]);
+		expect(dataFrame.getColumns().count()).to.eql(0);
 		expect(dataFrame.toRows()).to.eql([[], []]);
 	});	
 

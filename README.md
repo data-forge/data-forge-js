@@ -584,15 +584,25 @@ Get the names of the columns:
 
 	var arrayOfColumnNames = dataFrame.getColumnNames();
 
-Get an array of all columns:
+Get a Series of all columns:
 
-	var arrayOfColumns = dataFrame.getColumns();
+	var columns = dataFrame.getColumns();
+	var arrayOfColumns = columns.toValues();
 
 	for (var column in columns) {
 		var name = column.name;
 		var series = column.series;
 		// ... do something with the column ...
 	}
+
+The advantage to having a Series of columns, rather than a normal JavaScript array is that you can access to all the tools that Series offers for slicing and dicing a sequence, for example:
+
+	var sortedColumnsSubject = dataFrame.getColumns()
+		.where(column => column.name !== "Date")
+		.skip(2)
+		.take(3)
+		.orderBy(column => column.name)
+		;
 
 Get the series for a column by name:
 

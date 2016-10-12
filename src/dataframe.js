@@ -409,14 +409,16 @@ DataFrame.prototype.getColumns = function () {
 
 	var self = this;
 
-	return E.from(self.getColumnNames())
-		.select(function (columnName) {
-			return {
-				name: columnName,
-				series: self.getSeries(columnName),
-			};
-		})
-		.toArray();
+	return new Series({
+		values: E.from(self.getColumnNames())
+			.select(function (columnName) {
+				return {
+					name: columnName,
+					series: self.getSeries(columnName),
+				};
+			})
+			.toArray() 
+	});
 };
 
 /**
@@ -753,7 +755,7 @@ DataFrame.prototype.detectTypes = function () {
 
 	var self = this;
 
-	var dataFrames = E.from(self.getColumns())
+	var dataFrames = self.getColumns()
 		.select(function (column) {
 			var series = column.series;
 			var numValues = series.count();
@@ -769,7 +771,7 @@ DataFrame.prototype.detectTypes = function () {
 				.detectTypes()
 				.withSeries('Column', newSeries);
 		})
-		.toArray();
+		.toValues();
 	return concatDataFrames(dataFrames).resetIndex();
 };
 
@@ -783,7 +785,7 @@ DataFrame.prototype.detectValues = function () {
 
 	var self = this;
 
-	var dataFrames = E.from(self.getColumns())
+	var dataFrames = self.getColumns()
 		.select(function (column) {
 			var numValues = column.series.toValues().length;
 			//todo: broad-cast column
@@ -796,7 +798,7 @@ DataFrame.prototype.detectValues = function () {
 			});
 			return column.series.detectValues().withSeries('Column', newSeries);
 		})
-		.toArray();
+		.toValues();
 	return concatDataFrames(dataFrames).resetIndex();
 };
 
