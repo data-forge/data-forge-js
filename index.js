@@ -107,6 +107,14 @@ var dataForge = {
 
 		if (config) {
 			assert.isObject(config, "Expected 'config' parameter to 'dataForge.fromJSON' to be an object with configuration to pass to the DataFrame.");
+
+			if (config.columnNames) {
+				assert.isArray(config.columnNames, "Expect 'columnNames' field of 'config' parameter to DataForge.fromCSV to be an array of strings that specify column names.")
+
+				config.columnNames.forEach(function (columnName) {
+					assert.isString(columnName, "Expect 'columnNames' field of 'config' parameter to DataForge.fromCSV to be an array of strings that specify column names.")
+				});
+			}			
 		}
 
 		var csvConfig = extend({}, config);
@@ -142,27 +150,35 @@ var dataForge = {
 		if (rows.length === 0) {
 			return new dataForge.DataFrame({ columnNames: [], values: [] });
 		}
-				
-		var columnNames = E.from(E.from(rows).first())
-				.select(function (columnName) {
-					return columnName.trim();
-				})
-				.toArray();
 
-		var remaining = E.from(rows)
-			.skip(1)
+		var columnNames;
+		rows = E.from(rows)
 			.select(function (row) {
 				return E.from(row)
 					.select(function (cell) {
-						return cell.trim();
+						return cell.trim(); // Trim each cell.
 					})
 					.toArray()
 			})
 			.toArray();
 
+		if (config && config.columnNames) {
+			columnNames = config.columnNames;
+		}
+		else {
+			columnNames = E.from(E.from(rows).first())
+				.select(function (columnName) {
+					return columnName.trim();
+				})
+				.toArray();
+			rows = E.from(rows)
+				.skip(1) // Skip header.
+				.toArray();
+		}
+
 		var baseConfig = {
 			columnNames: columnNames, 
-			values: remaining,
+			values: rows,
 		};
 		var dataFrameConfig = extend({}, config || {}, baseConfig);
 		return new dataForge.DataFrame(dataFrameConfig);

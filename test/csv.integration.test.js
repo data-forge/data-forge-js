@@ -65,6 +65,50 @@ describe('csv.integration', function () {
 		]);
 	});
 
+	it('can read CSV with explicit header', function () {
+		
+		var csv =
+			"1975-2-24, 100, foo, 22\n" +
+			"2015-10-23, 300, bar, 23";
+
+		var dataFrame = dataForge.fromCSV(csv, { columnNames: ["Date", "Value1", "Value2", "Value3"] });
+		var series1 = dataFrame.getSeries('Value1');
+		expect(series1.toValues()).to.eql([
+			'100',
+			'300',
+		]);
+		
+		var series2 = dataFrame.getSeries('Value2');
+		expect(series2.toValues()).to.eql([
+			'foo',
+			'bar',			
+		]);
+		
+		expect(dataFrame.getColumnNames()).to.eql([
+			"Date",
+			'Value1',
+			'Value2',
+			'Value3',			
+		]);
+		
+		expect(dataFrame.toRows()).to.eql([
+			['1975-2-24', '100', "foo", '22'],
+			['2015-10-23', '300', "bar", '23'],
+		]);
+		
+		var dataFrame2 = dataFrame.subset(['Value1', 'Value3']); 
+		
+		expect(dataFrame2.getColumnNames()).to.eql([
+			'Value1',
+			'Value3',			
+		]);
+		
+		expect(dataFrame2.toRows()).to.eql([
+			['100', '22'],
+			['300', '23'],			
+		]);
+	});
+
 	it('can handle CSV with trailing commas', function () {
 		
 		var csv =

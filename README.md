@@ -477,9 +477,15 @@ An index is required for certain operations like `merge`.
 
 ## Reading CSV files
 
+If your CSV has a header with column names:
+
 	var fs = require('fs');
 	var inputCsvData = fs.readFileSync('some-csv-file.csv', 'utf8');
 	var dataFrame = dataForge.fromCSV(inputCsvData );
+
+If your CSV doesn't have a header:
+
+	var dataFrame = dataForge.fromCSV(inputCsvData, { columnNames: ["some", "explicit", "column", "names"] } );
 
 ## Writing CSV files
 
