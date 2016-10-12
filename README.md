@@ -864,7 +864,7 @@ LINQ-style functions that are currently available (or close equivalents):
 - orderBy/orderByDescending/thenBy/thenByDescending
 - groupBy
 - distinct
-- toValues/toObjects
+- toValues/toRows
 - count
 - head/tail
 - first/last
@@ -1216,7 +1216,7 @@ When working with large text files use *FileReader* and *FileWriter*. *FileReade
 
 			var outputDataFrame = inputDataFrame.select(... some transformation ...);
 
-			return db.someOtherCollection.insert(outputDataFrame.toObjects());			
+			return db.someOtherCollection.insert(outputDataFrame.toValues());			
 		})
 		.then(function () {
 			console.log('Done!');
@@ -1241,7 +1241,7 @@ Same as previous example, except use skip and take to only process a window of t
 
 			var outputDataFrame = inputDataFrame.select(... some transformation ...);
 
-			return db.someOtherCollection.insert(outputDataFrame.toObjects());			
+			return db.someOtherCollection.insert(outputDataFrame.toValues());			
 		})
 		.then(function () {
 			console.log('Done!');
@@ -1270,7 +1270,7 @@ Same as previous example, except use skip and take to only process a window of t
 					method: 'POST',
 					uri: "http://some-host/another/rest/api',
 					body: { 
-						data: outputDataFrame.toObjects() 
+						data: outputDataFrame.toValues() 
 					},
 					json: true,
 				});			 
@@ -1306,7 +1306,7 @@ Note the differences in the way plugins are referenced than in the NodeJS versio
 	);
 
 	var someDataFrame = ...
-	$.post(url, someDataFrame.toObjects(),
+	$.post(url, someDataFrame.toValues(),
 		function (data) {
 			// ...
 		}
@@ -1352,7 +1352,7 @@ Note the differences in the way plugins are referenced than in the NodeJS versio
 		});
 
 	var someDataFrame = ...
-	$http.post(url, someDataFrame.toObjects())
+	$http.post(url, someDataFrame.toValues())
 		.then(function () {
 			// ... handle success ...
 		})
