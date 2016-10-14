@@ -570,6 +570,15 @@ DataFrame.prototype.withSeries = function (columnName, series) {
 
 	var self = this;
 
+	if (self.none()) {
+		// Empty data frame.
+		return series.inflate(function (value) {
+				var row = {};
+				row[columnName] = value;
+				return row;
+			});
+	}
+
 	return new DataFrame({
 		iterable: {
 			getIterator: function () {
