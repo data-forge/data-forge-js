@@ -2203,3 +2203,20 @@ Series.prototype.except = function (other, comparer) {
 		})
 		;
 };
+
+/** 
+ * Convert a series or a dataframe to a series of pairs in the form [pair1, pair2, pair3, ...] where each pair is [index, value].
+ * 
+ * @returns {Series} Returns a series of pairs for each index and value pair in the input sequence.
+ */
+Series.prototype.asPairs = function () {
+
+	var self = this;
+	return new Series({
+		iterable: new PairsIterable(
+			new CountIterable(),
+			self
+		),
+	})
+
+};
