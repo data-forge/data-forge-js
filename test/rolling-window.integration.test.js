@@ -22,9 +22,14 @@ describe('rolling window integration', function () {
 
 		var newSeries = dataFrame.getSeries('Value')
 			.rollingWindow(5)
-			.selectPairs(function (windowIndex, window) {
+			.asPairs()
+			.select(function (pair) {
+				var windowIndex = pair[0]
+				var window = pair[1];
 				return [window.getIndex().last(), window.last()];
-			});
+			})
+			.asValues()
+			;
 
 		expect(newSeries.getIndex().toValues()).to.eql([14, 15, 16, 17, 18, 19, 20, 21]);
 		expect(newSeries.toValues()).to.eql([5, 6, 7, 8, 9, 10, 11, 12]);
@@ -97,9 +102,13 @@ describe('rolling window integration', function () {
 		var dataFrame = genDataFrame(2, 4);
 		var series = dataFrame
 			.window(2)
-			.selectPairs(function (windowIndex, window) {
+			.asPairs()
+			.select(function (pair) {
+				var windowIndex = pair[0]
+				var window = pair[1];
 				return [windowIndex, [window.getSeries("1").sum(), window.getSeries("2").sum()]];
 			})
+			.asValues()
 			.selectMany(function (value) {
 				assert.isArray(value);
 				return value; // The value is already a list.
@@ -118,9 +127,19 @@ describe('rolling window integration', function () {
 		var dataFrame = genDataFrame(2, 4);
 		var series = dataFrame
 			.rollingWindow(2)
-			.selectPairs(function (windowIndex, window) {
-				return [windowIndex, [window.getSeries("1").sum(), window.getSeries("2").sum()]];
+			.asPairs()
+			.select(function (pair) {
+				var windowIndex = pair[0]
+				var window = pair[1];
+				return [
+					windowIndex, 
+					[
+						window.getSeries("1").sum(), 
+						window.getSeries("2").sum()
+					]
+				];
 			})
+			.asValues()
 			.selectMany(function (value) {
 				assert.isArray(value);
 				return value; // The value is already a list.

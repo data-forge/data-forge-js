@@ -136,16 +136,6 @@ describe('Series', function () {
 		expect(modified.toValues()).to.eql([110, 310, 210, 15]);		
 	});
 
-	it('can select pairs', function () {
-		var series = initSeries([0, 1, 2, 3], [100, 300, 200, 5]);
-		var modified = series.selectPairs(function (index, value) {
-				expect(index).to.be.a('number');
-				return [index+1, value + 10];
-			});
-		expect(modified.getIndex().toValues()).to.eql([1, 2, 3, 4]);
-		expect(modified.toValues()).to.eql([110, 310, 210, 15]);		
-	});
-
 	it('can select many - with array', function () {
 		var series = initSeries([0, 1, 2, 3], [100, 300, 200, 5]);
 		var modified = series.selectMany(function (value) {
@@ -179,18 +169,6 @@ describe('Series', function () {
 			});
 		expect(modified.getIndex().toValues()).to.eql([0, 0, 1, 1]);
 		expect(modified.toValues()).to.eql([{ Value: 100 }, { Value: 101 }, { Value: 300 }, { Value: 301 }]);
-	});
-
-	it('can select many pairs', function () {
-		var series = initSeries([0, 1, 2, 3], [100, 300, 200, 5]);
-		var modified = series.selectManyPairs(function (index, value) {
-				return [
-					[index, value],
-					[index, value],
-				];
-			});
-		expect(modified.getIndex().toValues()).to.eql([0, 0, 1, 1, 2, 2, 3, 3]);
-		expect(modified.toValues()).to.eql([100, 100, 300, 300, 200, 200, 5, 5]);		
 	});
 
 	it('responds gracefully to non-list returned from selectMany selector', function () {
@@ -389,9 +367,14 @@ describe('Series', function () {
 
 		var series = new Series();
 		var windowed = series.window(2)
-			.selectPairs(function (windowIndex, window) {
+			.asPairs()
+			.select(function (pair) {
+				var windowIndex = pair[0];
+				var window = pair[1];
 				return [windowIndex, window.sum()];
-			});
+			})
+			.asValues()
+			;
 
 		expect(windowed.count()).to.eql(0);
 	});
@@ -401,9 +384,14 @@ describe('Series', function () {
 		var series = new Series({ values: [1, 2, 3, 4] });
 		var windowed = series
 			.window(2)
-			.selectPairs(function (windowIndex, window) {
+			.asPairs()
+			.select(function (pair) {
+				var windowIndex = pair[0];
+				var window = pair[1];
 				return [windowIndex, window.toValues()];
-			});
+			})
+			.asValues()
+			;
 
 		expect(windowed.toPairs()).to.eql([
 			[0, [1, 2]],
@@ -416,9 +404,14 @@ describe('Series', function () {
 		var series = new Series({ values: [1, 2, 3, 4, 5] });
 		var windowed = series
 			.window(2)
-			.selectPairs(function (windowIndex, window) {
+			.asPairs()
+			.select(function (pair) {
+				var windowIndex = pair[0];
+				var window = pair[1];
 				return [windowIndex, window.toValues()];
-			});
+			})
+			.asValues()
+			;
 
 		expect(windowed.toPairs()).to.eql([
 			[0, [1, 2]],
@@ -432,9 +425,14 @@ describe('Series', function () {
 		var series = new Series({ values: [1, 2, 3, 4, 5, 6] });
 		var windowed = series
 			.window(3)
-			.selectPairs(function (windowIndex, window) {
+			.asPairs()
+			.select(function (pair) {
+				var windowIndex = pair[0];
+				var window = pair[1];
 				return [windowIndex, window.toValues()];
-			});
+			})
+			.asValues()
+			;
 
 		expect(windowed.toPairs()).to.eql([
 			[0, [1, 2, 3]],
@@ -448,9 +446,14 @@ describe('Series', function () {
 		var series = new Series({ values: [1, 2, 3, 4, 5] });
 		var windowed = series
 			.window(3)
-			.selectPairs(function (windowIndex, window) {
+			.asPairs()
+			.select(function (pair) {
+				var windowIndex = pair[0];
+				var window = pair[1];
 				return [windowIndex, window.toValues()];
-			});
+			})
+			.asValues()
+			;
 
 		expect(windowed.toPairs()).to.eql([
 			[0, [1, 2, 3]],
@@ -464,9 +467,14 @@ describe('Series', function () {
 		var series = initSeries([], []);
 		var newSeries = series
 			.rollingWindow(2)
-			.selectPairs(function (windowIndex, window) {
+			.asPairs()
+			.select(function (pair) {
+				var windowIndex = pair[0];
+				var window = pair[1];
 				return [windowIndex, window.toValues()];
-			});
+			})
+			.asValues()
+			;
 
 		expect(newSeries.toValues().length).to.eql(0);
 	});
@@ -476,9 +484,14 @@ describe('Series', function () {
 		var series = initSeries([0, 1], [1, 2]);
 		var newSeries = series
 			.rollingWindow(3)
-			.selectPairs(function (windowIndex, window) {
+			.asPairs()
+			.select(function (pair) {
+				var windowIndex = pair[0];
+				var window = pair[1];
 				return [windowIndex, window.toValues()];
-			});
+			})
+			.asValues()
+			;
 
 		expect(newSeries.toValues().length).to.eql(0);
 	});
@@ -488,9 +501,14 @@ describe('Series', function () {
 		var series = initSeries(E.range(0, 5).toArray(), E.range(0, 5).toArray());
 		var newSeries = series
 			.rollingWindow(2)
-			.selectPairs(function (windowIndex, window) {
+			.asPairs()
+			.select(function (pair) {
+				var windowIndex = pair[0];
+				var window = pair[1];
 				return [windowIndex, window.toValues()];
-			});
+			})
+			.asValues()
+			;
 
 		var index = newSeries.getIndex().toValues();
 		expect(index).to.eql([0, 1, 2, 3]);
@@ -508,9 +526,14 @@ describe('Series', function () {
 		var series = initSeries(E.range(0, 5).toArray(), E.range(0, 5).toArray());
 		var newSeries = series
 			.rollingWindow(3)
-			.selectPairs(function (windowIndex, window) {
+			.asPairs()
+			.select(function (pair) {
+				var windowIndex = pair[0];
+				var window = pair[1];
 				return [windowIndex, window.toValues()];
-			});
+			})
+			.asValues()
+			;
 
 		var index = newSeries.getIndex().toValues();
 		expect(index).to.eql([0, 1, 2]);
@@ -527,9 +550,14 @@ describe('Series', function () {
 		var series = initSeries(E.range(0, 6).toArray(), E.range(0, 6).toArray());
 		var newSeries = series
 			.rollingWindow(2)
-			.selectPairs(function (windowIndex, window) {
+			.asPairs()
+			.select(function (pair) {
+				var windowIndex = pair[0];
+				var window = pair[1];
 				return [windowIndex+10, window.toValues()];
-			});
+			})
+			.asValues()
+			;
 
 		var index = newSeries.getIndex().toValues();
 		expect(index).to.eql([10, 11, 12, 13, 14]);
@@ -548,9 +576,14 @@ describe('Series', function () {
 		var series = initSeries(E.range(0, 6).toArray(), E.range(0, 6).toArray());
 		var newSeries = series
 			.rollingWindow(3)
-			.selectPairs(function (windowIndex, window) {
+			.asPairs()
+			.select(function (pair) {
+				var windowIndex = pair[0];
+				var window = pair[1];
 				return [windowIndex, window.toValues()];
-			});
+			})
+			.asValues()
+			;
 
 		var index = newSeries.getIndex().toValues();
 		expect(index).to.eql([0, 1, 2, 3]);
@@ -568,11 +601,16 @@ describe('Series', function () {
 		var series = initSeries(E.range(0, 6).toArray(), E.range(0, 6).toArray());
 		var newSeries = series
 			.rollingWindow(3)
-			.selectPairs(function (windowIndex, window) {
+			.asPairs()
+			.select(function (pair) {
+				var windowIndex = pair[0];
+				var window = pair[1];
 				var index = window.getIndex().toValues();
 				var values = window.toValues();
 				return [index[index.length-1], values[values.length-1]];
-			});
+			})
+			.asValues()
+			;
 
 		var index = newSeries.getIndex().toValues();
 		expect(index).to.eql([2, 3, 4, 5]);
@@ -883,49 +921,6 @@ describe('Series', function () {
 		expect(function () {
 			series.firstPair();
 		}).to.throw();
-	});
-
-	it('getting last pair of empty series throws exception', function () {
-
-		var series = initSeries([], []);
-
-		expect(function () {
-			series.lastPair();
-		}).to.throw();
-	});
-
-	it('can get first and last pairs', function () {
-
-		var series = initSeries([0, 1, 2], ['A', 'B', 'C']);
-
-		expect(series.firstPair()).to.eql([0, 'A']);
-		expect(series.lastPair()).to.eql([2, 'C']);
-	});
-
-	it('getting first index of empty series throws exception', function () {
-
-		var series = initSeries([], []);
-
-		expect(function () {
-			series.firstPair();
-		}).to.throw();
-	});
-
-	it('getting last index of empty series throws exception', function () {
-
-		var series = initSeries([], []);
-
-		expect(function () {
-			series.lastPair();
-		}).to.throw();
-	});
-
-	it('can get first and last indicies', function () {
-
-		var series = initSeries([0, 1, 2], ['A', 'B', 'C']);
-
-		expect(series.firstIndex()).to.eql(0);
-		expect(series.lastIndex()).to.eql(2);
 	});
 
 	it('can reverse', function () {
@@ -1378,9 +1373,14 @@ describe('Series', function () {
 		});
 
 		var collapsed = series.groupSequentialBy()
-			.selectPairs(function (windowIndex, window) {
+			.asPairs()
+			.select(function (pair) {
+				var windowIndex = pair[0];
+				var window = pair[1];
 				return [window.getIndex().first(), window.first()];
-			});
+			})
+			.asValues()
+			;
 
 		expect(collapsed.toPairs()).to.eql([
 			[0, 1],
@@ -1400,9 +1400,14 @@ describe('Series', function () {
 		});
 
 		var collapsed = series.groupSequentialBy()
-			.selectPairs(function (windowIndex, window) {
-				return [window.lastPair()[0], window.last()];
-			});
+			.asPairs()
+			.select(function (pair) {
+				var windowIndex = pair[0];
+				var window = pair[1];
+				return [window.getIndex().last(), window.last()];
+			})
+			.asValues()
+			;
 
 		expect(collapsed.toPairs()).to.eql([
 			[1, 1],
@@ -1422,9 +1427,14 @@ describe('Series', function () {
 		});
 
 		var collapsed = series.groupSequentialBy(value => value.A)
-			.selectPairs(function (windowIndex, window) {
-				return [window.lastIndex(), window.last().A];
-			});
+			.asPairs()
+			.select(function (pair) {
+				var windowIndex = pair[0];
+				var window = pair[1];
+				return [window.getIndex().last(), window.last().A];
+			})
+			.asValues()
+			;
 
 		expect(collapsed.toPairs()).to.eql([
 			[1, 1],
@@ -1484,9 +1494,14 @@ describe('Series', function () {
 			.variableWindow(function (a, b) {
 				return a === b;
 			})
-			.selectPairs(function (windowIndex, window) {
+			.asPairs()
+			.select(function (pair) {
+				var windowIndex = pair[0];
+				var window = pair[1];
 				return [window.getIndex().first(), window.count()];
-			});
+			})
+			.asValues()
+			;
 
 		expect(aggregated.toPairs()).to.eql([
 			[0, 2],

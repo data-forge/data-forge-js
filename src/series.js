@@ -347,22 +347,6 @@ Series.prototype.select = function (selector) {
 /**
  * Generate a new series based on the results of the selector function.
  *
- * @param {function} selector - Selector function that transforms each index/value to a create a new series.
- * 
- * @returns {Series|DataFrame} Returns a new series or dataframe with index/value pairs that have been transformed by the selector function. 
- */
-Series.prototype.selectPairs = function (selector) {
-	assert.isFunction(selector, "Expected 'selector' parameter to 'selectPairs' function to be a function.");
-
-	var self = this;
-	return new self.Constructor({
-		iterable: new SelectPairsIterable(self.iterable, selector),
-	}); 	
-};
-
-/**
- * Generate a new series based on the results of the selector function.
- *
  * @param {function} generator - Generator function that may generator 0 or more new values from value in the series or dataframe.
  * 
  * @returns {Series|DataFrame} Returns a new series or dataframe with values that have been produced by the generator function. 
@@ -373,23 +357,6 @@ Series.prototype.selectMany = function (generator) {
 	var self = this;
 	return new self.Constructor({
 		iterable: new SelectManyIterable(self.iterable, generator),
-	}); 	
-};
-
-/**
- * Generate a new series based on the results of the generator function.
- *
- * @param {function} generator -  Generator function that may generator 0 or more new index/value pairs from each pair in the series or dataframe.
- * 
- * @returns {Series|DataFrame} Returns a new series or dataframe with index/value pairs that have been produced by the generator function.
- */
-Series.prototype.selectManyPairs = function (generator) {
-	assert.isFunction(generator, "Expected 'generator' parameter to 'Series.selectManyPairs' function to be a function.");
-
-	var self = this;
-
-	return new self.Constructor({
-		iterable: new SelectManyPairsIterable(self.iterable, generator),
 	}); 	
 };
 
@@ -748,12 +715,16 @@ Series.prototype.percentChange = function () {
 	var self = this;
 	return self
 		.rollingWindow(2)
-		.selectPairs(function (windowIndex, window) {
+		.asPairs()
+		.select(function (pair) {
+			var window = pair[1];
 			var values = window.toValues();
 			var amountChange = values[1] - values[0]; // Compute amount of change.
 			var pctChange = amountChange / values[0]; // Compute % change.
 			return [window.getIndex().last(), pctChange]; // Return new index and value.
-		});
+		})
+		.asValues()
+		;
 };
 
 /**
@@ -1115,82 +1086,6 @@ Series.prototype.last = function () {
 	}
 
 	return iterator.getCurrent()[1]; // Just evaluate the last item of the iterator.
-};
-
-/**
- * Get the first [index, value] pair of the series or dataframe.
- *
- * @returns {pair} Returns the first [index, value] pair of the series or dataframe.   
- */
-Series.prototype.firstPair = function () {
-
-	var self = this;
-	var iterator = self.getIterator();
-
-	if (!iterator.moveNext()) {
-		throw new Error("No values in Series.");
-	}
-
-	return iterator.getCurrent();
-};
-
-/**
- * Get the last [index, value] pair of the series or dataframe.
- *
- * @returns {pair} Returns the last [index, value] pair of the series or dataframe.   
- */
-Series.prototype.lastPair = function () {
-
-	var self = this;
-	var iterator = self.getIterator();
-
-	if (!iterator.moveNext()) {
-		throw new Error("No values in Series.");
-	}
-
-	while (iterator.moveNext()) {
-		; // Don't evaluate each item, it's too expensive.
-	}
-
-	return iterator.getCurrent();
-};
-
-/**
- * Get the first index of the series or dataframe.
- *
- * @returns {index-value} Returns the first index of the series or dataframe.   
- */
-Series.prototype.firstIndex = function () {
-
-	var self = this;
-	var iterator = self.getIterator();
-
-	if (!iterator.moveNext()) {
-		throw new Error("No values in Series.");
-	}
-
-	return iterator.getCurrent()[0]; // Extract index.
-};
-
-/**
- * Get the last index of the series or dataframe.
- *
- * @returns {index-value} Returns the last index of the series or dataframe.   
- */
-Series.prototype.lastIndex = function () {
-
-	var self = this;
-	var iterator = self.getIterator();
-
-	if (!iterator.moveNext()) {
-		throw new Error("No values in Series.");
-	}
-
-	while (iterator.moveNext()) {
-		; // Don't evaluate each item, it's too expensive.
-	}
-
-	return iterator.getCurrent()[0]; // Extract index.
 };
 
 /** 
@@ -1572,9 +1467,13 @@ Series.prototype.sequentialDistinct = function (selector) {
 	return self.variableWindow(function (a, b) {
 			return selector(a) === selector(b);
 		})
-		.selectPairs(function (windowIndex, window) {
+		.asPairs()
+		.select(function (pair) {
+			var window = pair[1];
 			return [window.getIndex().first(), window.first()];
-		});
+		})
+		.asValues()
+		;
 };
 
 /**
@@ -1779,9 +1678,11 @@ Series.prototype.fillGaps = function (predicate, generator) {
 	var self = this;
 
 	return self.rollingWindow(2)
-		.selectManyPairs(function (windowIndex, window) {
-			var pairA = window.firstPair();
-			var pairB = window.lastPair();
+		.asPairs()
+		.selectMany(function (pair) {
+			var window = pair[1];
+			var pairA = window.asPairs().first();
+			var pairB = window.asPairs().last();
 			if (!predicate(pairA, pairB)) {
 				return [pairA];
 			}
@@ -1791,7 +1692,8 @@ Series.prototype.fillGaps = function (predicate, generator) {
 
 			return [pairA].concat(generatedRows);
 		})
-		.appendPair(self.lastPair())
+		.asValues()
+		.appendPair(self.asPairs().last())
 		;
 };
 

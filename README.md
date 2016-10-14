@@ -814,15 +814,18 @@ This produces an entirely new immutable data-frame. However the new data-frame h
 
 	var mergedDataFrame = dataForge.merge(sourceDataFrame, transformedDataFrame);
 
-Note that `select` only transforms the value. The index for each row is preserved in the new DataFrame. To completely transform a DataFrame, both value and index, you must use `selectPairs`:
+Note that `select` only transforms the value. The index for each row is preserved in the new DataFrame. To completely transform a DataFrame, both value and index, you must use `asPairs`:
 
 	var transformedDataFrame = sourceDataFrame
-		.selectPairs(function (index, value) {
+		.asPairs()
+		.select(function (pair) {
 			return [ // Returns a new pair.
 				... some new index ...,
 				... some new row ...
 			];
-		});
+		})
+		.asValues()
+		;
 
 Note that `selectMany` and `selectManyPairs` functions are also available and work the same as LINQ SelectMany.
 
@@ -845,12 +848,15 @@ The source index is preserved to the transformed series.
 Use `selectPairs` to transform both value and index:  
 
 	var newSeries = oldSeries
-		.selectPairs(function (index, value) {
+		.asPairs()
+		.select(function (index, value) {
 			return [ // Returns a new pair.
 				... some new index ...,
 				... some new value ...
 			];
-		});	
+		})
+		.asValues()
+		;	
 
 The result of `select` and `selectPairs` is a completely new immutable Series.
 
@@ -991,13 +997,16 @@ An example that summarizes weekly sales data:
 	var salesData = ... series containing amount sales for each business day ...
 
 	var weeklySales = salesData.window(7)
-			.selectPairs(function (windowIndex, window) {
-				// Return new index and value.
-				return [
-					window.lastIndex(), 	// Week ending.
-					window.sum()			// Total the amount sold during the week.
-				]; 
-			});
+		.asPairs()
+		.select(function (windowIndex, window) {
+			// Return new index and value.
+			return [
+				window.lastIndex(), 	// Week ending.
+				window.sum()			// Total the amount sold during the week.
+			]; 
+		})
+		.asValues()
+		;
 
 ## Rolling window
 
@@ -1008,17 +1017,20 @@ The `percentChange` function that is included in Data-Forge is probably the simp
 The implementation of `percentChange` looks a bit like this:
     
 	var pctChangeSeries = sourceSeries.rollingWindow(2)
-		.selectPairs(function (window, windowIndex) {
-				var values = window.toValues();
-				var amountChange = values[1] - values[0]; // Compute amount of change.
-				var pctChange = amountChange / values[0]; // Compute % change.
+		.asPairs()
+		.select(function (window, windowIndex) {
+			var values = window.toValues();
+			var amountChange = values[1] - values[0]; // Compute amount of change.
+			var pctChange = amountChange / values[0]; // Compute % change.
 
-				// Return new index and value.
-				return [
-					window.lastIndex(), 
-					pctChange
-				]; 
-			});
+			// Return new index and value.
+			return [
+				window.lastIndex(), 
+				pctChange
+			]; 
+		})
+		.asValues()
+		;
    
 `percentChange` is simple because it only considers a window size of 2 (eg it considers each adjacent pair of values).
 
@@ -1028,11 +1040,14 @@ Now consider an example that requires a configurable window size. Here is some c
 
 	var smaPeriod = ... configurable moving average period ...
  	var smSeries = someSeries.rollingWindow(smaPeriod)
-		.selectPairs(function (windowIndex, window) {
+	 	.asPairs()
+		.select(function (windowIndex, window) {
     		return [
 				window.lastIndex(),
 				window.sum() / smaPeriod,
-    	});
+    	})
+		.asValues()
+		;
 
 ## Variable window
 

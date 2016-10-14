@@ -23,9 +23,11 @@ describe('rolling window performance', function () {
 
 		var newSeries = series
 			.rollingWindow(windowSize)
-			.selectPairs(function (windowIndex, window) {
+			.asPairs()
+			.select(function (windowIndex, window) {
 				return [windowIndex, windowIndex];
-			});
+			})
+			.asValues();
 
 		stopwatch1.stop();
 		var time1 = stopwatch1.read();
