@@ -1809,5 +1809,21 @@ describe('Series', function () {
 
 
 	});
+
+	it('can transform series of pairs to series of values', function () {
+
+		var series = new Series({
+			index: [10, 20, 30],
+			values: [1, 2, 3],
+		});
+
+		var values = series.asPairs().asValues();
+		expect(values.toPairs()).to.eql([
+			[10, 1],
+			[20, 2],
+			[30, 3],
+		]);
+		
+	})
 });
 

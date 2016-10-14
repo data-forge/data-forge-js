@@ -2220,3 +2220,23 @@ Series.prototype.asPairs = function () {
 	})
 
 };
+
+/** 
+ * Convert a series of pairs to back to a series of values.
+ * 
+ * @returns {Series} Returns a series of values where each pair has been extracted from the value of the input series.
+ */
+Series.prototype.asValues = function () {
+
+	var self = this;
+	return new Series({
+		iterable: new SelectPairsIterable(
+			self,
+			function (index, value) {
+				return [value[0], value[1]];
+			}
+		)
+	})
+
+};
+
