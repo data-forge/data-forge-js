@@ -5,6 +5,7 @@ describe('DataFrame', function () {
 	
 	var dataForge = require('../index');	
 	var DataFrame = require('../src/dataframe');
+	var Series = require('../src/series');
 	var ArrayIterator = require('../src/iterators/array');
 	var moment = require('moment');
 	var extend = require('extend');
@@ -446,6 +447,63 @@ describe('DataFrame', function () {
 			[1],
 			[2],
 			[3],
+		]);
+	});
+
+	it('can set new series', function () {
+
+		var dataFrame = new dataForge.DataFrame({
+				columnNames: ["A"],
+				values: [[1], [2], [3]],
+			});
+		var withSeries = dataFrame.withSeries("B", new Series({ values: [10, 20, 30]}));
+
+		expect(withSeries.getColumnNames()).to.eql(["A", "B"]);
+		expect(withSeries.toRows()).to.eql([
+			[1, 10],
+			[2, 20],
+			[3, 30],
+		]);
+	});
+
+	it('can generate new series', function () {
+
+		var dataFrame = new dataForge.DataFrame({
+				columnNames: ["A"],
+				values: [[1], [2], [3]],
+			});
+		var withSeries = dataFrame
+			.withSeries("B", function (df) {
+				return new Series({ values: [10, 20, 30]});				
+			});
+
+		expect(withSeries.getColumnNames()).to.eql(["A", "B"]);
+		expect(withSeries.toRows()).to.eql([
+			[1, 10],
+			[2, 20],
+			[3, 30],
+		]);
+	});
+
+	it('can transform existing series', function () {
+
+		var dataFrame = new dataForge.DataFrame({
+				columnNames: ["A"],
+				values: [[1], [2], [3]],
+			});
+		var withSeries = dataFrame
+			.withSeries("B", function (df) {
+				return df
+					.getSeries("A")
+					.select(v => v * 10)
+					; 
+			});
+
+		expect(withSeries.getColumnNames()).to.eql(["A", "B"]);
+		expect(withSeries.toRows()).to.eql([
+			[1, 10],
+			[2, 20],
+			[3, 30],
 		]);
 	});
 

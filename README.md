@@ -155,7 +155,7 @@ This section explains the key concepts of *Data-Forge*.
 
 ## DataFrame
 
-DataFrame is the *main* concept. It is a sequence of rows. It can also be considered a matrix (rows and columns) of structured started. Can be considered a sequence of rows. Has an implicit or explicit index. Think of it as a spreadsheet in memory.
+DataFrame is the *main* concept. It is a sequence of rows. It can also be considered a matrix (rows and columns) of structured data. Can be considered a sequence of rows. Has an implicit or explicit index. Think of it as a spreadsheet in memory.
 
 A *data-frame* can be easily constructed from various formats and it can be exported to various formats. 
 

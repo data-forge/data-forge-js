@@ -559,19 +559,23 @@ DataFrame.prototype.keepSeries = function (columnOrColumns) {
  * Create a new data frame with an additional column specified by the passed-in series.
  *
  * @param {string} columnName - The name of the column to add or replace.
- * @param {Series} series - Series to add to the data-frame.
+ * @param {Series|function} seriesOrFn - Series to add to the data-frame or a function that produces a series (given a dataframe).
  *
  * @returns {DataFrame} Returns a new dataframe replacing or adding a particular named column.
  */
-DataFrame.prototype.withSeries = function (columnName, series) {
+DataFrame.prototype.withSeries = function (columnName, seriesOrFn) {
 
 	assert.isString(columnName, "Expected 'columnName' parameter to 'DataFrame.withSeries' function to be a string that specifies the column to set or replace.");
-	assert.isObject(series, "Expected 'series' parameter to 'DataFrame.withSeries' to be a Series object.");
+
+	if (!Object.isFunction(seriesOrFn)) {
+		assert.isObject(seriesOrFn, "Expected 'seriesOrFn' parameter to 'DataFrame.withSeries' to be a Series object or a function that produces a Series object.");
+	}
 
 	var self = this;
 
 	if (self.none()) {
 		// Empty data frame.
+		var series = Object.isFunction(seriesOrFn) ? seriesOrFn(self) : seriesOrFn; 
 		return series.inflate(function (value) {
 				var row = {};
 				row[columnName] = value;
@@ -582,6 +586,7 @@ DataFrame.prototype.withSeries = function (columnName, series) {
 	return new DataFrame({
 		iterable: {
 			getIterator: function () {
+				var series = Object.isFunction(seriesOrFn) ? seriesOrFn(self) : seriesOrFn;
 				var seriesValueMap = E.from(series.toPairs())
 					.toObject(
 						function (pair) {
