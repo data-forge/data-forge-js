@@ -892,9 +892,12 @@ describe('DataFrame', function () {
 				],
 				[10, 11]
 			);
-		var modified = dataFrame.transformSeries({
-				Column2: function (value) {
-					return value + 100;
+		var modified = dataFrame.withSeries({
+				Column2: function (df) {
+					return df
+						.deflate(row => row.Column2)
+						.select(v => v + 100)
+						;
 				}
 			});
 		expect(dataFrame.getSeries("Column2").toValues()).to.eql([1, 2]);
@@ -911,38 +914,21 @@ describe('DataFrame', function () {
 				],
 				[10, 11]
 			);
-		var modified = dataFrame.transformSeries({
-				Column2: function (value) {
-					return value + 100;
-				},
-				Column1: function (value) {
-					return value + value;
-				},
+		var modified = dataFrame.withSeries({
+				Column2: df => df
+					.deflate(row => row.Column2)
+					.select(v => v + 100)
+					,
+				Column1: df => df
+					.deflate(row => row.Column1)
+					.select(v => v + v)
+					,
 			});
+
 		expect(dataFrame.getSeries("Column1").toValues()).to.eql(['A', 'B']);
 		expect(dataFrame.getSeries("Column2").toValues()).to.eql([1, 2]);
 		expect(modified.getSeries("Column1").toValues()).to.eql(['AA', 'BB']);
 		expect(modified.getSeries("Column2").toValues()).to.eql([101, 102]);
-	});
-
-	it('transforming non-existing column has no effect', function () {
-
-		var columnNames = ["Column1", "Column2"];
-		var dataFrame = initDataFrame(
-				columnNames, 
-				[
-					['A', 1],
-					['B', 2],
-				],
-				[10, 11]
-			);
-		var modified = dataFrame.transformSeries({
-				"non-existing-column": function (value) {
-					return value + 100;
-				},
-			});
-		expect(dataFrame).to.equal(modified);
-		expect(dataFrame.getColumnNames()).to.eql(columnNames);
 	});
 
 	//
@@ -983,10 +969,8 @@ describe('DataFrame', function () {
 				[10, 11, 12]
 			);
 
-		var modified = dataFrame.generateSeries(function (row) {
-				return {
-					NewColumn: row.Column1 + row.Column2,
-				};
+		var modified = dataFrame.withSeries({
+				NewColumn: df => df.deflate(row => row.Column1 + row.Column2),
 			});
 
 		var newColumnName = "NewColumn";
@@ -1010,10 +994,8 @@ describe('DataFrame', function () {
 				[10, 11, 12]
 			);
 
-		var modified = dataFrame.generateSeries({
-				NewColumn: function (row) {
-					return row.Column1 + row.Column2;
-				},
+		var modified = dataFrame.withSeries({
+				NewColumn: df => df.deflate(row => row.Column1 + row.Column2),
 			});
 			
 		var newColumnName = "NewColumn";

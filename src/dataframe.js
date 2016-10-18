@@ -581,7 +581,7 @@ DataFrame.prototype.withSeries = function (columnNameOrSpec, seriesOrFn) {
 	if (Object.isObject(columnNameOrSpec)) {
 		return E.from(Object.keys(columnNameOrSpec))
 			.aggregate(self, function (dataFrame, columnName) {
-				return self.withSeries(columnName, columnNameOrSpec[columnName]);
+				return dataFrame.withSeries(columnName, columnNameOrSpec[columnName]);
 			});
 	}
 
@@ -1012,72 +1012,6 @@ DataFrame.prototype.toCSV = function () {
 			.toArray();
 	return [header].concat(rows).join('\r\n');	
 	*/
-};
-
-/**
- * Transform one or more columns. This is equivalent to extracting a column, calling 'select' on it,
- * then plugging it back in as the same column.
- *
- * @param {object} columnSelectors - Object with field names for each column to be transformed. Each field you be a selector that transforms that column.
- * 
- * @returns {DataFrame} Returns a new dataframe with 1 or more columns transformed.   
- */
-DataFrame.prototype.transformSeries = function (columnSelectors) {
-
-	assert.isObject(columnSelectors, "Expected 'columnSelectors' parameter of 'transformSeries' function to be an object. Field names should specify columns to transform. Field values should be selector functions that specify the transformation for each column.");
-
-	var self = this;
-	return E.from(Object.keys(columnSelectors))
-		.aggregate(self, function (prevDataFrame, columnName) {
-			if (prevDataFrame.hasSeries(columnName)) {
-				return prevDataFrame.withSeries(
-					columnName,
-					prevDataFrame.getSeries(columnName)
-						.select(columnSelectors[columnName])
-				);			
-			}
-			else {
-				return self;
-			}	
-		});
-};
-
-/** 
- * Generate new columns based on existing rows.
- *
- * @param {function|object} generator - Generator function that transforms each row to a new set of columns.
- * 
- * @returns {DataFrame} Returns a new dataframe with 1 or more new columns.
- */
-DataFrame.prototype.generateSeries = function (generator) {
-
-	var self = this;
-
-	//todo: make this lazy.
-	//todo: this should merge on index.
-	//todo: need to be able to override columns on 1 data frame with columns from another.
-
-	if (!Object.isObject(generator)) {
-		assert.isFunction(generator, "Expected 'generator' parameter to 'DataFrame.generateSeries' function to be a function or an object.");
-
-		var newColumns = self.select(generator)
-			.bake()
-			;
-
-		return E.from(newColumns.getColumnNames())
-			.aggregate(self, function (prevDataFrame, newColumnName) {
-				return prevDataFrame.withSeries(newColumnName, newColumns.getSeries(newColumnName).bake()).bake();
-			})
-			;
-	}
-	else {
-		var newColumnNames = Object.keys(generator);
-		return E.from(newColumnNames)
-			.aggregate(self, function (prevDataFrame, newColumnName) {
-				return prevDataFrame.withSeries(newColumnName, prevDataFrame.deflate(generator[newColumnName]).bake()).bake();
-			})
-			;
-	}
 };
 
 /** 
