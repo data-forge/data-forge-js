@@ -507,6 +507,70 @@ describe('DataFrame', function () {
 		]);
 	});
 
+	it('can set new series - using column spec', function () {
+
+		var dataFrame = new dataForge.DataFrame({
+				columnNames: ["A"],
+				values: [[1], [2], [3]],
+			});
+		var withSeries = dataFrame
+			.withSeries({ 
+				B: new Series({ values: [10, 20, 30] }), 
+			});
+
+		expect(withSeries.getColumnNames()).to.eql(["A", "B"]);
+		expect(withSeries.toRows()).to.eql([
+			[1, 10],
+			[2, 20],
+			[3, 30],
+		]);
+	});
+
+	it('can generate new series - using column spec', function () {
+
+		var dataFrame = new dataForge.DataFrame({
+				columnNames: ["A"],
+				values: [[1], [2], [3]],
+			});
+		var withSeries = dataFrame
+			.withSeries({
+				B: function (df) {
+					return new Series({ values: [10, 20, 30]});				
+				}
+			});
+
+		expect(withSeries.getColumnNames()).to.eql(["A", "B"]);
+		expect(withSeries.toRows()).to.eql([
+			[1, 10],
+			[2, 20],
+			[3, 30],
+		]);
+	});
+
+	it('can transform existing series - using column spec', function () {
+
+		var dataFrame = new dataForge.DataFrame({
+				columnNames: ["A"],
+				values: [[1], [2], [3]],
+			});
+		var withSeries = dataFrame
+			.withSeries({
+				B: function (df) {
+					return df
+						.getSeries("A")
+						.select(v => v * 10)
+						; 
+				},
+			});
+
+		expect(withSeries.getColumnNames()).to.eql(["A", "B"]);
+		expect(withSeries.toRows()).to.eql([
+			[1, 10],
+			[2, 20],
+			[3, 30],
+		]);
+	});
+
 	it('can set index by column name', function () {
 
 		var dataFrame = initDataFrame(

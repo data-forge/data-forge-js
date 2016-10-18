@@ -558,20 +558,34 @@ DataFrame.prototype.keepSeries = function (columnOrColumns) {
 /**
  * Create a new data frame with an additional column specified by the passed-in series.
  *
- * @param {string} columnName - The name of the column to add or replace.
- * @param {Series|function} seriesOrFn - Series to add to the data-frame or a function that produces a series (given a dataframe).
+ * @param {string|object} columnNameOrSpec - The name of the column to add or replace.
+ * @param {Series|function} [seriesOrFn] - When columnNameOrSpec is a string that identifies the column to add, this specifies the Series to add to the data-frame or a function that produces a series (given a dataframe).
  *
  * @returns {DataFrame} Returns a new dataframe replacing or adding a particular named column.
  */
-DataFrame.prototype.withSeries = function (columnName, seriesOrFn) {
+DataFrame.prototype.withSeries = function (columnNameOrSpec, seriesOrFn) {
 
-	assert.isString(columnName, "Expected 'columnName' parameter to 'DataFrame.withSeries' function to be a string that specifies the column to set or replace.");
+	if (!Object.isObject(columnNameOrSpec)) {
+		assert.isString(columnNameOrSpec, "Expected 'columnNameOrSpec' parameter to 'DataFrame.withSeries' function to be a string that specifies the column to set or replace.");
 
-	if (!Object.isFunction(seriesOrFn)) {
-		assert.isObject(seriesOrFn, "Expected 'seriesOrFn' parameter to 'DataFrame.withSeries' to be a Series object or a function that produces a Series object.");
+		if (!Object.isFunction(seriesOrFn)) {
+			assert.isObject(seriesOrFn, "Expected 'seriesOrFn' parameter to 'DataFrame.withSeries' to be a Series object or a function that produces a Series object.");
+		}
+	}
+	else {
+		assert.isUndefined(seriesOrFn, "Expected 'seriesOrFn' parameter to 'DataFrame.withSeries' to not be unset when 'columnNameOrSpec is an object.");
 	}
 
 	var self = this;
+
+	if (Object.isObject(columnNameOrSpec)) {
+		return E.from(Object.keys(columnNameOrSpec))
+			.aggregate(self, function (dataFrame, columnName) {
+				return self.withSeries(columnName, columnNameOrSpec[columnName]);
+			});
+	}
+
+	var columnName = columnNameOrSpec;
 
 	if (self.none()) {
 		// Empty data frame.
