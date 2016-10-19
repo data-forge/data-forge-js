@@ -1564,4 +1564,20 @@ describe('DataFrame', function () {
 		]);
 
 	});
+
+	it('using select on a dataframe redefines the columns', function () {
+
+		var df = new DataFrame({
+			columnNames: ["A", "B"],
+			values: [
+				[1, 10],
+				[2, 20],
+			],
+		});
+
+		var modified = df.select(row => ({ X: row.A, Y: row.B }));
+
+		expect(df.getColumnNames()).to.eql(["A", "B"]);
+		expect(modified.getColumnNames()).to.eql(["X", "Y"]);
+	});
 });
