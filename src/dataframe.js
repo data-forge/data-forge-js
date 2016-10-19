@@ -871,12 +871,12 @@ DataFrame.prototype.truncateStrings = function (maxLength) {
  * 
  * @returns {DataFrame} Returns a new dataframe with columns remapped according to the specified column layout.   
  */
-DataFrame.prototype.remapColumns = function (columnNames) {
+DataFrame.prototype.reorderSeries = function (columnNames) {
 
-	assert.isArray(columnNames, "Expected parameter 'columnNames' to remapColumns to be an array with column names.");
+	assert.isArray(columnNames, "Expected parameter 'columnNames' to DataFrame.reorderSeries to be an array with column names.");
 
 	columnNames.forEach(function (columnName) {
-		assert.isString(columnName, "Expected parameter 'columnNames' to remapColumns to be an array with column names.");
+		assert.isString(columnName, "Expected parameter 'columnNames' to DataFrame.reorderSeries to be an array with column names.");
 	});
 
 	var self = this;
@@ -1152,7 +1152,7 @@ DataFrame.prototype.bringToFront = function (columnOrColumns) {
 		.toArray();
 
 	var reorderedColumnNames = columnsToMove.concat(remainingColumnNames);
-	return self.remapColumns(reorderedColumnNames);
+	return self.reorderSeries(reorderedColumnNames);
 };
 
 /**
@@ -1190,7 +1190,7 @@ DataFrame.prototype.bringToBack = function (columnOrColumns) {
 		.toArray();
 
 	var reorderedColumnNames = remainingColumnNames.concat(columnsToMove);
-	return self.remapColumns(reorderedColumnNames);
+	return self.reorderSeries(reorderedColumnNames);
 };
 
 /**

@@ -59,7 +59,7 @@ module.exports = function (dataFrames, options) {
 				getIterator: function () {
 					var iterators = E.from(dataFrames)
 						.select(function (dataFrame) {
-							return dataFrame.remapColumns(concatenatedColumnsNames);
+							return dataFrame.reorderSeries(concatenatedColumnsNames);
 						})
 						.select(function (dataFrame) {
 							return dataFrame.getIterator();

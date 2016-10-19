@@ -665,7 +665,7 @@ describe('DataFrame', function () {
 			[5, 6]
 		);
 
-		var remapped = dataFrame.remapColumns(["Col2", "Col1"]);
+		var remapped = dataFrame.reorderSeries(["Col2", "Col1"]);
 
 		expect(remapped.getColumnNames()).to.eql([ "Col2", "Col1" ]);
 		expect(remapped.toRows()).to.eql([
@@ -685,7 +685,7 @@ describe('DataFrame', function () {
 			[5, 6]
 		);
 
-		var remapped = dataFrame.remapColumns(["Col2"]);
+		var remapped = dataFrame.reorderSeries(["Col2"]);
 
 		expect(remapped.getColumnNames()).to.eql([ "Col2" ]);
 		expect(remapped.toRows()).to.eql([
@@ -705,7 +705,7 @@ describe('DataFrame', function () {
 			[5, 6]
 		);
 
-		var remapped = dataFrame.remapColumns(["New Column", "Col2"]);
+		var remapped = dataFrame.reorderSeries(["New Column", "Col2"]);
 
 		expect(remapped.getColumnNames()).to.eql([ "New Column", "Col2" ]);
 		expect(remapped.toRows()).to.eql([
@@ -1415,7 +1415,7 @@ describe('DataFrame', function () {
 			]
 		);
 
-		var inflated = dataFrame.inflateColumn("b");
+		var inflated = dataFrame.inflateSeries("b");
 		expect(inflated.getColumnNames()).to.eql(["a", "b", "X", "Y"]);
 		expect(inflated.toRows()).to.eql([
 			[1, { X: 2, Y: 3 }, 2, 3],
