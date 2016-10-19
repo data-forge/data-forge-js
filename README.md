@@ -314,7 +314,7 @@ Most times however in the examples I have used the traditional syntax:
 		return 1 + 1;
 	}
 
-Even though I haven't used it much in this readme, I prefer the new syntax as it is more concise and the code flows better when multiple are chained together.
+Even though I haven't used it much in this readme, I prefer the new syntax as it is more concise and the code flows better when multiple anonymous functions are chained together.
 
 # Basic Usage 
 
@@ -671,7 +671,7 @@ An index is actually just another Series so you can call the `toValues` function
 
 New columns can be added to a DataFrame. This doesn't change the original data-frame, it generates a new data-frame that contains the additional column.
 
-	var newDf = df.withSeries("Some-New-Column", someNewSeries); 
+	var newDf = df.withSeries("Some-New-Column", someNewSeries);
 
 ## Replacing a column
 
@@ -681,6 +681,37 @@ New columns can be added to a DataFrame. This doesn't change the original data-f
 
 Again note that it is only the new data frame that includes the modified column.
 
+## Generating a column
+
+`withSeries` can be used to generate a new column from an existing data frame by passing in a function: 
+
+	var newDf = df.withSeries("Some-New-Column", 
+		df => df.getSeries("Some-Existing-Column")
+			.select(value => transformValue(value))
+	);
+
+## Transforming a column
+
+`withSeries` can be used to transform an existing column by passing in a function:
+
+	var newDf = df.withSeries("Some-Existing-Column", 
+		df => df.getSeries("Some-Existing-Column")
+			.select(value => transformValue(value))
+	);
+
+## Adding, replacing, generating and transforming multiple columns 
+
+Any of the previous examples of `withSeries` can work with multiple columns by passing in a *column spec*, the following example adds two new 
+
+	var columnSpec = {
+		Column1: df => computeColumn1(df),
+		Column2: df => computeColumn2(df),
+	};
+
+	var newDf = df.withSeries(columnSpec);
+
+This syntax can be used to add, generate and transform any number of colums at once.
+	
 ## Removing columns
 
 One or more columns can easily be removed:
