@@ -1060,6 +1060,25 @@ describe('Series', function () {
 		expect(series.average()).to.eql(0);
 	});
 
+	it('can get median of even series', function () {
+
+		var series = initSeries([0, 1, 2, 3], [1, 2, 3, 4]);		
+		expect(series.median()).to.eql(2.5);
+	});
+
+	it('can get median of odd series', function () {
+
+		var series = initSeries([0, 1, 2], [1, 2, 3]);		
+		expect(series.median()).to.eql(2);
+	});
+
+	it('median of an empty series is zero', function () {
+
+		var series = initSeries([], []);
+		expect(series.median()).to.eql(0);
+	});
+
+
 	it('can get series minimum', function () {
 
 		var series = initSeries([0, 1, 2], [5, 2.5, 3]);		

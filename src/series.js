@@ -1208,6 +1208,37 @@ Series.prototype.average = function () {
 };
 
 /**
+ * Get the median value in the series. Not this sorts the series, so can be expensive.
+ * 
+ * @returns {Number} Returns the median of the values in the series.
+ */
+Series.prototype.median = function () {
+
+	//
+	// From here: http://stackoverflow.com/questions/5275115/add-a-median-method-to-a-list
+	//
+	var self = this;
+	var count = self.count();
+	if (count === 0) {
+		return 0;
+	}
+
+	var ordered = self.orderBy(function (value) {
+			return value;
+		});
+	
+	if ((count % 2) == 0) {
+		// Even.
+		var a = ordered.at(count / 2 - 1);
+        var b = ordered.at(count / 2);
+        return (a + b) / 2;	
+	}
+
+	// Odd
+	return ordered.at(Math.floor(count / 2));
+};
+
+/**
  * Get the min value in the series.
  * 
  * @returns {number} Returns the minimum of the number values in the series.
