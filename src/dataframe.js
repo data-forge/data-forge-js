@@ -1046,18 +1046,24 @@ DataFrame.prototype.deflate = function (selector) {
 };
 
 /** 
- * Inflate a named column in the data-frame to 1 or more new columns.
+ * Inflate a named series in the data-frame to 1 or more new series.
  *
- * @param {string|int} columnNameOrIndex - Name or index of the column to retreive.
- * @param {function} [selector] - Selector function that transforms each value in the column to new columns.
+ * @param {string} columnName - Name or index of the column to retreive.
+ * @param {function} [selector] - Optional selector function that transforms each value in the column to new columns. If not specified it is expected that each value in the column is an object whose fields define the new column names.
  * 
  * @returns {DataFrame} Returns a new dataframe with a column inflated to 1 or more new columns.
  */
-DataFrame.prototype.inflateColumn = function (columnNameOrIndex, selector) {
+DataFrame.prototype.inflateSeries = function (columnName, selector) {
+
+	assert.isString(columnName, "Expected 'columnName' parameter to DataFrame.inflateSeries to be a string that is the name of the column to inflate.");
+
+	if (selector) {
+		assert.isFunction(selector, "Expected optional 'selector' parameter to DataFrame.inflateSeries to be a selector function, if it is specified.");
+	}
 
 	var self = this;
 	return self.zip(
-		self.getSeries(columnNameOrIndex).inflate(selector),
+		self.getSeries(columnName).inflate(selector),
 		function (row1, row2) {
 			return extend({}, row1, row2); //todo: this be should zip's default operation.
 		}
