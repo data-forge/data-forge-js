@@ -1092,7 +1092,7 @@ DataFrame.prototype.aggregate = function (seedOrSelector, selector) {
 		var it = self.iterable.getIterator();
 		while (it.moveNext()) {
 			var curValue = it.getCurrent()[1];
-			working = selector(working, curValue); //todo: should pass index in here as well.
+			working = selector(working, curValue);
 		}
 
 		return working;		
