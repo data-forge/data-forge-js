@@ -27,7 +27,7 @@ describe('concat-series', function () {
             new Series({ values: [5, 6] }),
         ]);
 
-        expect(concatenated.toValues()).to.eql([
+        expect(concatenated.toArray()).to.eql([
             1,
             2,
             3,
@@ -44,7 +44,7 @@ describe('concat-series', function () {
             new Series({ values: [3, 4] }),
         ]);
 
-        expect(concatenated.toValues()).to.eql([
+        expect(concatenated.toArray()).to.eql([
             3,
             4,
         ]);
@@ -57,7 +57,7 @@ describe('concat-series', function () {
             new Series(),
         ]);
 
-        expect(concatenated.toValues()).to.eql([
+        expect(concatenated.toArray()).to.eql([
             1,
             2,
         ]);
@@ -72,7 +72,7 @@ describe('concat-series', function () {
                 new Series({ values: [5, 6] })
             );
 
-        expect(concatenated.toValues()).to.eql([
+        expect(concatenated.toArray()).to.eql([
             1,
             2,
             3,
@@ -91,7 +91,7 @@ describe('concat-series', function () {
                 new Series({ values: [5, 6] })
             ]);
 
-        expect(concatenated.toValues()).to.eql([
+        expect(concatenated.toArray()).to.eql([
             1,
             2,
             3,
@@ -110,7 +110,7 @@ describe('concat-series', function () {
                 new Series({ values: [5, 6] })
             );
 
-        expect(concatenated.toValues()).to.eql([
+        expect(concatenated.toArray()).to.eql([
             1,
             2,
             3,
@@ -129,7 +129,7 @@ describe('concat-series', function () {
                 [new Series({ values: [5, 6] })]
             );
 
-        expect(concatenated.toValues()).to.eql([
+        expect(concatenated.toArray()).to.eql([
             1,
             2,
             3,

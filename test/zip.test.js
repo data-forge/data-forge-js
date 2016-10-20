@@ -126,7 +126,7 @@ describe('zip', function () {
 				return s1 + s2;
 			});
 
-		expect(zipped.toValues()).to.eql([0+10, 1+11, 2+12]);
+		expect(zipped.toArray()).to.eql([0+10, 1+11, 2+12]);
 	});
 
 	it('can zip multiple series', function () {
@@ -140,7 +140,7 @@ describe('zip', function () {
 				}
 			);
 
-		expect(zipped.toValues()).to.eql([0+10+100, 1+11+101, 2+12+102]);
+		expect(zipped.toArray()).to.eql([0+10+100, 1+11+101, 2+12+102]);
 	});
 
 	it('zip preserves the index of the first series', function () {

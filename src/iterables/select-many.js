@@ -28,7 +28,7 @@ SelectManyIterable.prototype.getIterator = function () {
 
             if (newValues instanceof Series)
             {
-                newValues = newValues.toValues();
+                newValues = newValues.toArray();
             }
 
             var newPairs = [];

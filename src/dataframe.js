@@ -256,7 +256,7 @@ var DataFrame = function (config) {
 								.select(function (columnName) {
 									var column = columns[columnName];
 									if (column instanceof Series) {
-										column = column.toValues();
+										column = column.toArray();
 									}
 									return new ArrayIterator(column);
 								})
@@ -799,7 +799,7 @@ DataFrame.prototype.detectTypes = function () {
 				.detectTypes()
 				.withSeries('Column', newSeries);
 		})
-		.toValues();
+		.toArray();
 	return concatDataFrames(dataFrames).resetIndex();
 };
 
@@ -815,7 +815,7 @@ DataFrame.prototype.detectValues = function () {
 
 	var dataFrames = self.getColumns()
 		.select(function (column) {
-			var numValues = column.series.toValues().length;
+			var numValues = column.series.toArray().length;
 			//todo: broad-cast column
 			var newSeries = new Series({
 				values: E.range(0, numValues)
@@ -826,7 +826,7 @@ DataFrame.prototype.detectValues = function () {
 			});
 			return column.series.detectValues().withSeries('Column', newSeries);
 		})
-		.toValues();
+		.toArray();
 	return concatDataFrames(dataFrames).resetIndex();
 };
 
@@ -981,7 +981,7 @@ DataFrame.prototype.renameSeries = function (newColumnNames) {
  */
 DataFrame.prototype.toJSON = function () {
 	var self = this;
-	return JSON.stringify(self.toValues(), null, 4);
+	return JSON.stringify(self.toArray(), null, 4);
 };
 
 /**
@@ -1215,7 +1215,7 @@ DataFrame.prototype.pivot = function (column, value) {
 		throw new Error("Expected to find a column with name '" + value + "'.");
 	}
 
-	var newColumnNames = self.getSeries(column).distinct().toValues();
+	var newColumnNames = self.getSeries(column).distinct().toArray();
 
 	var newSeries = E.from(newColumnNames) // Create a series for each column
 		.select(function (columnName) {
@@ -1239,7 +1239,7 @@ DataFrame.prototype.pivot = function (column, value) {
 					return column[0];
 				},
 				function (column) {
-					return column[1].toValues();
+					return column[1].toArray();
 				}
 			),
 	});

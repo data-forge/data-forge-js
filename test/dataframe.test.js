@@ -111,16 +111,16 @@ describe('DataFrame', function () {
 		);
 		
 		var series1 = dataFrame.getSeries('Value1');
-		expect(series1.getIndex().take(2).toValues()).to.eql([5, 6]);
-		expect(series1.toValues()).to.eql([100, 200]);
+		expect(series1.getIndex().take(2).toArray()).to.eql([5, 6]);
+		expect(series1.toArray()).to.eql([100, 200]);
 		
 		var series2 = dataFrame.getSeries('Value2');
-		expect(series2.getIndex().take(2).toValues()).to.eql([5, 6]);
-		expect(series2.toValues()).to.eql(['foo', 'bar']);
+		expect(series2.getIndex().take(2).toArray()).to.eql([5, 6]);
+		expect(series2.toArray()).to.eql(['foo', 'bar']);
 		
 		var series3 = dataFrame.getSeries('Value3');
-		expect(series3.getIndex().take(2).toValues()).to.eql([5, 6]);
-		expect(series3.toValues()).to.eql([11, 22]);
+		expect(series3.getIndex().take(2).toArray()).to.eql([5, 6]);
+		expect(series3.toArray()).to.eql([11, 22]);
 	});
 
 	it('when a series is extracted from a dataframe, undefined values are stripped out.', function () {
@@ -170,10 +170,10 @@ describe('DataFrame', function () {
 		expect(columns.count()).to.eql(4);
 
 		expect(columns.at(0).name).to.eql('Date');
-		expect(columns.at(0).series.toValues()).to.eql([new Date(1975, 24, 2), new Date(2015, 24, 2)]);
+		expect(columns.at(0).series.toArray()).to.eql([new Date(1975, 24, 2), new Date(2015, 24, 2)]);
 
 		expect(columns.at(2).name).to.eql('Value2');
-		expect(columns.at(2).series.toValues()).to.eql(['foo', 'bar']);
+		expect(columns.at(2).series.toArray()).to.eql(['foo', 'bar']);
 	});
 
 	it('can retreive column subset as new dataframe', function () 
@@ -188,7 +188,7 @@ describe('DataFrame', function () {
 		);
 		var subset = dataFrame.subset(['Value3', 'Value1']);
 		expect(dataFrame).not.to.equal(subset); 
-		expect(subset.getIndex().toValues()).to.eql([5, 6]);
+		expect(subset.getIndex().toArray()).to.eql([5, 6]);
 		expect(subset.toRows()).to.eql([
 			[11, 100],
 			[22, 200],
@@ -208,7 +208,7 @@ describe('DataFrame', function () {
 			[5, 6, 7, 8]
 		);
 		var modified = dataFrame.dropSeries('Date');
-		expect(modified.getIndex().toValues()).to.eql([5, 6, 7, 8]);
+		expect(modified.getIndex().toArray()).to.eql([5, 6, 7, 8]);
 		expect(modified.toRows()).to.eql([
 			[300, 'c', 3],
 			[200, 'b', 1],
@@ -230,7 +230,7 @@ describe('DataFrame', function () {
 			[5, 6, 7, 8]
 		);
 		var modified = dataFrame.dropSeries(['Date', 'Value2'])
-		expect(modified.getIndex().toValues()).to.eql([5, 6, 7, 8]);
+		expect(modified.getIndex().toArray()).to.eql([5, 6, 7, 8]);
 		expect(modified.toRows()).to.eql([
 			[300, 3],
 			[200, 1],
@@ -253,7 +253,7 @@ describe('DataFrame', function () {
 		);
 		var modified = dataFrame.keepSeries('Value1');
 		expect(modified.getColumnNames()).to.eql(['Value1']);
-		expect(modified.getIndex().toValues()).to.eql([5, 6, 7, 8]);
+		expect(modified.getIndex().toArray()).to.eql([5, 6, 7, 8]);
 		expect(modified.toRows()).to.eql([
 			[300],
 			[200],
@@ -277,7 +277,7 @@ describe('DataFrame', function () {
 
 		var modified = dataFrame.keepSeries(['Value1', 'Value3']);
 		expect(modified.getColumnNames()).to.eql(['Value1', 'Value3']);
-		expect(modified.getIndex().toValues()).to.eql([5, 6, 7, 8]);
+		expect(modified.getIndex().toArray()).to.eql([5, 6, 7, 8]);
 		expect(modified.toRows()).to.eql([
 			[300, 3],
 			[200, 1],
@@ -300,7 +300,7 @@ describe('DataFrame', function () {
 			[5, 6, 7, 8]
 		);
 		var modified = dataFrame.dropSeries('non-existing-column');
-		expect(modified.getIndex().toValues()).to.eql([5, 6, 7, 8]);
+		expect(modified.getIndex().toArray()).to.eql([5, 6, 7, 8]);
 		expect(modified.getColumnNames()).to.eql(columnNames);
 		expect(modified.toRows()).to.eql([
 				[new Date(2011, 24, 2), 300, 'c', 3],
@@ -324,7 +324,7 @@ describe('DataFrame', function () {
 		);
 		var series = new dataForge.Series({ index: [5, 6, 7, 8], values: [1, 2, 3, 4] });
 		var modified = dataFrame.withSeries('Value4', series);
-		expect(modified.getIndex().toValues()).to.eql([5, 6, 7, 8]);
+		expect(modified.getIndex().toArray()).to.eql([5, 6, 7, 8]);
 		expect(modified.getColumnNames()).to.eql([
 			"Date",
 			"Value1",
@@ -354,7 +354,7 @@ describe('DataFrame', function () {
 		);
 		var series = new dataForge.Series({ index: [5, 6, 7, 8], values: [1, 2, 3, 4] });
 		var modified = dataFrame.withSeries('Value1', series);
-		expect(modified.getIndex().toValues()).to.eql([5, 6, 7, 8]);
+		expect(modified.getIndex().toArray()).to.eql([5, 6, 7, 8]);
 		expect(modified.toRows()).to.eql([
 			[new Date(2011, 24, 2), 1, 'c', 3],
 			[new Date(1975, 24, 2), 2, 'b', 1],
@@ -418,7 +418,7 @@ describe('DataFrame', function () {
 		var modified = dataFrame.withSeries(newColumnName, newSeries);
 		var mergedSeries = modified.getSeries(newColumnName);
 
-		expect(modified.getIndex().take(4).toValues()).to.eql([5, 6, 7, 8]);
+		expect(modified.getIndex().take(4).toArray()).to.eql([5, 6, 7, 8]);
 		expect(modified.getColumnNames()).to.eql([
 			"Date",
 			"Value1",
@@ -433,8 +433,8 @@ describe('DataFrame', function () {
 			[new Date(2015, 24, 2), 100, 'd', 4, undefined],
 		]);
 
-		expect(mergedSeries.getIndex().take(4).toValues()).to.eql([5, 6, 7, 8]);
-		expect(mergedSeries.toValues()).to.eql([3, 1]);
+		expect(mergedSeries.getIndex().take(4).toArray()).to.eql([5, 6, 7, 8]);
+		expect(mergedSeries.toArray()).to.eql([3, 1]);
 	});
 
 	it('can set series on empty dataframe', function () {
@@ -583,7 +583,7 @@ describe('DataFrame', function () {
 		);
 		var indexedDataFrame = dataFrame.setIndex("Date");
 
-		expect(indexedDataFrame.getIndex().toValues()).to.eql([
+		expect(indexedDataFrame.getIndex().toArray()).to.eql([
 			new Date(1975, 24, 2),
 			new Date(2015, 24, 2)
 		]);
@@ -607,7 +607,7 @@ describe('DataFrame', function () {
 
 		var detectedTypes = dataFrame.detectTypes();
 		expect(detectedTypes.getColumnNames()).to.eql(["Type", "Frequency", "Column"]);
-		expect(detectedTypes.getIndex().take(3).toValues()).to.eql([0, 1, 2]);
+		expect(detectedTypes.getIndex().take(3).toArray()).to.eql([0, 1, 2]);
 		expect(detectedTypes.take(3).toRows()).to.eql([
 			['date', 100, "Date"],
 			['string', 50, "Value1"],
@@ -628,7 +628,7 @@ describe('DataFrame', function () {
 
 		var detectedTypes = dataFrame.detectValues();
 		expect(detectedTypes.getColumnNames()).to.eql(["Value", "Frequency", "Column"]);
-		expect(detectedTypes.getIndex().toValues()).to.eql([0, 1, 2]);
+		expect(detectedTypes.getIndex().toArray()).to.eql([0, 1, 2]);
 		expect(detectedTypes.toRows()).to.eql([
 			[new Date(1975, 24, 2), 50, "Date"],
 			[new Date(2015, 24, 2), 50, "Date"],
@@ -730,9 +730,9 @@ describe('DataFrame', function () {
 		expect(renamed.getColumnNames()).to.eql(newColumnNames);
 		var columns = renamed.getColumns();
 		expect(columns.count()).to.eql(3);
-		expect(columns.at(0).series.toValues()).to.eql([300, 200]);
-		expect(columns.at(1).series.toValues()).to.eql(['c', 'b']);
-		expect(columns.at(2).series.toValues()).to.eql([3, 1]);
+		expect(columns.at(0).series.toArray()).to.eql([300, 200]);
+		expect(columns.at(1).series.toArray()).to.eql(['c', 'b']);
+		expect(columns.at(2).series.toArray()).to.eql([3, 1]);
 	});
 
 	it('can extract values as array objects', function () {
@@ -746,7 +746,7 @@ describe('DataFrame', function () {
 			[5, 6]
 		);
 
-		expect(dataFrame.toValues()).to.eql([
+		expect(dataFrame.toArray()).to.eql([
 			{
 				Col1: 300,
 				Col2: 'c',
@@ -859,7 +859,7 @@ describe('DataFrame', function () {
 		var renamed = dataFrame.renameSeries(columnDef);
 
 		expect(dataFrame.getColumnNames()).to.eql(columnNames);
-		expect(dataFrame.getIndex().toValues()).to.eql([10, 11]);
+		expect(dataFrame.getIndex().toArray()).to.eql([10, 11]);
 		expect(dataFrame.toRows()).to.eql([
 			['A', 1],
 			['B', 2],
@@ -900,8 +900,8 @@ describe('DataFrame', function () {
 						;
 				}
 			});
-		expect(dataFrame.getSeries("Column2").toValues()).to.eql([1, 2]);
-		expect(modified.getSeries("Column2").toValues()).to.eql([101, 102]);
+		expect(dataFrame.getSeries("Column2").toArray()).to.eql([1, 2]);
+		expect(modified.getSeries("Column2").toArray()).to.eql([101, 102]);
 	});
 
 	it('can transform multiple columns', function () {
@@ -925,10 +925,10 @@ describe('DataFrame', function () {
 					,
 			});
 
-		expect(dataFrame.getSeries("Column1").toValues()).to.eql(['A', 'B']);
-		expect(dataFrame.getSeries("Column2").toValues()).to.eql([1, 2]);
-		expect(modified.getSeries("Column1").toValues()).to.eql(['AA', 'BB']);
-		expect(modified.getSeries("Column2").toValues()).to.eql([101, 102]);
+		expect(dataFrame.getSeries("Column1").toArray()).to.eql(['A', 'B']);
+		expect(dataFrame.getSeries("Column2").toArray()).to.eql([1, 2]);
+		expect(modified.getSeries("Column1").toArray()).to.eql(['AA', 'BB']);
+		expect(modified.getSeries("Column2").toArray()).to.eql([101, 102]);
 	});
 
 	//
@@ -978,7 +978,7 @@ describe('DataFrame', function () {
 
 		expect(dataFrame.getColumnNames()).to.eql(initialColumns);
 		expect(modified.getColumnNames()).to.eql(newColumnNames);
-		expect(modified.getSeries(newColumnName).toValues()).to.eql([11, 22, 33]);
+		expect(modified.getSeries(newColumnName).toArray()).to.eql([11, 22, 33]);
 	});
 
 	it('can generate series - object version', function () {
@@ -1003,7 +1003,7 @@ describe('DataFrame', function () {
 
 		expect(dataFrame.getColumnNames()).to.eql(initialColumns);
 		expect(modified.getColumnNames()).to.eql(newColumnNames);
-		expect(modified.getSeries(newColumnName).toValues()).to.eql([11, 22, 33]);
+		expect(modified.getSeries(newColumnName).toArray()).to.eql([11, 22, 33]);
 	});
 
 	it('can deflate dataframe to series', function () {
@@ -1022,7 +1022,7 @@ describe('DataFrame', function () {
 				return row.Column1 + row.Column2;
 			});
 
-		expect(series.toValues()).to.eql([11, 22, 33]);
+		expect(series.toArray()).to.eql([11, 22, 33]);
 	});
 
 	it('can aggregate dataframe', function () {
@@ -1198,8 +1198,8 @@ describe('DataFrame', function () {
 		};
 		var dataFrame = new dataForge.DataFrame({ values: iterable });
 		expect(dataFrame.getColumnNames()).to.eql(["V1", "V2"]);
-		expect(dataFrame.getSeries("V1").toValues()).to.eql([1, 2]);
-		expect(dataFrame.getSeries("V2").toValues()).to.eql([10, 100]);
+		expect(dataFrame.getSeries("V1").toArray()).to.eql([1, 2]);
+		expect(dataFrame.getSeries("V2").toArray()).to.eql([10, 100]);
 	});
 
 	it('default index is generated', function () {
@@ -1210,7 +1210,7 @@ describe('DataFrame', function () {
 			[new Date(2015, 24, 2), 200, 'bar', 22],
 		];
 		var dataFrame = new dataForge.DataFrame({ columnNames: columns, values: rows });
-		expect(dataFrame.getIndex().take(2).toValues()).to.eql([0, 1 ]);
+		expect(dataFrame.getIndex().take(2).toArray()).to.eql([0, 1 ]);
 	});
 
 	it('there are no rows or columns when no columns or rows are specified', function () {
@@ -1254,10 +1254,10 @@ describe('DataFrame', function () {
 		expect(columns.count()).to.eql(2);
 
 		expect(columns.at(0).name).to.eql("Col1");
-		expect(columns.at(0).series.toValues()).to.eql([1, 10]);
+		expect(columns.at(0).series.toArray()).to.eql([1, 10]);
 
 		expect(columns.at(1).name).to.eql("Col2");
-		expect(columns.at(1).series.toValues()).to.eql(["hello", "computer"]);
+		expect(columns.at(1).series.toArray()).to.eql(["hello", "computer"]);
 	});
 
 	/*todo: Would like to enable this feature again one day.
@@ -1288,16 +1288,16 @@ describe('DataFrame', function () {
 		expect(columns.count()).to.eql(4);
 
 		expect(columns.at(0).name).to.eql("Col1");
-		expect(columns.at(0).series.toValues()).to.eql([1]);
+		expect(columns.at(0).series.toArray()).to.eql([1]);
 
 		expect(columns.at(1).name).to.eql("Col2");
-		expect(columns.at(1).series.toValues()).to.eql(["hello"]);
+		expect(columns.at(1).series.toArray()).to.eql(["hello"]);
 
 		expect(columns.at(2).name).to.eql("Col3");
-		expect(columns.at(2).series.toValues()).to.eql([10]);
+		expect(columns.at(2).series.toArray()).to.eql([10]);
 
 		expect(columns.at(3).name).to.eql("Col4");
-		expect(columns.at(3).series.toValues()).to.eql(["computer"]);
+		expect(columns.at(3).series.toArray()).to.eql(["computer"]);
 	});
 	*/	
 

@@ -216,7 +216,7 @@ describe('merge-examples', function () {
                 ;
 
             expect(merged.getColumnNames()).to.eql(["Column1", "Column2"]);
-            expect(merged.getIndex().take(3).toValues()).to.eql([0, 1, 2]);
+            expect(merged.getIndex().take(3).toArray()).to.eql([0, 1, 2]);
             expect(merged.toRows()).to.eql([
                 [1, 10],
                 [2, 12],
@@ -329,7 +329,7 @@ describe('merge-examples', function () {
 
             var df_new = dataForge.concatDataFrames([df_a, df_b]);
 
-            expect(df_new.getIndex().toValues()).to.eql([
+            expect(df_new.getIndex().toArray()).to.eql([
                 0, 1, 2, 3, 4,
                 0, 1, 2, 3, 4,
             ]);
@@ -353,7 +353,7 @@ describe('merge-examples', function () {
 
             var df_new = dataForge.concatDataFrames([df_a, df_b], { axis: 1 });
 
-            expect(df_new.getIndex().take(5).toValues()).to.eql([
+            expect(df_new.getIndex().take(5).toArray()).to.eql([
                 0, 1, 2, 3, 4,
             ]);
 
@@ -398,7 +398,7 @@ describe('merge-examples', function () {
                 )
                 ;
 
-            expect(df_merged.getIndex().take(9).toValues()).to.eql([
+            expect(df_merged.getIndex().take(9).toArray()).to.eql([
                 0, 1, 2, 3, 4, 5, 6, 7, 8,
             ]);
 
@@ -440,7 +440,7 @@ describe('merge-examples', function () {
                 )
                 ;
 
-            expect(df_merged.getIndex().take(9).toValues()).to.eql([
+            expect(df_merged.getIndex().take(9).toArray()).to.eql([
                 0, 1, 2, 3, 4, 5, 6, 7, 8,
             ]);
 
@@ -484,7 +484,7 @@ describe('merge-examples', function () {
                 )
                 ;
 
-            expect(df_merged.getIndex().take(9).toValues()).to.eql([
+            expect(df_merged.getIndex().take(9).toArray()).to.eql([
                 0, 1, 2, 3, 4, 5, 6, 7, 8,
             ]);
 
@@ -531,7 +531,7 @@ describe('merge-examples', function () {
                 )
                 ;
 
-            expect(df_merged.getIndex().take(8).toValues()).to.eql([
+            expect(df_merged.getIndex().take(8).toArray()).to.eql([
                 0, 1, 2, 3, 4, 5, 6, 7
             ]);
 
@@ -573,7 +573,7 @@ describe('merge-examples', function () {
                 )
                 ;
 
-            expect(df_merged.getIndex().take(2).toValues()).to.eql([
+            expect(df_merged.getIndex().take(2).toArray()).to.eql([
                 0, 1,
             ]);
 
@@ -614,7 +614,7 @@ describe('merge-examples', function () {
                 )
                 ;
 
-            expect(df_merged.getIndex().take(5).toValues()).to.eql([
+            expect(df_merged.getIndex().take(5).toArray()).to.eql([
                 0, 1, 2, 3, 4,
             ]);
 
@@ -658,7 +658,7 @@ describe('merge-examples', function () {
                 )
                 ;
 
-            expect(df_merged.getIndex().take(5).toValues()).to.eql([
+            expect(df_merged.getIndex().take(5).toArray()).to.eql([
                 0, 1, 2, 3, 4,
             ]);
 
@@ -702,7 +702,7 @@ describe('merge-examples', function () {
                 )
                 ;
 
-            expect(df_merged.getIndex().take(5).toValues()).to.eql([
+            expect(df_merged.getIndex().take(5).toArray()).to.eql([
                 0, 1, 2, 3, 4,
             ]);
 
@@ -742,7 +742,7 @@ describe('merge-examples', function () {
                 )
                 ;
 
-            expect(df_merged.getIndex().take(5).toValues()).to.eql([
+            expect(df_merged.getIndex().take(5).toArray()).to.eql([
                 0, 1, 2, 3, 4,
             ]);
 

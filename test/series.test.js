@@ -24,7 +24,7 @@ describe('Series', function () {
 	it('default index is generated', function () {
 		
 		var column = new dataForge.Series({ values: [100, 200] });
-		expect(column.getIndex().take(2).toValues()).to.eql([			
+		expect(column.getIndex().take(2).toArray()).to.eql([			
 			0,
 			1			
 		]);		
@@ -33,7 +33,7 @@ describe('Series', function () {
 	it('can get index', function () {
 		
 		var column = new dataForge.Series({ values: [100, 200], index: [5, 6] });
-		expect(column.getIndex().toValues()).to.eql([
+		expect(column.getIndex().toArray()).to.eql([
 			5,
 			6
 		]);		
@@ -43,11 +43,11 @@ describe('Series', function () {
 
 		var series = new dataForge.Series({ values: [100, 200], index: [5, 6] });
 		var modified = series.withIndex([10, 20]);
-		expect(modified.getIndex().toValues()).to.eql([
+		expect(modified.getIndex().toArray()).to.eql([
 			10,
 			20
 		]);		
-		expect(modified.toValues()).to.eql([
+		expect(modified.toArray()).to.eql([
 			100,
 			200
 		]);		
@@ -57,11 +57,11 @@ describe('Series', function () {
 
 		var series = new dataForge.Series({ values: [100, 200], index: [5, 6] });
 		var modified = series.withIndex(new dataForge.Series({ values: [10, 20] }));
-		expect(modified.getIndex().toValues()).to.eql([
+		expect(modified.getIndex().toArray()).to.eql([
 			10,
 			20
 		]);		
-		expect(modified.toValues()).to.eql([
+		expect(modified.toArray()).to.eql([
 			100,
 			200
 		]);		
@@ -71,7 +71,7 @@ describe('Series', function () {
 
 		var series = new dataForge.Series({ values: [100, 200], index: [5, 6] });
 		var reset = series.resetIndex();
-		expect(reset.getIndex().take(2).toValues()).to.eql([
+		expect(reset.getIndex().take(2).toArray()).to.eql([
 			0,
 			1
 		]);
@@ -80,7 +80,7 @@ describe('Series', function () {
 	it('can get column values', function () {
 		
 		var column = new dataForge.Series({ values: [100, 200] });
-		expect(column.toValues()).to.eql([			
+		expect(column.toArray()).to.eql([			
 			100,
 			200			
 		]);		
@@ -92,7 +92,7 @@ describe('Series', function () {
 			return new ArrayIterator([100, 200]);
 		};
 		var column = new dataForge.Series({ values: iterable });
-		expect(column.toValues()).to.eql([			
+		expect(column.toArray()).to.eql([			
 			100,
 			200			
 		]);		
@@ -101,21 +101,21 @@ describe('Series', function () {
 	it('can bake values from enumerator', function () {
 
 		var series = initSeries([0, 1, 2, 3], [100, 300, 200, 5]);
-		expect(series.toValues()).to.eql([100, 300, 200, 5]);
+		expect(series.toArray()).to.eql([100, 300, 200, 5]);
 	});	
 
 	it('can skip', function () {
 		var series = initSeries([0, 1, 2, 3], [100, 300, 200, 5]);
 		var skipped = series.skip(2);		
-		expect(skipped.getIndex().toValues()).to.eql([2, 3]);
-		expect(skipped.toValues()).to.eql([200, 5]);		
+		expect(skipped.getIndex().toArray()).to.eql([2, 3]);
+		expect(skipped.toArray()).to.eql([200, 5]);		
 	});
 
 	it('can take', function () {
 		var series = initSeries([0, 1, 2, 3], [100, 300, 200, 5]);
 		var skipped = series.take(2);		
-		expect(skipped.getIndex().toValues()).to.eql([0, 1]);
-		expect(skipped.toValues()).to.eql([100, 300]);		
+		expect(skipped.getIndex().toArray()).to.eql([0, 1]);
+		expect(skipped.toArray()).to.eql([100, 300]);		
 	});
 
 	it('can filter', function () {
@@ -123,8 +123,8 @@ describe('Series', function () {
 		var filtered = series.where(function (value) {
 				return value >= 100 && value < 300;
 			});
-		expect(filtered.getIndex().toValues()).to.eql([0, 2]);
-		expect(filtered.toValues()).to.eql([100, 200]);		
+		expect(filtered.getIndex().toArray()).to.eql([0, 2]);
+		expect(filtered.toArray()).to.eql([100, 200]);		
 	});
 
 	it('can select', function () {
@@ -132,8 +132,8 @@ describe('Series', function () {
 		var modified = series.select(function (value, index) {
 				return value + 10;
 			});
-		expect(modified.getIndex().toValues()).to.eql([0, 1, 2, 3]);
-		expect(modified.toValues()).to.eql([110, 310, 210, 15]);		
+		expect(modified.getIndex().toArray()).to.eql([0, 1, 2, 3]);
+		expect(modified.toArray()).to.eql([110, 310, 210, 15]);		
 	});
 
 	it('can select many - with array', function () {
@@ -145,8 +145,8 @@ describe('Series', function () {
 					})
 					.toArray();
 			});
-		expect(modified.getIndex().toValues()).to.eql([0, 0, 1, 1, 2, 2, 3, 3]);
-		expect(modified.toValues()).to.eql([101, 102, 301, 302, 201, 202, 6, 7]);		
+		expect(modified.getIndex().toArray()).to.eql([0, 0, 1, 1, 2, 2, 3, 3]);
+		expect(modified.toArray()).to.eql([101, 102, 301, 302, 201, 202, 6, 7]);		
 	});
 
 	it('can select many - with series', function () {
@@ -155,8 +155,8 @@ describe('Series', function () {
 				return dataForge.range(0, 2)
 					.select(i => i + value);
 			});
-		expect(modified.getIndex().toValues()).to.eql([0, 0, 1, 1]);
-		expect(modified.toValues()).to.eql([100, 101, 300, 301]);
+		expect(modified.getIndex().toArray()).to.eql([0, 0, 1, 1]);
+		expect(modified.toArray()).to.eql([100, 101, 300, 301]);
 	});
 
 	it('can select many - with data-frame', function () {
@@ -167,8 +167,8 @@ describe('Series', function () {
 					.inflate(v => { return { Value: v }; })
 					;
 			});
-		expect(modified.getIndex().toValues()).to.eql([0, 0, 1, 1]);
-		expect(modified.toValues()).to.eql([{ Value: 100 }, { Value: 101 }, { Value: 300 }, { Value: 301 }]);
+		expect(modified.getIndex().toArray()).to.eql([0, 0, 1, 1]);
+		expect(modified.toArray()).to.eql([{ Value: 100 }, { Value: 101 }, { Value: 300 }, { Value: 301 }]);
 	});
 
 	it('responds gracefully to non-list returned from selectMany selector', function () {
@@ -177,7 +177,7 @@ describe('Series', function () {
 				return 5.0; // non a list!
 			});
 		expect(function () {
-				modified.toValues();
+				modified.toArray();
 			})
 			.to.throw();
 	});
@@ -211,8 +211,8 @@ describe('Series', function () {
 			.thenBy(function (row) {
 				return row.i;
 			});
-		expect(sorted.getIndex().toValues()).to.eql([3, 2, 1, 0]);
-		expect(sorted.toValues()).to.eql([
+		expect(sorted.getIndex().toArray()).to.eql([3, 2, 1, 0]);
+		expect(sorted.toArray()).to.eql([
 			{
 				i: 3,
 				v: 5
@@ -261,8 +261,8 @@ describe('Series', function () {
 			.thenByDescending(function (row) {
 				return row.i;
 			});
-		expect(sorted.getIndex().toValues()).to.eql([0, 1, 2, 3]);
-		expect(sorted.toValues()).to.eql([
+		expect(sorted.getIndex().toArray()).to.eql([0, 1, 2, 3]);
+		expect(sorted.toArray()).to.eql([
 			{
 				i: 1,
 				v: 300,
@@ -388,7 +388,7 @@ describe('Series', function () {
 			.select(function (pair) {
 				var windowIndex = pair[0];
 				var window = pair[1];
-				return [windowIndex, window.toValues()];
+				return [windowIndex, window.toArray()];
 			})
 			.asValues()
 			;
@@ -408,7 +408,7 @@ describe('Series', function () {
 			.select(function (pair) {
 				var windowIndex = pair[0];
 				var window = pair[1];
-				return [windowIndex, window.toValues()];
+				return [windowIndex, window.toArray()];
 			})
 			.asValues()
 			;
@@ -429,7 +429,7 @@ describe('Series', function () {
 			.select(function (pair) {
 				var windowIndex = pair[0];
 				var window = pair[1];
-				return [windowIndex, window.toValues()];
+				return [windowIndex, window.toArray()];
 			})
 			.asValues()
 			;
@@ -450,7 +450,7 @@ describe('Series', function () {
 			.select(function (pair) {
 				var windowIndex = pair[0];
 				var window = pair[1];
-				return [windowIndex, window.toValues()];
+				return [windowIndex, window.toArray()];
 			})
 			.asValues()
 			;
@@ -471,12 +471,12 @@ describe('Series', function () {
 			.select(function (pair) {
 				var windowIndex = pair[0];
 				var window = pair[1];
-				return [windowIndex, window.toValues()];
+				return [windowIndex, window.toArray()];
 			})
 			.asValues()
 			;
 
-		expect(newSeries.toValues().length).to.eql(0);
+		expect(newSeries.toArray().length).to.eql(0);
 	});
 
 	it('rolling window returns 0 values when there are not enough values in the data set', function () {
@@ -488,12 +488,12 @@ describe('Series', function () {
 			.select(function (pair) {
 				var windowIndex = pair[0];
 				var window = pair[1];
-				return [windowIndex, window.toValues()];
+				return [windowIndex, window.toArray()];
 			})
 			.asValues()
 			;
 
-		expect(newSeries.toValues().length).to.eql(0);
+		expect(newSeries.toArray().length).to.eql(0);
 	});
 
 	it('can compute rolling window - odd data set with even period', function () {
@@ -505,15 +505,15 @@ describe('Series', function () {
 			.select(function (pair) {
 				var windowIndex = pair[0];
 				var window = pair[1];
-				return [windowIndex, window.toValues()];
+				return [windowIndex, window.toArray()];
 			})
 			.asValues()
 			;
 
-		var index = newSeries.getIndex().toValues();
+		var index = newSeries.getIndex().toArray();
 		expect(index).to.eql([0, 1, 2, 3]);
 
-		var values = newSeries.toValues();
+		var values = newSeries.toArray();
 		expect(values.length).to.eql(4);
 		expect(values[0]).to.eql([0, 1]);
 		expect(values[1]).to.eql([1, 2]);
@@ -530,15 +530,15 @@ describe('Series', function () {
 			.select(function (pair) {
 				var windowIndex = pair[0];
 				var window = pair[1];
-				return [windowIndex, window.toValues()];
+				return [windowIndex, window.toArray()];
 			})
 			.asValues()
 			;
 
-		var index = newSeries.getIndex().toValues();
+		var index = newSeries.getIndex().toArray();
 		expect(index).to.eql([0, 1, 2]);
 
-		var values = newSeries.toValues();
+		var values = newSeries.toArray();
 		expect(values.length).to.eql(3);
 		expect(values[0]).to.eql([0, 1, 2]);
 		expect(values[1]).to.eql([1, 2, 3]);
@@ -554,15 +554,15 @@ describe('Series', function () {
 			.select(function (pair) {
 				var windowIndex = pair[0];
 				var window = pair[1];
-				return [windowIndex+10, window.toValues()];
+				return [windowIndex+10, window.toArray()];
 			})
 			.asValues()
 			;
 
-		var index = newSeries.getIndex().toValues();
+		var index = newSeries.getIndex().toArray();
 		expect(index).to.eql([10, 11, 12, 13, 14]);
 
-		var values = newSeries.toValues();
+		var values = newSeries.toArray();
 		expect(values.length).to.eql(5);
 		expect(values[0]).to.eql([0, 1]);
 		expect(values[1]).to.eql([1, 2]);
@@ -580,15 +580,15 @@ describe('Series', function () {
 			.select(function (pair) {
 				var windowIndex = pair[0];
 				var window = pair[1];
-				return [windowIndex, window.toValues()];
+				return [windowIndex, window.toArray()];
 			})
 			.asValues()
 			;
 
-		var index = newSeries.getIndex().toValues();
+		var index = newSeries.getIndex().toArray();
 		expect(index).to.eql([0, 1, 2, 3]);
 
-		var values = newSeries.toValues();
+		var values = newSeries.toArray();
 		expect(values.length).to.eql(4);
 		expect(values[0]).to.eql([0, 1, 2]);
 		expect(values[1]).to.eql([1, 2, 3]);
@@ -605,17 +605,17 @@ describe('Series', function () {
 			.select(function (pair) {
 				var windowIndex = pair[0];
 				var window = pair[1];
-				var index = window.getIndex().toValues();
-				var values = window.toValues();
+				var index = window.getIndex().toArray();
+				var values = window.toArray();
 				return [index[index.length-1], values[values.length-1]];
 			})
 			.asValues()
 			;
 
-		var index = newSeries.getIndex().toValues();
+		var index = newSeries.getIndex().toArray();
 		expect(index).to.eql([2, 3, 4, 5]);
 
-		var values = newSeries.toValues();
+		var values = newSeries.toArray();
 		expect(values).to.eql([2, 3, 4, 5]);
 	});
 	
@@ -623,8 +623,8 @@ describe('Series', function () {
 
 		var series = initSeries([0, 1, 2, 3], [1, 2, 4, 8]);
 		var pctChanged = series.percentChange();
-		expect(pctChanged.getIndex().toValues()).to.eql([1, 2, 3]);
-		expect(pctChanged.toValues()).to.eql([1, 1, 1]);
+		expect(pctChanged.getIndex().toArray()).to.eql([1, 2, 3]);
+		expect(pctChanged.toArray()).to.eql([1, 1, 1]);
 	});
 
 	it('can parse string series to int', function () {
@@ -632,8 +632,8 @@ describe('Series', function () {
 		var series = initSeries([10, 5, 2], ['1', '100', '5']);
 		var parsed = series.parseInts();
 
-		expect(parsed.getIndex().toValues()).to.eql([10, 5, 2]);
-		expect(parsed.toValues()).to.eql([1, 100, 5]);
+		expect(parsed.getIndex().toArray()).to.eql([10, 5, 2]);
+		expect(parsed.toArray()).to.eql([1, 100, 5]);
 	});
 
 	it('can parse string series to int - with empty string', function () {
@@ -641,8 +641,8 @@ describe('Series', function () {
 		var series = initSeries([10], ['']);
 		var parsed = series.parseInts();
 
-		expect(parsed.getIndex().toValues()).to.eql([10]);
-		expect(parsed.toValues()).to.eql([]);
+		expect(parsed.getIndex().toArray()).to.eql([10]);
+		expect(parsed.toArray()).to.eql([]);
 	});
 
 	it('can parse string series to int - with undefined', function () {
@@ -650,8 +650,8 @@ describe('Series', function () {
 		var series = initSeries([10], [undefined]);
 		var parsed = series.parseInts();
 
-		expect(parsed.getIndex().toValues()).to.eql([10]);
-		expect(parsed.toValues()).to.eql([]);
+		expect(parsed.getIndex().toArray()).to.eql([10]);
+		expect(parsed.toArray()).to.eql([]);
 	});
 
 	it('can parse string series to int - throws when source value is not a string', function () {
@@ -660,7 +660,7 @@ describe('Series', function () {
 		var parsed = series.parseInts();
 
 		expect(function () { 
-			parsed.toValues();
+			parsed.toArray();
 		}).to.throw();
 	});
 
@@ -669,8 +669,8 @@ describe('Series', function () {
 		var series = initSeries([10, 5, 2], ['1', '100.2020', '5.5']);
 		var parsed = series.parseFloats();
 
-		expect(parsed.getIndex().toValues()).to.eql([10, 5, 2]);
-		expect(parsed.toValues()).to.eql([1, 100.2020, 5.5]);
+		expect(parsed.getIndex().toArray()).to.eql([10, 5, 2]);
+		expect(parsed.toArray()).to.eql([1, 100.2020, 5.5]);
 	});
 
 	it('can parse string series to float - with empty string', function () {
@@ -678,8 +678,8 @@ describe('Series', function () {
 		var series = initSeries([10], ['']);
 		var parsed = series.parseFloats();
 
-		expect(parsed.getIndex().toValues()).to.eql([10]);
-		expect(parsed.toValues()).to.eql([]);
+		expect(parsed.getIndex().toArray()).to.eql([10]);
+		expect(parsed.toArray()).to.eql([]);
 	});
 
 	it('can parse string series to float - with undefined', function () {
@@ -687,8 +687,8 @@ describe('Series', function () {
 		var series = initSeries([10], [undefined]);
 		var parsed = series.parseFloats();
 
-		expect(parsed.getIndex().toValues()).to.eql([10]);
-		expect(parsed.toValues()).to.eql([]);
+		expect(parsed.getIndex().toArray()).to.eql([10]);
+		expect(parsed.toArray()).to.eql([]);
 	});
 
 	it('can parse string series to float - throws when source value is not a string', function () {
@@ -697,7 +697,7 @@ describe('Series', function () {
 		var parsed = series.parseFloats();
 
 		expect(function () { 
-			parsed.toValues();
+			parsed.toArray();
 		}).to.throw();
 	});
 
@@ -706,8 +706,8 @@ describe('Series', function () {
 		var series = initSeries([10, 5], ['1975-2-24', '2015-2-24']);
 		var parsed = series.parseDates();
 
-		expect(parsed.getIndex().toValues()).to.eql([10, 5]);
-		expect(parsed.toValues()).to.eql([new Date(1975, 1, 24), new Date(2015, 1, 24)]); // Note months are 0-based here.
+		expect(parsed.getIndex().toArray()).to.eql([10, 5]);
+		expect(parsed.toArray()).to.eql([new Date(1975, 1, 24), new Date(2015, 1, 24)]); // Note months are 0-based here.
 	});
 
 	it('can parse string series to date - with empty string', function () {
@@ -715,8 +715,8 @@ describe('Series', function () {
 		var series = initSeries([10], ['']);
 		var parsed = series.parseDates();
 
-		expect(parsed.getIndex().toValues()).to.eql([10]);
-		expect(parsed.toValues()).to.eql([]);
+		expect(parsed.getIndex().toArray()).to.eql([10]);
+		expect(parsed.toArray()).to.eql([]);
 	});
 
 	it('can parse string series to date - with undefined', function () {
@@ -724,8 +724,8 @@ describe('Series', function () {
 		var series = initSeries([10], [undefined]);
 		var parsed = series.parseDates();
 
-		expect(parsed.getIndex().toValues()).to.eql([10]);
-		expect(parsed.toValues()).to.eql([]);
+		expect(parsed.getIndex().toArray()).to.eql([10]);
+		expect(parsed.toArray()).to.eql([]);
 	});
 
 	it('can parse string series to date - throws when source value is not a string', function () {
@@ -734,7 +734,7 @@ describe('Series', function () {
 		var parsed = series.parseDates();
 
 		expect(function () { 
-			parsed.toValues();
+			parsed.toArray();
 		}).to.throw();
 	});
 
@@ -743,8 +743,8 @@ describe('Series', function () {
 		var series = initSeries([10, 5], ['24-02-75', '24-02-15']);
 		var parsed = series.parseDates('DD-MM-YY');
 
-		expect(parsed.getIndex().toValues()).to.eql([10, 5]);
-		expect(parsed.toValues()).to.eql([new Date(1975, 1, 24), new Date(2015, 1, 24)]); // Note months are 0-based here.
+		expect(parsed.getIndex().toArray()).to.eql([10, 5]);
+		expect(parsed.toArray()).to.eql([new Date(1975, 1, 24), new Date(2015, 1, 24)]); // Note months are 0-based here.
 	});
 
 	it('can parse values to strings', function () {
@@ -752,8 +752,8 @@ describe('Series', function () {
 		var series = initSeries([1, 2, 3, 4, 5, 6], [1, null, undefined, "foo", 5.5, new Date(2015, 1, 1)]);
 		var converted = series.toStrings();
 
-		expect(converted.getIndex().toValues()).to.eql([1, 2, 3, 4, 5, 6]);
-		expect(converted.toValues()).to.eql([
+		expect(converted.getIndex().toArray()).to.eql([1, 2, 3, 4, 5, 6]);
+		expect(converted.toArray()).to.eql([
 			'1', 
 			null, 
 			"foo", 
@@ -768,8 +768,8 @@ describe('Series', function () {
 		var series = initSeries([1], [new Date(2015, 1, 3)]);
 		var converted = series.toStrings('YYYY-DD-MM');
 
-		expect(converted.getIndex().toValues()).to.eql([1]);
-		expect(converted.toValues()).to.eql([
+		expect(converted.getIndex().toArray()).to.eql([1]);
+		expect(converted.toArray()).to.eql([
 			'2015-03-02',
 		]);
 	});
@@ -779,8 +779,8 @@ describe('Series', function () {
 		var series = initSeries([1], [moment(new Date(2015, 1, 3))]);
 		var converted = series.toStrings('YYYY-DD-MM');
 
-		expect(converted.getIndex().toValues()).to.eql([1]);
-		expect(converted.toValues()).to.eql([
+		expect(converted.getIndex().toArray()).to.eql([1]);
+		expect(converted.toArray()).to.eql([
 			'2015-03-02',
 		]);
 	});
@@ -790,7 +790,7 @@ describe('Series', function () {
 		var series = initSeries([1], [1]);
 		var types = series.detectTypes();
 		expect(types.getColumnNames()).to.eql(['Type', 'Frequency']);
-		expect(types.getIndex().take(1).toValues()).to.eql([0]);
+		expect(types.getIndex().take(1).toArray()).to.eql([0]);
 		expect(types.toRows()).to.eql([
 			['number', 100]
 		]);
@@ -801,7 +801,7 @@ describe('Series', function () {
 		var series = initSeries([1], [new Date(2015, 1, 1)]);
 		var types = series.detectTypes();
 		expect(types.getColumnNames()).to.eql(['Type', 'Frequency']);
-		expect(types.getIndex().take(1).toValues()).to.eql([0]);
+		expect(types.getIndex().take(1).toArray()).to.eql([0]);
 		expect(types.toRows()).to.eql([
 			['date', 100]
 		]);
@@ -812,7 +812,7 @@ describe('Series', function () {
 		var series = initSeries([1, 2], [1, 'foo']);
 		var types = series.detectTypes();
 		expect(types.getColumnNames()).to.eql(['Type', 'Frequency']);
-		expect(types.getIndex().take(2).toValues()).to.eql([0, 1]);
+		expect(types.getIndex().take(2).toArray()).to.eql([0, 1]);
 		expect(types.toRows()).to.eql([
 			['number', 50],
 			['string', 50],
@@ -823,7 +823,7 @@ describe('Series', function () {
 		var series = initSeries([1, 2], [1, 'foo']);
 		var values = series.detectValues();
 		expect(values.getColumnNames()).to.eql(['Value', 'Frequency']);
-		expect(values.getIndex().take(2).toValues()).to.eql([0, 1]);
+		expect(values.getIndex().take(2).toArray()).to.eql([0, 1]);
 		expect(values.toRows()).to.eql([
 			[1, 50],
 			['foo', 50],
@@ -835,8 +835,8 @@ describe('Series', function () {
 		var series = initSeries([1, 2], ['foo', 'bar']);
 		var truncated = series.truncateStrings(2);
 
-		expect(truncated.getIndex().toValues()).to.eql([1, 2]);
-		expect(truncated.toValues()).to.eql(['fo', 'ba']);
+		expect(truncated.getIndex().toArray()).to.eql([1, 2]);
+		expect(truncated.toArray()).to.eql(['fo', 'ba']);
 	});
 
 	it('truncation ignores strings that are already short enough', function () {
@@ -844,7 +844,7 @@ describe('Series', function () {
 		var series = initSeries([1, 2], ['foo', 'bar']);
 		var truncated = series.truncateStrings(20);
 
-		expect(truncated.toValues()).to.eql(['foo', 'bar']);
+		expect(truncated.toArray()).to.eql(['foo', 'bar']);
 	});
 
 	it('truncation passes through other values', function () {
@@ -852,7 +852,7 @@ describe('Series', function () {
 		var series = initSeries([1, 2, 3, 4], [null, undefined, 1, new Date(2015, 1, 1)]);
 		var truncated = series.truncateStrings(20);
 
-		expect(truncated.toValues()).to.eql([null, 1, new Date(2015, 1, 1)]);
+		expect(truncated.toArray()).to.eql([null, 1, new Date(2015, 1, 1)]);
 	});
 
 	it('can bake series', function () {
@@ -865,8 +865,8 @@ describe('Series', function () {
 		expect(baked).not.to.equal(series);
 		expect(baked).to.be.an.instanceOf(dataForge.Series);
 		expect(baked.getIndex()).to.be.an.instanceOf(dataForge.Series);
-		expect(baked.getIndex().toValues()).to.eql(indicies);
-		expect(baked.toValues()).to.eql(values);
+		expect(baked.getIndex().toArray()).to.eql(indicies);
+		expect(baked.toArray()).to.eql(values);
 	});
 
 	it('can get pairs', function () {
@@ -927,10 +927,10 @@ describe('Series', function () {
 
 		var series = initSeries([0, 1, 2], ['A', 'B', 'C']);
 		var reversed = series.reverse();
-		expect(series.toValues()).to.eql(['A', 'B', 'C']);
-		expect(series.getIndex().toValues()).to.eql([0, 1, 2]);
-		expect(reversed.toValues()).to.eql(['C', 'B', 'A']);
-		expect(reversed.getIndex().toValues()).to.eql([2, 1, 0]);
+		expect(series.toArray()).to.eql(['A', 'B', 'C']);
+		expect(series.getIndex().toArray()).to.eql([0, 1, 2]);
+		expect(reversed.toArray()).to.eql(['C', 'B', 'A']);
+		expect(reversed.getIndex().toArray()).to.eql([2, 1, 0]);
 	});
 
 	it('can inflate series to data frame', function () {
@@ -978,14 +978,14 @@ describe('Series', function () {
 
 		var series = initSeries([0, 1, 2], ['A', 'B', 'C']);
 		var head = series.head(2);
-		expect(head.toValues()).to.eql(['A', 'B']);
+		expect(head.toArray()).to.eql(['A', 'B']);
 	});
 
 	it('can get tail of series', function () {
 
 		var series = initSeries([0, 1, 2], ['A', 'B', 'C']);
 		var head = series.tail(2);
-		expect(head.toValues()).to.eql(['B', 'C']);
+		expect(head.toArray()).to.eql(['B', 'C']);
 	});
 
 	it('can skip while', function () {
@@ -1723,21 +1723,21 @@ describe('Series', function () {
 
 		var series = new Series();
 		var defaulted = series.defaultIfEmpty([1, 2]);
-		expect(defaulted.toValues()).to.eql([1, 2]);
+		expect(defaulted.toArray()).to.eql([1, 2]);
 	});
 
 	it('can select default instead of empty series - series', function () {
 
 		var series = new Series();
 		var defaulted = series.defaultIfEmpty(new Series({ values: [1, 2] }));
-		expect(defaulted.toValues()).to.eql([1, 2]);
+		expect(defaulted.toArray()).to.eql([1, 2]);
 	});
 
 	it('default is ignored for non-empty series', function () {
 
 		var series = new Series({ values: [5, 6] });
 		var defaulted = series.defaultIfEmpty([1, 2]);
-		expect(defaulted.toValues()).to.eql([5, 6]);
+		expect(defaulted.toArray()).to.eql([5, 6]);
 	});
 
 	it('can get union of 2 series with unique values', function () {
@@ -1746,7 +1746,7 @@ describe('Series', function () {
 		var series2 = new Series({ values: [7, 8] })
 		var result = series1.union(series2);
 
-		expect(result.toValues()).to.eql([5, 6, 7, 8]);
+		expect(result.toArray()).to.eql([5, 6, 7, 8]);
 	});
 
 	it('can get union of 2 series with overlapping values', function () {
@@ -1755,7 +1755,7 @@ describe('Series', function () {
 		var series2 = new Series({ values: [6, 7] })
 		var result = series1.union(series2);
 
-		expect(result.toValues()).to.eql([5, 6, 7]);
+		expect(result.toArray()).to.eql([5, 6, 7]);
 	});
 
 	it('union can work with selector', function () {
@@ -1766,7 +1766,7 @@ describe('Series', function () {
 			return row.X;
 		});
 
-		expect(result.toValues()).to.eql([ { X: 5 }, { X: 6 }, { X: 7 }]);
+		expect(result.toArray()).to.eql([ { X: 5 }, { X: 6 }, { X: 7 }]);
 	});
 
 	it('can get intersection of 2 series with overlapping values', function () {
@@ -1775,7 +1775,7 @@ describe('Series', function () {
 		var series2 = new Series({ values: [6, 7] })
 		var result = series1.intersection(series2);
 
-		expect(result.toValues()).to.eql([6]);
+		expect(result.toArray()).to.eql([6]);
 	});
 
 	it('intersection result is empty for 2 series that have no overlapping values', function () {
@@ -1784,7 +1784,7 @@ describe('Series', function () {
 		var series2 = new Series({ values: [7, 8] })
 		var result = series1.intersection(series2);
 
-		expect(result.toValues()).to.eql([]);
+		expect(result.toArray()).to.eql([]);
 	});
 
 	it('intersection can work with selector', function () {
@@ -1795,7 +1795,7 @@ describe('Series', function () {
 			return left.X === right.X;
 		});
 
-		expect(result.toValues()).to.eql([ { X: 6 }, ]);
+		expect(result.toArray()).to.eql([ { X: 6 }, ]);
 	});
 
 	it('can get exception of 2 series with overlapping values', function () {
@@ -1804,7 +1804,7 @@ describe('Series', function () {
 		var series2 = new Series({ values: [6, 7] })
 		var result = series1.except(series2);
 
-		expect(result.toValues()).to.eql([5]);
+		expect(result.toArray()).to.eql([5]);
 	});
 
 	it('exception result is empty for 2 series that have fully overlapping values', function () {
@@ -1813,7 +1813,7 @@ describe('Series', function () {
 		var series2 = new Series({ values: [5, 6] })
 		var result = series1.except(series2);
 
-		expect(result.toValues()).to.eql([]);
+		expect(result.toArray()).to.eql([]);
 	});
 
 	it('except can work with selector', function () {
@@ -1824,7 +1824,7 @@ describe('Series', function () {
 			return left.X === right.X;
 		});
 
-		expect(result.toValues()).to.eql([ { X: 5 }, ]);
+		expect(result.toArray()).to.eql([ { X: 5 }, ]);
 	});
 
 	it('can transform a series to a series of pairs', function () {
@@ -1834,7 +1834,7 @@ describe('Series', function () {
 			values: [1, 2, 3],
 		});
 
-		var pairs = series.asPairs().toValues();
+		var pairs = series.asPairs().toArray();
 		expect(pairs).to.eql([
 			[10, 1],
 			[20, 2],

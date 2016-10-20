@@ -31,12 +31,12 @@ describe('rolling window integration', function () {
 			.asValues()
 			;
 
-		expect(newSeries.getIndex().toValues()).to.eql([14, 15, 16, 17, 18, 19, 20, 21]);
-		expect(newSeries.toValues()).to.eql([5, 6, 7, 8, 9, 10, 11, 12]);
+		expect(newSeries.getIndex().toArray()).to.eql([14, 15, 16, 17, 18, 19, 20, 21]);
+		expect(newSeries.toArray()).to.eql([5, 6, 7, 8, 9, 10, 11, 12]);
 
 		var newDataFrame = dataFrame.withSeries('Value2', newSeries);
 
-		expect(newDataFrame.getIndex().toValues()).to.eql([10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]);
+		expect(newDataFrame.getIndex().toArray()).to.eql([10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]);
 
 		expect(newDataFrame.toRows()).to.eql([
 			[1, undefined],

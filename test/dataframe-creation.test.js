@@ -304,7 +304,7 @@ describe('dataframe creation', function () {
 		});
 
 		expect(function () {
-			d.toValues();
+			d.toArray();
 
 		}).to.throw();
 	});
@@ -322,7 +322,7 @@ describe('dataframe creation', function () {
 		});
 
 		expect(function () {
-			d.toValues();
+			d.toArray();
 
 		}).to.throw();
 	});
@@ -374,7 +374,7 @@ describe('dataframe creation', function () {
 			},
 		});
 
-		expect(df.toValues()).to.eql([
+		expect(df.toArray()).to.eql([
 			{ A: 1, B: 'a' },
 			{ A: 2, B: 'b' },
 			{ A: 3, B: 'c' },
@@ -413,7 +413,7 @@ describe('dataframe creation', function () {
 		});
 
 		expect(df.getColumnNames()).to.eql(["some-column.1", "some-Column.2"]);
-		expect(df.toValues()).to.eql([
+		expect(df.toArray()).to.eql([
 			{
 				"some-column.1": 1,
 				"some-Column.2": 2,

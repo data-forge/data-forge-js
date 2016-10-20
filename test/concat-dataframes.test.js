@@ -35,7 +35,7 @@ describe('concat-dataframes', function () {
 	 	var result = dataForge.concatDataFrames([df1, df2]);
 
 	 	expect(result.getColumnNames()).to.eql(["1", "2"]);
-	 	expect(result.getIndex().toValues()).to.eql([0, 1, 0, 1]);
+	 	expect(result.getIndex().toArray()).to.eql([0, 1, 0, 1]);
 	 	expect(result.toRows()).to.eql([
  			[1, 2],
  			[3, 4],
@@ -52,7 +52,7 @@ describe('concat-dataframes', function () {
 	 	var result = dataForge.concatDataFrames([df1, df2]);
 
 	 	expect(result.getColumnNames()).to.eql(["1", "2", "3"]);
-	 	expect(result.getIndex().toValues()).to.eql([0, 1, 0, 1]);
+	 	expect(result.getIndex().toArray()).to.eql([0, 1, 0, 1]);
 	 	expect(result.toRows()).to.eql([
  			[1, 2, undefined],
  			[3, 4, undefined],

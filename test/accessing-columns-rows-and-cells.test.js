@@ -34,7 +34,7 @@ describe('accessing columns, rows and cells', function () {
     it('can load csv', function () {
 
         expect(df1.getColumnNames()).to.eql(["GEOID", "State", "2005", "2006", "2007", "2008", "2009", "2010", "2011", "2012", "2013", ]);
-        expect(df1.getIndex().toValues()).to.eql([0, 1, 2, 3, 4]);        
+        expect(df1.getIndex().toArray()).to.eql([0, 1, 2, 3, 4]);        
         expect(df1.toRows()).to.eql([
             ["04000US01", "Alabama", 37150, 37952, 42212, 44476, 39980, 40933, 42590, 43464, 41381],            
             ["04000US02", "Alaska", 55891, 56418, 62993, 63989, 61604, 57848, 57431, 63648, 61137],         
@@ -47,7 +47,7 @@ describe('accessing columns, rows and cells', function () {
     it('can set index', function () {
 
         expect(df2.getColumnNames()).to.eql(["GEOID", "2005", "2006", "2007", "2008", "2009", "2010", "2011", "2012", "2013", ]);
-        expect(df2.getIndex().toValues()).to.eql(["Alabama", "Alaska", "Arizona", "Arkansas", "California", ]);        
+        expect(df2.getIndex().toArray()).to.eql(["Alabama", "Alaska", "Arizona", "Arkansas", "California", ]);        
         expect(df2.toRows()).to.eql([
             ["04000US01", 37150, 37952, 42212, 44476, 39980, 40933, 42590, 43464, 41381],            
             ["04000US02", 55891, 56418, 62993, 63989, 61604, 57848, 57431, 63648, 61137],         
@@ -65,7 +65,7 @@ describe('accessing columns, rows and cells', function () {
             ;
 
         expect(subset.getColumnNames()).to.eql(["2005", "2006", "2007", ]);
-        expect(subset.getIndex().toValues()).to.eql(["Alaska", "Arizona", "Arkansas", ]);        
+        expect(subset.getIndex().toArray()).to.eql(["Alaska", "Arizona", "Arkansas", ]);        
         expect(subset.toRows()).to.eql([
             [55891, 56418, 62993],         
             [45245, 46657, 47215],
@@ -77,8 +77,8 @@ describe('accessing columns, rows and cells', function () {
 
         var series = df2.getSeries("2005");
 
-        expect(series.getIndex().toValues()).to.eql(["Alabama", "Alaska", "Arizona", "Arkansas", "California"]);        
-        expect(series.toValues()).to.eql([ 37150, 55891, 45245, 36658, 51755, ]);
+        expect(series.getIndex().toArray()).to.eql(["Alabama", "Alaska", "Arizona", "Arkansas", "California"]);        
+        expect(series.toArray()).to.eql([ 37150, 55891, 45245, 36658, 51755, ]);
     });
 
     it('can get single cell', function () {

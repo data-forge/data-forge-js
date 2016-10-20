@@ -29,13 +29,13 @@ describe('csv.integration', function () {
 
 		var dataFrame = dataForge.fromCSV(csv);
 		var series1 = dataFrame.getSeries('Value1');
-		expect(series1.toValues()).to.eql([
+		expect(series1.toArray()).to.eql([
 			'100',
 			'300',
 		]);
 		
 		var series2 = dataFrame.getSeries('Value2');
-		expect(series2.toValues()).to.eql([
+		expect(series2.toArray()).to.eql([
 			'foo',
 			'bar',			
 		]);
@@ -73,13 +73,13 @@ describe('csv.integration', function () {
 
 		var dataFrame = dataForge.fromCSV(csv, { columnNames: ["Date", "Value1", "Value2", "Value3"] });
 		var series1 = dataFrame.getSeries('Value1');
-		expect(series1.toValues()).to.eql([
+		expect(series1.toArray()).to.eql([
 			'100',
 			'300',
 		]);
 		
 		var series2 = dataFrame.getSeries('Value2');
-		expect(series2.toValues()).to.eql([
+		expect(series2.toArray()).to.eql([
 			'foo',
 			'bar',			
 		]);
@@ -120,13 +120,13 @@ describe('csv.integration', function () {
 		expect(dataFrame.getColumnNames()).to.eql(["c1", "c2", ""]);
 
 		var series1 = dataFrame.getSeries('c1');
-		expect(series1.toValues()).to.eql([
+		expect(series1.toArray()).to.eql([
 			'f',
 			'x',
 		]);
 		
 		var series2 = dataFrame.getSeries('c2');
-		expect(series2.toValues()).to.eql([
+		expect(series2.toArray()).to.eql([
 			'1',
 			'2',
 		]);
@@ -143,13 +143,13 @@ describe('csv.integration', function () {
 		expect(dataFrame.getColumnNames()).to.eql(["c1", "c2"]);
 
 		var series1 = dataFrame.getSeries('c1');
-		expect(series1.toValues()).to.eql([
+		expect(series1.toArray()).to.eql([
 			'a',
 			'b',
 		]);
 		
 		var series2 = dataFrame.getSeries('c2');
-		expect(series2.toValues()).to.eql([
+		expect(series2.toArray()).to.eql([
 			'1',
 			'2',
 		]);
@@ -166,13 +166,13 @@ describe('csv.integration', function () {
 		expect(dataFrame.getColumnNames()).to.eql(["c1", "c2"]);
 
 		var series1 = dataFrame.getSeries('c1');
-		expect(series1.toValues()).to.eql([
+		expect(series1.toArray()).to.eql([
 			'a',
 			'b',
 		]);
 		
 		var series2 = dataFrame.getSeries('c2');
-		expect(series2.toValues()).to.eql([
+		expect(series2.toArray()).to.eql([
 			'1',
 			'2',
 		]);
@@ -189,13 +189,13 @@ describe('csv.integration', function () {
 		expect(dataFrame.getColumnNames()).to.eql(["c1", "c2"]);
 
 		var series1 = dataFrame.getSeries('c1');
-		expect(series1.toValues()).to.eql([
+		expect(series1.toArray()).to.eql([
 			'a',
 			'b',
 		]);
 		
 		var series2 = dataFrame.getSeries('c2');
-		expect(series2.toValues()).to.eql([
+		expect(series2.toArray()).to.eql([
 			'1',
 			'2',
 		]);
@@ -212,14 +212,14 @@ describe('csv.integration', function () {
 		expect(dataFrame.getColumnNames()).to.eql(["Company name", "Code", ""]);
 
 		var series1 = dataFrame.getSeries('Company name');
-		expect(series1.toValues()).to.eql([
+		expect(series1.toArray()).to.eql([
 			'AUSTRALIAN AGRICULTURAL COMPANY LIMITED.',
 			'ARDENT LEISURE GROUP',
 			'',
 		]);
 		
 		var series2 = dataFrame.getSeries('Code');
-		expect(series2.toValues()).to.eql([
+		expect(series2.toArray()).to.eql([
 			'AAC',
 			'AAD',
 		]);

@@ -101,13 +101,13 @@ describe('series creation', function () {
 
 		var series = new Series();
 		expect(series.count()).to.eql(0);
-		expect(series.toValues()).to.eql([]);
+		expect(series.toArray()).to.eql([]);
 	});
 
 	it('can create empty series with empty config', function () {
 
 		var series = new Series({});
 		expect(series.count()).to.eql(0);
-		expect(series.toValues()).to.eql([]);
+		expect(series.toArray()).to.eql([]);
 	});
 });

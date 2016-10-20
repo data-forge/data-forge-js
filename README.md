@@ -187,7 +187,7 @@ Through this documentation and the Data-Forge code you will occasionally see a r
 
 ## Lazy Evaluation
 
-Data-frames, series and index are only fully evaluated when necessary. Operations are queued up and only fully evaluated as needed and when required, for example when serializing to csv or json (`toCSV` or `toJSON`) or when baking to values (`toValues` or `toRows`). 
+Data-frames, series and index are only fully evaluated when necessary. Operations are queued up and only fully evaluated as needed and when required, for example when serializing to csv or json (`toCSV` or `toJSON`) or when baking to values (`toArray` or `toRows`). 
 
 A data-frame, series or index can be forcibly evaluated by calling the `bake` function. 
 
@@ -424,7 +424,7 @@ To get back the names of columns:
 
 To get back an array of objects (with column names as field names):
 
-	var objects = dataFrame.toValues();
+	var objects = dataFrame.toArray();
 
 To get back an array of rows (in column order):
 
@@ -438,7 +438,7 @@ To get back index and value pairs:
 
 To retreive the data from Series as an array:
 
-	var values = series.toValues();
+	var values = series.toArray();
 
 To get back index and value pairs:
 
@@ -579,7 +579,7 @@ To extract rows as arrays of data (ordered by column):
 
 To extract rows as objects (with column names as fields):
 
-	var arrayOfObjects = dataFrame.toValues();
+	var arrayOfObjects = dataFrame.toArray();
 
 To extracts index + row pairs:
 
@@ -606,7 +606,7 @@ Get the names of the columns:
 Get a Series of all columns:
 
 	var columns = dataFrame.getColumns();
-	var arrayOfColumns = columns.toValues();
+	var arrayOfColumns = columns.toArray();
 
 	for (var column in columns) {
 		var name = column.name;
@@ -641,7 +641,7 @@ Note: the follow functions cause lazy evaluation to complete (like the *toArray*
 
 Extract the values from the series as an array:   
 
-	var arrayOfValues = someSeries.toValues();
+	var arrayOfValues = someSeries.toArray();
 
 Extract index + value pairs from the series as an array:
 
@@ -663,9 +663,9 @@ Retrieve the index from a series:
 
 	var index = someSeries.getIndex();
 
-An index is actually just another Series so you can call the `toValues` function or anything else that normally works for a Series:
+An index is actually just another Series so you can call the `toArray` function or anything else that normally works for a Series:
 
-	var arrayOfValues = index.toValues();
+	var arrayOfValues = index.toArray();
 
 ## Adding a column
 
@@ -930,7 +930,7 @@ LINQ-style functions that are currently available (or close equivalents):
 - orderBy/orderByDescending/thenBy/thenByDescending
 - groupBy
 - distinct
-- toValues/toRows
+- toArray/toRows
 - count
 - head/tail
 - first/last
@@ -1050,7 +1050,7 @@ The implementation of `percentChange` looks a bit like this:
 	var pctChangeSeries = sourceSeries.rollingWindow(2)
 		.asPairs()
 		.select(function (window, windowIndex) {
-			var values = window.toValues();
+			var values = window.toArray();
 			var amountChange = values[1] - values[0]; // Compute amount of change.
 			var pctChange = amountChange / values[0]; // Compute % change.
 
@@ -1291,7 +1291,7 @@ When working with large text files use *FileReader* and *FileWriter*. *FileReade
 
 			var outputDataFrame = inputDataFrame.select(... some transformation ...);
 
-			return db.someOtherCollection.insert(outputDataFrame.toValues());			
+			return db.someOtherCollection.insert(outputDataFrame.toArray());			
 		})
 		.then(function () {
 			console.log('Done!');
@@ -1316,7 +1316,7 @@ Same as previous example, except use skip and take to only process a window of t
 
 			var outputDataFrame = inputDataFrame.select(... some transformation ...);
 
-			return db.someOtherCollection.insert(outputDataFrame.toValues());			
+			return db.someOtherCollection.insert(outputDataFrame.toArray());			
 		})
 		.then(function () {
 			console.log('Done!');
@@ -1345,7 +1345,7 @@ Same as previous example, except use skip and take to only process a window of t
 					method: 'POST',
 					uri: "http://some-host/another/rest/api',
 					body: { 
-						data: outputDataFrame.toValues() 
+						data: outputDataFrame.toArray() 
 					},
 					json: true,
 				});			 
@@ -1381,7 +1381,7 @@ Note the differences in the way plugins are referenced than in the NodeJS versio
 	);
 
 	var someDataFrame = ...
-	$.post(url, someDataFrame.toValues(),
+	$.post(url, someDataFrame.toArray(),
 		function (data) {
 			// ...
 		}
@@ -1427,7 +1427,7 @@ Note the differences in the way plugins are referenced than in the NodeJS versio
 		});
 
 	var someDataFrame = ...
-	$http.post(url, someDataFrame.toValues())
+	$http.post(url, someDataFrame.toArray())
 		.then(function () {
 			// ... handle success ...
 		})

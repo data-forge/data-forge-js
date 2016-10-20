@@ -685,9 +685,9 @@ Series.prototype.toString = function () {
 	var self = this;
 	var Table = require('easy-table');
 
-	var index = self.getIndex().toValues();
+	var index = self.getIndex().toArray();
 	var header = ["__index__", "__value__"];
-	var rows = E.from(self.toValues())
+	var rows = E.from(self.toArray())
 			.select(function (value, rowIndex) { 
 				return [index[rowIndex], value];
 			})
@@ -718,7 +718,7 @@ Series.prototype.percentChange = function () {
 		.asPairs()
 		.select(function (pair) {
 			var window = pair[1];
-			var values = window.toValues();
+			var values = window.toArray();
 			var amountChange = values[1] - values[0]; // Compute amount of change.
 			var pctChange = amountChange / values[0]; // Compute % change.
 			return [window.getIndex().last(), pctChange]; // Return new index and value.
@@ -849,8 +849,8 @@ Series.prototype.detectTypes = function () {
 
 	return new DataFrame({
 		columnNames: ["Type", "Frequency"],
-		values: function () { //todo: make this properly lazy.
-			var values = self.toValues();
+		values: function () {
+			var values = self.toArray();
 			var totalValues = values.length;
 
 			var typeFrequencies = E.from(values)
@@ -901,7 +901,7 @@ Series.prototype.detectValues = function () {
 	return new DataFrame({
 		columnNames: ["Value", "Frequency"],
 		values: function () {
-			var values = self.toValues();
+			var values = self.toArray();
 			var totalValues = values.length;
 
 			var valueFrequencies = E.from(values)
@@ -962,7 +962,7 @@ Series.prototype.truncateStrings = function (maxLength) {
  * 
  * @returns {array} Returns an array of values contained within the series or dataframe.  
  */
-Series.prototype.toValues = function () {
+Series.prototype.toArray = function () {
 
 	var self = this;
 	var iterator = self.getIterator();
@@ -1312,7 +1312,7 @@ Series.prototype.toObject = function (keySelector, valueSelector) {
 	assert.isFunction(keySelector, "Expected 'keySelector' parameter to toObject to be a function.");
 	assert.isFunction(valueSelector, "Expected 'valueSelector' parameter to toObject to be a function.");
 
-	return E.from(self.toValues()).toObject(keySelector, valueSelector);
+	return E.from(self.toArray()).toObject(keySelector, valueSelector);
 };
 
 /**
@@ -1348,7 +1348,7 @@ Series.prototype.zip = function () {
 	return zip(
 		inputSeries, 
 		function (series) {
-			return selector.apply(undefined, series.toValues());
+			return selector.apply(undefined, series.toArray());
 		},
 		self.Constructor
 	);

@@ -19,7 +19,7 @@ module.exports = function (input, selector, Constructor) {
 
 	var toZip = E.from(input)
 		.select(function (sequence) {
-			return sequence.toValues();
+			return sequence.toArray();
 		})
 		.toArray();
 
