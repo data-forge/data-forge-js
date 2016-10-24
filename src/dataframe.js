@@ -400,6 +400,47 @@ DataFrame.prototype.expectSeries = function (columnName) {
 	return self;
 };
 
+/**
+ * Add a series if it doesn't already exist.
+ * 
+ * @param {string|object} columnNameOrSpec - The name of the series to add or a column spec that defines the new column.
+ * @param {function} seriesOrFn - The series to add or a function that returns the series.
+ * 
+ * @returns {DataFrame} Returns a new dataframe with the specified series added, if the series didn't already exist. Otherwise if the requested series already exists the same dataframe is returned.  
+ */
+DataFrame.prototype.ensureSeries = function (columnNameOrSpec, seriesOrFn) {
+
+	if (!Object.isObject(columnNameOrSpec)) {
+		assert.isString(columnNameOrSpec, "Expected 'columnNameOrSpec' parameter to 'DataFrame.ensureSeries' function to be a string that specifies the column to set or replace.");
+
+		if (!Object.isFunction(seriesOrFn)) {
+			assert.isObject(seriesOrFn, "Expected 'seriesOrFn' parameter to 'DataFrame.ensureSeries' to be a Series object or a function that produces a Series object.");
+		}
+	}
+	else {
+		assert.isUndefined(seriesOrFn, "Expected 'seriesOrFn' parameter to 'DataFrame.ensureSeries' to not be unset when 'columnNameOrSpec is an object.");
+	}
+
+	var self = this;
+
+	if (Object.isObject(columnNameOrSpec)) {
+		return E.from(Object.keys(columnNameOrSpec))
+			.aggregate(self, function (dataFrame, columnName) {
+				return dataFrame.ensureSeries(columnName, columnNameOrSpec[columnName]);
+			});
+	}
+
+	var columnName = columnNameOrSpec;
+
+	var self = this;
+	if (self.hasSeries(columnName)) {
+		return self;
+	}
+	else {
+		return self.withSeries(columnName, seriesOrFn);
+	}
+};
+
 /** 
  * Retreive a collection of all columns.
  * 

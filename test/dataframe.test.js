@@ -156,6 +156,166 @@ describe('DataFrame', function () {
 		expect(series.toPairs()).to.eql([]);
 	});
 
+	it('can ensure series that doesnt exist', function () {
+
+		var dataFrame = new DataFrame({
+			columnNames: ["C1"],
+			values: [
+				[1],
+				[2],
+			],
+		});
+
+		console.log(dataFrame.toArray());
+
+		var modified = dataFrame.ensureSeries("C2", new Series({ values: [10, 20] }));
+
+		expect(modified.getColumnNames()).to.eql(["C1", "C2"]);
+		expect(modified.toRows()).to.eql([
+			[1, 10],
+			[2, 20],
+		]);
+	});
+
+	it('can ensure series that already exists', function () {
+
+		var dataFrame = new DataFrame({
+			columnNames: ["C1", "C2"],
+			values: [
+				[1, 52],
+				[2, 53],
+			],
+		});
+
+		var modified = dataFrame.ensureSeries("C2", new Series({ values: [100, 200] }));
+
+		expect(modified.getColumnNames()).to.eql(["C1", "C2"]);
+		expect(modified.toRows()).to.eql([
+			[1, 52],
+			[2, 53],
+		]);
+	});
+
+	it('can ensure series that doesnt exist - with series generator function', function () {
+
+		var dataFrame = new DataFrame({
+			columnNames: ["C1"],
+			values: [
+				[1],
+				[2],
+			],
+		});
+
+		console.log(dataFrame.toArray());
+
+		var modified = dataFrame.ensureSeries("C2", df => new Series({ values: [10, 20] }));
+
+		expect(modified.getColumnNames()).to.eql(["C1", "C2"]);
+		expect(modified.toRows()).to.eql([
+			[1, 10],
+			[2, 20],
+		]);
+	});
+
+	it('can ensure series that already exists - with series generator function', function () {
+
+		var dataFrame = new DataFrame({
+			columnNames: ["C1", "C2"],
+			values: [
+				[1, 52],
+				[2, 53],
+			],
+		});
+
+		var modified = dataFrame.ensureSeries("C2", df => new Series({ values: [100, 200] }));
+
+		expect(modified.getColumnNames()).to.eql(["C1", "C2"]);
+		expect(modified.toRows()).to.eql([
+			[1, 52],
+			[2, 53],
+		]);
+	});
+
+	it('can ensure series that doesnt exist - with column spec', function () {
+
+		var dataFrame = new DataFrame({
+			columnNames: ["C1"],
+			values: [
+				[1],
+				[2],
+			],
+		});
+
+		console.log(dataFrame.toArray());
+
+		var modified = dataFrame.ensureSeries({ C2: new Series({ values: [10, 20] }) });
+
+		expect(modified.getColumnNames()).to.eql(["C1", "C2"]);
+		expect(modified.toRows()).to.eql([
+			[1, 10],
+			[2, 20],
+		]);
+	});
+
+	it('can ensure series that already exists - with column spec', function () {
+
+		var dataFrame = new DataFrame({
+			columnNames: ["C1", "C2"],
+			values: [
+				[1, 52],
+				[2, 53],
+			],
+		});
+
+		var modified = dataFrame.ensureSeries({ C2: new Series({ values: [100, 200] }) });
+
+		expect(modified.getColumnNames()).to.eql(["C1", "C2"]);
+		expect(modified.toRows()).to.eql([
+			[1, 52],
+			[2, 53],
+		]);
+	});
+
+	it('can ensure series that doesnt exist - with column spec and series generator fn', function () {
+
+		var dataFrame = new DataFrame({
+			columnNames: ["C1"],
+			values: [
+				[1],
+				[2],
+			],
+		});
+
+		console.log(dataFrame.toArray());
+
+		var modified = dataFrame.ensureSeries({ C2: df => new Series({ values: [10, 20] }) });
+
+		expect(modified.getColumnNames()).to.eql(["C1", "C2"]);
+		expect(modified.toRows()).to.eql([
+			[1, 10],
+			[2, 20],
+		]);
+	});
+
+	it('can ensure series that already exists - with column spec and series generator fn', function () {
+
+		var dataFrame = new DataFrame({
+			columnNames: ["C1", "C2"],
+			values: [
+				[1, 52],
+				[2, 53],
+			],
+		});
+
+		var modified = dataFrame.ensureSeries({ C2: df => new Series({ values: [100, 200] }) });
+
+		expect(modified.getColumnNames()).to.eql(["C1", "C2"]);
+		expect(modified.toRows()).to.eql([
+			[1, 52],
+			[2, 53],
+		]);
+	});
+
 	it('can retreive columns', function () {
 		
 		var dataFrame = initDataFrame(

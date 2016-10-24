@@ -153,21 +153,27 @@ Install via NPM and Bower as described in previous sections or clone, fork or do
 
 This section explains the key concepts of *Data-Forge*.
 
-## DataFrame
-
-DataFrame is the *main* concept. It is a sequence of rows. It can also be considered a matrix (rows and columns) of structured data. Can be considered a sequence of rows. Has an implicit or explicit index. Think of it as a spreadsheet in memory.
-
-A *data-frame* can be easily constructed from various formats and it can be exported to various formats. 
-
 ## Series
 
-Series is a sequence of values. A series is indexed. By default a Series has an integer index starting at 0 and couting up (just like arrays). Series will often be used with a date-time index, this is usually known as a [time series](https://en.wikipedia.org/wiki/Time_series).
+A series is an indexed sequence of values and is implemented by the `Series` class. By default a series has an integer index starting at 0 and counting up (just like arrays). Series will often be used with a date-time index, something usually known as a [time series](https://en.wikipedia.org/wiki/Time_series).
 
-All values in a series are generally expected to have the same type, although this is not a requirement of *data-forge-js*.
+All values in a series are generally expected to have the same type, although this is not specifically a requirement of *data-forge-js*.
+
+## DataFrame
+
+A dataframe is the *main* concept and type of data structure in data-forge. It is implemented by the `DataFrame`. It is a sequence of rows. It can also be considered a matrix (rows and columns) of structured data. Think of it as a spreadsheet in memory.
+
+A *data-frame* can be easily constructed from various formats and it can be exported to various formats.
+
+`DataFrame` is actually a sub-class of `Series`, so it inherits all the functions of `Series`. 
 
 ## Value / Row
 
-A single piece of data in a sequence. For `DataFrame` a value is a JavaScript object, each field of the object represnts a column in the data-frame. For `Series` each value can be any valid JavaScript value. 
+A single piece of data in a sequence. 
+
+For `DataFrame` a value is a JavaScript object, each field of which represnts a column in the dataframe. 
+
+For `Series` each value can be any valid JavaScript value. 
 
 ## Column
 
