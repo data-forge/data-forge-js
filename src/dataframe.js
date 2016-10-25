@@ -977,7 +977,7 @@ DataFrame.prototype.renameSeries = function (newColumnNames) {
 		var existingColumns = self.iterable.getColumnNames();
 		var numExistingColumns = existingColumns.length;
 
-		assert.isArray(newColumnNames, "Expected parameter 'newColumnNames' to renameColumns to be an array with column names.");
+		assert.isArray(newColumnNames, "Expected parameter 'newColumnNames' to renameSeries to be an array with column names.");
 		assert(newColumnNames.length === numExistingColumns, "Expected 'newColumnNames' array to have an element for each existing column. There are " + numExistingColumns + "existing columns.");
 
 		return new DataFrame({
