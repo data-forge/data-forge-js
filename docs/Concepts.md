@@ -1,6 +1,6 @@
 # Key Concepts
 
-This section explains the key concepts of *Data-Forge*.
+This document explains the key concepts of *Data-Forge*.
 
 ## Series
 
@@ -16,11 +16,11 @@ A *data-frame* can be easily constructed from various formats and it can be expo
 
 `DataFrame` is actually a sub-class of `Series`, so it inherits all the functions of `Series`. 
 
-## Value / Row
+## Value / row
 
 A single piece of data in a sequence. 
 
-For `DataFrame` a value is a JavaScript object, each field of which represnts a column in the dataframe. 
+For `DataFrame` a value is a JavaScript object, each field of which represents a column in the dataframe. 
 
 For `Series` each value can be any valid JavaScript value. 
 
@@ -154,3 +154,8 @@ Alternatively (to support lazy evaluation) a generator may return a lazily evalu
 			return myIterator;
 		};
 	};
+
+## Group / Window
+
+A Series where each value in the series is itself another Series or DataFrame. Think of it as a sequence of groups. This concept is used by the multiple Data-Forge functions that create groups and windows, for example `groupBy`, `window` and `rollingWindow`.
+
