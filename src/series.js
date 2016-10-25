@@ -519,6 +519,8 @@ Series.prototype.orderByDescending = function (sortSelector) {
 
 /**
  * Create a new series from a slice of rows.
+ * 
+ * WARNING: To use slice, your index must already be sorted.
  *
  * @param {int|function} startIndexOrStartPredicate - Index where the slice starts or a predicate function that determines where the slice starts.
  * @param {int|function} endIndexOrEndPredicate - Marks the end of the slice, one row past the last row to include. Or a predicate function that determines when the slice has ended.

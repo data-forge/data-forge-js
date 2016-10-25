@@ -504,6 +504,8 @@ A new data-frame can also be created from a *slice* of rows:
 	var endIndex = ... // Ending row index to include in subset.
 	var rowSubset = dataFrame.slice(startIndex, endIndex);
 
+NOTE: To use `slice` your index must be sorted.
+
 Invoke a callback for each row in a data-frame using `forEach`:
 
 	dataFrame.forEach(function (row, index) {

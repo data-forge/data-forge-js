@@ -28,11 +28,12 @@ Browser:
         * [.getSeries(columnName)](#dataForge.DataFrame+getSeries)
         * [.hasSeries(columnName)](#dataForge.DataFrame+hasSeries)
         * [.expectSeries(columnName)](#dataForge.DataFrame+expectSeries)
+        * [.ensureSeries(columnNameOrSpec, seriesOrFn)](#dataForge.DataFrame+ensureSeries) ⇒ <code>DataFrame</code>
         * [.getColumns()](#dataForge.DataFrame+getColumns) ⇒ <code>array</code>
         * [.subset(columnNames)](#dataForge.DataFrame+subset) ⇒ <code>DataFrame</code>
         * [.dropSeries(columnOrColumns)](#dataForge.DataFrame+dropSeries) ⇒ <code>DataFrame</code>
         * [.keepSeries(columnOrColumns)](#dataForge.DataFrame+keepSeries) ⇒ <code>DataFrame</code>
-        * [.withSeries(columnName, series)](#dataForge.DataFrame+withSeries) ⇒ <code>DataFrame</code>
+        * [.withSeries(columnNameOrSpec, [seriesOrFn])](#dataForge.DataFrame+withSeries) ⇒ <code>DataFrame</code>
         * [.setIndex(columnName)](#dataForge.DataFrame+setIndex) ⇒ <code>DataFrame</code>
         * [.toString()](#dataForge.DataFrame+toString) ⇒ <code>string</code>
         * [.parseInts(columnNameOrNames)](#dataForge.DataFrame+parseInts) ⇒ <code>DataFrame</code>
@@ -42,14 +43,12 @@ Browser:
         * [.detectTypes()](#dataForge.DataFrame+detectTypes) ⇒ <code>DataFrame</code>
         * [.detectValues()](#dataForge.DataFrame+detectValues) ⇒ <code>DataFrame</code>
         * [.truncateStrings(maxLength)](#dataForge.DataFrame+truncateStrings) ⇒ <code>DataFrame</code>
-        * [.remapColumns(columnNames)](#dataForge.DataFrame+remapColumns) ⇒ <code>DataFrame</code>
+        * [.reorderSeries(columnNames)](#dataForge.DataFrame+reorderSeries) ⇒ <code>DataFrame</code>
         * [.renameSeries(newColumnNames|columnsMap)](#dataForge.DataFrame+renameSeries) ⇒ <code>DataFrame</code>
         * [.toJSON()](#dataForge.DataFrame+toJSON) ⇒ <code>string</code>
         * [.toCSV()](#dataForge.DataFrame+toCSV) ⇒ <code>string</code>
-        * [.transformSeries(columnSelectors)](#dataForge.DataFrame+transformSeries) ⇒ <code>DataFrame</code>
-        * [.generateSeries(generator)](#dataForge.DataFrame+generateSeries) ⇒ <code>DataFrame</code>
         * [.deflate(selector)](#dataForge.DataFrame+deflate) ⇒ <code>Series</code>
-        * [.inflateColumn(columnNameOrIndex, [selector])](#dataForge.DataFrame+inflateColumn) ⇒ <code>DataFrame</code>
+        * [.inflateSeries(columnName, [selector])](#dataForge.DataFrame+inflateSeries) ⇒ <code>DataFrame</code>
         * [.aggregate([seed], selector)](#dataForge.DataFrame+aggregate) ⇒ <code>DataFrame</code>
         * [.bringToFront(columnOrColumns)](#dataForge.DataFrame+bringToFront) ⇒ <code>DataFrame</code>
         * [.bringToBack(columnOrColumns)](#dataForge.DataFrame+bringToBack) ⇒ <code>DataFrame</code>
@@ -86,6 +85,7 @@ Browser:
         * [.tail(values)](#dataForge.Series+tail) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
         * [.sum()](#dataForge.Series+sum) ⇒ <code>number</code>
         * [.average()](#dataForge.Series+average) ⇒ <code>number</code>
+        * [.median()](#dataForge.Series+median) ⇒ <code>Number</code>
         * [.min()](#dataForge.Series+min) ⇒ <code>number</code>
         * [.max()](#dataForge.Series+max) ⇒ <code>number</code>
         * [.toObject(keySelector, keySelector)](#dataForge.Series+toObject) ⇒ <code>object</code>
@@ -155,6 +155,7 @@ Browser:
         * [.tail(values)](#dataForge.Series+tail) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
         * [.sum()](#dataForge.Series+sum) ⇒ <code>number</code>
         * [.average()](#dataForge.Series+average) ⇒ <code>number</code>
+        * [.median()](#dataForge.Series+median) ⇒ <code>Number</code>
         * [.min()](#dataForge.Series+min) ⇒ <code>number</code>
         * [.max()](#dataForge.Series+max) ⇒ <code>number</code>
         * [.aggregate([seed], selector)](#dataForge.Series+aggregate) ⇒ <code>value</code>
@@ -210,11 +211,12 @@ Browser:
     * [.getSeries(columnName)](#dataForge.DataFrame+getSeries)
     * [.hasSeries(columnName)](#dataForge.DataFrame+hasSeries)
     * [.expectSeries(columnName)](#dataForge.DataFrame+expectSeries)
+    * [.ensureSeries(columnNameOrSpec, seriesOrFn)](#dataForge.DataFrame+ensureSeries) ⇒ <code>DataFrame</code>
     * [.getColumns()](#dataForge.DataFrame+getColumns) ⇒ <code>array</code>
     * [.subset(columnNames)](#dataForge.DataFrame+subset) ⇒ <code>DataFrame</code>
     * [.dropSeries(columnOrColumns)](#dataForge.DataFrame+dropSeries) ⇒ <code>DataFrame</code>
     * [.keepSeries(columnOrColumns)](#dataForge.DataFrame+keepSeries) ⇒ <code>DataFrame</code>
-    * [.withSeries(columnName, series)](#dataForge.DataFrame+withSeries) ⇒ <code>DataFrame</code>
+    * [.withSeries(columnNameOrSpec, [seriesOrFn])](#dataForge.DataFrame+withSeries) ⇒ <code>DataFrame</code>
     * [.setIndex(columnName)](#dataForge.DataFrame+setIndex) ⇒ <code>DataFrame</code>
     * [.toString()](#dataForge.DataFrame+toString) ⇒ <code>string</code>
     * [.parseInts(columnNameOrNames)](#dataForge.DataFrame+parseInts) ⇒ <code>DataFrame</code>
@@ -224,14 +226,12 @@ Browser:
     * [.detectTypes()](#dataForge.DataFrame+detectTypes) ⇒ <code>DataFrame</code>
     * [.detectValues()](#dataForge.DataFrame+detectValues) ⇒ <code>DataFrame</code>
     * [.truncateStrings(maxLength)](#dataForge.DataFrame+truncateStrings) ⇒ <code>DataFrame</code>
-    * [.remapColumns(columnNames)](#dataForge.DataFrame+remapColumns) ⇒ <code>DataFrame</code>
+    * [.reorderSeries(columnNames)](#dataForge.DataFrame+reorderSeries) ⇒ <code>DataFrame</code>
     * [.renameSeries(newColumnNames|columnsMap)](#dataForge.DataFrame+renameSeries) ⇒ <code>DataFrame</code>
     * [.toJSON()](#dataForge.DataFrame+toJSON) ⇒ <code>string</code>
     * [.toCSV()](#dataForge.DataFrame+toCSV) ⇒ <code>string</code>
-    * [.transformSeries(columnSelectors)](#dataForge.DataFrame+transformSeries) ⇒ <code>DataFrame</code>
-    * [.generateSeries(generator)](#dataForge.DataFrame+generateSeries) ⇒ <code>DataFrame</code>
     * [.deflate(selector)](#dataForge.DataFrame+deflate) ⇒ <code>Series</code>
-    * [.inflateColumn(columnNameOrIndex, [selector])](#dataForge.DataFrame+inflateColumn) ⇒ <code>DataFrame</code>
+    * [.inflateSeries(columnName, [selector])](#dataForge.DataFrame+inflateSeries) ⇒ <code>DataFrame</code>
     * [.aggregate([seed], selector)](#dataForge.DataFrame+aggregate) ⇒ <code>DataFrame</code>
     * [.bringToFront(columnOrColumns)](#dataForge.DataFrame+bringToFront) ⇒ <code>DataFrame</code>
     * [.bringToBack(columnOrColumns)](#dataForge.DataFrame+bringToBack) ⇒ <code>DataFrame</code>
@@ -268,6 +268,7 @@ Browser:
     * [.tail(values)](#dataForge.Series+tail) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
     * [.sum()](#dataForge.Series+sum) ⇒ <code>number</code>
     * [.average()](#dataForge.Series+average) ⇒ <code>number</code>
+    * [.median()](#dataForge.Series+median) ⇒ <code>Number</code>
     * [.min()](#dataForge.Series+min) ⇒ <code>number</code>
     * [.max()](#dataForge.Series+max) ⇒ <code>number</code>
     * [.toObject(keySelector, keySelector)](#dataForge.Series+toObject) ⇒ <code>object</code>
@@ -396,6 +397,19 @@ Verify the existance of a column and return it.Throws an exception if the colum
 | --- | --- | --- |
 | columnName | <code>string</code> | Name or index of the column to retreive. |
 
+<a name="dataForge.DataFrame+ensureSeries"></a>
+
+#### dataFrame.ensureSeries(columnNameOrSpec, seriesOrFn) ⇒ <code>DataFrame</code>
+Add a series if it doesn't already exist.
+
+**Kind**: instance method of <code>[DataFrame](#dataForge.DataFrame)</code>  
+**Returns**: <code>DataFrame</code> - Returns a new dataframe with the specified series added, if the series didn't already exist. Otherwise if the requested series already exists the same dataframe is returned.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| columnNameOrSpec | <code>string</code> &#124; <code>object</code> | The name of the series to add or a column spec that defines the new column. |
+| seriesOrFn | <code>function</code> | The series to add or a function that returns the series. |
+
 <a name="dataForge.DataFrame+getColumns"></a>
 
 #### dataFrame.getColumns() ⇒ <code>array</code>
@@ -441,7 +455,7 @@ Create a new data frame with only the requested column or columns dropped, other
 
 <a name="dataForge.DataFrame+withSeries"></a>
 
-#### dataFrame.withSeries(columnName, series) ⇒ <code>DataFrame</code>
+#### dataFrame.withSeries(columnNameOrSpec, [seriesOrFn]) ⇒ <code>DataFrame</code>
 Create a new data frame with an additional column specified by the passed-in series.
 
 **Kind**: instance method of <code>[DataFrame](#dataForge.DataFrame)</code>  
@@ -449,8 +463,8 @@ Create a new data frame with an additional column specified by the passed-in ser
 
 | Param | Type | Description |
 | --- | --- | --- |
-| columnName | <code>string</code> | The name of the column to add or replace. |
-| series | <code>Series</code> | Series to add to the data-frame. |
+| columnNameOrSpec | <code>string</code> &#124; <code>object</code> | The name of the column to add or replace. |
+| [seriesOrFn] | <code>Series</code> &#124; <code>function</code> | When columnNameOrSpec is a string that identifies the column to add, this specifies the Series to add to the data-frame or a function that produces a series (given a dataframe). |
 
 <a name="dataForge.DataFrame+setIndex"></a>
 
@@ -555,9 +569,9 @@ Produces a new data frame with all string values truncated to the requested maxi
 | --- | --- | --- |
 | maxLength | <code>int</code> | The maximum length of the string values after truncation. |
 
-<a name="dataForge.DataFrame+remapColumns"></a>
+<a name="dataForge.DataFrame+reorderSeries"></a>
 
-#### dataFrame.remapColumns(columnNames) ⇒ <code>DataFrame</code>
+#### dataFrame.reorderSeries(columnNames) ⇒ <code>DataFrame</code>
 Create a new data frame with columns reordered.New column names create new columns (with undefined values), omitting existing column names causes those columns to be dropped.
 
 **Kind**: instance method of <code>[DataFrame](#dataForge.DataFrame)</code>  
@@ -593,30 +607,6 @@ Serialize the data frame to CSV.
 
 **Kind**: instance method of <code>[DataFrame](#dataForge.DataFrame)</code>  
 **Returns**: <code>string</code> - Returns a CSV format string representing the dataframe.  
-<a name="dataForge.DataFrame+transformSeries"></a>
-
-#### dataFrame.transformSeries(columnSelectors) ⇒ <code>DataFrame</code>
-Transform one or more columns. This is equivalent to extracting a column, calling 'select' on it,then plugging it back in as the same column.
-
-**Kind**: instance method of <code>[DataFrame](#dataForge.DataFrame)</code>  
-**Returns**: <code>DataFrame</code> - Returns a new dataframe with 1 or more columns transformed.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| columnSelectors | <code>object</code> | Object with field names for each column to be transformed. Each field you be a selector that transforms that column. |
-
-<a name="dataForge.DataFrame+generateSeries"></a>
-
-#### dataFrame.generateSeries(generator) ⇒ <code>DataFrame</code>
-Generate new columns based on existing rows.
-
-**Kind**: instance method of <code>[DataFrame](#dataForge.DataFrame)</code>  
-**Returns**: <code>DataFrame</code> - Returns a new dataframe with 1 or more new columns.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| generator | <code>function</code> &#124; <code>object</code> | Generator function that transforms each row to a new set of columns. |
-
 <a name="dataForge.DataFrame+deflate"></a>
 
 #### dataFrame.deflate(selector) ⇒ <code>Series</code>
@@ -629,18 +619,18 @@ Deflate a data-frame to a series.
 | --- | --- | --- |
 | selector | <code>function</code> | Selector function that transforms each row to a new sequence of values. |
 
-<a name="dataForge.DataFrame+inflateColumn"></a>
+<a name="dataForge.DataFrame+inflateSeries"></a>
 
-#### dataFrame.inflateColumn(columnNameOrIndex, [selector]) ⇒ <code>DataFrame</code>
-Inflate a named column in the data-frame to 1 or more new columns.
+#### dataFrame.inflateSeries(columnName, [selector]) ⇒ <code>DataFrame</code>
+Inflate a named series in the data-frame to 1 or more new series.
 
 **Kind**: instance method of <code>[DataFrame](#dataForge.DataFrame)</code>  
 **Returns**: <code>DataFrame</code> - Returns a new dataframe with a column inflated to 1 or more new columns.  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| columnNameOrIndex | <code>string</code> &#124; <code>int</code> | Name or index of the column to retreive. |
-| [selector] | <code>function</code> | Selector function that transforms each value in the column to new columns. |
+| columnName | <code>string</code> | Name or index of the column to retreive. |
+| [selector] | <code>function</code> | Optional selector function that transforms each value in the column to new columns. If not specified it is expected that each value in the column is an object whose fields define the new column names. |
 
 <a name="dataForge.DataFrame+aggregate"></a>
 
@@ -883,6 +873,8 @@ Sorts the series or dataframe (descending).
 #### dataFrame.slice(startIndexOrStartPredicate, endIndexOrEndPredicate, [predicate]) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
 Create a new series from a slice of rows.
 
+WARNING: To use slice, your index must already be sorted.
+
 **Kind**: instance method of <code>[DataFrame](#dataForge.DataFrame)</code>  
 **Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a new series or dataframe that contains a slice or values from the original.  
 
@@ -1018,6 +1010,13 @@ Average the values in a series.
 
 **Kind**: instance method of <code>[DataFrame](#dataForge.DataFrame)</code>  
 **Returns**: <code>number</code> - Returns the average of the number values in the series.  
+<a name="dataForge.Series+median"></a>
+
+#### dataFrame.median() ⇒ <code>Number</code>
+Get the median value in the series. Not this sorts the series, so can be expensive.
+
+**Kind**: instance method of <code>[DataFrame](#dataForge.DataFrame)</code>  
+**Returns**: <code>Number</code> - Returns the median of the values in the series.  
 <a name="dataForge.Series+min"></a>
 
 #### dataFrame.min() ⇒ <code>number</code>
@@ -1410,6 +1409,7 @@ Convert a series of pairs to back to a series of values.
     * [.tail(values)](#dataForge.Series+tail) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
     * [.sum()](#dataForge.Series+sum) ⇒ <code>number</code>
     * [.average()](#dataForge.Series+average) ⇒ <code>number</code>
+    * [.median()](#dataForge.Series+median) ⇒ <code>Number</code>
     * [.min()](#dataForge.Series+min) ⇒ <code>number</code>
     * [.max()](#dataForge.Series+max) ⇒ <code>number</code>
     * [.aggregate([seed], selector)](#dataForge.Series+aggregate) ⇒ <code>value</code>
@@ -1646,6 +1646,8 @@ Sorts the series or dataframe (descending).
 #### series.slice(startIndexOrStartPredicate, endIndexOrEndPredicate, [predicate]) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
 Create a new series from a slice of rows.
 
+WARNING: To use slice, your index must already be sorted.
+
 **Kind**: instance method of <code>[Series](#dataForge.Series)</code>  
 **Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a new series or dataframe that contains a slice or values from the original.  
 
@@ -1852,6 +1854,13 @@ Average the values in a series.
 
 **Kind**: instance method of <code>[Series](#dataForge.Series)</code>  
 **Returns**: <code>number</code> - Returns the average of the number values in the series.  
+<a name="dataForge.Series+median"></a>
+
+#### series.median() ⇒ <code>Number</code>
+Get the median value in the series. Not this sorts the series, so can be expensive.
+
+**Kind**: instance method of <code>[Series](#dataForge.Series)</code>  
+**Returns**: <code>Number</code> - Returns the median of the values in the series.  
 <a name="dataForge.Series+min"></a>
 
 #### series.min() ⇒ <code>number</code>
