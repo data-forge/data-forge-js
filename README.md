@@ -35,8 +35,9 @@ Examples and some tests have been removed to a [separate repository](https://git
 - [Lazy Evaluation](#lazy-evaluation-1)
 - [Working with data](#working-with-data)
 - [Data exploration and visualization](#data-exploration-and-visualization)
-- [Data transformation](#data-transformation)
-- [LINQ/PANDAS-style functions](#linqpandas-style-functions)
+- [Transformation](#transformation)
+- [Filtering](#filtering)
+- [Combining](#combining)
 - [Collapsing unique values](#collapsing-unique-values)
 - [Groups and windows](#groups-and-windows)
 - [Summarization and Aggregation](#summarization-and-aggregation)
@@ -715,34 +716,7 @@ The [Github repo](https://github.com/data-forge/data-forge-js) has [examples](ht
 
 There is a [Code Project article](http://www.codeproject.com/Articles/1069489/Highstock-plus-Data-Forge-plus-Yahoo) on using Highstock with Data-Forge to chart Yahoo financial data.
 
-# Data transformation
-
-## Concatenation
-
-Series and DataFrames can be concatenated.
-
-	var df1 = ... some dataframe ...
-	var df2 = ... some other dataframe ...
-
-	var concatenated = df1.concat(df2);
-
-Multiple series or dataframes may be passed to concat:
-
-	var concatenated = df1.concat(df2, df3, df4, etc);
-
-Or an array may be used:
-
-	var toConcat = [df2, df3, df4, etc];
-	var concatenated = df1.concat(toConcat); 
-
-You can also concatenate by passing a list to the global data-forge `concat` function:
-
-	var toConcat = [df2, df3, df4, etc];
-	var concatenated = dataForge.concat(toConcat);
-
-Note that when concatenating series using the global function you must use the Series-specific version:
-
-	var concatenatedSeries = dataForge.concatSeries([series1, series2, etc]);
+# Transformation
 
 ## Data frame transformation
 
@@ -806,63 +780,124 @@ Use `selectPairs` to transform both value and index:
 
 The result of `select` and `selectPairs` is a completely new immutable Series.
 
-Data-Frame offers a convenience function `transformSeries` for when you want to extract, transform and plug back in one or more series at once. For example to simplify the previous code example:
+## Transform a series in a data-frame
+
+Data-Frame offers a convenience function `transformSeries` for when you need a simple convenient mechanism to extract, transform and plug back in one or more series at once. For example to simplify the previous code example:
 
 	var newDf = df.transformSeries({
-		Some-Column: function (value, index) {
-			// Apply a transformation to each value in the column.
+		Some-Column: function (value) {
+			// Apply a transformation to each value in the series.
 			return transform(value); 	
 		},
 	);
 
 Note that `selectMany` and `selectManyPairs` functions are also available and work the same as LINQ SelectMany.
 
-## Data-frame and series filtering
+# Filtering
 
 Data-frames and series can be filtered using the [LINQ](https://en.wikipedia.org/wiki/Language_Integrated_Query)-style [`where`](http://www.dotnetperls.com/where) function:
 
+	var newDf = df.where(somePredicateFunction);
+
+The predicate function must return *truthy* to keep the row, or *falsy* to filter it out, for example:
+
 	var newDf = df
 		.where(function (row) {
-			// ... return true to include the row in the new data frame, return false to exclude it ...
+			return row.SomeColumn > 10l
 		});
 
-# LINQ/PANDAS-style functions
+# Combining
 
-Most of the other [LINQ functions](https://code.msdn.microsoft.com/101-LINQ-Samples-3fb9811b) are or will be available. 
+## Concatenation
 
-LINQ-style functions that are currently available (or close equivalents):
+Series and DataFrames can be concatenated.
 
-- select/selectMany
-- selectPairs/selectManyPairs
-- skip/skipWhile/skipUntil
-- take/takeWhile/takeUntil
-- where
-- any
-- all
-- none
-- subset
-- slice
-- orderBy/orderByDescending/thenBy/thenByDescending
-- groupBy
-- distinct
-- toArray/toRows
-- count
-- head/tail
-- first/last
-- firstPair/lastPair
-- firstIndex/lastIndex
-- reverse
-- 
-- 
-- average/min/max/sum
-- zip
+	var df1 = ... some dataframe ...
+	var df2 = ... some other dataframe ...
 
-Pandas-style functions that are currently available: 
+	var concatenated = df1.concat(df2);
 
-- pivot
-- merge/mergeSeries
-- getSeries/withSeries
-- window/rollingWindow/variableWindow
+Multiple series or dataframes may be passed to concat:
+
+	var concatenated = df1.concatDataFrames(df2, df3, df4, etc);
+
+Or an array may be used:
+
+	var toConcat = [df2, df3, df4, etc];
+	var concatenated = df1.concat(toConcat); 
+
+You can also concatenate by passing an array of series or dataframes to the global data-forge functions `concatSeries` or `concatDataFrames`: 
+
+	var toConcat = [df1, df2, df3, df4, etc];
+	var concatenated = dataForge.concatDataFrames(toConcat);
+
+## Join
+
+Series and dataframes can be merged or joined using the `join` function as in LINQ.  This performs an inner join. Data-Forge also has additional functions for outer joins: `joinOuter`, `joinOuterLeft` and `joinOuterRight`. Thanks to [Ryan Hatch for the implementation](http://blogs.geniuscode.net/RyanDHatch/?p=116).
+
+Following is [an example translated from Pandas code on Chris Albon's blog](http://chrisalbon.com/python/pandas_join_merge_dataframe.html). You can find more such examples of Data-Forge in *merge-dataframe.test.js*.
+
+	var df_a = new dataForge.DataFrame({
+		columnNames: [
+			'subject_id',
+			'first_name',
+			'last_name',
+		],
+		values: [
+			[1, 'Alex', 'Anderson'],
+			[2, 'Amy', 'Ackerman'],
+			// ... and more.
+		],
+	});
+
+	var df_b = new dataForge.DataFrame({
+		columnNames: [
+			'subject_id',
+			'first_name',
+			'last_name',
+		],
+		values: [
+			[4, 'Billy', 'Bonder'],
+			[5, 'Brian', 'Black'],
+			// ... and more.
+		],
+	});
+
+	var df_n = new dataForge.DataFrame({
+		columnNames: [
+			"subject_id",
+			"test_id",
+		],
+		values: [
+			[1, 51],
+			[2, 15],
+			// .. and more.
+		],
+	});
+
+	var df_new = df_a.concat(df_b);
+	var df_merged = df_new.join(
+			df_n,
+			left => left.subject_id,
+			right => right.subject_id,
+			(left, right) => {
+				return {
+					subject_id: left.subject_id,
+					first_name: left.first_name,
+					last_name: left.last_name,
+					test_id: right.test_id,
+				};
+			}
+		)
+		;
+
+## Zip
+
+Series and dataframes can be *zipped* together in the same was in LINQ. 
+
+One or more additional series or dataframes can be passed to the `zip` function. You must provide a selector that combines the values from each series or dataframe:
+
+	var zipped = df1.zip(df2, df3, (df1_row, df2_row) => myRowMergeFunction(df1_row, df2_row));
 
 # Collapsing unique values
 
@@ -894,7 +929,7 @@ The resulting `Series` or `DataFrame` has duplicate values or rows removed, but 
 
 Data-Forge provides various methods for grouping data. All of these methods return a `Series` of *buckets*. Each bucket is a `Series` or `DataFrame` containing grouped data. 
 
-Use any of the [data transformation](#data-transformation) or [aggregation](#summarization-and-aggregation) functions to transform a `Series` of buckets into something else.
+Use any of the [data transformation](#transformation) or [aggregation](#summarization-and-aggregation) functions to transform a `Series` of buckets into something else.
 
 ## Group
 
@@ -1019,31 +1054,36 @@ The [`sequentialDistinct` function](#sequential-distinct-values) is actually imp
 
 ## Aggregate
 
-[Aggregation, reduction or summarization](https://en.wikipedia.org/wiki/Fold_(higher-order_function)) works the same was as in LINQ.
+[Aggregation, reduction or summarization](https://en.wikipedia.org/wiki/Fold_(higher-order_function)) works the same as LINQ.
 
 Call the `aggregate` function, here's an example to sum a series:
 
 	var sum = inputSeries.aggregate(0, (prevValue, nextValue) => prevValue + nextValue);
 
-Fortunately (as with LINQ) there is actually a `sum` function (among others) that can do this for you, but it is built upon `aggregate` and it's a nice simple example. If we use the `sum` function we rewrite the previous example as follows:
+Fortunately (as with LINQ) there is actually a `sum` function (among other helper functions) that can do this for you, but it is built upon `aggregate` and it's a nice simple example. Using the `sum` function we rewrite the previous example as:
 
 	var sum = inputSeries.sum();
 
 Another good example is averaging a series where the first element in the series is used as the *seed*:
 
-	var average = inputSeries.skip(1).average(inputSeries.first(), (prevValue, nextValue) => (prevValue + nextValue) / 2);
+	var average = inputSeries
+		.skip(1)
+		.average(
+			inputSeries.first(), // The seed 
+			(prevValue, nextValue) => (prevValue + nextValue) / 2
+		);
 
-This is a litte bit more complicated than the previous example, but it can be simplified if we build it based on the the pre-existing `sum` function:
+This can be simplified by building on `sum`:
 
 	var average = inputSeries.sum() / inputSeries.count();
 
-Again though, as with `sum`, there is already an `average` function that do this for us:
+Again though there is already an `average` helper function that do this for us:
 
 	var average = inputSeries.average();
 
 Also check out the functions for `min`, `max` and `median`. These all help you summarise values in a series.
 
-A dataframe can also be aggregated in the same way, for example summarizing sales data:
+A dataframe can be aggregated in the same way, for example summarizing sales data:
 
 	var dataFrame = ... today's sales, including Price and Revenue ...
 	var seed = {
@@ -1051,115 +1091,55 @@ A dataframe can also be aggregated in the same way, for example summarizing sale
 		AveragePrice: dataFrame.first().AveragePrice,
 		TotalRevenue: dataFrame.first().Revenue,
 	};
-	var summary = dataFrame.aggregate(seed, 
-		(agg, row) => {
-			return {
-				TotalSales: agg.TotalSales + 1,
-				AveragePrice: (agg.AveragePrice + row.Price) / 2,
-				TotalRevenue: agg.TotalRevenue + row.Revenue,
-			};
-		}
-	);
+	var summary = dataFrame
+		.skip(1)
+		.aggregate(seed, 
+			(agg, row) => {
+				return {
+					TotalSales: agg.TotalSales + 1,
+					AveragePrice: (agg.AveragePrice + row.Price) / 2,
+					TotalRevenue: agg.TotalRevenue + row.Revenue,
+				};
+			}
+		);
 
 I'm considering a new structure as well that will make `aggregate` more convenient for summarizing dataframes. Please let me know if this would be useful to you and I'll implement it:
 
-	var dataFrame = ... today's sales, including Price and Revenue ...
+	var dataFrame = ...
 	var summary = dataFrame.aggregate({
 			TotalSales: df => df.count(),
 			AveragePrice: df => df.deflate(row => row.Price).average(),
 			TotalRevenue: df => df.deflate(row => row.Revenue).sum(), 
 		});
 
-## Concat
+Or even better if I could make it work something like this:
 
-todo:
-
-## Join
-
-Series and dataframes can be merged or joined using the `join` function as in LINQ.  This performs an inner join. Data-Forge also has additional functions for outer joins: `joinOuter`, `joinOuterLeft` and `joinOuterRight`. Thanks to [Ryan Hatch for the implementation](http://blogs.geniuscode.net/RyanDHatch/?p=116).
-
-Following is [an example translated from Pandas code on Chris Albon's blog](http://chrisalbon.com/python/pandas_join_merge_dataframe.html). You can find more such examples of Data-Forge in *merge-dataframe.test.js*.
-
-	var df_a = new dataForge.DataFrame({
-		columnNames: [
-			'subject_id',
-			'first_name',
-			'last_name',
-		],
-		values: [
-			[1, 'Alex', 'Anderson'],
-			[2, 'Amy', 'Ackerman'],
-			// ... and more.
-		],
-	});
-
-	var df_b = new dataForge.DataFrame({
-		columnNames: [
-			'subject_id',
-			'first_name',
-			'last_name',
-		],
-		values: [
-			[4, 'Billy', 'Bonder'],
-			[5, 'Brian', 'Black'],
-			// ... and more.
-		],
-	});
-
-	var df_n = new dataForge.DataFrame({
-		columnNames: [
-			"subject_id",
-			"test_id",
-		],
-		values: [
-			[1, 51],
-			[2, 15],
-			// .. and more.
-		],
-	});
-
-	var df_new = df_a.concat(df_b);
-	var df_merged = df_new.join(
-			df_n,
-			left => left.subject_id,
-			right => right.subject_id,
-			(left, right) => {
-				return {
-					subject_id: left.subject_id,
-					first_name: left.first_name,
-					last_name: left.last_name,
-					test_id: right.test_id,
-				};
-			}
-		)
-		;
-
-## Zip
-
-todo:
-
-## Group, Aggregate and Combine
-
-todo: should be able to do this without LINQ now.
-
-	// Group by client.
-	var groups = salesData.groupBy(function (row) { 
-			return row.ClientName;
+	var dataFrame = ...
+	var summary = dataFrame.aggregate({
+			TotalSales: count,
+			AveragePrice: average,
+			TotalRevenue: sum, 
 		});
 
-	// Aggregate each group.
-	var aggregated = Enumerable.from(groups) 	// Use regular linq. 
-		.select(function (group) {
-				return group.data.aggregate({
-					ClientName: group.key,
-					Amount: dataForge.sum, 		// Sum sales per client.
-				});
-		})
-		.toArray();
+## Group and Aggregate
 
-	// Combine the data back together.
-	var combined = dataForge.concat(aggregated);
-	console.log(combined.toString());
+This an example of using `groupBy` and `aggregate` to summarize a dataframe:
+
+	// Group by client.
+	var groups = salesData.groupBy(row => row.ClientName);
+
+	// Aggregate each group.
+	var aggregated = groups 
+		.select(function (group) {
+			return {
+				ClientName: group.first().ClientName,
+
+				// Sum sales per client.
+				Amount: group.deflate(row => row.Sales).sum(),
+			}; 
+		})
+		.inflate() // Series -> dataframe.
+		.toArray();
 
 # Filling gaps and missing data
 
