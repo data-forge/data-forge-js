@@ -68,7 +68,7 @@ The principles that drive decision making and tradeoffs:
 - Minimize the magic, everything should be understandable, the API should be orthogonal.
 - The library should have high performance.
 - Be able to use a similar API in both Javascript and C#.
-- The code you build during interactive data exploration should be transplantable to an webapp, server or microservice.
+- The code you build during interactive data exploration should be transplantable to a webapp, server or microservice.
 
 ## Implementation
 
@@ -178,7 +178,7 @@ Even though I haven't used it much in this readme, I prefer the new syntax as it
 
 ### DataFrame
 
-The DataFrame constructor is passed a *config* object that specifies the initial contents of the DataFrame and any additional options required. 
+The DataFrame constructor is passed a *config* object that specifies the initial contents of the DataFrame and additional options. 
 
 Create a data frame from column names and rows:
 
@@ -191,7 +191,7 @@ Create a data frame from column names and rows:
 			]
 		});
 
-A data frame can also be created from an array of JavaScript objects:
+A data frame can also be created from an array of JavaScript objects and the column names are inferred from the fields in the first object: 
 
 	var dataFrame = new dataForge.DataFrame({
 			values: [
@@ -213,7 +213,7 @@ A data frame can also be created from an array of JavaScript objects:
 			]
 		});
 
-If you need to specify any other configuration, you can also simply pass in an array of objects:
+If you don't need additional options, you can simply pass in an array of objects:
 
 	var dataFrame = new dataForge.DataFrame([
 				{
@@ -232,8 +232,6 @@ If you need to specify any other configuration, you can also simply pass in an a
 					Col3: new Date(....)
 				}
 		]);
-
-In this case column names are automatically generated form the fields in the objects. For performance reasons only the fields of the first object are considered.  
 
 If you have irregular data you can enable *considerAllRows*, but be warned that this can be expensive as every value must be examined to determine column names:
 
@@ -271,7 +269,7 @@ A DataFrame can also be constructed from separate columns as follows using array
  
 ### Series
 
-This is very similar to creating a DataFrame. You pass in a *configuration* object with the values and any additional options:
+This is very similar to creating a DataFrame. You pass in a *configuration* object with the values and  additional options:
 
 	var series = new dataForge.Series({
 			values: [1, 2, 3]
@@ -320,23 +318,23 @@ An index can also be set explicitly when creating a Series or DataFrame:
 	var dataFrame = new dataForge.DataFrame({
 			columnNames: <column-names>,
 			values: <initial-values>,
-			index: [5, 10, 100]
+			index: [5, 10, 100, ...]
 		});
 
 	var series = new dataForge.Series({
 			values: <initial-values>,
-			index: [5, 10, 100]			
+			index: [5, 10, 100, ...]
 		});
 
 A new index can easily be assigned to either Series or DataFrame using the `withIndex` function:
 
-	var dataFrameWithNewIndex = dataFrame.withIndex([1, 2, 3]);
+	var dataFrameWithNewIndex = dataFrame.withIndex([1, 2, 3, ...]);
 
 Most likely when using a DataFrame you will want to promote an existing column to an index:
  
 	var dataFrame = new dataForge.DataFrame(someConfig).setIndex("Col3");
 
-Be aware that promoting a column to an index in Data-Forge doesn't remove the column (as it does in Pandas). You can easily achieve this by calling `dropSeries`:
+Be aware that promoting a column to an index in Data-Forge doesn't remove the column (as it does in Pandas), however you can easily achieve this by calling `dropSeries`:
 
 	var dataFrame = new dataForge.DataFrame(someConfig).setIndex("Col3").dropSeries("Col3");
 
@@ -348,7 +346,7 @@ If your CSV has a header with column names:
 
 	var fs = require('fs');
 	var inputCsvData = fs.readFileSync('some-csv-file.csv', 'utf8');
-	var dataFrame = dataForge.fromCSV(inputCsvData );
+	var dataFrame = dataForge.fromCSV(inputCsvData);
 
 If your CSV doesn't have a header:
 
@@ -383,7 +381,7 @@ You can call these on a `Series`, for example:
 	var stringSeries = new dataForge.Series(["15", "16"]);
 	assert.isString(stringSeries.first());
 
-	var parsedSeries =  stringSeries.parseInts();
+	var parsedSeries = stringSeries.parseInts();
 	assert.isNumber(parsedSeries.first()); 
 
 To call these functions on a `DataFrame` you must pass in the name of the column that is to be parsed, for example say you load from a CSV (which loads in string data) and want to parse a particuar column:
@@ -423,9 +421,9 @@ Data-Forge uses [Moment.js](http://momentjs.com/) under the hood, please see its
 
 You may have noticed in previous examples that multiple functions have been chained.
 
-Data-Forge supports only [immutable](https://en.wikipedia.org/wiki/Immutable_object) operations. Each operation returns a new immutable data frame or column. No *in place* operations are supported (one of the things I found confusing about *Pandas*). 
+Data-Forge supports only [immutable](https://en.wikipedia.org/wiki/Immutable_object) operations. Each operation returns a new immutable dataframe or series. No *in place* operations are supported (one of the things I found confusing about *Pandas*). 
 
-This is why, in the following example, the final data frame is captured after all operations are applied:
+This is why, in the following example, the final dataframe is captured after all operations are applied:
 
 	var df = new dataForge.DataFrame(config).setIndex("Col3").dropSeries("Col3");
 
@@ -435,13 +433,13 @@ Consider an alternate structure:
 	var df2 = df1.setIndex("Col3");
 	var df3 = df2.dropSeries("Col3");
 
-Here *df1*, *df2* and *df3* are separate data-frames with the results of the previous operations applied. These data-frames are all immutable and cannot be changed. Any function that transforms a data-frame returns a new and independent data frame. If you are not used to this sort of thing, it may require some getting used to!
+Here *df1*, *df2* and *df3* are separate dataframes with the results of the previous operations applied. These dataframes are all immutable and cannot be changed. Any function that transforms a dataframe returns a new and independent dataframe. If you are not used to this sort of thing, it may require some getting used to!
 
 # Lazy Evaluation
 
 Lazy evaluation in Data-Forge is implemented through *iterators*. 
 
-An iterator is retrieved from a data-frame, series or index by calling `getIterator`. A new and distinct iterator is created each time `getIterator` is called.
+An iterator is retrieved from a dataframe or series by calling `getIterator`. A new and distinct iterator is created each time `getIterator` is called.
 
 For example:
 
@@ -463,29 +461,13 @@ An iterator can be used to traverse a sequence and extract each index+value pair
 		// do something with the pair.
 	}
 
-A data-frame can be created from a function that returns an iterator. This is the primary mechanism that supports creation of a pipeline of lazy DataFrames. 
-
-	var df = new dataForge.DataFrame({ 
-		iterable: () => 
-			return ... some iterator ...
-		},
-	});
-
-A series can also be created from a function that returns an iterator:
-
-	var series = new dataForge.Series({ 
-		iterable: function () {
-			return ... some iterator ...
-		},
-	});
-
 # Working with data
 
 ## Extracting rows from a data-frame
 
-Rows can be extracted from a data-frame in several ways.
+Values can be extracted from a dataframe in several ways.
 
-Note: the follow functions cause lazy evaluation to complete (like the *toArray* function in LINQ). This can be performance intensive.
+NOTE: the following functions cause lazy evaluation to complete (like the *toArray* function in LINQ). This can be performance intensive.
 
 To extract rows as arrays of data (ordered by column): 
 
@@ -507,9 +489,9 @@ A new data-frame can also be created from a *slice* of rows:
 
 NOTE: To use `slice` your index must be sorted.
 
-Invoke a callback for each row in a data-frame using `forEach`:
+Invoke a callback for each row in a dataframe using `forEach`:
 
-	dataFrame.forEach(function (row, index) {
+	dataFrame.forEach(function (row) {
 		// Callback function invoked for each row.
 	}); 
 
@@ -530,7 +512,7 @@ Get a Series of all columns:
 		// ... do something with the column ...
 	}
 
-The advantage to having a Series of columns, rather than a normal JavaScript array is that you can access to all the tools that Series offers for slicing and dicing a sequence, for example:
+The advantage to having a Series of columns, rather than a normal JavaScript array is that you can access  all the tools that Series offers for slicing and dicing a sequence, for example:
 
 	var sortedColumnsSubject = dataFrame.getColumns()
 		.where(column => column.name !== "Date")
@@ -543,17 +525,13 @@ Get the series for a column by name:
 
 	var series = dataFrame.getSeries('some-series'); 
 
-Get the series for a column by index:
-
-	var series = dataFrame.getSeries(5); 
-
 Create a new data-frame from a subset of columns:
 
 	var columnSubset = df.subset(["Some-Column", "Some-Other-Column"]);
 
 ## Extract values from a series
 
-Note: the follow functions cause lazy evaluation to complete (like the *toArray* function in LINQ). This can be performance intensive.
+NOTE: the follow functions cause lazy evaluation to complete (like the *toArray* function in LINQ). This can be performance intensive.
 
 Extract the values from the series as an array:   
 
@@ -565,13 +543,13 @@ Extract index + value pairs from the series as an array:
 
 Invoke a callback for each value in the series using `forEach`:
 
-	someSeries.forEach(function (value, index) {
+	someSeries.forEach(function (value) {
 		// Callback function invoked for each value.
 	}); 
 
 ## Extract values from an index
 
-Retrieve the index from a data-frame:
+Retrieve the index from a dataframe:
 
 	var index = dataFrame.getIndex();
 
@@ -581,11 +559,11 @@ Retrieve the index from a series:
 
 An index is actually just another Series so you can call the `toArray` function or anything else that normally works for a Series:
 
-	var arrayOfValues = index.toArray();
+	var arrayOfIndexValues = index.toArray();
 
 ## Adding a column
 
-New columns can be added to a DataFrame. This doesn't change the original data-frame, it generates a new data-frame that contains the additional column.
+New columns can be added to a dataframe. This doesn't change the original dataframe, it generates a new one with the additional column.
 
 	var newDf = df.withSeries("Some-New-Column", someNewSeries);
 
@@ -666,7 +644,7 @@ A particular value of a Series or a row of DataFrame can be set by specifying th
 	// Set the row and produce a new DataFrame.
 	var newDataFrame = dataFrame.set(10, newRow);
 
-Series and DataFrame are immutable, so the set operation does not modify in place, it returns a new Series or DataFrame.
+Series and DataFrame are immutable, so the set operation does not modify in place, it returns a new Series or DataFrame with the original unchanged.
 
 # Data exploration and visualization
 
@@ -674,7 +652,7 @@ In order to understand the data we are working with we must explore it, understa
 
 ## Console output
 
-Data-frame, index and series all provide a `toString` function that can be used to dump data to the console in a readable format.
+DataFrame and Series provide a `toString` function that can be used to dump data to the console in a readable format.
 
 Use the LINQ functions `skip` and `take` to preview a subset of the data (more on LINQ functions soon):
 
@@ -686,7 +664,7 @@ Or more conveniently:
 	// Get a range of rows starting at row index 10 and ending at (but not including) row index 20.
 	console.log(df.slice(10, 20).toString()); 
 
-As you explore a data set you may want to understand what data types you are working with. You can use the `detectTypes` function to produce a new data frame with information on the data types in the data frame you are exploring:
+As you explore a data set you may want to understand what data types you are working with. You can use the `detectTypes` function to produce a new data frame with information on the data types in the dataframe you are exploring:
 
 	// Create a data frame with details of the types from the source data frame.
 	var typesDf = df.detectTypes(); 
@@ -723,16 +701,14 @@ There is a [Code Project article](http://www.codeproject.com/Articles/1069489/Hi
 An data-frame can be transformed using the [LINQ](https://en.wikipedia.org/wiki/Language_Integrated_Query)-style [`select`](http://www.dotnetperls.com/select) function:
 
 	var transformedDataFrame = sourceDataFrame
-		.select(function (row, index) {
+		.select(function (row) {
 			return {
 				NewColumn: row.OldColumn * 2,	// <-- Transform existing column to create a new column.
 				AnotherNewColumn: rand(0, 100)	// <-- Create a new column (in this cause just use random data).
 			};
 		});
 
-This produces an entirely new immutable data-frame. However the new data-frame has the same index as the source data-frame, so both can be merged back together, if required: 
-
-	var mergedDataFrame = dataForge.merge(sourceDataFrame, transformedDataFrame);
+This produces an entirely new immutable dataframe. However the new dataframe has the same index as the source dataframe, so both can be merged back together, if required. 
 
 Note that `select` only transforms the value. The index for each row is preserved in the new DataFrame. To completely transform a DataFrame, both value and index, you must use `asPairs`:
 
@@ -755,7 +731,7 @@ Series can be transformed using `select`:
 
 	var oldSeries = df.getSeries("Some-Column");
 	var newSeries = oldSeries
-		.select(function (value, index) {
+		.select(function (value) {
 			// Apply a transformation to each value in the column.
 			return transform(value); 	
 		});	
@@ -769,7 +745,7 @@ Use `selectPairs` to transform both value and index:
 
 	var newSeries = oldSeries
 		.asPairs()
-		.select(function (index, value) {
+		.select(function (pair) {
 			return [ // Returns a new pair.
 				... some new index ...,
 				... some new value ...
@@ -780,7 +756,7 @@ Use `selectPairs` to transform both value and index:
 
 The result of `select` and `selectPairs` is a completely new immutable Series.
 
-## Transform a series in a data-frame
+## Transform a series in a dataframe
 
 Data-Frame offers a convenience function `transformSeries` for when you need a simple convenient mechanism to extract, transform and plug back in one or more series at once. For example to simplify the previous code example:
 
@@ -791,11 +767,9 @@ Data-Frame offers a convenience function `transformSeries` for when you need a s
 		},
 	);
 
-Note that `selectMany` and `selectManyPairs` functions are also available and work the same as LINQ SelectMany.
-
 # Filtering
 
-Data-frames and series can be filtered using the [LINQ](https://en.wikipedia.org/wiki/Language_Integrated_Query)-style [`where`](http://www.dotnetperls.com/where) function:
+Dataframes and series can be filtered using the [LINQ](https://en.wikipedia.org/wiki/Language_Integrated_Query)-style [`where`](http://www.dotnetperls.com/where) function:
 
 	var newDf = df.where(somePredicateFunction);
 
@@ -810,7 +784,7 @@ The predicate function must return *truthy* to keep the row, or *falsy* to filte
 
 ## Concatenation
 
-Series and DataFrames can be concatenated.
+Series and dataframes can be concatenated:
 
 	var df1 = ... some dataframe ...
 	var df2 = ... some other dataframe ...
@@ -819,7 +793,7 @@ Series and DataFrames can be concatenated.
 
 Multiple series or dataframes may be passed to concat:
 
-	var concatenated = df1.concatDataFrames(df2, df3, df4, etc);
+	var concatenated = df1.concat(df2, df3, df4, etc);
 
 Or an array may be used:
 
@@ -927,9 +901,9 @@ The resulting `Series` or `DataFrame` has duplicate values or rows removed, but 
 
 # Groups and windows
 
-Data-Forge provides various methods for grouping data. All of these methods return a `Series` of *buckets*. Each bucket is a `Series` or `DataFrame` containing grouped data. 
+Data-Forge provides various methods for grouping data. All of these methods return a `Series` of *windows*. Each window is a `Series` or `DataFrame` containing grouped data. 
 
-Use any of the [data transformation](#transformation) or [aggregation](#summarization-and-aggregation) functions to transform a `Series` of buckets into something else.
+Use any of the [data transformation](#transformation) or [aggregation](#summarization-and-aggregation) functions to transform a `Series` of windows into something else.
 
 ## Group
 
@@ -937,21 +911,19 @@ The `groupBy` function groups `Series` or `DataFrame` based on the output of the
 
 For example, grouping a `DataFrame` with sales data by client:
 
-	var salesByClient = salesData.groupBy(function (row, index) {
+	var salesByClient = salesData.groupBy(function (row) {
 			return row.ClientName;
 		});
 
-This returns a `Series` of data buckets. Each group contains a separate `DataFrame` with only those rows that are part of the group as specified by the *selector*.
+This returns a `Series` of data windows. Each windows contains a separate `DataFrame` with only those rows that are part of the group as specified by the *selector*.
 
 This can also be done with `Series`:
 
-	var outputSeries = someSeries.groupBy(function (value, index) {
-			return index;
+	var outputSeries = someSeries.groupBy(function (value) {
+			return value; // Can potentially select a different value here.
 		});
 
-The output is still a `Series` of data buckets. Each group contains a separate `Series` with only those values that are part of the group as specified by *selector*.
-
-Note that in this example we are grouping by *index* as an alternative to grouping by *value*.
+The output is still a `Series` of data windows. Each group contains a separate `Series` with only those values that are part of the group as specified by *selector*.
 
 ## Group Sequential
 
@@ -966,12 +938,12 @@ The `groupSequentialBy` function for `Series` and `DataFrame` is similar to `gro
 
 The `window` function groups a `Series` or `DataFrame` into equally sized batches. The *window* passes over the data-frame or series *batch-by-batch*, taking the first N rows for the first window, then the second N rows for the next window and so on. 
 
-The output is a `Series` of buckets. Each data bucket contains the values or rows for that *window*.  
+The output is a `Series` of windows. Each windows contains the values or rows for that group.  
 
 	var windowSize = 5; // Looking at 5 rows at a times.
 	var newSeries = seriesOrDataFrame.window(windowSize);
 
-Use any of the [data transformation](#data-transformation) functions to transform the `Series` of *window* into something else.
+Use any of the [data transformation](#data-transformation) functions to transform the `Series` of *windows* into something else.
 
 An example that summarizes weekly sales data:
 
@@ -979,8 +951,8 @@ An example that summarizes weekly sales data:
 
 	var weeklySales = salesData.window(7)
 		.asPairs()
-		.select(function (windowIndex, window) {
-			// Return new index and value.
+		.select(function (pair) { // Rewrite index and value.			
+			var window = pair[1];
 			return [
 				window.lastIndex(), 	// Week ending.
 				window.sum()			// Total the amount sold during the week.
@@ -991,15 +963,16 @@ An example that summarizes weekly sales data:
 
 ## Rolling window
 
-The `rollingWindow` function groups a `Series` or `DataFrame` into batches, this function however differs from `window` in that it *rolls* the *window* across data set *row-by-row* rather than batch-by-batch. 
+The `rollingWindow` function groups a `Series` or `DataFrame` into batches, this function however differs from `window` in that it *rolls* the *window* across the sequence *row-by-row* rather than batch-by-batch. 
 
-The `percentChange` function that is included in Data-Forge is probably the simplest example use of `rollingWindow`. It computes a new series with the percentage increase of each value in the source series.
+The `percentChange` function that is included in Data-Forge is probably the simplest example use of `rollingWindow`. It computes a new series with the percentage increase of each subsquent value in the original series.
 
 The implementation of `percentChange` looks a bit like this:
     
 	var pctChangeSeries = sourceSeries.rollingWindow(2)
 		.asPairs()
-		.select(function (window, windowIndex) {
+		.select(function (pair) {
+			var window = pair[1];
 			var values = window.toArray();
 			var amountChange = values[1] - values[0]; // Compute amount of change.
 			var pctChange = amountChange / values[0]; // Compute % change.
@@ -1022,7 +995,8 @@ Now consider an example that requires a configurable window size. Here is some c
 	var smaPeriod = ... configurable moving average period ...
  	var smSeries = someSeries.rollingWindow(smaPeriod)
 	 	.asPairs()
-		.select(function (windowIndex, window) {
+		.select(function (pair) {
+			var window = pair[1];
     		return [
 				window.lastIndex(),
 				window.sum() / smaPeriod,
@@ -1032,7 +1006,7 @@ Now consider an example that requires a configurable window size. Here is some c
 
 ## Variable window
 
-The `variableWindow` function groups a `Series` or `DataFrame` into buckets that have a variable amount of values or rows. Adjacent values and rows are compared using a user-defined [*comparer*](#comparer). When the *comparer* returns `true` (or *truthy*) adjacent data items are combined into the same group.
+The `variableWindow` function groups a `Series` or `DataFrame` into windows that have a variable amount of values per window. Adjacent values and rows are compared using a user-defined [*comparer*](#comparer). When the *comparer* returns `true` (or *truthy*) adjacent data items are combined into the same group.
 
 An example:
 
@@ -1042,7 +1016,7 @@ An example:
 
 The [`sequentialDistinct` function](#sequential-distinct-values) is actually implemented using `variableWindow` so it is a good example:
 
-	var sequentialDistinct = function (valueSelector, obsoleteSelector) {
+	var sequentialDistinct = function (valueSelector) {
 
 		var self = this;	
 		return self.variableWindow(function (a, b) {
