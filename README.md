@@ -584,13 +584,28 @@ Again note that it is only the new data frame that includes the modified column.
 			.select(value => transformValue(value))
 	);
 
+There is a also a convenient `generateSeries` function:
+
+	var newDf = df.generateSeries({
+			"Some-New-Column": function (row) {
+				return row["Some-Existing-Column"];
+			},
+		});
+
+
 ## Transforming a column
 
 `withSeries` can be used to transform an existing column by passing in a function:
 
 	var newDf = df.withSeries("Some-Existing-Column", 
 		df => df.getSeries("Some-Existing-Column")
-			.select(value => transformValue(value))
+			.select(row => transformValue(row))
+	);
+
+There is also a convenient `transformSeries` function:
+
+	var newDf = df.transformSeries({
+		"Some-Existing-Column": row => transformValue(row), 
 	);
 
 ## Adding, replacing, generating and transforming multiple columns 
