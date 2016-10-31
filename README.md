@@ -1043,13 +1043,13 @@ The [`sequentialDistinct` function](#sequential-distinct-values) is actually imp
 
 ## Aggregate
 
-[Aggregation, reduction or summarization](https://en.wikipedia.org/wiki/Fold_(higher-order_function)) works the same as LINQ.
+[Aggregation, reduction or summarization](https://en.wikipedia.org/wiki/Fold_(higher-order_function)) works as in LINQ.
 
-Call the `aggregate` function, here's an example to sum a series:
+Here's an example of the `aggregate` function to sum a series:
 
 	var sum = inputSeries.aggregate(0, (prevValue, nextValue) => prevValue + nextValue);
 
-Fortunately (as with LINQ) there is actually a `sum` function (among other helper functions) that can do this for you, but it is built upon `aggregate` and it's a nice simple example. Using the `sum` function we rewrite the previous example as:
+Fortunately (as with LINQ) there is actually a `sum` function (among other helper functions) that can do this for you, it is actually built on `aggregate` so it's a nice (and simple) example. Using the `sum` function we rewrite the previous example as:
 
 	var sum = inputSeries.sum();
 
@@ -1070,7 +1070,7 @@ Again though there is already an `average` helper function that do this for us:
 
 	var average = inputSeries.average();
 
-Also check out the functions for `min`, `max` and `median`. These all help you summarise values in a series.
+Also check out the functions for `min`, `max` and `median`. These all help to summarise values in a series.
 
 A dataframe can be aggregated in the same way, for example summarizing sales data:
 
@@ -1115,20 +1115,16 @@ Or even better if I could make it work something like this:
 This an example of using `groupBy` and `aggregate` to summarize a dataframe:
 
 	// Group by client.
-	var groups = salesData.groupBy(row => row.ClientName);
+	var summarized = salesData
+		.groupBy(row => row.ClientName);
+		.select(group => ({
+			ClientName: group.first().ClientName,
 
-	// Aggregate each group.
-	var aggregated = groups 
-		.select(function (group) {
-			return {
-				ClientName: group.first().ClientName,
-
-				// Sum sales per client.
-				Amount: group.deflate(row => row.Sales).sum(),
-			}; 
-		})
+			// Sum sales per client.
+			Amount: group.deflate(row => row.Sales).sum(),
+		}))
 		.inflate() // Series -> dataframe.
-		.toArray();
+		.toArray(); // Convert to regular JS array.
 
 # Filling gaps and missing data
 
@@ -1153,7 +1149,7 @@ The function `fillGaps` works the same for both Series and DataFrame:
 
 	var sequenceWithoutGaps = sequenceWithGaps.fillGaps(gapExists, gapFiller);
 
-For a more concrete example, let's fill gaps in daily share data:
+For a more concrete example, let's fill gaps in daily share data (with some help from [Moment.js](http://momentjs.com/)):
 
 	var moment = require('moment');
 
@@ -1187,7 +1183,7 @@ For a more concrete example, let's fill gaps in daily share data:
 		return newEntries;
 	}
 
-	var dailyShareValueWithoutGaps = sequenceWithGaps.fillGaps(gapExists, gapFiller);
+	var sequenceWithoutGaps = sequenceWithGaps.fillGaps(gapExists, gapFiller);
 	
 
 # Node.js examples
@@ -1221,6 +1217,8 @@ For a more concrete example, let's fill gaps in daily share data:
 	fs.writeFileSync(outputFilePath, outputDataFrame.toJSON()); 
 
 ## Working a massive CSV file
+
+WARNING: This section doesn't work yet. I'm look at performance with large files soon. 
 
 When working with large text files use *FileReader* and *FileWriter*. *FileReader* is an iterator, it allows the specified file to be loaded piecemeal, in chunks, as required. *FileWriter* allows iterative output. These work in combination with lazy evaluation so to incrementally read, process and write massive files that are too large or too slow to work with in memory in their entirety.  
 
@@ -1268,7 +1266,7 @@ Same as previous example, except use skip and take to only process a window of t
 
 	db.someCollection.find()
 		.skip(300)
-		.take(100)
+		.limit(100)
 		.toArray()		
 		.then(function (documents) {
 			var inputDataFrame = new dataForge.DataFrame({ rows: documents });
@@ -1288,8 +1286,7 @@ Same as previous example, except use skip and take to only process a window of t
 
 	var request = require('request-promise');
 
-	request(
-		{
+	request({
 			method: 'GET',
 			uri: "http://some-host/a/rest/api',
 			json: true,
@@ -1299,15 +1296,14 @@ Same as previous example, except use skip and take to only process a window of t
 
 			var outputDataFrame = inputDataFrame.select(... some transformation ...);
 			
-			return request(
-				{
-					method: 'POST',
-					uri: "http://some-host/another/rest/api',
-					body: { 
-						data: outputDataFrame.toArray() 
-					},
-					json: true,
-				});			 
+			return request({
+				method: 'POST',
+				uri: "http://some-host/another/rest/api',
+				body: { 
+					data: outputDataFrame.toArray() 
+				},
+				json: true,
+			});			 
 		})
 		.then(function () {
 			console.log('Done!');
@@ -1332,36 +1328,28 @@ Note the differences in the way plugins are referenced than in the NodeJS versio
 **Javascript for JSON**
 
 	var url = "http://somewhere.com/rest/api";
-	$.get(url, 
-		function (data) {
-			var dataFrame = new dataForge.DataFrame({ rows: data });
-			// ... work with the data frame ...
-		}
-	);
+	$.get(url, function (data) {
+		var dataFrame = new dataForge.DataFrame({ rows: data });
+		// ... work with the data frame ...
+	});
 
 	var someDataFrame = ...
-	$.post(url, someDataFrame.toArray(),
-		function (data) {
-			// ...
-		}
-	);
+	$.post(url, someDataFrame.toArray(), function (data) {
+		// ...
+	});
 	
 **Javascript for CSV**
 
 	var url = "http://somewhere.com/rest/api";
-	$.get(url, 
-		function (data) {
-			var dataFrame = dataForge.fromCSV();
+	$.get(url, function (data) {
+			var dataFrame = dataForge.fromCSV(data);
 			// ... work with the data frame ...
-		}
-	);
+	});
 
 	var someDataFrame = ...
-	$.post(url, someDataFrame.toCSV(),
-		function (data) {
-			// ...
-		}
-	);
+	$.post(url, someDataFrame.toCSV(), function (data) {
+		// ...
+	});
 
 
 ## Working with HTTP in AngularJS
@@ -1393,13 +1381,3 @@ Note the differences in the way plugins are referenced than in the NodeJS versio
 		.catch(function (err) {
 			// ... handle error ...
 		});
- 
-## Visualisation with Flot
-
-todo
-
-## Visualisation with Highstock
-
-todo
-
-
