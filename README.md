@@ -728,14 +728,14 @@ This produces an entirely new immutable dataframe. However the new dataframe has
 Note that `select` only transforms the value. The index for each row is preserved in the new DataFrame. To completely transform a DataFrame, both value and index, you must use `asPairs`:
 
 	var transformedDataFrame = sourceDataFrame
-		.asPairs()
+		.asPairs() // Transform to sequence of pairs.
 		.select(function (pair) {
 			return [ // Returns a new pair.
 				... some new index ...,
 				... some new row ...
 			];
 		})
-		.asValues()
+		.asValues() // Transform back to a sequence of values.
 		;
 
 Note that `selectMany` and `selectManyPairs` functions are also available and work the same as LINQ SelectMany.
