@@ -35,6 +35,7 @@ Examples and some tests have been removed to a [separate repository](https://git
 - [Lazy Evaluation](#lazy-evaluation-1)
 - [Working with data](#working-with-data)
 - [Data exploration and visualization](#data-exploration-and-visualization)
+- [Sorting]([#sorting)
 - [Transformation](#transformation)
 - [Filtering](#filtering)
 - [Combining](#combining)
@@ -709,11 +710,27 @@ The [Github repo](https://github.com/data-forge/data-forge-js) has [examples](ht
 
 There is a [Code Project article](http://www.codeproject.com/Articles/1069489/Highstock-plus-Data-Forge-plus-Yahoo) on using Highstock with Data-Forge to chart Yahoo financial data.
 
+# Sorting
+
+Series and dataframes can be sorted using the LINQ-style functions: `orderBy` and `orderByDescending`.
+
+	var sortedAscending = dataFrame.orderBy(row => row.SomeColumn);
+
+	var sortedDescending = dataFrame.orderByDescending(row => row.SomeColumn);
+
+Use `thenBy` and `thenByDescending` to specify additional sorting criteria:
+
+	var sorted = dataFrame
+		.orderBy(row => row.SomeColumn)
+		.thenByDescending(row => row.AnotherColumn)
+		.orderBy(row => row.SomeOtherColumn)
+		;
+
 # Transformation
 
 ## Data frame transformation
 
-An data-frame can be transformed using the [LINQ](https://en.wikipedia.org/wiki/Language_Integrated_Query)-style [`select`](http://www.dotnetperls.com/select) function:
+A dataframe can be transformed using the [LINQ](https://en.wikipedia.org/wiki/Language_Integrated_Query)-style [`select`](http://www.dotnetperls.com/select) function:
 
 	var transformedDataFrame = sourceDataFrame
 		.select(function (row) {
