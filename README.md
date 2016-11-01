@@ -8,7 +8,7 @@ Works in both NodeJS and the browser.
 
 ----------
 
-**Warning**: This project is a work in progress, the API is now stabilizing. I'll make every effort to keep it backward compatible, however some small changes may still be made.
+**Warning**: This project is a work in progress, the API is now stabilizing and I'm turning my focus to performance. Moving forward I'm making every effort to keep the API backward compatible, however some small changes should still be expected and the version number will be updated appropriately.
 
 Please contribute and help guide the direction of *data-forge*.
 
