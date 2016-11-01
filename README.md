@@ -8,9 +8,11 @@ Works in both NodeJS and the browser.
 
 ----------
 
-**Warning**: This project is a work in progress, please don't use unless you want to be an early adopter. Please expect API changes. Please contribute and help guide the direction of *data-forge*.
+**Warning**: This project is a work in progress, the API is now stabilizing. I'll make every effort to keep it backward compatible, however some small changes may still be made.
 
-Note that some features described in this README are not yet implemented, although that list grows smaller every day.
+Please contribute and help guide the direction of *data-forge*.
+
+**Note**: Data-Forge relies heavily on [linq.js](https://github.com/mihaifm/linq) which I use extensively for all aspects of my JavaScript work. Over time I'll reduce Data-Forge reliance on linq.js although it will remain an invaluable resource.  
 
 # Generated API docs
 
