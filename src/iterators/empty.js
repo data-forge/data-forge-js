@@ -5,17 +5,15 @@
  */
 
 var EmptyIterator = function () {
-
-	var self = this;
-
-	self.moveNext = function () {
-		return false;
-	};
-
-	self.getCurrent = function () {
-		return undefined;
-	};
-
 };
 
 module.exports = EmptyIterator;
+
+EmptyIterator.prototype.moveNext = function () {
+	return false;
+};
+
+EmptyIterator.prototype.getCurrent = function () {
+	return undefined;
+};
+

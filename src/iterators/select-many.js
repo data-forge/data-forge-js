@@ -12,57 +12,64 @@ var SelectManyIterator = function (iterator, selector) {
 
 	var self = this;
 
-	var expandIterator = new SelectIterator(iterator, selector);
-	var childIterator = null;
+	self._expandIterator = new SelectIterator(iterator, selector);
+	self._childIterator = null;
+};
 
-	self.moveNext = function () {				
-		if (!childIterator) {
-			if (!expandIterator.moveNext()) {
-				return false;
-			}
+SelectManyIterator.prototype.moveNext = function () {
 
-			childIterator = expandIterator.getCurrent();
-			if (Object.isArray(childIterator)) {
-				childIterator = new ArrayIterator(childIterator);
-			}
+	var self = this;			
 
-			return childIterator.moveNext();
-		}
-		else {
-			if (childIterator.moveNext()) {
-				return true;
-			}
-
-			if (!expandIterator.moveNext()) {
-				return false;
-			}
-
-			childIterator = expandIterator.getCurrent();
-			if (Object.isArray(childIterator)) {
-				childIterator = new ArrayIterator(childIterator);
-			}
-
-			return childIterator.moveNext();
-		}
-	};
-
-	self.getCurrent = function () {
-		return childIterator.getCurrent();
-	};
-
-	//
-	// Bake the iterator into an array.
-	//
-	self.realize = function () {
-
-		var output = [];
-
-		while (self.moveNext()) {
-			output.push(self.getCurrent());
+	if (!self._childIterator) {
+		if (!self._expandIterator.moveNext()) {
+			return false;
 		}
 
-		return output;
-	};
+		self._childIterator = self._expandIterator.getCurrent();
+		if (Object.isArray(self._childIterator)) {
+			self._childIterator = new ArrayIterator(self._childIterator);
+		}
+
+		return self._childIterator.moveNext();
+	}
+	else {
+		if (self._childIterator.moveNext()) {
+			return true;
+		}
+
+		if (!self._expandIterator.moveNext()) {
+			return false;
+		}
+
+		self._childIterator = self._expandIterator.getCurrent();
+		if (Object.isArray(self._childIterator)) {
+			self._childIterator = new ArrayIterator(self._childIterator);
+		}
+
+		return self._childIterator.moveNext();
+	}
+};
+
+SelectManyIterator.prototype.getCurrent = function () {
+
+	var self = this;
+	return self._childIterator.getCurrent();
+};
+
+//
+// Bake the iterator into an array.
+//
+SelectManyIterator.prototype.realize = function () {
+
+	var self = this;
+
+	var output = [];
+
+	while (self.moveNext()) {
+		output.push(self.getCurrent());
+	}
+
+	return output;
 };
 
 module.exports = SelectManyIterator;

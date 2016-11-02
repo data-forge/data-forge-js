@@ -8,41 +8,43 @@ var E = require('linq');
 var ConcatIterator = function (iterators) {
 
 	var self = this;
-
-	var curIterator = -1;
-
-	self.moveNext = function () {				
-		
-		if (iterators.length === 0) {
-			return false;
-		}
-
-		if (curIterator < 0) {
-			++curIterator;
-		}
-		
-		for (;;) {
-			if (iterators[curIterator].moveNext()) {
-				return true;
-			}
-
-			if (curIterator >= iterators.length-1) {
-				return false;
-			}
-
-			++curIterator;
-		}
-	};
-
-	self.getCurrent = function () {
-		if (curIterator >= 0) {
-			return iterators[curIterator].getCurrent();
-		}
-		else {
-			return undefined;
-		}
-	};
-
+	self._curIterator = -1;
+	self._iterators = iterators;
 };
 
 module.exports = ConcatIterator;
+
+ConcatIterator.prototype.moveNext = function () {				
+	
+	var self = this;
+	if (self._iterators.length === 0) {
+		return false;
+	}
+
+	if (self._curIterator < 0) {
+		++self._curIterator;
+	}
+	
+	for (;;) {
+		if (self._iterators[self._curIterator].moveNext()) {
+			return true;
+		}
+
+		if (self._curIterator >= self._iterators.length-1) {
+			return false;
+		}
+
+		++self._curIterator;
+	}
+};
+
+ConcatIterator.prototype.getCurrent = function () {
+
+	var self = this;
+	if (self._curIterator >= 0) {
+		return self._iterators[self._curIterator].getCurrent();
+	}
+	else {
+		return undefined;
+	}
+};

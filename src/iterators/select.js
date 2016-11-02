@@ -8,30 +8,42 @@ var E = require('linq');
 var SelectIterator = function (iterator, selector) {
 
 	var self = this;
-	var i = -1; //todo: test this.
+	self._i = -1;
+	self._iterator = iterator;
+	self._selector = selector;
 
-	self.moveNext = function () {				
-		++i;
-		return iterator.moveNext();
-	};
 
-	self.getCurrent = function () {
-		return selector(iterator.getCurrent(), i);
-	};
 
-	//
-	// Bake the iterator into an array.
-	//
-	self.realize = function () {
-
-		var output = [];
-
-		while (self.moveNext()) {
-			output.push(self.getCurrent());
-		}
-
-		return output;
-	};
 };
 
 module.exports = SelectIterator;
+
+SelectIterator.prototype.moveNext = function () {
+
+	var self = this;
+
+	++self._i;
+	return self._iterator.moveNext();
+};
+
+SelectIterator.prototype.getCurrent = function () {
+
+	var self = this;
+	return self._selector(self._iterator.getCurrent(), self._i);
+};
+
+//
+// Bake the iterator into an array.
+//
+SelectIterator.prototype.realize = function () {
+
+	var self = this;
+
+	var output = [];
+
+	while (self.moveNext()) {
+		output.push(self.getCurrent());
+	}
+
+	return output;
+};

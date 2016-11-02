@@ -6,18 +6,24 @@
 var SkipIterator = function (iterator, skipAmount) {
 
 	var self = this;
-
-	self.moveNext = function () {
-		while (--skipAmount >= 0 && iterator.moveNext()) {
-			// Skip first rows.
-		}
-		return iterator.moveNext();
-	};
-
-	self.getCurrent = function () {
-		return iterator.getCurrent();
-	};
-
+	self._iterator = iterator;
+	self._skipAmount = skipAmount;
 };
 
 module.exports = SkipIterator;
+
+SkipIterator.prototype.moveNext = function () {
+
+	var self = this;
+	while (--self._skipAmount >= 0 && self._iterator.moveNext()) {
+		// Skip first rows.
+	}
+
+	return self._iterator.moveNext();
+};
+
+SkipIterator.prototype.getCurrent = function () {
+	
+	var self = this;
+	return self._iterator.getCurrent();
+};

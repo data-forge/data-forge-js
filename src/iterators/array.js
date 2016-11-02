@@ -10,39 +10,46 @@ var ArrayIterator = function (arr) {
 	assert.isArray(arr);
 	
 	var self = this;
-	var rowIndex = -1;
-	
-	self.moveNext = function () {
-		if (rowIndex < arr.length-1) {
-			++rowIndex;
-			return true;
-		}
-		
-		return false;
-	};
-
-	self.getCurrent = function () {
-		if (rowIndex >= 0 && rowIndex < arr.length) {
-			return arr[rowIndex];
-		}
-		else {
-			return undefined;
-		}		
-	};
-
-	//
-	// Bake the iterator into an array.
-	//
-	self.realize = function () {
-
-		var output = [];
-
-		while (self.moveNext()) {
-			output.push(self.getCurrent());
-		}
-
-		return output;
-	};
+	self._rowIndex = -1;
+	self._arr = arr;
 };
 
 module.exports = ArrayIterator;
+
+ArrayIterator.prototype.moveNext = function () {
+
+	var self = this;
+	if (self._rowIndex < self._arr.length-1) {
+		++self._rowIndex;
+		return true;
+	}
+	
+	return false;
+};
+
+ArrayIterator.prototype.getCurrent = function () {
+
+	var self = this;
+	if (self._rowIndex >= 0 && self._rowIndex < self._arr.length) {
+		return self._arr[self._rowIndex];
+	}
+	else {
+		return undefined;
+	}		
+};
+
+//
+// Bake the iterator into an array.
+//
+ArrayIterator.prototype.realize = function () {
+
+	var self = this;
+
+	var output = [];
+
+	while (self.moveNext()) {
+		output.push(self.getCurrent());
+	}
+
+	return output;
+};
