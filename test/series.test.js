@@ -1857,7 +1857,20 @@ describe('Series', function () {
 			[20, 2],
 			[30, 3],
 		]);
+	});
+
+	it('can get series starting at particular index - with integer index', function () {
+
+		var series = new Series({
+			index: [10, 20, 30],
+			values: [1, 2, 3],
+		});
 		
-	})
+		var reduced = series.startAt(20);
+		expect(reduced.toPairs()).to.eql([
+			[20, 2],
+			[30, 3],
+		]); 	
+	});
 });
 

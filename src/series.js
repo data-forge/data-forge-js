@@ -141,6 +141,7 @@ var DataFrame = require('./dataframe');
 var zip = require('./zip');
 var SelectManyIterable = require('../src/iterables/select-many');
 var SelectManyPairsIterable = require('../src/iterables/select-many-pairs');
+var Index = require("./index");
 
 /**
  * Get an iterator for index & values of the series.
@@ -159,7 +160,7 @@ Series.prototype.getIterator = function () {
  */
 Series.prototype.getIndex = function () {
 	var self = this;
-	return new Series({
+	return new Index({ //todo: Should cache index.
 		values: new ExtractIterable(self.iterable, 0), // Extract the index. 
 	});
 };
@@ -2175,3 +2176,23 @@ Series.prototype.asValues = function () {
 
 };
 
+
+/* Future feature.
+ *
+ * Get a new series or dataframe starting at the specified index value.
+ * 
+ * @param {value} indexValue - The value to search for before starting the new Series or DataFrame.
+ * 
+ * @returns {Series|DataFrame} Returns a new series or dataframe starting at the specified index. Returns an empty series or dataframe if the index was not found. 
+ */
+Series.prototype.startAt = function (indexValue) {
+
+	var self = this;
+	var lessThan = self.getIndex().getLessThan();
+	return self.asPairs()
+		.skipWhile(function (pair) {
+			return lessThan(pair[0], indexValue);
+		})
+		.asValues()
+		;
+};
