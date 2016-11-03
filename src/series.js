@@ -2177,8 +2177,7 @@ Series.prototype.asValues = function () {
 };
 
 
-/* Future feature.
- *
+/**
  * Get a new series or dataframe starting at the specified index value.
  * 
  * @param {value} indexValue - The value to search for before starting the new Series or DataFrame.
@@ -2192,6 +2191,25 @@ Series.prototype.startAt = function (indexValue) {
 	return self.asPairs()
 		.skipWhile(function (pair) {
 			return lessThan(pair[0], indexValue);
+		})
+		.asValues()
+		;
+};
+
+/**
+ * Get a new series or dataframe ending at the specified index value (inclusive).
+ * 
+ * @param {value} indexValue - The value to search for before ending the new Series or DataFrame.
+ * 
+ * @returns {Series|DataFrame} Returns a new series or dataframe ending at the specified index. Returns an empty series or dataframe if the index was not found. 
+ */
+Series.prototype.endAt = function (indexValue) {
+
+	var self = this;
+	var greaterThan = self.getIndex().getGreaterThan();
+	return self.asPairs()
+		.takeUntil(function (pair) {
+			return greaterThan(pair[0], indexValue);
 		})
 		.asValues()
 		;

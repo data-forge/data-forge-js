@@ -63,7 +63,9 @@ Index.prototype.getType = function () {
  * @returns {function} Returns a function that can be used to compare a value against an index value.
  */
 Index.prototype.getLessThan = function () {
+
     var self = this;
+
     switch (self.getType()) {
         case "date":
             return function (d1, d2) {
@@ -77,6 +79,31 @@ Index.prototype.getLessThan = function () {
 
         default:
             throw new Error("No less than operation avaiable!");
+    }
+};
+
+/**
+ * Get the greater than operation for the index.
+ * 
+ * @returns {function} Returns a function that can be used to compare a value against an index value.
+ */
+Index.prototype.getGreaterThan = function () {
+
+    var self = this;
+
+    switch (self.getType()) {
+        case "date":
+            return function (d1, d2) {
+                return moment(d1).isAfter(d2);
+            };
+
+        case "number":
+            return function (v1, v2) {
+                return v1 > v2;
+            };
+
+        default:
+            throw new Error("No greater than operation avaiable!");
     }
 };
 

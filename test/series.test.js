@@ -1922,5 +1922,70 @@ describe('Series', function () {
 			[new Date(2016, 5, 10), 3],
 		]); 	
 	});
+
+	it('can get series ending at particular index - with integer index', function () {
+
+		var series = new Series({
+			index: [10, 20, 30],
+			values: [1, 2, 3],
+		});
+		
+		var reduced = series.endAt(20);
+		expect(reduced.toPairs()).to.eql([
+			[10, 1],
+			[20, 2],
+		]); 	
+	});
+
+	it('can get series ending before a particular index - with integer index', function () {
+
+		var series = new Series({
+			index: [10, 20, 30],
+			values: [1, 2, 3],
+		});
+		
+		var reduced = series.endAt(25);
+		expect(reduced.toPairs()).to.eql([
+			[10, 1],
+			[20, 2],
+		]); 	
+	});
+
+	it('can get series ending at particular index - with date index', function () {
+
+		var series = new Series({
+			index: [
+				new Date(2016, 5, 1), 
+				new Date(2016, 5, 5), 
+				new Date(2016, 5, 10),
+			],
+			values: [1, 2, 3],
+		});
+		
+		var reduced = series.endAt(new Date(2016, 5, 5));
+		expect(reduced.toPairs()).to.eql([
+			[new Date(2016, 5, 1), 1],
+			[new Date(2016, 5, 5), 2],
+		]); 	
+	});
+
+	it('can get series ending before a particular index - with date index', function () {
+
+		var series = new Series({
+			index: [
+				new Date(2016, 5, 1), 
+				new Date(2016, 5, 5), 
+				new Date(2016, 5, 10),
+			],
+			values: [1, 2, 3],
+		});
+		
+		var reduced = series.endAt(new Date(2016, 5, 6));
+		expect(reduced.toPairs()).to.eql([
+			[new Date(2016, 5, 1), 1],
+			[new Date(2016, 5, 5), 2],
+		]); 	
+	});
+
 });
 
