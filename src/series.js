@@ -2182,7 +2182,7 @@ Series.prototype.asValues = function () {
  * 
  * @param {value} indexValue - The value to search for before starting the new Series or DataFrame.
  * 
- * @returns {Series|DataFrame} Returns a new series or dataframe starting at the specified index. Returns an empty series or dataframe if the index was not found. 
+ * @returns {Series|DataFrame} Returns a new series or dataframe with all values after the specified index. 
  */
 Series.prototype.startAt = function (indexValue) {
 
@@ -2201,7 +2201,7 @@ Series.prototype.startAt = function (indexValue) {
  * 
  * @param {value} indexValue - The value to search for before ending the new Series or DataFrame.
  * 
- * @returns {Series|DataFrame} Returns a new series or dataframe ending at the specified index. Returns an empty series or dataframe if the index was not found. 
+ * @returns {Series|DataFrame} Returns a new series or dataframe with values up to and including the specified index. 
  */
 Series.prototype.endAt = function (indexValue) {
 
@@ -2210,6 +2210,25 @@ Series.prototype.endAt = function (indexValue) {
 	return self.asPairs()
 		.takeUntil(function (pair) {
 			return greaterThan(pair[0], indexValue);
+		})
+		.asValues()
+		;
+};
+
+/**
+ * Get a new series or dataframe with all values before the specified index value (exclusive).
+ * 
+ * @param {value} indexValue - The value to search for while taking values.
+ * 
+ * @returns {Series|DataFrame} Returns a new series or dataframe with all values before the specified index. 
+ */
+Series.prototype.before = function (indexValue) {
+
+	var self = this;
+	var lessThan = self.getIndex().getLessThan();
+	return self.asPairs()
+		.takeWhile(function (pair) {
+			return lessThan(pair[0], indexValue);
 		})
 		.asValues()
 		;
