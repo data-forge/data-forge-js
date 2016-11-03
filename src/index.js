@@ -22,6 +22,7 @@ module.exports = Index;
 var inherit = require('./inherit');
 var Series = require('./series');
 var parent = inherit(Index, Series);
+var moment = require('moment');
 
 /**
  * Get the type of the index.
@@ -41,7 +42,7 @@ Index.prototype.getType = function () {
             if (Object.isNumber(firstValue)) {
                 self._type = 'number';
             }
-            else if (Object.instanceof(firstValue, Date)) {
+            else if (firstValue instanceof Date) {
                 self._type = 'date';
             }
             else {
@@ -71,7 +72,7 @@ Index.prototype.getLessThan = function () {
 
         case "number":
             return function (v1, v2) {
-                return v1 - v2;
+                return v1 < v2;
             };
 
         default:
