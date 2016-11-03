@@ -2233,3 +2233,22 @@ Series.prototype.before = function (indexValue) {
 		.asValues()
 		;
 };
+
+/**
+ * Get a new series or dataframe with all values after the specified index value (exclusive).
+ * 
+ * @param {value} indexValue - The value to search for while taking values.
+ * 
+ * @returns {Series|DataFrame} Returns a new series or dataframe with all values before the specified index. 
+ */
+Series.prototype.after = function (indexValue) {
+
+	var self = this;
+	var greaterThan = self.getIndex().getGreaterThan();
+	return self.asPairs()
+		.skipUntil(function (pair) {
+			return greaterThan(pair[0], indexValue);
+		})
+		.asValues()
+		;
+};

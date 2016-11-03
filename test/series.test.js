@@ -2019,5 +2019,36 @@ describe('Series', function () {
 		]); 	
 	});
 
+	it('can get series after a particular index - with integer index', function () {
+
+		var series = new Series({
+			index: [10, 20, 30],
+			values: [1, 2, 3],
+		});
+		
+		var reduced = series.after(15);
+		expect(reduced.toPairs()).to.eql([
+			[20, 2],
+			[30, 3],
+		]); 	
+	});
+
+	it('can get series after a particular index - with date index', function () {
+
+		var series = new Series({
+			index: [
+				new Date(2016, 5, 1), 
+				new Date(2016, 5, 5), 
+				new Date(2016, 5, 10),
+			],
+			values: [1, 2, 3],
+		});
+		
+		var reduced = series.after(new Date(2016, 5, 2));
+		expect(reduced.toPairs()).to.eql([
+			[new Date(2016, 5, 5), 2],
+			[new Date(2016, 5, 10), 3],
+		]); 	
+	});
 });
 
