@@ -2252,3 +2252,17 @@ Series.prototype.after = function (indexValue) {
 		.asValues()
 		;
 };
+
+/**
+ * Get a new series or dataframe with all values between the specified index values (inclusive).
+ * 
+ * @param {value} startIndexValue - The index where the new sequence starts. 
+ * @param {value} endIndexValue - The index where the new sequence ends.
+ * 
+ * @returns {Series|DataFrame} Returns a new series or dataframe with all values before the specified index. 
+ */
+Series.prototype.between = function (startIndexValue, endIndexValue) {
+
+	var self = this;
+	return self.startAt(startIndexValue).endAt(endIndexValue); 
+};

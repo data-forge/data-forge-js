@@ -2050,5 +2050,35 @@ describe('Series', function () {
 			[new Date(2016, 5, 10), 3],
 		]); 	
 	});
+
+	it('can get series between particular indices - with integer index', function () {
+
+		var series = new Series({
+			index: [10, 20, 30],
+			values: [1, 2, 3],
+		});
+		
+		var reduced = series.between(11, 25);
+		expect(reduced.toPairs()).to.eql([
+			[20, 2],
+		]); 	
+	});
+
+	it('can get series between particular indices - with date index', function () {
+
+		var series = new Series({
+			index: [
+				new Date(2016, 5, 1), 
+				new Date(2016, 5, 5), 
+				new Date(2016, 5, 10),
+			],
+			values: [1, 2, 3],
+		});
+		
+		var reduced = series.between(new Date(2016, 5, 2), new Date(2016, 5, 8));
+		expect(reduced.toPairs()).to.eql([
+			[new Date(2016, 5, 5), 2],
+		]); 	
+	});
 });
 
