@@ -40,6 +40,7 @@ Examples and some tests have been removed to a [separate repository](https://git
 - [Sorting]([#sorting)
 - [Transformation](#transformation)
 - [Filtering](#filtering)
+- [Data subsets](#data-subsets)
 - [Combining](#combining)
 - [Collapsing unique values](#collapsing-unique-values)
 - [Groups and windows](#groups-and-windows)
@@ -813,6 +814,26 @@ The predicate function must return *truthy* to keep the row, or *falsy* to filte
 		.where(function (row) {
 			return row.SomeColumn > 10l
 		});
+
+# Data subsets
+
+There are multiple ways to extract a subset of data from a series or dataframe.
+
+At the most basic `skip` and `take` allow a specified number of values to be skipped or taken.
+
+	var newSubset = someSeries.skip(10).take(15); 
+
+`head` and `tail` are handy functions that can extract X elements at the start or end of the sequence:
+
+	var firstTenValues = someSeries.head(10);
+
+	var lastFiveValues = someSeries.tail(5);
+
+A bit more advanced are `skipWhile`, `takeWhile`, `skipUntil` and `takeUntil`. These all skip or take values according to the boolean result of a predicate function:
+
+	var newSeries = someSeries.skipWhile(row => somePredicate(row));
+
+More sophisticated again a `startAt`, `endAt`, `after`, `before` and `between`. These are functions intelligently filter values based on the index. Note that your index must already be sorted to use these functions. `startAt` retreives all values starting at a particular index. `endAt` retreives all values ending at a particular index (inclusive). `after` retreives all values after a particluar index (exclusive). `before` retreives all values before a particular index (exclusive). Finally `between` retreives all values between two indexes (inclusive).
 
 # Combining
 
