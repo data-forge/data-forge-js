@@ -61,7 +61,7 @@ describe('accessing columns, rows and cells', function () {
 
         var subset = df2
             .subset(["2005", "2006", "2007"]) 
-            .slice("Alaska", "California")
+            .between("Alaska", "Arkansas")
             ;
 
         expect(subset.getColumnNames()).to.eql(["2005", "2006", "2007", ]);

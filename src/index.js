@@ -42,6 +42,9 @@ Index.prototype.getType = function () {
             if (Object.isNumber(firstValue)) {
                 self._type = 'number';
             }
+            else if (Object.isString(firstValue)) {
+                self._type = 'string';
+            }
             else if (firstValue instanceof Date) {
                 self._type = 'date';
             }
@@ -72,6 +75,7 @@ Index.prototype.getLessThan = function () {
                 return moment(d1).isBefore(d2);
             };
 
+        case "string":
         case "number":
             return function (v1, v2) {
                 return v1 < v2;
@@ -97,6 +101,7 @@ Index.prototype.getGreaterThan = function () {
                 return moment(d1).isAfter(d2);
             };
 
+        case "string":
         case "number":
             return function (v1, v2) {
                 return v1 > v2;

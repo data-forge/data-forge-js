@@ -286,7 +286,7 @@ describe('Series', function () {
 	it('can get slice of rows - with integer indices', function () {
 
 		var series = initSeries([0, 1, 2, 3], [100, 300, 200, 5]);
-		var slice = series.slice(1, 3);
+		var slice = series.between(1, 2);
 		expect(slice.toPairs()).to.eql([
 			[1, 300],
 			[2, 200],
@@ -299,40 +299,19 @@ describe('Series', function () {
 			index: ["a", "b", "c", "d", "e"], 
 			values: [100, 300, 200, 5, 30],
 		});
-		var slice = series.slice("b", "e");
+		var slice = series.between("b", "e");
 		expect(slice.toPairs()).to.eql([
 			["b", 300],
 			["c", 200],
 			["d", 5],
-		]);
-	});
-
-	it('can get slice of rows with explict predicates', function () {
-
-		var series = initSeries([0, 1, 2, 3], [100, 300, 200, 5]);
-		var slice = series.slice(
-			function (indexValue) {
-				return indexValue < 1;
-			},
-			function (indexValue) {
-				return indexValue < 3;
-			}
-		);
-
-		expect(slice.toPairs()).to.eql([
-			[1, 300],
-			[2, 200],
+			["e", 30],
 		]);
 	});
 
 	it('can get slice of rows from time series', function () {
 
 		var series = initSeries([new Date(2016, 1, 1), new Date(2016, 1, 3), new Date(2016, 1, 5), new Date(2016, 1, 10)], [0, 1, 2, 3]);
-		var slice = series.slice(new Date(2016, 1, 2), new Date(2016, 1, 8),
-			function (a, b) {
-				return moment(a).isBefore(b);
-			}
-		);
+		var slice = series.between(new Date(2016, 1, 2), new Date(2016, 1, 8));
 		expect(slice.toPairs()).to.eql([
 			[new Date(2016, 1, 3), 1],
 			[new Date(2016, 1, 5), 2],

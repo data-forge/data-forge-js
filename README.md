@@ -485,13 +485,13 @@ To extracts index + row pairs:
 
 	var arrayOfPairs = dataFrame.toPairs();
 
-A new data-frame can also be created from a *slice* of rows:
+A new data-frame can also be created from a *between* of rows:
 
 	var startIndex = ... // Starting row index to include in subset. 
 	var endIndex = ... // Ending row index to include in subset.
-	var rowSubset = dataFrame.slice(startIndex, endIndex);
+	var rowSubset = dataFrame.between(startIndex, endIndex);
 
-NOTE: To use `slice` your index must be sorted.
+NOTE: To use `between` your index must already be sorted.
 
 Invoke a callback for each row in a dataframe using `forEach`:
 
@@ -681,7 +681,7 @@ Use the LINQ functions `skip` and `take` to preview a subset of the data (more o
 Or more conveniently: 
 
 	// Get a range of rows starting at row index 10 and ending at (but not including) row index 20.
-	console.log(df.slice(10, 20).toString()); 
+	console.log(df.between(10, 20).toString()); 
 
 As you explore a data set you may want to understand what data types you are working with. You can use the `detectTypes` function to produce a new data frame with information on the data types in the dataframe you are exploring:
 

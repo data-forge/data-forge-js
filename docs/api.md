@@ -71,7 +71,6 @@ Browser:
         * [.selectMany(generator)](#dataForge.Series+selectMany) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
         * [.orderBy(sortSelector)](#dataForge.Series+orderBy) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
         * [.orderByDescending(sortSelector)](#dataForge.Series+orderByDescending) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
-        * [.slice(startIndexOrStartPredicate, endIndexOrEndPredicate, [predicate])](#dataForge.Series+slice) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
         * [.window(period)](#dataForge.Series+window) ⇒ <code>Series</code>
         * [.rollingWindow(period)](#dataForge.Series+rollingWindow) ⇒ <code>Series</code>
         * [.percentChange()](#dataForge.Series+percentChange) ⇒ <code>Series</code>
@@ -141,7 +140,6 @@ Browser:
         * [.selectMany(generator)](#dataForge.Series+selectMany) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
         * [.orderBy(sortSelector)](#dataForge.Series+orderBy) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
         * [.orderByDescending(sortSelector)](#dataForge.Series+orderByDescending) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
-        * [.slice(startIndexOrStartPredicate, endIndexOrEndPredicate, [predicate])](#dataForge.Series+slice) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
         * [.window(period)](#dataForge.Series+window) ⇒ <code>Series</code>
         * [.rollingWindow(period)](#dataForge.Series+rollingWindow) ⇒ <code>Series</code>
         * [.toString()](#dataForge.Series+toString) ⇒ <code>string</code>
@@ -218,7 +216,6 @@ Browser:
         * [.selectMany(generator)](#dataForge.Series+selectMany) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
         * [.orderBy(sortSelector)](#dataForge.Series+orderBy) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
         * [.orderByDescending(sortSelector)](#dataForge.Series+orderByDescending) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
-        * [.slice(startIndexOrStartPredicate, endIndexOrEndPredicate, [predicate])](#dataForge.Series+slice) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
         * [.window(period)](#dataForge.Series+window) ⇒ <code>Series</code>
         * [.rollingWindow(period)](#dataForge.Series+rollingWindow) ⇒ <code>Series</code>
         * [.toString()](#dataForge.Series+toString) ⇒ <code>string</code>
@@ -345,7 +342,6 @@ Browser:
     * [.selectMany(generator)](#dataForge.Series+selectMany) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
     * [.orderBy(sortSelector)](#dataForge.Series+orderBy) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
     * [.orderByDescending(sortSelector)](#dataForge.Series+orderByDescending) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
-    * [.slice(startIndexOrStartPredicate, endIndexOrEndPredicate, [predicate])](#dataForge.Series+slice) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
     * [.window(period)](#dataForge.Series+window) ⇒ <code>Series</code>
     * [.rollingWindow(period)](#dataForge.Series+rollingWindow) ⇒ <code>Series</code>
     * [.percentChange()](#dataForge.Series+percentChange) ⇒ <code>Series</code>
@@ -977,22 +973,6 @@ Sorts the series or dataframe (descending).
 | --- | --- | --- |
 | sortSelector | <code>function</code> | Selects the value to sort by. |
 
-<a name="dataForge.Series+slice"></a>
-
-#### dataFrame.slice(startIndexOrStartPredicate, endIndexOrEndPredicate, [predicate]) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
-Create a new series from a slice of rows.
-
-WARNING: To use slice, your index must already be sorted.
-
-**Kind**: instance method of <code>[DataFrame](#dataForge.DataFrame)</code>  
-**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a new series or dataframe that contains a slice or values from the original.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| startIndexOrStartPredicate | <code>int</code> &#124; <code>function</code> | Index where the slice starts or a predicate function that determines where the slice starts. |
-| endIndexOrEndPredicate | <code>int</code> &#124; <code>function</code> | Marks the end of the slice, one row past the last row to include. Or a predicate function that determines when the slice has ended. |
-| [predicate] | <code>function</code> | Optional predicate to compare index against start/end index. Return true to start or stop the slice. |
-
 <a name="dataForge.Series+window"></a>
 
 #### dataFrame.window(period) ⇒ <code>Series</code>
@@ -1560,7 +1540,6 @@ Get a new series or dataframe with all values between the specified index values
     * [.selectMany(generator)](#dataForge.Series+selectMany) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
     * [.orderBy(sortSelector)](#dataForge.Series+orderBy) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
     * [.orderByDescending(sortSelector)](#dataForge.Series+orderByDescending) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
-    * [.slice(startIndexOrStartPredicate, endIndexOrEndPredicate, [predicate])](#dataForge.Series+slice) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
     * [.window(period)](#dataForge.Series+window) ⇒ <code>Series</code>
     * [.rollingWindow(period)](#dataForge.Series+rollingWindow) ⇒ <code>Series</code>
     * [.toString()](#dataForge.Series+toString) ⇒ <code>string</code>
@@ -1840,22 +1819,6 @@ Sorts the series or dataframe (descending).
 | Param | Type | Description |
 | --- | --- | --- |
 | sortSelector | <code>function</code> | Selects the value to sort by. |
-
-<a name="dataForge.Series+slice"></a>
-
-#### index.slice(startIndexOrStartPredicate, endIndexOrEndPredicate, [predicate]) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
-Create a new series from a slice of rows.
-
-WARNING: To use slice, your index must already be sorted.
-
-**Kind**: instance method of <code>[Index](#dataForge.Index)</code>  
-**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a new series or dataframe that contains a slice or values from the original.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| startIndexOrStartPredicate | <code>int</code> &#124; <code>function</code> | Index where the slice starts or a predicate function that determines where the slice starts. |
-| endIndexOrEndPredicate | <code>int</code> &#124; <code>function</code> | Marks the end of the slice, one row past the last row to include. Or a predicate function that determines when the slice has ended. |
-| [predicate] | <code>function</code> | Optional predicate to compare index against start/end index. Return true to start or stop the slice. |
 
 <a name="dataForge.Series+window"></a>
 
@@ -2516,7 +2479,6 @@ Get a new series or dataframe with all values between the specified index values
     * [.selectMany(generator)](#dataForge.Series+selectMany) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
     * [.orderBy(sortSelector)](#dataForge.Series+orderBy) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
     * [.orderByDescending(sortSelector)](#dataForge.Series+orderByDescending) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
-    * [.slice(startIndexOrStartPredicate, endIndexOrEndPredicate, [predicate])](#dataForge.Series+slice) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
     * [.window(period)](#dataForge.Series+window) ⇒ <code>Series</code>
     * [.rollingWindow(period)](#dataForge.Series+rollingWindow) ⇒ <code>Series</code>
     * [.toString()](#dataForge.Series+toString) ⇒ <code>string</code>
@@ -2775,22 +2737,6 @@ Sorts the series or dataframe (descending).
 | Param | Type | Description |
 | --- | --- | --- |
 | sortSelector | <code>function</code> | Selects the value to sort by. |
-
-<a name="dataForge.Series+slice"></a>
-
-#### series.slice(startIndexOrStartPredicate, endIndexOrEndPredicate, [predicate]) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
-Create a new series from a slice of rows.
-
-WARNING: To use slice, your index must already be sorted.
-
-**Kind**: instance method of <code>[Series](#dataForge.Series)</code>  
-**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a new series or dataframe that contains a slice or values from the original.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| startIndexOrStartPredicate | <code>int</code> &#124; <code>function</code> | Index where the slice starts or a predicate function that determines where the slice starts. |
-| endIndexOrEndPredicate | <code>int</code> &#124; <code>function</code> | Marks the end of the slice, one row past the last row to include. Or a predicate function that determines when the slice has ended. |
-| [predicate] | <code>function</code> | Optional predicate to compare index against start/end index. Return true to start or stop the slice. |
 
 <a name="dataForge.Series+window"></a>
 

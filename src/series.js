@@ -519,73 +519,6 @@ Series.prototype.orderByDescending = function (sortSelector) {
 };
 
 /**
- * Create a new series from a slice of rows.
- * 
- * WARNING: To use slice, your index must already be sorted.
- *
- * @param {int|function} startIndexOrStartPredicate - Index where the slice starts or a predicate function that determines where the slice starts.
- * @param {int|function} endIndexOrEndPredicate - Marks the end of the slice, one row past the last row to include. Or a predicate function that determines when the slice has ended.
- * @param {function} [predicate] - Optional predicate to compare index against start/end index. Return true to start or stop the slice.
- * 
- * @returns {Series|DataFrame} Returns a new series or dataframe that contains a slice or values from the original.
- */
-Series.prototype.slice = function (startIndexOrStartPredicate, endIndexOrEndPredicate, predicate) {
-
-	var self = this;
-
-	var startIndex;
-	var endIndex;
-	var startPredicate = null;
-	var endPredicate = null;
-
-	if (predicate) {
-		assert.isFunction(predicate, "Expected 'predicate' parameter to slice function to be function.");
-	}
-
-	if (Object.isFunction(startIndexOrStartPredicate)) {
-		startPredicate = startIndexOrStartPredicate;
-	}
-	else {
-		startIndex = startIndexOrStartPredicate;
-		startPredicate = function (value) {
-				return predicate ? predicate(value, startIndex) : value !== startIndex;
-			};
-	}
-
-	if (Object.isFunction(endIndexOrEndPredicate)) {
-		endPredicate = endIndexOrEndPredicate;
-	}
-	else {
-		endIndex = endIndexOrEndPredicate;
-		endPredicate = function (value) {
-				return predicate ? predicate(value, endIndex) : value !== endIndex;
-			};
-	}
-
-	return new self.Constructor({
-		iterable: {
-			getIterator: function () {
-				return new TakeWhileIterator(
-					new SkipWhileIterator(
-						self.iterable.getIterator(),
-						function (pair) {
-							return startPredicate(pair[0]); // Check index for start condition.
-						}
-					),
-					function (pair) {
-						return endPredicate(pair[0]); // Check index for end condition.
-					}
-				);
-			},
-
-			getColumnNames: function () {
-				return self.iterable.getColumnNames();
-			},
-		},
-	});
-};
-
-/**
  * Segment a Series into 'windows'. Returns a new Series. Each value in the new Series contains a 'window' (or segment) of the original series or dataframe.
  * Use select or selectPairs to aggregate.
  *
@@ -2162,10 +2095,10 @@ Series.prototype.asPairs = function () {
  * 
  * @returns {Series} Returns a series of values where each pair has been extracted from the value of the input series.
  */
-Series.prototype.asValues = function () {
+Series.prototype.asValues = function (Constructor) {
 
 	var self = this;
-	return new Series({
+	return new (Constructor || Series)({
 		iterable: new SelectPairsIterable(
 			self,
 			function (index, value) {
@@ -2192,7 +2125,7 @@ Series.prototype.startAt = function (indexValue) {
 		.skipWhile(function (pair) {
 			return lessThan(pair[0], indexValue);
 		})
-		.asValues()
+		.asValues(self.Constructor)
 		;
 };
 
@@ -2211,7 +2144,7 @@ Series.prototype.endAt = function (indexValue) {
 		.takeUntil(function (pair) {
 			return greaterThan(pair[0], indexValue);
 		})
-		.asValues()
+		.asValues(self.Constructor)
 		;
 };
 
@@ -2230,7 +2163,7 @@ Series.prototype.before = function (indexValue) {
 		.takeWhile(function (pair) {
 			return lessThan(pair[0], indexValue);
 		})
-		.asValues()
+		.asValues(self.Constructor)
 		;
 };
 
@@ -2249,7 +2182,7 @@ Series.prototype.after = function (indexValue) {
 		.skipUntil(function (pair) {
 			return greaterThan(pair[0], indexValue);
 		})
-		.asValues()
+		.asValues(self.Constructor)
 		;
 };
 
