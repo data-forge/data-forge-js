@@ -32,7 +32,6 @@ Browser:
         * [.getColumns()](#dataForge.DataFrame+getColumns) ⇒ <code>array</code>
         * [.subset(columnNames)](#dataForge.DataFrame+subset) ⇒ <code>DataFrame</code>
         * [.dropSeries(columnOrColumns)](#dataForge.DataFrame+dropSeries) ⇒ <code>DataFrame</code>
-        * [.keepSeries(columnOrColumns)](#dataForge.DataFrame+keepSeries) ⇒ <code>DataFrame</code>
         * [.withSeries(columnNameOrSpec, [seriesOrFn])](#dataForge.DataFrame+withSeries) ⇒ <code>DataFrame</code>
         * [.setIndex(columnName)](#dataForge.DataFrame+setIndex) ⇒ <code>DataFrame</code>
         * [.toString()](#dataForge.DataFrame+toString) ⇒ <code>string</code>
@@ -47,6 +46,8 @@ Browser:
         * [.renameSeries(newColumnNames|columnsMap)](#dataForge.DataFrame+renameSeries) ⇒ <code>DataFrame</code>
         * [.toJSON()](#dataForge.DataFrame+toJSON) ⇒ <code>string</code>
         * [.toCSV()](#dataForge.DataFrame+toCSV) ⇒ <code>string</code>
+        * [.transformSeries(columnSelectors)](#dataForge.DataFrame+transformSeries) ⇒ <code>DataFrame</code>
+        * [.generateSeries(generator)](#dataForge.DataFrame+generateSeries) ⇒ <code>DataFrame</code>
         * [.deflate(selector)](#dataForge.DataFrame+deflate) ⇒ <code>Series</code>
         * [.inflateSeries(columnName, [selector])](#dataForge.DataFrame+inflateSeries) ⇒ <code>DataFrame</code>
         * [.aggregate([seed], selector)](#dataForge.DataFrame+aggregate) ⇒ <code>DataFrame</code>
@@ -113,6 +114,91 @@ Browser:
         * [.except(other, [comparer])](#dataForge.Series+except) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
         * [.asPairs()](#dataForge.Series+asPairs) ⇒ <code>Series</code>
         * [.asValues()](#dataForge.Series+asValues) ⇒ <code>Series</code>
+        * [.startAt(indexValue)](#dataForge.Series+startAt) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.endAt(indexValue)](#dataForge.Series+endAt) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.before(indexValue)](#dataForge.Series+before) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.after(indexValue)](#dataForge.Series+after) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.between(startIndexValue, endIndexValue)](#dataForge.Series+between) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.Index](#dataForge.Index) ⇐ <code>[Series](#dataForge.Series)</code>
+        * [new Index(config|values)](#new_dataForge.Index_new)
+        * [.thenBy](#dataForge.Series+thenBy) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.thenByDescending](#dataForge.Series+thenByDescending) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.getType()](#dataForge.Index+getType) ⇒ <code>string</code>
+        * [.getLessThan()](#dataForge.Index+getLessThan) ⇒ <code>function</code>
+        * [.getGreaterThan()](#dataForge.Index+getGreaterThan) ⇒ <code>function</code>
+        * [.getIterator()](#dataForge.Series+getIterator) ⇒ <code>iterator</code>
+        * [.getIndex()](#dataForge.Series+getIndex) ⇒ <code>Series</code>
+        * [.withIndex(newIndex)](#dataForge.Series+withIndex) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.resetIndex()](#dataForge.Series+resetIndex) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.skip(numRows)](#dataForge.Series+skip) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.skipWhile(predicate)](#dataForge.Series+skipWhile) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.skipUntil(predicate)](#dataForge.Series+skipUntil) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.take(numRows)](#dataForge.Series+take) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.takeWhile(predicate)](#dataForge.Series+takeWhile) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.takeUntil(predicate)](#dataForge.Series+takeUntil) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.where(predicate)](#dataForge.Series+where) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.select(selector)](#dataForge.Series+select) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.selectMany(generator)](#dataForge.Series+selectMany) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.orderBy(sortSelector)](#dataForge.Series+orderBy) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.orderByDescending(sortSelector)](#dataForge.Series+orderByDescending) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.slice(startIndexOrStartPredicate, endIndexOrEndPredicate, [predicate])](#dataForge.Series+slice) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.window(period)](#dataForge.Series+window) ⇒ <code>Series</code>
+        * [.rollingWindow(period)](#dataForge.Series+rollingWindow) ⇒ <code>Series</code>
+        * [.toString()](#dataForge.Series+toString) ⇒ <code>string</code>
+        * [.percentChange()](#dataForge.Series+percentChange) ⇒ <code>Series</code>
+        * [.parseInts()](#dataForge.Series+parseInts) ⇒ <code>Series</code>
+        * [.parseFloats()](#dataForge.Series+parseFloats) ⇒ <code>Series</code>
+        * [.parseDates([formatString])](#dataForge.Series+parseDates) ⇒ <code>Series</code>
+        * [.toStrings([formatString])](#dataForge.Series+toStrings) ⇒ <code>Series</code>
+        * [.detectTypes()](#dataForge.Series+detectTypes) ⇒ <code>DataFrame</code>
+        * [.detectValues()](#dataForge.Series+detectValues) ⇒ <code>DataFrame</code>
+        * [.truncateStrings(maxLength)](#dataForge.Series+truncateStrings) ⇒ <code>Series</code>
+        * [.bake()](#dataForge.Series+bake) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.toPairs()](#dataForge.Series+toPairs) ⇒ <code>array</code>
+        * [.count()](#dataForge.Series+count) ⇒ <code>array</code>
+        * [.first()](#dataForge.Series+first) ⇒ <code>value</code>
+        * [.last()](#dataForge.Series+last) ⇒ <code>value</code>
+        * [.reverse()](#dataForge.Series+reverse) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.inflate([selector])](#dataForge.Series+inflate) ⇒ <code>DataFrame</code>
+        * [.head(values)](#dataForge.Series+head) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.tail(values)](#dataForge.Series+tail) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.sum()](#dataForge.Series+sum) ⇒ <code>number</code>
+        * [.average()](#dataForge.Series+average) ⇒ <code>number</code>
+        * [.median()](#dataForge.Series+median) ⇒ <code>Number</code>
+        * [.min()](#dataForge.Series+min) ⇒ <code>number</code>
+        * [.max()](#dataForge.Series+max) ⇒ <code>number</code>
+        * [.aggregate([seed], selector)](#dataForge.Series+aggregate) ⇒ <code>value</code>
+        * [.toObject(keySelector, keySelector)](#dataForge.Series+toObject) ⇒ <code>object</code>
+        * [.zip(sequence, selector)](#dataForge.Series+zip) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.forEach(callback)](#dataForge.Series+forEach) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.all(predicate)](#dataForge.Series+all) ⇒ <code>boolean</code>
+        * [.any([predicate])](#dataForge.Series+any) ⇒ <code>boolean</code>
+        * [.none([predicate])](#dataForge.Series+none) ⇒ <code>boolean</code>
+        * [.sequentialDistinct(selector)](#dataForge.Series+sequentialDistinct) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.distinct(selector)](#dataForge.Series+distinct) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.variableWindow(comparer)](#dataForge.Series+variableWindow) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.insertPair(pair)](#dataForge.Series+insertPair) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.appendPair(pair)](#dataForge.Series+appendPair) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.fillGaps(predicate, generator)](#dataForge.Series+fillGaps) ⇒ <code>Series</code>
+        * [.groupBy(selector)](#dataForge.Series+groupBy) ⇒ <code>Series</code>
+        * [.groupSequentialBy(selector)](#dataForge.Series+groupSequentialBy) ⇒ <code>Series</code>
+        * [.at(index)](#dataForge.Series+at) ⇒ <code>value</code>
+        * [.concat(series)](#dataForge.Series+concat) ⇒ <code>Series</code>
+        * [.join(self, inner, outerKeySelector, innerKeySelector, resultSelector)](#dataForge.Series+join) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.joinOuter(self, inner, outerKeySelector, innerKeySelector, outerResultSelector, innerResultSelector, mergeSelector)](#dataForge.Series+joinOuter) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.joinOuterLeft(self, inner, outerKeySelector, innerKeySelector, outerResultSelector, innerResultSelector, mergeSelector)](#dataForge.Series+joinOuterLeft) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.joinOuterRight(self, inner, outerKeySelector, innerKeySelector, outerResultSelector, innerResultSelector, mergeSelector)](#dataForge.Series+joinOuterRight) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.defaultIfEmpty(defaultSequence)](#dataForge.Series+defaultIfEmpty) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.union(other, [comparer])](#dataForge.Series+union) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.intersection(other, [comparer])](#dataForge.Series+intersection) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.except(other, [comparer])](#dataForge.Series+except) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.asPairs()](#dataForge.Series+asPairs) ⇒ <code>Series</code>
+        * [.asValues()](#dataForge.Series+asValues) ⇒ <code>Series</code>
+        * [.startAt(indexValue)](#dataForge.Series+startAt) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.endAt(indexValue)](#dataForge.Series+endAt) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.before(indexValue)](#dataForge.Series+before) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.after(indexValue)](#dataForge.Series+after) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.between(startIndexValue, endIndexValue)](#dataForge.Series+between) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
     * [.Series](#dataForge.Series)
         * [new Series(config|values)](#new_dataForge.Series_new)
         * [.thenBy](#dataForge.Series+thenBy) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
@@ -185,6 +271,11 @@ Browser:
         * [.except(other, [comparer])](#dataForge.Series+except) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
         * [.asPairs()](#dataForge.Series+asPairs) ⇒ <code>Series</code>
         * [.asValues()](#dataForge.Series+asValues) ⇒ <code>Series</code>
+        * [.startAt(indexValue)](#dataForge.Series+startAt) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.endAt(indexValue)](#dataForge.Series+endAt) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.before(indexValue)](#dataForge.Series+before) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.after(indexValue)](#dataForge.Series+after) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+        * [.between(startIndexValue, endIndexValue)](#dataForge.Series+between) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
     * [.concatDataFrames](#dataForge.concatDataFrames) ⇒ <code>DataFrame</code>
     * [.concatSeries](#dataForge.concatSeries) ⇒ <code>Series</code>
     * [.use(plugin)](#dataForge.use) ⇒ <code>[dataForge](#dataForge)</code>
@@ -215,7 +306,6 @@ Browser:
     * [.getColumns()](#dataForge.DataFrame+getColumns) ⇒ <code>array</code>
     * [.subset(columnNames)](#dataForge.DataFrame+subset) ⇒ <code>DataFrame</code>
     * [.dropSeries(columnOrColumns)](#dataForge.DataFrame+dropSeries) ⇒ <code>DataFrame</code>
-    * [.keepSeries(columnOrColumns)](#dataForge.DataFrame+keepSeries) ⇒ <code>DataFrame</code>
     * [.withSeries(columnNameOrSpec, [seriesOrFn])](#dataForge.DataFrame+withSeries) ⇒ <code>DataFrame</code>
     * [.setIndex(columnName)](#dataForge.DataFrame+setIndex) ⇒ <code>DataFrame</code>
     * [.toString()](#dataForge.DataFrame+toString) ⇒ <code>string</code>
@@ -230,6 +320,8 @@ Browser:
     * [.renameSeries(newColumnNames|columnsMap)](#dataForge.DataFrame+renameSeries) ⇒ <code>DataFrame</code>
     * [.toJSON()](#dataForge.DataFrame+toJSON) ⇒ <code>string</code>
     * [.toCSV()](#dataForge.DataFrame+toCSV) ⇒ <code>string</code>
+    * [.transformSeries(columnSelectors)](#dataForge.DataFrame+transformSeries) ⇒ <code>DataFrame</code>
+    * [.generateSeries(generator)](#dataForge.DataFrame+generateSeries) ⇒ <code>DataFrame</code>
     * [.deflate(selector)](#dataForge.DataFrame+deflate) ⇒ <code>Series</code>
     * [.inflateSeries(columnName, [selector])](#dataForge.DataFrame+inflateSeries) ⇒ <code>DataFrame</code>
     * [.aggregate([seed], selector)](#dataForge.DataFrame+aggregate) ⇒ <code>DataFrame</code>
@@ -296,6 +388,11 @@ Browser:
     * [.except(other, [comparer])](#dataForge.Series+except) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
     * [.asPairs()](#dataForge.Series+asPairs) ⇒ <code>Series</code>
     * [.asValues()](#dataForge.Series+asValues) ⇒ <code>Series</code>
+    * [.startAt(indexValue)](#dataForge.Series+startAt) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.endAt(indexValue)](#dataForge.Series+endAt) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.before(indexValue)](#dataForge.Series+before) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.after(indexValue)](#dataForge.Series+after) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.between(startIndexValue, endIndexValue)](#dataForge.Series+between) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
 
 <a name="new_dataForge.DataFrame_new"></a>
 
@@ -440,18 +537,6 @@ Create a new data frame with the requested column or columns dropped.
 | Param | Type | Description |
 | --- | --- | --- |
 | columnOrColumns | <code>string</code> &#124; <code>array</code> | Specifies the column name (a string) or columns (array of column names) to drop. |
-
-<a name="dataForge.DataFrame+keepSeries"></a>
-
-#### dataFrame.keepSeries(columnOrColumns) ⇒ <code>DataFrame</code>
-Create a new data frame with only the requested column or columns dropped, other columns are dropped.
-
-**Kind**: instance method of <code>[DataFrame](#dataForge.DataFrame)</code>  
-**Returns**: <code>DataFrame</code> - Returns a new dataframe only preserving a particular named column or columns.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| columnOrColumns | <code>string</code> &#124; <code>array</code> | Specifies the column name (a string) or columns (array of column names) to keep. |
 
 <a name="dataForge.DataFrame+withSeries"></a>
 
@@ -607,6 +692,30 @@ Serialize the data frame to CSV.
 
 **Kind**: instance method of <code>[DataFrame](#dataForge.DataFrame)</code>  
 **Returns**: <code>string</code> - Returns a CSV format string representing the dataframe.  
+<a name="dataForge.DataFrame+transformSeries"></a>
+
+#### dataFrame.transformSeries(columnSelectors) ⇒ <code>DataFrame</code>
+Transform one or more columns. This is equivalent to extracting a column, calling 'select' on it,then plugging it back in as the same column.
+
+**Kind**: instance method of <code>[DataFrame](#dataForge.DataFrame)</code>  
+**Returns**: <code>DataFrame</code> - Returns a new dataframe with 1 or more columns transformed.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| columnSelectors | <code>object</code> | Object with field names for each column to be transformed. Each field you be a selector that transforms that column. |
+
+<a name="dataForge.DataFrame+generateSeries"></a>
+
+#### dataFrame.generateSeries(generator) ⇒ <code>DataFrame</code>
+Generate new columns based on existing rows.
+
+**Kind**: instance method of <code>[DataFrame](#dataForge.DataFrame)</code>  
+**Returns**: <code>DataFrame</code> - Returns a new dataframe with 1 or more new columns.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| generator | <code>function</code> &#124; <code>object</code> | Generator function that transforms each row to a new set of columns. |
+
 <a name="dataForge.DataFrame+deflate"></a>
 
 #### dataFrame.deflate(selector) ⇒ <code>Series</code>
@@ -1362,6 +1471,1027 @@ Convert a series of pairs to back to a series of values.
 
 **Kind**: instance method of <code>[DataFrame](#dataForge.DataFrame)</code>  
 **Returns**: <code>Series</code> - Returns a series of values where each pair has been extracted from the value of the input series.  
+<a name="dataForge.Series+startAt"></a>
+
+#### dataFrame.startAt(indexValue) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+Get a new series or dataframe starting at the specified index value.
+
+**Kind**: instance method of <code>[DataFrame](#dataForge.DataFrame)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a new series or dataframe with all values after the specified index.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| indexValue | <code>value</code> | The value to search for before starting the new Series or DataFrame. |
+
+<a name="dataForge.Series+endAt"></a>
+
+#### dataFrame.endAt(indexValue) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+Get a new series or dataframe ending at the specified index value (inclusive).
+
+**Kind**: instance method of <code>[DataFrame](#dataForge.DataFrame)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a new series or dataframe with values up to and including the specified index.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| indexValue | <code>value</code> | The value to search for before ending the new Series or DataFrame. |
+
+<a name="dataForge.Series+before"></a>
+
+#### dataFrame.before(indexValue) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+Get a new series or dataframe with all values before the specified index value (exclusive).
+
+**Kind**: instance method of <code>[DataFrame](#dataForge.DataFrame)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a new series or dataframe with all values before the specified index.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| indexValue | <code>value</code> | The value to search for while taking values. |
+
+<a name="dataForge.Series+after"></a>
+
+#### dataFrame.after(indexValue) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+Get a new series or dataframe with all values after the specified index value (exclusive).
+
+**Kind**: instance method of <code>[DataFrame](#dataForge.DataFrame)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a new series or dataframe with all values before the specified index.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| indexValue | <code>value</code> | The value to search for while taking values. |
+
+<a name="dataForge.Series+between"></a>
+
+#### dataFrame.between(startIndexValue, endIndexValue) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+Get a new series or dataframe with all values between the specified index values (inclusive).
+
+**Kind**: instance method of <code>[DataFrame](#dataForge.DataFrame)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a new series or dataframe with all values before the specified index.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| startIndexValue | <code>value</code> | The index where the new sequence starts. |
+| endIndexValue | <code>value</code> | The index where the new sequence ends. |
+
+<a name="dataForge.Index"></a>
+
+### dataForge.Index ⇐ <code>[Series](#dataForge.Series)</code>
+**Kind**: static class of <code>[dataForge](#dataForge)</code>  
+**Extends:** <code>[Series](#dataForge.Series)</code>  
+
+* [.Index](#dataForge.Index) ⇐ <code>[Series](#dataForge.Series)</code>
+    * [new Index(config|values)](#new_dataForge.Index_new)
+    * [.thenBy](#dataForge.Series+thenBy) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.thenByDescending](#dataForge.Series+thenByDescending) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.getType()](#dataForge.Index+getType) ⇒ <code>string</code>
+    * [.getLessThan()](#dataForge.Index+getLessThan) ⇒ <code>function</code>
+    * [.getGreaterThan()](#dataForge.Index+getGreaterThan) ⇒ <code>function</code>
+    * [.getIterator()](#dataForge.Series+getIterator) ⇒ <code>iterator</code>
+    * [.getIndex()](#dataForge.Series+getIndex) ⇒ <code>Series</code>
+    * [.withIndex(newIndex)](#dataForge.Series+withIndex) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.resetIndex()](#dataForge.Series+resetIndex) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.skip(numRows)](#dataForge.Series+skip) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.skipWhile(predicate)](#dataForge.Series+skipWhile) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.skipUntil(predicate)](#dataForge.Series+skipUntil) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.take(numRows)](#dataForge.Series+take) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.takeWhile(predicate)](#dataForge.Series+takeWhile) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.takeUntil(predicate)](#dataForge.Series+takeUntil) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.where(predicate)](#dataForge.Series+where) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.select(selector)](#dataForge.Series+select) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.selectMany(generator)](#dataForge.Series+selectMany) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.orderBy(sortSelector)](#dataForge.Series+orderBy) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.orderByDescending(sortSelector)](#dataForge.Series+orderByDescending) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.slice(startIndexOrStartPredicate, endIndexOrEndPredicate, [predicate])](#dataForge.Series+slice) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.window(period)](#dataForge.Series+window) ⇒ <code>Series</code>
+    * [.rollingWindow(period)](#dataForge.Series+rollingWindow) ⇒ <code>Series</code>
+    * [.toString()](#dataForge.Series+toString) ⇒ <code>string</code>
+    * [.percentChange()](#dataForge.Series+percentChange) ⇒ <code>Series</code>
+    * [.parseInts()](#dataForge.Series+parseInts) ⇒ <code>Series</code>
+    * [.parseFloats()](#dataForge.Series+parseFloats) ⇒ <code>Series</code>
+    * [.parseDates([formatString])](#dataForge.Series+parseDates) ⇒ <code>Series</code>
+    * [.toStrings([formatString])](#dataForge.Series+toStrings) ⇒ <code>Series</code>
+    * [.detectTypes()](#dataForge.Series+detectTypes) ⇒ <code>DataFrame</code>
+    * [.detectValues()](#dataForge.Series+detectValues) ⇒ <code>DataFrame</code>
+    * [.truncateStrings(maxLength)](#dataForge.Series+truncateStrings) ⇒ <code>Series</code>
+    * [.bake()](#dataForge.Series+bake) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.toPairs()](#dataForge.Series+toPairs) ⇒ <code>array</code>
+    * [.count()](#dataForge.Series+count) ⇒ <code>array</code>
+    * [.first()](#dataForge.Series+first) ⇒ <code>value</code>
+    * [.last()](#dataForge.Series+last) ⇒ <code>value</code>
+    * [.reverse()](#dataForge.Series+reverse) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.inflate([selector])](#dataForge.Series+inflate) ⇒ <code>DataFrame</code>
+    * [.head(values)](#dataForge.Series+head) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.tail(values)](#dataForge.Series+tail) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.sum()](#dataForge.Series+sum) ⇒ <code>number</code>
+    * [.average()](#dataForge.Series+average) ⇒ <code>number</code>
+    * [.median()](#dataForge.Series+median) ⇒ <code>Number</code>
+    * [.min()](#dataForge.Series+min) ⇒ <code>number</code>
+    * [.max()](#dataForge.Series+max) ⇒ <code>number</code>
+    * [.aggregate([seed], selector)](#dataForge.Series+aggregate) ⇒ <code>value</code>
+    * [.toObject(keySelector, keySelector)](#dataForge.Series+toObject) ⇒ <code>object</code>
+    * [.zip(sequence, selector)](#dataForge.Series+zip) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.forEach(callback)](#dataForge.Series+forEach) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.all(predicate)](#dataForge.Series+all) ⇒ <code>boolean</code>
+    * [.any([predicate])](#dataForge.Series+any) ⇒ <code>boolean</code>
+    * [.none([predicate])](#dataForge.Series+none) ⇒ <code>boolean</code>
+    * [.sequentialDistinct(selector)](#dataForge.Series+sequentialDistinct) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.distinct(selector)](#dataForge.Series+distinct) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.variableWindow(comparer)](#dataForge.Series+variableWindow) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.insertPair(pair)](#dataForge.Series+insertPair) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.appendPair(pair)](#dataForge.Series+appendPair) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.fillGaps(predicate, generator)](#dataForge.Series+fillGaps) ⇒ <code>Series</code>
+    * [.groupBy(selector)](#dataForge.Series+groupBy) ⇒ <code>Series</code>
+    * [.groupSequentialBy(selector)](#dataForge.Series+groupSequentialBy) ⇒ <code>Series</code>
+    * [.at(index)](#dataForge.Series+at) ⇒ <code>value</code>
+    * [.concat(series)](#dataForge.Series+concat) ⇒ <code>Series</code>
+    * [.join(self, inner, outerKeySelector, innerKeySelector, resultSelector)](#dataForge.Series+join) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.joinOuter(self, inner, outerKeySelector, innerKeySelector, outerResultSelector, innerResultSelector, mergeSelector)](#dataForge.Series+joinOuter) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.joinOuterLeft(self, inner, outerKeySelector, innerKeySelector, outerResultSelector, innerResultSelector, mergeSelector)](#dataForge.Series+joinOuterLeft) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.joinOuterRight(self, inner, outerKeySelector, innerKeySelector, outerResultSelector, innerResultSelector, mergeSelector)](#dataForge.Series+joinOuterRight) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.defaultIfEmpty(defaultSequence)](#dataForge.Series+defaultIfEmpty) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.union(other, [comparer])](#dataForge.Series+union) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.intersection(other, [comparer])](#dataForge.Series+intersection) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.except(other, [comparer])](#dataForge.Series+except) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.asPairs()](#dataForge.Series+asPairs) ⇒ <code>Series</code>
+    * [.asValues()](#dataForge.Series+asValues) ⇒ <code>Series</code>
+    * [.startAt(indexValue)](#dataForge.Series+startAt) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.endAt(indexValue)](#dataForge.Series+endAt) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.before(indexValue)](#dataForge.Series+before) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.after(indexValue)](#dataForge.Series+after) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.between(startIndexValue, endIndexValue)](#dataForge.Series+between) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+
+<a name="new_dataForge.Index_new"></a>
+
+#### new Index(config|values)
+Constructor for Index.
+
+
+| Param | Type | Description |
+| --- | --- | --- |
+| config|values | <code>object</code> &#124; <code>array</code> | Specifies content and configuration for the Index. |
+
+<a name="dataForge.Series+thenBy"></a>
+
+#### index.thenBy ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+Performs additional sorting (ascending).
+
+**Kind**: instance property of <code>[Index](#dataForge.Index)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a new series or dataframe that has been sorted by the value returned by the selector.  
+**Access:** public  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| sortSelector | <code>function</code> | Selects the value to sort by. |
+
+<a name="dataForge.Series+thenByDescending"></a>
+
+#### index.thenByDescending ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+Performs additional sorting (descending).
+
+**Kind**: instance property of <code>[Index](#dataForge.Index)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a new series or dataframe that has been sorted by the value returned by the selector.  
+**Access:** public  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| sortSelector | <code>function</code> | Selects the value to sort by. |
+
+<a name="dataForge.Index+getType"></a>
+
+#### index.getType() ⇒ <code>string</code>
+Get the type of the index.
+
+**Kind**: instance method of <code>[Index](#dataForge.Index)</code>  
+**Returns**: <code>string</code> - Returns a string that specifies the type of the index.  
+<a name="dataForge.Index+getLessThan"></a>
+
+#### index.getLessThan() ⇒ <code>function</code>
+Get the less than operation for the index.
+
+**Kind**: instance method of <code>[Index](#dataForge.Index)</code>  
+**Returns**: <code>function</code> - Returns a function that can be used to compare a value against an index value.  
+<a name="dataForge.Index+getGreaterThan"></a>
+
+#### index.getGreaterThan() ⇒ <code>function</code>
+Get the greater than operation for the index.
+
+**Kind**: instance method of <code>[Index](#dataForge.Index)</code>  
+**Returns**: <code>function</code> - Returns a function that can be used to compare a value against an index value.  
+<a name="dataForge.Series+getIterator"></a>
+
+#### index.getIterator() ⇒ <code>iterator</code>
+Get an iterator for index & values of the series.
+
+**Kind**: instance method of <code>[Index](#dataForge.Index)</code>  
+**Returns**: <code>iterator</code> - Returns an iterator that can be used to enumerate and lazily evalute the contents of the series or dataframe.  
+<a name="dataForge.Series+getIndex"></a>
+
+#### index.getIndex() ⇒ <code>Series</code>
+Retreive the index of the series.
+
+**Kind**: instance method of <code>[Index](#dataForge.Index)</code>  
+**Returns**: <code>Series</code> - Returns a new series that contains the values of the index for this series.  
+<a name="dataForge.Series+withIndex"></a>
+
+#### index.withIndex(newIndex) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+Apply a new index to the Series.
+
+**Kind**: instance method of <code>[Index](#dataForge.Index)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a new series or dataframe with the specified index attached.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| newIndex | <code>array</code> &#124; <code>Series</code> | The new index to apply to the Series. |
+
+<a name="dataForge.Series+resetIndex"></a>
+
+#### index.resetIndex() ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+Reset the index of the data frame back to the default sequential integer index.
+
+**Kind**: instance method of <code>[Index](#dataForge.Index)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a new series or dataframe with the index reset to the default zero-based index.  
+<a name="dataForge.Series+skip"></a>
+
+#### index.skip(numRows) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+Skip a number of rows in the series.
+
+**Kind**: instance method of <code>[Index](#dataForge.Index)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a new series or dataframe with the specified number of values skipped.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| numRows | <code>int</code> | Number of rows to skip. |
+
+<a name="dataForge.Series+skipWhile"></a>
+
+#### index.skipWhile(predicate) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+Skips values in the series while a condition is met.
+
+**Kind**: instance method of <code>[Index](#dataForge.Index)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a new series or dataframe with all initial sequential values removed that match the predicate.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| predicate | <code>function</code> | Return true to indicate the condition met. |
+
+<a name="dataForge.Series+skipUntil"></a>
+
+#### index.skipUntil(predicate) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+Skips values in the series until a condition is met.
+
+**Kind**: instance method of <code>[Index](#dataForge.Index)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a new series or dataframe with all initial sequential values removed that don't match the predicate.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| predicate | <code>function</code> | Return true to indicate the condition met. |
+
+<a name="dataForge.Series+take"></a>
+
+#### index.take(numRows) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+Take a number of rows in the series.
+
+**Kind**: instance method of <code>[Index](#dataForge.Index)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a new series or dataframe with up to the specified number of values included.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| numRows | <code>int</code> | Number of rows to take. |
+
+<a name="dataForge.Series+takeWhile"></a>
+
+#### index.takeWhile(predicate) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+Take values from the series while a condition is met.
+
+**Kind**: instance method of <code>[Index](#dataForge.Index)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a new series or dataframe that only includes the initial sequential values that have matched the predicate.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| predicate | <code>function</code> | Return true to indicate the condition met. |
+
+<a name="dataForge.Series+takeUntil"></a>
+
+#### index.takeUntil(predicate) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+Take values from the series until a condition is met.
+
+**Kind**: instance method of <code>[Index](#dataForge.Index)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a new series or dataframe that only includes the initial sequential values that have not matched the predicate.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| predicate | <code>function</code> | Return true to indicate the condition met. |
+
+<a name="dataForge.Series+where"></a>
+
+#### index.where(predicate) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+Filter a series by a predicate selector.
+
+**Kind**: instance method of <code>[Index](#dataForge.Index)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a new series or dataframe containing only the values that match the predicate.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| predicate | <code>function</code> | Predicte function to filter rows of the series. |
+
+<a name="dataForge.Series+select"></a>
+
+#### index.select(selector) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+Generate a new series based on the results of the selector function.
+
+**Kind**: instance method of <code>[Index](#dataForge.Index)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a new series or dataframe that has been transformed by the selector function.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| selector | <code>function</code> | Selector function that transforms each value to create a new series or dataframe. |
+
+<a name="dataForge.Series+selectMany"></a>
+
+#### index.selectMany(generator) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+Generate a new series based on the results of the selector function.
+
+**Kind**: instance method of <code>[Index](#dataForge.Index)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a new series or dataframe with values that have been produced by the generator function.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| generator | <code>function</code> | Generator function that may generator 0 or more new values from value in the series or dataframe. |
+
+<a name="dataForge.Series+orderBy"></a>
+
+#### index.orderBy(sortSelector) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+Sorts the series or dataframe (ascending).
+
+**Kind**: instance method of <code>[Index](#dataForge.Index)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a new series or dataframe that has been sorted by the value returned by the selector.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| sortSelector | <code>function</code> | Selects the value to sort by. |
+
+<a name="dataForge.Series+orderByDescending"></a>
+
+#### index.orderByDescending(sortSelector) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+Sorts the series or dataframe (descending).
+
+**Kind**: instance method of <code>[Index](#dataForge.Index)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a new series or dataframe that has been sorted by the value returned by the selector.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| sortSelector | <code>function</code> | Selects the value to sort by. |
+
+<a name="dataForge.Series+slice"></a>
+
+#### index.slice(startIndexOrStartPredicate, endIndexOrEndPredicate, [predicate]) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+Create a new series from a slice of rows.
+
+WARNING: To use slice, your index must already be sorted.
+
+**Kind**: instance method of <code>[Index](#dataForge.Index)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a new series or dataframe that contains a slice or values from the original.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| startIndexOrStartPredicate | <code>int</code> &#124; <code>function</code> | Index where the slice starts or a predicate function that determines where the slice starts. |
+| endIndexOrEndPredicate | <code>int</code> &#124; <code>function</code> | Marks the end of the slice, one row past the last row to include. Or a predicate function that determines when the slice has ended. |
+| [predicate] | <code>function</code> | Optional predicate to compare index against start/end index. Return true to start or stop the slice. |
+
+<a name="dataForge.Series+window"></a>
+
+#### index.window(period) ⇒ <code>Series</code>
+Segment a Series into 'windows'. Returns a new Series. Each value in the new Series contains a 'window' (or segment) of the original series or dataframe.
+Use select or selectPairs to aggregate.
+
+**Kind**: instance method of <code>[Index](#dataForge.Index)</code>  
+**Returns**: <code>Series</code> - Returns a new series, each value of which is a 'window' (or segment) of the original series or dataframe.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| period | <code>integer</code> | The number of values in the window. |
+
+<a name="dataForge.Series+rollingWindow"></a>
+
+#### index.rollingWindow(period) ⇒ <code>Series</code>
+Segment a Series into 'rolling windows'. Returns a new Series. Each value in the new Series contains a 'window' (or segment) of the original Series.
+Use select or selectPairs to aggregate.
+
+**Kind**: instance method of <code>[Index](#dataForge.Index)</code>  
+**Returns**: <code>Series</code> - Returns a new series, each value of which is a 'window' (or segment) of the original series or dataframe.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| period | <code>integer</code> | The number of values in the window. |
+
+<a name="dataForge.Series+toString"></a>
+
+#### index.toString() ⇒ <code>string</code>
+Format the data frame for display as a string.
+
+**Kind**: instance method of <code>[Index](#dataForge.Index)</code>  
+**Returns**: <code>string</code> - Generates and returns a string representation of the series or dataframe.  
+<a name="dataForge.Series+percentChange"></a>
+
+#### index.percentChange() ⇒ <code>Series</code>
+Compute the percent change for each row after the first.
+Percentages are expressed as 0-1 values.
+
+**Kind**: instance method of <code>[Index](#dataForge.Index)</code>  
+**Returns**: <code>Series</code> - Returns a new series where each value indicates the percent change from the previous number value in the original series.  
+<a name="dataForge.Series+parseInts"></a>
+
+#### index.parseInts() ⇒ <code>Series</code>
+Parse a series with string values to a series with int values.
+
+**Kind**: instance method of <code>[Index](#dataForge.Index)</code>  
+**Returns**: <code>Series</code> - Returns a new series where string values from the original series have been parsed to integer values.  
+<a name="dataForge.Series+parseFloats"></a>
+
+#### index.parseFloats() ⇒ <code>Series</code>
+Parse a series with string values to a series with float values.
+
+**Kind**: instance method of <code>[Index](#dataForge.Index)</code>  
+**Returns**: <code>Series</code> - Returns a new series where string values from the original series have been parsed to floating-point values.  
+<a name="dataForge.Series+parseDates"></a>
+
+#### index.parseDates([formatString]) ⇒ <code>Series</code>
+Parse a series with string values to a series with date values.
+
+**Kind**: instance method of <code>[Index](#dataForge.Index)</code>  
+**Returns**: <code>Series</code> - Returns a new series where string values from the original series have been parsed to Date values.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| [formatString] | <code>string</code> | Optional formatting string for dates. |
+
+<a name="dataForge.Series+toStrings"></a>
+
+#### index.toStrings([formatString]) ⇒ <code>Series</code>
+Convert a series of values of different types to a series of string values.
+
+**Kind**: instance method of <code>[Index](#dataForge.Index)</code>  
+**Returns**: <code>Series</code> - Returns a new series where the values from the original series have been stringified.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| [formatString] | <code>string</code> | Optional formatting string for dates. |
+
+<a name="dataForge.Series+detectTypes"></a>
+
+#### index.detectTypes() ⇒ <code>DataFrame</code>
+Detect the types of the values in the sequence.
+
+**Kind**: instance method of <code>[Index](#dataForge.Index)</code>  
+**Returns**: <code>DataFrame</code> - Returns a dataframe that describes the data types contained in the input series or dataframe.  
+<a name="dataForge.Series+detectValues"></a>
+
+#### index.detectValues() ⇒ <code>DataFrame</code>
+Detect the frequency of values in the sequence.
+
+**Kind**: instance method of <code>[Index](#dataForge.Index)</code>  
+**Returns**: <code>DataFrame</code> - Returns a dataframe that describes the values contained in the input sequence.  
+<a name="dataForge.Series+truncateStrings"></a>
+
+#### index.truncateStrings(maxLength) ⇒ <code>Series</code>
+Produces a new series with all string values truncated to the requested maximum length.
+
+**Kind**: instance method of <code>[Index](#dataForge.Index)</code>  
+**Returns**: <code>Series</code> - Returns a new series with strings that are truncated to the specified maximum length.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| maxLength | <code>int</code> | The maximum length of the string values after truncation. |
+
+<a name="dataForge.Series+bake"></a>
+
+#### index.bake() ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+Forces lazy evaluation to complete and 'bakes' the series into memory.
+
+**Kind**: instance method of <code>[Index](#dataForge.Index)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a series or dataframe that has been 'baked', all lazy evaluation has completed.  
+<a name="dataForge.Series+toPairs"></a>
+
+#### index.toPairs() ⇒ <code>array</code>
+Retreive the data as pairs of [index, value].
+
+**Kind**: instance method of <code>[Index](#dataForge.Index)</code>  
+**Returns**: <code>array</code> - Returns an array of pairs for the content of the series or dataframe. Each pair is a two element array that contains an index and a value.  
+<a name="dataForge.Series+count"></a>
+
+#### index.count() ⇒ <code>array</code>
+Count the number of rows in the series.
+
+**Kind**: instance method of <code>[Index](#dataForge.Index)</code>  
+**Returns**: <code>array</code> - Returns the count of all values in the series or dataframes.  
+<a name="dataForge.Series+first"></a>
+
+#### index.first() ⇒ <code>value</code>
+Get the first value of the series or dataframe.
+
+**Kind**: instance method of <code>[Index](#dataForge.Index)</code>  
+**Returns**: <code>value</code> - Returns the first value of the series or dataframe.  
+<a name="dataForge.Series+last"></a>
+
+#### index.last() ⇒ <code>value</code>
+Get the last value of the series or dataframe.
+
+**Kind**: instance method of <code>[Index](#dataForge.Index)</code>  
+**Returns**: <code>value</code> - Returns the last value of the series or dataframe.  
+<a name="dataForge.Series+reverse"></a>
+
+#### index.reverse() ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+Reverse the series or dataframe.
+
+**Kind**: instance method of <code>[Index](#dataForge.Index)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a new series or dataframe that is the reverse of the input.  
+<a name="dataForge.Series+inflate"></a>
+
+#### index.inflate([selector]) ⇒ <code>DataFrame</code>
+Inflate a series to a data-frame.
+
+**Kind**: instance method of <code>[Index](#dataForge.Index)</code>  
+**Returns**: <code>DataFrame</code> - Returns a new dataframe that has been created from the input series via the 'selector' function.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| [selector] | <code>function</code> | Optional selector function that transforms each value in the series to a row in the new data-frame. |
+
+<a name="dataForge.Series+head"></a>
+
+#### index.head(values) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+Get X values from the start of the series or dataframe.
+
+**Kind**: instance method of <code>[Index](#dataForge.Index)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a new series or dataframe that has only the specified number of values taken from the start of the input sequence.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| values | <code>int</code> | Number of values to take. |
+
+<a name="dataForge.Series+tail"></a>
+
+#### index.tail(values) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+Get X values from the end of the series or dataframe.
+
+**Kind**: instance method of <code>[Index](#dataForge.Index)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a new series or dataframe that has only the specified number of values taken from the end of the input sequence.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| values | <code>int</code> | Number of values to take. |
+
+<a name="dataForge.Series+sum"></a>
+
+#### index.sum() ⇒ <code>number</code>
+Sum the values in a series.
+
+**Kind**: instance method of <code>[Index](#dataForge.Index)</code>  
+**Returns**: <code>number</code> - Returns the sum of the number values in the series.  
+<a name="dataForge.Series+average"></a>
+
+#### index.average() ⇒ <code>number</code>
+Average the values in a series.
+
+**Kind**: instance method of <code>[Index](#dataForge.Index)</code>  
+**Returns**: <code>number</code> - Returns the average of the number values in the series.  
+<a name="dataForge.Series+median"></a>
+
+#### index.median() ⇒ <code>Number</code>
+Get the median value in the series. Not this sorts the series, so can be expensive.
+
+**Kind**: instance method of <code>[Index](#dataForge.Index)</code>  
+**Returns**: <code>Number</code> - Returns the median of the values in the series.  
+<a name="dataForge.Series+min"></a>
+
+#### index.min() ⇒ <code>number</code>
+Get the min value in the series.
+
+**Kind**: instance method of <code>[Index](#dataForge.Index)</code>  
+**Returns**: <code>number</code> - Returns the minimum of the number values in the series.  
+<a name="dataForge.Series+max"></a>
+
+#### index.max() ⇒ <code>number</code>
+Get the max value in the series.
+
+**Kind**: instance method of <code>[Index](#dataForge.Index)</code>  
+**Returns**: <code>number</code> - Returns the maximum of the number values in the series.  
+<a name="dataForge.Series+aggregate"></a>
+
+#### index.aggregate([seed], selector) ⇒ <code>value</code>
+Aggregate the values in the series.
+
+**Kind**: instance method of <code>[Index](#dataForge.Index)</code>  
+**Returns**: <code>value</code> - Returns a new value that has been aggregated from the input sequence by the 'selector' function.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| [seed] | <code>object</code> | The seed value for producing the aggregation. |
+| selector | <code>function</code> | Function that takes the seed and then each value in the series and produces the aggregate value. |
+
+<a name="dataForge.Series+toObject"></a>
+
+#### index.toObject(keySelector, keySelector) ⇒ <code>object</code>
+Convert the series to a JavaScript object.
+
+**Kind**: instance method of <code>[Index](#dataForge.Index)</code>  
+**Returns**: <code>object</code> - Returns a JavaScript object generated from the input sequence by the key and value selector funtions.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| keySelector | <code>function</code> | Function that selects keys for the resulting object. |
+| keySelector | <code>valueSelector</code> | Function that selects values for the resulting object. |
+
+<a name="dataForge.Series+zip"></a>
+
+#### index.zip(sequence, selector) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+Zip together multiple series or dataframes to produce a new series or dataframe.
+
+**Kind**: instance method of <code>[Index](#dataForge.Index)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a single series or dataframe that is the combination of multiple input sequences that have been 'zipped' together by the 'selector' function.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| sequence | <code>Series</code> &#124; <code>DataFrame</code> | Multiple parameters, one for each sequence to be zipped. |
+| selector | <code>function</code> | Selector function that produces a new series or dataframe based on the inputs. |
+
+<a name="dataForge.Series+forEach"></a>
+
+#### index.forEach(callback) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+Invoke a callback function for each value in the series.
+
+**Kind**: instance method of <code>[Index](#dataForge.Index)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns the input sequence with no modifications.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| callback | <code>function</code> | The calback to invoke for each value. |
+
+<a name="dataForge.Series+all"></a>
+
+#### index.all(predicate) ⇒ <code>boolean</code>
+Determine if the predicate returns truthy for all values in the sequence.
+Returns false as soon as the predicate evaluates to falsy.
+Returns true if the predicate returns truthy for all values in the Series.
+Returns false if the series is empty.
+
+**Kind**: instance method of <code>[Index](#dataForge.Index)</code>  
+**Returns**: <code>boolean</code> - Returns true if the predicate has returned truthy for every value in the sequence, otherwise returns false.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| predicate | <code>function</code> | Predicate function that receives each value in turn and returns truthy for a match, otherwise falsy. |
+
+<a name="dataForge.Series+any"></a>
+
+#### index.any([predicate]) ⇒ <code>boolean</code>
+Determine if the predicate returns truthy for any of the values in the sequence.
+Returns true as soon as the predicate returns truthy.
+Returns false if the predicate never returns truthy.
+If no predicate is specified the value itself is checked.
+
+**Kind**: instance method of <code>[Index](#dataForge.Index)</code>  
+**Returns**: <code>boolean</code> - Returns true if the predicate has returned truthy for any value in the sequence, otherwise returns false.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| [predicate] | <code>function</code> | Optional predicate function that receives each value in turn and returns truthy for a match, otherwise falsy. |
+
+<a name="dataForge.Series+none"></a>
+
+#### index.none([predicate]) ⇒ <code>boolean</code>
+Determine if the predicate returns truthy for none of the values in the sequence.
+Returns true for an empty Series.
+Returns true if the predicate always returns falsy.
+Otherwise returns false.
+If no predicate is specified the value itself is checked.
+
+**Kind**: instance method of <code>[Index](#dataForge.Index)</code>  
+**Returns**: <code>boolean</code> - Returns true if the predicate has returned truthy for no values in the sequence, otherwise returns false.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| [predicate] | <code>function</code> | Optional predicate function that receives each value in turn and returns truthy for a match, otherwise falsy. |
+
+<a name="dataForge.Series+sequentialDistinct"></a>
+
+#### index.sequentialDistinct(selector) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+Group sequential duplicate values into a Series of windows.
+
+**Kind**: instance method of <code>[Index](#dataForge.Index)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a series of groups. Each group is itself a series or dataframe.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| selector | <code>function</code> | Selects the value used to compare for duplicates. |
+
+<a name="dataForge.Series+distinct"></a>
+
+#### index.distinct(selector) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+Group distinct values in the Series into a Series of windows.
+
+**Kind**: instance method of <code>[Index](#dataForge.Index)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a series or dataframe containing only unique values as determined by the 'selector' function.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| selector | <code>function</code> | Selects the value used to compare for duplicates. |
+
+<a name="dataForge.Series+variableWindow"></a>
+
+#### index.variableWindow(comparer) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+Groups sequential values into variable length 'windows'. The windows can then be transformed/transformed using selectPairs or selectManyPairs.
+
+**Kind**: instance method of <code>[Index](#dataForge.Index)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a series of groups. Each group is itself a series or dataframe that contains the values in the 'window'.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| comparer | <code>function</code> | Predicate that compares two values and returns true if they should be in the same window. |
+
+<a name="dataForge.Series+insertPair"></a>
+
+#### index.insertPair(pair) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+Insert a pair at the start of a Series.
+
+**Kind**: instance method of <code>[Index](#dataForge.Index)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a new series or dataframe with the specified pair inserted.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| pair | <code>pair</code> | The pair to insert. |
+
+<a name="dataForge.Series+appendPair"></a>
+
+#### index.appendPair(pair) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+Append a pair to the end of a Series.
+
+**Kind**: instance method of <code>[Index](#dataForge.Index)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a new series or dataframe with the specified pair appended.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| pair | <code>pair</code> | The pair to append. |
+
+<a name="dataForge.Series+fillGaps"></a>
+
+#### index.fillGaps(predicate, generator) ⇒ <code>Series</code>
+Fill gaps in a series.
+
+**Kind**: instance method of <code>[Index](#dataForge.Index)</code>  
+**Returns**: <code>Series</code> - Returns a new series with gaps filled in.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| predicate | <code>function</code> | Predicate that is passed pairA and pairB, two consecutive rows, return truthy if there is a gap between the rows, or falsey if there is no gap. |
+| generator | <code>function</code> | Generator that is passed pairA and pairB, two consecutive rows, returns an array of pairs that fills the gap between the rows. |
+
+<a name="dataForge.Series+groupBy"></a>
+
+#### index.groupBy(selector) ⇒ <code>Series</code>
+Group the series according to the selector.
+
+**Kind**: instance method of <code>[Index](#dataForge.Index)</code>  
+**Returns**: <code>Series</code> - Returns a series of groups. Each group is a series with values that have been grouped by the 'selector' function.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| selector | <code>function</code> | Selector that defines the value to group by. |
+
+<a name="dataForge.Series+groupSequentialBy"></a>
+
+#### index.groupSequentialBy(selector) ⇒ <code>Series</code>
+Group sequential values into a Series of windows.
+
+**Kind**: instance method of <code>[Index](#dataForge.Index)</code>  
+**Returns**: <code>Series</code> - Returns a series of groups. Each group is a series with values that have been grouped by the 'selector' function.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| selector | <code>function</code> | Selector that defines the value to group by. |
+
+<a name="dataForge.Series+at"></a>
+
+#### index.at(index) ⇒ <code>value</code>
+Get the value at a specified index.
+
+**Kind**: instance method of <code>[Index](#dataForge.Index)</code>  
+**Returns**: <code>value</code> - Returns the value from the specified index in the sequence.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| index | <code>function</code> | Index to for which to retreive the value. |
+
+<a name="dataForge.Series+concat"></a>
+
+#### index.concat(series) ⇒ <code>Series</code>
+Concatenate multiple other series onto this series.
+
+**Kind**: instance method of <code>[Index](#dataForge.Index)</code>  
+**Returns**: <code>Series</code> - Returns a single series concatenated from multiple input series.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| series | <code>array</code> &#124; <code>Series</code> | Multiple arguments. Each can be either a series or an array of series. |
+
+<a name="dataForge.Series+join"></a>
+
+#### index.join(self, inner, outerKeySelector, innerKeySelector, resultSelector) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+Correlates the elements of two Series or DataFrames based on matching keys.
+
+**Kind**: instance method of <code>[Index](#dataForge.Index)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns the joined series or dataframe.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| self | <code>Series</code> &#124; <code>DataFrame</code> | The outer Series or DataFrame to join. |
+| inner | <code>Series</code> &#124; <code>DataFrame</code> | The inner Series or DataFrame to join. |
+| outerKeySelector | <code>function</code> | Selector that chooses the join key from the outer sequence. |
+| innerKeySelector | <code>function</code> | Selector that chooses the join key from the inner sequence. |
+| resultSelector | <code>function</code> | Selector that defines how to merge outer and inner values. |
+
+<a name="dataForge.Series+joinOuter"></a>
+
+#### index.joinOuter(self, inner, outerKeySelector, innerKeySelector, outerResultSelector, innerResultSelector, mergeSelector) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+Performs an outer join on two Series or DataFrames. Correlates the elements based on matching keys.
+Includes elements that have no correlation.
+
+**Kind**: instance method of <code>[Index](#dataForge.Index)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns the joined series or dataframe.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| self | <code>Series</code> &#124; <code>DataFrame</code> | The outer Series or DataFrame to join. |
+| inner | <code>Series</code> &#124; <code>DataFrame</code> | The inner Series or DataFrame to join. |
+| outerKeySelector | <code>function</code> | Selector that chooses the join key from the outer sequence. |
+| innerKeySelector | <code>function</code> | Selector that chooses the join key from the inner sequence. |
+| outerResultSelector | <code>function</code> | Selector that defines how to extract the outer value before joining it with the inner value. |
+| innerResultSelector | <code>function</code> | Selector that defines how to extract the inner value before joining it with the outer value. |
+| mergeSelector | <code>function</code> | Selector that defines how to combine left and right. Implementation from here: 	http://blogs.geniuscode.net/RyanDHatch/?p=116 |
+
+<a name="dataForge.Series+joinOuterLeft"></a>
+
+#### index.joinOuterLeft(self, inner, outerKeySelector, innerKeySelector, outerResultSelector, innerResultSelector, mergeSelector) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+Performs a left outer join on two Series or DataFrames. Correlates the elements based on matching keys.
+Includes left elements that have no correlation.
+
+**Kind**: instance method of <code>[Index](#dataForge.Index)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns the joined series or dataframe.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| self | <code>Series</code> &#124; <code>DataFrame</code> | The outer Series or DataFrame to join. |
+| inner | <code>Series</code> &#124; <code>DataFrame</code> | The inner Series or DataFrame to join. |
+| outerKeySelector | <code>function</code> | Selector that chooses the join key from the outer sequence. |
+| innerKeySelector | <code>function</code> | Selector that chooses the join key from the inner sequence. |
+| outerResultSelector | <code>function</code> | Selector that defines how to extract the outer value before joining it with the inner value. |
+| innerResultSelector | <code>function</code> | Selector that defines how to extract the inner value before joining it with the outer value. |
+| mergeSelector | <code>function</code> | Selector that defines how to combine left and right. Implementation from here: 	http://blogs.geniuscode.net/RyanDHatch/?p=116 |
+
+<a name="dataForge.Series+joinOuterRight"></a>
+
+#### index.joinOuterRight(self, inner, outerKeySelector, innerKeySelector, outerResultSelector, innerResultSelector, mergeSelector) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+Performs a right outer join on two Series or DataFrames. Correlates the elements based on matching keys.
+Includes right elements that have no correlation.
+
+**Kind**: instance method of <code>[Index](#dataForge.Index)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns the joined series or dataframe.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| self | <code>Series</code> &#124; <code>DataFrame</code> | The outer Series or DataFrame to join. |
+| inner | <code>Series</code> &#124; <code>DataFrame</code> | The inner Series or DataFrame to join. |
+| outerKeySelector | <code>function</code> | Selector that chooses the join key from the outer sequence. |
+| innerKeySelector | <code>function</code> | Selector that chooses the join key from the inner sequence. |
+| outerResultSelector | <code>function</code> | Selector that defines how to extract the outer value before joining it with the inner value. |
+| innerResultSelector | <code>function</code> | Selector that defines how to extract the inner value before joining it with the outer value. |
+| mergeSelector | <code>function</code> | Selector that defines how to combine left and right. Implementation from here: 	http://blogs.geniuscode.net/RyanDHatch/?p=116 |
+
+<a name="dataForge.Series+defaultIfEmpty"></a>
+
+#### index.defaultIfEmpty(defaultSequence) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+Returns the specified default sequence if the Series or DataFrame is empty.
+
+**Kind**: instance method of <code>[Index](#dataForge.Index)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns 'defaultSequence' if the input sequence is empty.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| defaultSequence | <code>array</code> &#124; <code>Series</code> &#124; <code>DataFrame</code> | Default sequence to return if the Series or DataFrame is empty. |
+
+<a name="dataForge.Series+union"></a>
+
+#### index.union(other, [comparer]) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+Returns the unique union of values between two Series or DataFrames.
+
+**Kind**: instance method of <code>[Index](#dataForge.Index)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns the union of two sequences.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| other | <code>Series</code> &#124; <code>DataFrame</code> | The other Series or DataFrame to combine. |
+| [comparer] | <code>function</code> | Optional comparer that selects the value to compare. |
+
+<a name="dataForge.Series+intersection"></a>
+
+#### index.intersection(other, [comparer]) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+Returns the intersection of values between two Series or DataFrames.
+
+**Kind**: instance method of <code>[Index](#dataForge.Index)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns the intersection of two sequences.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| other | <code>Series</code> &#124; <code>DataFrame</code> | The other Series or DataFrame to combine. |
+| [comparer] | <code>function</code> | Optional comparer that selects the value to compare. |
+
+<a name="dataForge.Series+except"></a>
+
+#### index.except(other, [comparer]) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+Returns the exception of values between two Series or DataFrames.
+
+**Kind**: instance method of <code>[Index](#dataForge.Index)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns the difference of one sequence to another.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| other | <code>Series</code> &#124; <code>DataFrame</code> | The other Series or DataFrame to combine. |
+| [comparer] | <code>function</code> | Optional comparer that selects the value to compare. |
+
+<a name="dataForge.Series+asPairs"></a>
+
+#### index.asPairs() ⇒ <code>Series</code>
+Convert a series or a dataframe to a series of pairs in the form [pair1, pair2, pair3, ...] where each pair is [index, value].
+
+**Kind**: instance method of <code>[Index](#dataForge.Index)</code>  
+**Returns**: <code>Series</code> - Returns a series of pairs for each index and value pair in the input sequence.  
+<a name="dataForge.Series+asValues"></a>
+
+#### index.asValues() ⇒ <code>Series</code>
+Convert a series of pairs to back to a series of values.
+
+**Kind**: instance method of <code>[Index](#dataForge.Index)</code>  
+**Returns**: <code>Series</code> - Returns a series of values where each pair has been extracted from the value of the input series.  
+<a name="dataForge.Series+startAt"></a>
+
+#### index.startAt(indexValue) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+Get a new series or dataframe starting at the specified index value.
+
+**Kind**: instance method of <code>[Index](#dataForge.Index)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a new series or dataframe with all values after the specified index.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| indexValue | <code>value</code> | The value to search for before starting the new Series or DataFrame. |
+
+<a name="dataForge.Series+endAt"></a>
+
+#### index.endAt(indexValue) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+Get a new series or dataframe ending at the specified index value (inclusive).
+
+**Kind**: instance method of <code>[Index](#dataForge.Index)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a new series or dataframe with values up to and including the specified index.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| indexValue | <code>value</code> | The value to search for before ending the new Series or DataFrame. |
+
+<a name="dataForge.Series+before"></a>
+
+#### index.before(indexValue) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+Get a new series or dataframe with all values before the specified index value (exclusive).
+
+**Kind**: instance method of <code>[Index](#dataForge.Index)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a new series or dataframe with all values before the specified index.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| indexValue | <code>value</code> | The value to search for while taking values. |
+
+<a name="dataForge.Series+after"></a>
+
+#### index.after(indexValue) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+Get a new series or dataframe with all values after the specified index value (exclusive).
+
+**Kind**: instance method of <code>[Index](#dataForge.Index)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a new series or dataframe with all values before the specified index.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| indexValue | <code>value</code> | The value to search for while taking values. |
+
+<a name="dataForge.Series+between"></a>
+
+#### index.between(startIndexValue, endIndexValue) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+Get a new series or dataframe with all values between the specified index values (inclusive).
+
+**Kind**: instance method of <code>[Index](#dataForge.Index)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a new series or dataframe with all values before the specified index.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| startIndexValue | <code>value</code> | The index where the new sequence starts. |
+| endIndexValue | <code>value</code> | The index where the new sequence ends. |
+
 <a name="dataForge.Series"></a>
 
 ### dataForge.Series
@@ -1439,6 +2569,11 @@ Convert a series of pairs to back to a series of values.
     * [.except(other, [comparer])](#dataForge.Series+except) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
     * [.asPairs()](#dataForge.Series+asPairs) ⇒ <code>Series</code>
     * [.asValues()](#dataForge.Series+asValues) ⇒ <code>Series</code>
+    * [.startAt(indexValue)](#dataForge.Series+startAt) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.endAt(indexValue)](#dataForge.Series+endAt) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.before(indexValue)](#dataForge.Series+before) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.after(indexValue)](#dataForge.Series+after) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+    * [.between(startIndexValue, endIndexValue)](#dataForge.Series+between) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
 
 <a name="new_dataForge.Series_new"></a>
 
@@ -2231,6 +3366,67 @@ Convert a series of pairs to back to a series of values.
 
 **Kind**: instance method of <code>[Series](#dataForge.Series)</code>  
 **Returns**: <code>Series</code> - Returns a series of values where each pair has been extracted from the value of the input series.  
+<a name="dataForge.Series+startAt"></a>
+
+#### series.startAt(indexValue) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+Get a new series or dataframe starting at the specified index value.
+
+**Kind**: instance method of <code>[Series](#dataForge.Series)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a new series or dataframe with all values after the specified index.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| indexValue | <code>value</code> | The value to search for before starting the new Series or DataFrame. |
+
+<a name="dataForge.Series+endAt"></a>
+
+#### series.endAt(indexValue) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+Get a new series or dataframe ending at the specified index value (inclusive).
+
+**Kind**: instance method of <code>[Series](#dataForge.Series)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a new series or dataframe with values up to and including the specified index.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| indexValue | <code>value</code> | The value to search for before ending the new Series or DataFrame. |
+
+<a name="dataForge.Series+before"></a>
+
+#### series.before(indexValue) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+Get a new series or dataframe with all values before the specified index value (exclusive).
+
+**Kind**: instance method of <code>[Series](#dataForge.Series)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a new series or dataframe with all values before the specified index.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| indexValue | <code>value</code> | The value to search for while taking values. |
+
+<a name="dataForge.Series+after"></a>
+
+#### series.after(indexValue) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+Get a new series or dataframe with all values after the specified index value (exclusive).
+
+**Kind**: instance method of <code>[Series](#dataForge.Series)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a new series or dataframe with all values before the specified index.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| indexValue | <code>value</code> | The value to search for while taking values. |
+
+<a name="dataForge.Series+between"></a>
+
+#### series.between(startIndexValue, endIndexValue) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
+Get a new series or dataframe with all values between the specified index values (inclusive).
+
+**Kind**: instance method of <code>[Series](#dataForge.Series)</code>  
+**Returns**: <code>Series</code> &#124; <code>DataFrame</code> - Returns a new series or dataframe with all values before the specified index.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| startIndexValue | <code>value</code> | The index where the new sequence starts. |
+| endIndexValue | <code>value</code> | The index where the new sequence ends. |
+
 <a name="dataForge.concatDataFrames"></a>
 
 ### dataForge.concatDataFrames ⇒ <code>DataFrame</code>

@@ -411,7 +411,7 @@ describe('DataFrame', function () {
 			],
 			[5, 6, 7, 8]
 		);
-		var modified = dataFrame.keepSeries('Value1');
+		var modified = dataFrame.subset(['Value1']);
 		expect(modified.getColumnNames()).to.eql(['Value1']);
 		expect(modified.getIndex().toArray()).to.eql([5, 6, 7, 8]);
 		expect(modified.toRows()).to.eql([
@@ -435,7 +435,7 @@ describe('DataFrame', function () {
 			[5, 6, 7, 8]
 		);
 
-		var modified = dataFrame.keepSeries(['Value1', 'Value3']);
+		var modified = dataFrame.subset(['Value1', 'Value3']);
 		expect(modified.getColumnNames()).to.eql(['Value1', 'Value3']);
 		expect(modified.getIndex().toArray()).to.eql([5, 6, 7, 8]);
 		expect(modified.toRows()).to.eql([

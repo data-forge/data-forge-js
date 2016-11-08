@@ -637,7 +637,7 @@ Also works for single columns:
 
 Alternatively you can select the columns to keep and drop the rest:
 
-	var newDf = df.keepSeries(["Column-to-keep", "Some-other-column-to-keep"]);
+	var newDf = df.subset(["Column-to-keep", "Some-other-column-to-keep"]);
 
 ## Getting a row or value by index
 

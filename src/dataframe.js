@@ -553,50 +553,6 @@ DataFrame.prototype.dropSeries = function (columnOrColumns) {
 };
 
 /**
- * Create a new data frame with only the requested column or columns dropped, other columns are dropped.
- *
- * @param {string|array} columnOrColumns - Specifies the column name (a string) or columns (array of column names) to keep.
- * 
- * @returns {DataFrame} Returns a new dataframe only preserving a particular named column or columns.
- */
-DataFrame.prototype.keepSeries = function (columnOrColumns) {
-
-	var self = this;
-
-	if (!Object.isArray(columnOrColumns)) {
-		assert.isString(columnOrColumns, "'DataFrame.keepSeries' expected either a string or an array or strings.");
-
-		columnOrColumns = [columnOrColumns]; // Convert to array for coding convenience.
-	}
-
-	return new DataFrame({
-		iterable: {
-			getIterator: function () {
-				return new SelectIterator(
-					self.iterable.getIterator(),
-					function (pair) {
-						var row = extend({}, pair[1]);
-						Object.keys(row).forEach(function (fieldName) {
-							if (!E.from(columnOrColumns).contains(fieldName)) {
-								delete row[fieldName];
-							}
-						});
-						return [
-							pair[0],
-							row
-						];					
-					}
-				);
-			},
-
-			getColumnNames: function() {
-				return columnOrColumns;
-			}
-		},
-	});
-};
-
-/**
  * Create a new data frame with an additional column specified by the passed-in series.
  *
  * @param {string|object} columnNameOrSpec - The name of the column to add or replace.
