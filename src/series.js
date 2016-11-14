@@ -659,7 +659,7 @@ Series.prototype.percentChange = function () {
 			var pctChange = amountChange / values[0]; // Compute % change.
 			return [window.getIndex().last(), pctChange]; // Return new index and value.
 		})
-		.asValues()
+		.asValues() // Result is always a series.
 		;
 };
 
@@ -1439,7 +1439,7 @@ Series.prototype.sequentialDistinct = function (selector) {
 			var window = pair[1];
 			return [window.getIndex().first(), window.first()];
 		})
-		.asValues()
+		.asValues(self.Constructor) 
 		;
 };
 
@@ -1631,7 +1631,7 @@ Series.prototype.appendPair = function (pair) {
 
 
 /**
- * Fill gaps in a series.
+ * Fill gaps in a series or dataframe.
  *
  * @param {function} predicate - Predicate that is passed pairA and pairB, two consecutive rows, return truthy if there is a gap between the rows, or falsey if there is no gap.
  * @param {function} generator - Generator that is passed pairA and pairB, two consecutive rows, returns an array of pairs that fills the gap between the rows.
@@ -1659,7 +1659,7 @@ Series.prototype.fillGaps = function (predicate, generator) {
 
 			return [pairA].concat(generatedRows);
 		})
-		.asValues()
+		.asValues(self.Constructor)
 		.appendPair(self.asPairs().last())
 		;
 };
@@ -2105,8 +2105,7 @@ Series.prototype.asValues = function (Constructor) {
 				return [value[0], value[1]];
 			}
 		)
-	})
-
+	});
 };
 
 
