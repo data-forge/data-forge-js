@@ -1678,7 +1678,7 @@ Series.prototype.groupBy = function (selector) {
 	var self = this;
 	var groupedPairs = E.from(self.toPairs())
 		.groupBy(function (pair) {
-			return selector(pair[1], pair[0]);
+			return selector(pair[1]);
 		})
 		.select(function (group) {
 			return [

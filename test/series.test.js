@@ -1635,43 +1635,6 @@ describe('Series', function () {
 		]);
 	});
 
-	it('can group by index', function () {
-
-		var series = new Series({
-			index:   [1, 2, 2, 3, 2, 3, 5],
-			values:  [0, 1, 2, 3, 4, 5, 6],
-		});
-
-		var grouped = series.groupBy(function (value, index) {
-				return index; 
-			});
-
-		expect(grouped.count()).to.eql(4);
-
-		var group1 = grouped.skip(0).first();
-		expect(group1.toPairs()).to.eql([
-			[1, 0],
-		]);
-
-		var group2 = grouped.skip(1).first();
-		expect(group2.toPairs()).to.eql([
-			[2, 1],
-			[2, 2],
-			[2, 4],
-		]);
-
-		var group3 = grouped.skip(2).first();
-		expect(group3.toPairs()).to.eql([
-			[3, 3],
-			[3, 5],
-		]);
-
-		var group4 = grouped.skip(3).first();
-		expect(group4.toPairs()).to.eql([
-			[5, 6],
-		]);
-	});
-
 	it('can get value by index', function () {
 
 		var series = new Series({ 
