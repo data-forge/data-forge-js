@@ -1306,7 +1306,7 @@ Series.prototype.forEach = function (callback) {
 
 	while (iterator.moveNext()) {
 		var pair = iterator.getCurrent();
-		callback(pair[1], pair[0]);
+		callback(pair[1]);
 	}
 
 	return self;

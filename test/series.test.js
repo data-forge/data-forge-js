@@ -1177,8 +1177,7 @@ describe('Series', function () {
 			});
 
 		var count = 0;
-		series.forEach(function (v, i) {
-			expect(i).to.eql(count);
+		series.forEach(function (v) {
 			expect(v).to.eql(count.toString());
 			++count;
 		});
