@@ -152,7 +152,9 @@ var determineColumnNamesFromPairsIterable = function (iterable, considerAllRows)
 var DataFrame = function (config) {
 
 	var self = this;
-	self.Constructor = DataFrame;
+	self.factory = function (config) {
+		return new DataFrame(config);
+	};
 
 	var _columnNames = null;
 

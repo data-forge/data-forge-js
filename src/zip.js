@@ -11,11 +11,11 @@ var Series = require('./series.js');
  * @param {array} input - Array of series to zip together.
  * @param {function} selector - Selector function that produces a new series based on the input series.
  */
-module.exports = function (input, selector, Constructor) {
+module.exports = function (input, selector, factory) {
 
 	assert.isArray(input, "Expected 'input' parameter to zipSeries/DataFrames to be an array of Series or DataFrames.");
 	assert.isFunction(selector, "Expected 'selector' parameter to zipSeries/DataFrames to be a function.");
-	assert.isFunction(Constructor, "Expected 'Constructor' parameter to zipSeries/DataFrames to be a constructor function.");
+	assert.isFunction(factory, "Expected 'factory' parameter to zipSeries/DataFrames to be a factory function.");
 
 	var toZip = E.from(input)
 		.select(function (sequence) {
@@ -40,7 +40,7 @@ module.exports = function (input, selector, Constructor) {
 		output.push(selector(new Series({ values: curElements })));
 	}
 
-	return new Constructor({
+	return factory({
 		index: input[0].getIndex().take(length),
 		values: output,
 	});

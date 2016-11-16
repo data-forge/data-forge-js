@@ -289,7 +289,9 @@ var dataForge = {
 	 * @returns {Series} Returns a single series that is the combination of multiple input series that have been 'zipped' together by the 'selector' function.
 	 */
 	zipSeries: function (series, selector) {
-		return zip(series, selector, Series);
+		return zip(series, selector, function (config) {
+			return new Series(config);
+		});
 	},
 
 	/**
@@ -301,7 +303,9 @@ var dataForge = {
 	 * @returns {DataFrame} Returns a single dataframe that is the combination of multiple input dataframes that have been 'zipped' together by the 'selector' function.
 	 */
 	zipDataFrames: function (dataFrames, selector) {
-		return zip(dataFrames, selector, DataFrame);
+		return zip(dataFrames, selector, function (config) {
+			return new DataFrame(config);
+		});
 	},
 };
 

@@ -84,8 +84,10 @@ var Series = function (config) {
 
 	var self = this;
 
-	if (!self.Constructor) {
-		self.Constructor = Series;
+	if (!self.factory) {
+		self.factory = function (config) {
+			return new Series(config);
+		};
 	}
 
 	if (!config) {
@@ -142,6 +144,7 @@ var zip = require('./zip');
 var SelectManyIterable = require('../src/iterables/select-many');
 var SelectManyPairsIterable = require('../src/iterables/select-many-pairs');
 var Index = require("./index");
+var Pairs = require("./pairs");
 
 /**
  * Get an iterator for index & values of the series.
@@ -189,7 +192,7 @@ Series.prototype.withIndex = function (newIndex) {
 		new ExtractIterable(self.iterable, 1) // Extract value.
 	);
 
-	return new self.Constructor({
+	return self.factory({
 		iterable: pairsIterable,
 	});
 };
@@ -202,7 +205,7 @@ Series.prototype.withIndex = function (newIndex) {
 Series.prototype.resetIndex = function () {
 
 	var self = this;
-	return new self.Constructor({
+	return self.factory({
 		iterable: new PairsIterable(
 			new CountIterable(),		 // Reset index.
 			new ExtractIterable(self.iterable, 1) // Extract value.
@@ -221,7 +224,7 @@ Series.prototype.skip = function (numRows) {
 	assert.isNumber(numRows, "Expected 'numRows' parameter to 'skip' function to be a number.");
 
 	var self = this;
-	return new self.Constructor({
+	return self.factory({
 		iterable: new SkipIterable(self.iterable, numRows), 
 	}); 	
 };
@@ -237,7 +240,7 @@ Series.prototype.skipWhile = function (predicate) {
 	assert.isFunction(predicate, "Expected 'predicate' parameter to 'skipWhile' function to be a predicate function that returns true/false.");
 
 	var self = this;
-	return new self.Constructor({
+	return self.factory({
 		iterable: new SkipWhileIterable(self.iterable, function (pair) {
 			return predicate(pair[1]);
 		}),
@@ -271,7 +274,7 @@ Series.prototype.take = function (numRows) {
 	assert.isNumber(numRows, "Expected 'numRows' parameter to 'take' function to be a number.");
 
 	var self = this;
-	return new self.Constructor({
+	return self.factory({
 		iterable: new TakeIterable(self.iterable, numRows),
 	});
 };
@@ -287,7 +290,7 @@ Series.prototype.takeWhile = function (predicate) {
 	assert.isFunction(predicate, "Expected 'predicate' parameter to 'takeWhile' function to be a predicate function that returns true/false.");
 
 	var self = this;
-	return new self.Constructor({
+	return self.factory({
 		iterable: new TakeWhileIterable(self.iterable, function (pair) {
 			return predicate(pair[1]);
 		}),
@@ -321,7 +324,7 @@ Series.prototype.where = function (predicate) {
 	assert.isFunction(predicate, "Expected 'predicate' parameter to 'where' function to be a function.");
 
 	var self = this;
-	return new self.Constructor({
+	return self.factory({
 		iterable: new WhereIterable(self.iterable, function (pair) {
 			return predicate(pair[1]);
 		}),
@@ -340,7 +343,7 @@ Series.prototype.select = function (selector) {
 	assert.isFunction(selector, "Expected 'selector' parameter to 'select' function to be a function.");
 
 	var self = this;
-	return new self.Constructor({
+	return self.factory({
 		iterable: new SelectValuesIterable(self.iterable, selector),
 	}); 	
 };
@@ -356,7 +359,7 @@ Series.prototype.selectMany = function (generator) {
 	assert.isFunction(generator, "Expected 'generator' parameter to 'Series.selectMany' function to be a function.");
 
 	var self = this;
-	return new self.Constructor({
+	return self.factory({
 		iterable: new SelectManyIterable(self.iterable, generator),
 	}); 	
 };
@@ -406,7 +409,7 @@ var executeOrderBy = function (self, batch) {
 			.toArray();
 	};
 
-	return new self.Constructor({
+	return self.factory({
 		iterable: {
 			getIterator: function () {
 				return new ArrayIterator(executeLazySort());
@@ -930,7 +933,7 @@ Series.prototype.bake = function () {
 	}
 
 	var pairs = self.toPairs();
-	var baked = new self.Constructor({
+	var baked = self.factory({
 		iterable: {
 			getIterator: function () {
 				return new ArrayIterator(pairs);
@@ -1032,7 +1035,7 @@ Series.prototype.last = function () {
 Series.prototype.reverse = function () {
 
 	var self = this;
-	return new self.Constructor({
+	return self.factory({
 		iterable: {
 			getIterator: function () {
 				var pairs = [];
@@ -1286,7 +1289,7 @@ Series.prototype.zip = function () {
 		function (series) {
 			return selector.apply(undefined, series.toArray());
 		},
-		self.Constructor
+		self.factory
 	);
 };
 
@@ -1439,7 +1442,7 @@ Series.prototype.sequentialDistinct = function (selector) {
 			var window = pair[1];
 			return [window.getIndex().first(), window.first()];
 		})
-		.asValues(self.Constructor) 
+		.asValues() 
 		;
 };
 
@@ -1507,7 +1510,7 @@ Series.prototype.distinct = function (selector) {
 		output.push(curPair);
 	}
 
-	return new self.Constructor({
+	return self.factory({
 		iterable: {
 			getIterator: function () {
 				return new ArrayIterator(output);
@@ -1603,7 +1606,7 @@ Series.prototype.insertPair = function (pair) {
 
 	var self = this;
 	var pairs = [pair].concat(self.toPairs());
-	return new self.Constructor({
+	return self.factory({
 		iterable: new ArrayIterable(pairs), 
 	});
 };
@@ -1624,7 +1627,7 @@ Series.prototype.appendPair = function (pair) {
 	var self = this;
 	var pairs = self.toPairs();
 	pairs.push(pair);
-	return new self.Constructor({
+	return self.factory({
 		iterable: new ArrayIterable(pairs), 
 	});
 };
@@ -1659,7 +1662,7 @@ Series.prototype.fillGaps = function (predicate, generator) {
 
 			return [pairA].concat(generatedRows);
 		})
-		.asValues(self.Constructor)
+		.asValues()
 		.appendPair(self.asPairs().last())
 		;
 };
@@ -1975,7 +1978,7 @@ Series.prototype.defaultIfEmpty = function (defaultSequence) {
 			return defaultSequence;
 		}
 		else {
-			return new self.Constructor({
+			return self.factory({
 				values: defaultSequence,
 			});
 		}
@@ -2076,36 +2079,21 @@ Series.prototype.except = function (other, comparer) {
 /** 
  * Convert a series or a dataframe to a series of pairs in the form [pair1, pair2, pair3, ...] where each pair is [index, value].
  * 
- * @returns {Series} Returns a series of pairs for each index and value pair in the input sequence.
+ * @returns {Pairs} Returns a series of pairs for each index and value pair in the input sequence.
  */
 Series.prototype.asPairs = function () {
 
 	var self = this;
-	return new Series({
-		iterable: new PairsIterable(
-			new CountIterable(),
-			self
-		),
-	})
 
-};
-
-/** 
- * Convert a series of pairs to back to a series of values.
- * 
- * @returns {Series} Returns a series of values where each pair has been extracted from the value of the input series.
- */
-Series.prototype.asValues = function (Constructor) {
-
-	var self = this;
-	return new (Constructor || Series)({
-		iterable: new SelectPairsIterable(
-			self,
-			function (index, value) {
-				return [value[0], value[1]];
-			}
-		)
-	});
+	return new Pairs(
+		{
+			iterable: new PairsIterable(
+				new CountIterable(),
+				self
+			),
+		},
+		self.factory // Used to restore back to values.
+	);
 };
 
 
@@ -2124,7 +2112,7 @@ Series.prototype.startAt = function (indexValue) {
 		.skipWhile(function (pair) {
 			return lessThan(pair[0], indexValue);
 		})
-		.asValues(self.Constructor)
+		.asValues()
 		;
 };
 
@@ -2143,7 +2131,7 @@ Series.prototype.endAt = function (indexValue) {
 		.takeUntil(function (pair) {
 			return greaterThan(pair[0], indexValue);
 		})
-		.asValues(self.Constructor)
+		.asValues()
 		;
 };
 
@@ -2162,7 +2150,7 @@ Series.prototype.before = function (indexValue) {
 		.takeWhile(function (pair) {
 			return lessThan(pair[0], indexValue);
 		})
-		.asValues(self.Constructor)
+		.asValues()
 		;
 };
 
@@ -2181,7 +2169,7 @@ Series.prototype.after = function (indexValue) {
 		.skipUntil(function (pair) {
 			return greaterThan(pair[0], indexValue);
 		})
-		.asValues(self.Constructor)
+		.asValues()
 		;
 };
 
