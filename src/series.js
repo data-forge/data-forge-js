@@ -845,7 +845,7 @@ Series.prototype.detectValues = function () {
 
 			var valueFrequencies = E.from(values)
 				.aggregate({}, function (accumulated, value) {
-					var valueKey = value.toString() + "-" + typeof(value);
+					var valueKey = (value !== null && value.toString() || "null") + "-" + typeof(value);
 					var valueInfo = accumulated[valueKey];
 					if (!valueInfo) {
 						valueInfo = {
