@@ -222,6 +222,43 @@ var dataForge = {
 	},
 
 	/**
+	 * Deserialize a DataFrame from a JSON file in the local filesystem.
+	 * Doesn't work in the browser.
+	 * Returns a promise.
+	 * 
+	 * @returns {Promise<DataFrame>} Returns a promise of a dataframe loaded from the JSON file. 
+	 */
+	readJSONFile: function (filePath, config) {
+		assert.isString(filePath, "Expected 'filePath' parameter to DataForge.readJSONFile to be a string that specifies the path of the file to write to the local file system.");
+
+		return new Promise(function (resolve, reject) {
+			var fs = require('fs');
+			fs.readFile(filePath, 'utf8', function (err, data) {
+				if (err) {
+					reject(err);
+					return;
+				}
+
+				resolve(dataForge.fromJSON(data, config));
+			});
+		});
+	},
+
+	/**
+	 * Deserialize a DataFrame from a JSON in the local filesystem.
+	 * Doesn't work in the browser.
+	 * Works synchronously, returns a DataFrame.
+	 * 
+	 * @returns {DataFrame} Returns a dataframe loaded from the JSON file.
+	 */
+	readJSONFileSync: function (filePath, config) {
+		assert.isString(filePath, "Expected 'filePath' parameter to DataForge.readJSONFileSync to be a string that specifies the path of the file to write to the local file system.");
+
+		var fs = require('fs');
+		return dataForge.fromJSON(fs.readFileSync(filePath, 'utf8'), config);
+	},
+
+	/**
 	 * Concatenate multiple dataframes into a single dataframe.
 	 *
 	 * @param {array} dataFrames - Array of dataframes to concatenate.

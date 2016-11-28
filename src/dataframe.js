@@ -1026,8 +1026,7 @@ DataFrame.prototype.writeCSVFile = function (filePath) {
 	var self = this;
 	return new Promise(function (resolve, reject) {
 		var fs = require('fs');	
-		var csvData = self.toCSV();
-		fs.writeFile(filePath, csvData, function (err) {
+		fs.writeFile(filePath, self.toCSV(), function (err) {
 			if (err) {
 				reject(err);
 				return;
@@ -1049,8 +1048,7 @@ DataFrame.prototype.writeCSVFileSync = function (filePath) {
 	var self = this;
 	return new Promise(function (resolve, reject) {
 		var fs = require('fs');	
-		var csvData = self.toCSV();
-		fs.writeFileSync(filePath, csvData, function (err) {
+		fs.writeFileSync(filePath, self.toCSV(), function (err) {
 			if (err) {
 				reject(err);
 				return;
@@ -1061,6 +1059,51 @@ DataFrame.prototype.writeCSVFileSync = function (filePath) {
 	});
 };
 
+/**
+ * Serialize the data frame to JSON file in the local file system.
+ * Asynchronous version.
+ * 
+ *  @returns {Promise} Returns a promise that resolves when the file has been written.   
+ */
+DataFrame.prototype.writeJSONFile = function (filePath) {
+
+	assert.isString(filePath, "Expected 'filePath' parameter to DataFrame.writeJSONFile to be a string that specifies the path of the file to write to the local file system.");
+
+	var self = this;
+	return new Promise(function (resolve, reject) {
+		var fs = require('fs');	
+		fs.writeFile(filePath, self.toJSON(), function (err) {
+			if (err) {
+				reject(err);
+				return;
+			}
+
+			resolve();
+		});
+	});
+};
+
+/**
+ * Serialize the data frame to JSON file in the local file system.
+ * Synchronous version.
+ */
+DataFrame.prototype.writeJSONFileSync = function (filePath) {
+
+	assert.isString(filePath, "Expected 'filePath' parameter to DataFrame.writeJSONFileSync to be a string that specifies the path of the file to write to the local file system.");
+
+	var self = this;
+	return new Promise(function (resolve, reject) {
+		var fs = require('fs');	
+		fs.writeFileSync(filePath, self.toJSON(), function (err) {
+			if (err) {
+				reject(err);
+				return;
+			}
+
+			resolve();
+		});
+	});
+};
 /**
  * Transform one or more columns. This is equivalent to extracting a column, calling 'select' on it,
  * then plugging it back in as the same column.
