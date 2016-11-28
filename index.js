@@ -185,6 +185,43 @@ var dataForge = {
 	},
 
 	/**
+	 * Deserialize a DataFrame from a CSV file in the local filesystem.
+	 * Doesn't work in the browser.
+	 * Returns a promise.
+	 * 
+	 * @returns {Promise<DataFrame>} Returns a promise of a dataframe loaded from the CSV file. 
+	 */
+	readCSVFile: function (filePath, config) {
+		assert.isString(filePath, "Expected 'filePath' parameter to DataForge.readCSVFile to be a string that specifies the path of the file to write to the local file system.");
+
+		return new Promise(function (resolve, reject) {
+			var fs = require('fs');
+			fs.readFile(filePath, 'utf8', function (err, csvData) {
+				if (err) {
+					reject(err);
+					return;
+				}
+
+				resolve(dataForge.fromCSV(csvData, config));
+			});
+		});
+	},
+
+	/**
+	 * Deserialize a DataFrame from a CSV file in the local filesystem.
+	 * Doesn't work in the browser.
+	 * Works synchronously, returns a DataFrame.
+	 * 
+	 * @returns {DataFrame} Returns a dataframe loaded from the CSV file.
+	 */
+	readCSVFileSync: function (filePath, config) {
+		assert.isString(filePath, "Expected 'filePath' parameter to DataForge.readCSVFileSync to be a string that specifies the path of the file to write to the local file system.");
+
+		var fs = require('fs');
+		return dataForge.fromCSV(fs.readFileSync(filePath, 'utf8'), config);
+	},
+
+	/**
 	 * Concatenate multiple dataframes into a single dataframe.
 	 *
 	 * @param {array} dataFrames - Array of dataframes to concatenate.

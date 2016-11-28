@@ -1014,6 +1014,54 @@ DataFrame.prototype.toCSV = function () {
 };
 
 /**
+ * Serialize the data frame to CSV file in the local file system.
+ * Asynchronous version.
+ * 
+ *  @returns {Promise} Returns a promise that resolves when the file has been written.   
+ */
+DataFrame.prototype.writeCSVFile = function (filePath) {
+
+	assert.isString(filePath, "Expected 'filePath' parameter to DataFrame.writeCSVFile to be a string that specifies the path of the file to write to the local file system.");
+
+	var self = this;
+	return new Promise(function (resolve, reject) {
+		var fs = require('fs');	
+		var csvData = self.toCSV();
+		fs.writeFile(filePath, csvData, function (err) {
+			if (err) {
+				reject(err);
+				return;
+			}
+
+			resolve();
+		});
+	});
+};
+
+/**
+ * Serialize the data frame to CSV file in the local file system.
+ * Synchronous version.
+ */
+DataFrame.prototype.writeCSVFileSync = function (filePath) {
+
+	assert.isString(filePath, "Expected 'filePath' parameter to DataFrame.writeCSVFileSync to be a string that specifies the path of the file to write to the local file system.");
+
+	var self = this;
+	return new Promise(function (resolve, reject) {
+		var fs = require('fs');	
+		var csvData = self.toCSV();
+		fs.writeFileSync(filePath, csvData, function (err) {
+			if (err) {
+				reject(err);
+				return;
+			}
+
+			resolve();
+		});
+	});
+};
+
+/**
  * Transform one or more columns. This is equivalent to extracting a column, calling 'select' on it,
  * then plugging it back in as the same column.
  *
