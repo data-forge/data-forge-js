@@ -12,6 +12,7 @@ var DataFrame = require('./src/dataframe');
 var Series = require('./src/series');
 var E = require('linq');
 var zip = require('./src/zip');
+var request = require('request-promise');
 
 //
 // Records plugins that have been registered.
@@ -189,6 +190,9 @@ var dataForge = {
 	 * Doesn't work in the browser.
 	 * Returns a promise.
 	 * 
+	 * @param {string} filePath - The path to the CSV file to deserialize.
+	 * @param {object} [config] - Optional configuration for CSV deserialization.
+	 * 
 	 * @returns {Promise<DataFrame>} Returns a promise of a dataframe loaded from the CSV file. 
 	 */
 	readCSVFile: function (filePath, config) {
@@ -212,6 +216,9 @@ var dataForge = {
 	 * Doesn't work in the browser.
 	 * Works synchronously, returns a DataFrame.
 	 * 
+	 * @param {string} filePath - The path to the CSV file to deserialize.
+	 * @param {object} [config] - Optional configuration for CSV deserialization.
+	 * 
 	 * @returns {DataFrame} Returns a dataframe loaded from the CSV file.
 	 */
 	readCSVFileSync: function (filePath, config) {
@@ -226,6 +233,9 @@ var dataForge = {
 	 * Doesn't work in the browser.
 	 * Returns a promise.
 	 * 
+	 * @param {string} filePath - The path to the JSON file to deserialize.
+	 * @param {object} [config] - Optional configuration for JSON deserialization.
+	 *
 	 * @returns {Promise<DataFrame>} Returns a promise of a dataframe loaded from the JSON file. 
 	 */
 	readJSONFile: function (filePath, config) {
@@ -249,6 +259,9 @@ var dataForge = {
 	 * Doesn't work in the browser.
 	 * Works synchronously, returns a DataFrame.
 	 * 
+	 * @param {string} filePath - The path to the CSV file to deserialize.
+	 * @param {object} [config] - Optional configuration for JSON deserialization.
+	 * 
 	 * @returns {DataFrame} Returns a dataframe loaded from the JSON file.
 	 */
 	readJSONFileSync: function (filePath, config) {
@@ -256,6 +269,52 @@ var dataForge = {
 
 		var fs = require('fs');
 		return dataForge.fromJSON(fs.readFileSync(filePath, 'utf8'), config);
+	},
+
+	/**
+	 * Deserialize a DataFrame from a REST API that returns JSON data.
+	 * Works asynchronously, returns a promise.
+	 * 
+	 * @param {string} url - URL for a REST API that returns JSON data.
+	 * @param {object} [config] - Optional configuration for JSON deserialization.
+	 *   
+	 * @returns {Promise<DataFrame>} Returns a promise of a dataframe that will be resolved when the data is received from the REST API.
+	 */
+	requestJSON: function (url, config) {
+		assert.isString(url, "Expected 'url' parameter to DataForge.requestJSON to be a string that specifies the URL of the REST API from which to request JSON data.");
+
+		var requestOptions = {
+			uri: url,
+			json: true,
+		};
+		return request.get(requestOptions)
+			.then(function (data) {
+				assert.isArray(data, "Expected response from REST API to be an array!");
+				var dataFrameOptions = extend({ values: data }, config);
+				return new DataFrame(dataFrameOptions);
+			});
+	},
+
+	/**
+	 * Deserialize a DataFrame from a REST API that returns CSV data.
+	 * Works asynchronously, returns a promise.
+	 * 
+	 * @param {string} url - URL for a REST API that returns CSV data. 
+	 * @param {object} [config] - Optional configuration for CSV deserialization.
+	 * 
+	 * @returns {Promise<DataFrame>} Returns a promise of a dataframe that will be resolved when the data is received from the REST API.
+	 */
+	requestCSV: function (url, config) {
+		assert.isString(url, "Expected 'url' parameter to DataForge.requestCSV to be a string that specifies the URL of the REST API from which to request CSV data.");
+
+		var requestOptions = {
+			uri: url,
+		};
+
+		return request.get(requestOptions)
+			.then(function (data) {
+				return dataForge.fromCSV(data, config);
+			});
 	},
 
 	/**
