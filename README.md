@@ -344,35 +344,90 @@ Be aware that promoting a column to an index in Data-Forge doesn't remove the co
 
 An index is required for certain operations like `merge`.
 
-## Reading CSV files
+## Readingw/writing CSV files
+
+NOTE: Uses `fs` module, for Nodejs only, doesn't work in browser.
 
 If your CSV has a header with column names:
 
-	var fs = require('fs');
-	var inputCsvData = fs.readFileSync('some-csv-file.csv', 'utf8');
-	var dataFrame = dataForge.fromCSV(inputCsvData);
+	var dataFrame = dataForge.csv.readFileSync('some-csv-file.csv');
 
 If your CSV doesn't have a header:
 
-	var dataFrame = dataForge.fromCSV(inputCsvData, { columnNames: ["some", "explicit", "column", "names"] } );
+	var dataFrame = dataForge.csv.readFileSync('some-csv-file.csv', { columnNames: ["some", "explicit", "column", "names"] });
 
 ## Writing CSV files
 
-	var fs = require('fs');
+NOTE: Uses `fs` module, for Nodejs only, doesn't work in browser.
+
+	dataFrame.csv.writeFileSync('some-other-csv-file.csv');
+
+todo: Maybe this:
+
+	dataForge.csv.writeFileSync(dataFrame, 'some-other-csv-file.csv');
+
+## Working with CSV data
+
+If you already have CSV data (loaded into a string) you can parse it into a dataframe via `fromCSV`:
+
+	var inputCsvData = ... some string with CSV data ...
+	var dataFrame = dataForge.fromCSV(inputCsvData);
+
+You can stringify a dataframe by calling `toCSV`:
+
 	var outputCsvData = dataFrame.toCSV();
 	fs.writeFileSync('some-other-csv-file.csv', outputCsvData);
 
+## Reading a CSV file from a REST API
+
+NOTE: Uses `request` and `request-promise` module, for Nodejs only, doesn't work in browser.
+
+	dataForge.requestCSV('http://some-host/some-rest-api')
+		.then(dataFrame => {
+			// You have the data!
+		})
+		.catch(err => {
+			// Handle the error.
+		})
+		;
+
 ## Reading JSON files
 
-	var fs = require('fs');
-	var inputJsonData = fs.readFileSync('some-json-file.json', 'utf8');
-	var dataFrame = dataForge.fromJSON(inputJsonData);
+NOTE: Uses `fs` module, for Nodejs only, doesn't work in browser.
+
+	var dataFrame = dataForge.json.readFileSync('some-json-file.json');
 
 ## Writing JSON files
+
+NOTE: Uses `fs` module, for Nodejs only, doesn't work in browser.
 
 	var fs = require('fs');
 	var outputJsonData = dataFrame.toJSON();
 	fs.writeFileSync('some-other-json-file.json', outputJsonData);
+
+## Working with JSON data
+
+If you already have JSON data (loaded into a string) you can parse it into a dataframe via `fromJSON`:
+
+	var inputJsonData = ... some string with JSON data ...
+	var dataFrame = dataForge.fromJSON(inputJsonData);
+
+You can stringify a dataframe by calling `toJSON`:
+
+	var outputJsonData = dataFrame.toJSON();
+
+## Reading a JSON file from a REST API
+
+NOTE: Uses `request` and `request-promise` module, for Nodejs only, doesn't work in browser.
+
+	dataForge.requestJSON('http://some-host/some-rest-api')
+		.then(dataFrame => {
+			// You have the data!
+		})
+		.catch(err => {
+			// Handle the error.
+		})
+		;
 
 ## Parsing column values
 
