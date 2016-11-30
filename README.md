@@ -391,6 +391,19 @@ NOTE: Uses `request` and `request-promise` module, for Nodejs only, doesn't work
 		})
 		;
 
+## Posting a CSV file to a REST API
+
+NOTE: Uses `request` and `request-promise` module, for Nodejs only, doesn't work in browser.
+
+	dataFrame.postCSV('http://some-host/some-rest-api')
+		.then(response) => {
+			// No error!
+		})
+		.catch(err => {
+			// Handle the error.
+		})
+		;
+
 ## Reading JSON files
 
 NOTE: Uses `fs` module, for Nodejs only, doesn't work in browser.
@@ -423,6 +436,19 @@ NOTE: Uses `request` and `request-promise` module, for Nodejs only, doesn't work
 	dataForge.requestJSON('http://some-host/some-rest-api')
 		.then(dataFrame => {
 			// You have the data!
+		})
+		.catch(err => {
+			// Handle the error.
+		})
+		;
+
+## Posting a JSON file to a REST API
+
+NOTE: Uses `request` and `request-promise` module, for Nodejs only, doesn't work in browser.
+
+	dataFrame.postJSON('http://some-host/some-rest-api')
+		.then(response) => {
+			// No error!
 		})
 		.catch(err => {
 			// Handle the error.
