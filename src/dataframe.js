@@ -1046,17 +1046,8 @@ DataFrame.prototype.writeCSVFileSync = function (filePath) {
 	assert.isString(filePath, "Expected 'filePath' parameter to DataFrame.writeCSVFileSync to be a string that specifies the path of the file to write to the local file system.");
 
 	var self = this;
-	return new Promise(function (resolve, reject) {
-		var fs = require('fs');	
-		fs.writeFileSync(filePath, self.toCSV(), function (err) {
-			if (err) {
-				reject(err);
-				return;
-			}
-
-			resolve();
-		});
-	});
+	var fs = require('fs');	
+	fs.writeFileSync(filePath, self.toCSV());
 };
 
 /**
@@ -1092,18 +1083,10 @@ DataFrame.prototype.writeJSONFileSync = function (filePath) {
 	assert.isString(filePath, "Expected 'filePath' parameter to DataFrame.writeJSONFileSync to be a string that specifies the path of the file to write to the local file system.");
 
 	var self = this;
-	return new Promise(function (resolve, reject) {
-		var fs = require('fs');	
-		fs.writeFileSync(filePath, self.toJSON(), function (err) {
-			if (err) {
-				reject(err);
-				return;
-			}
-
-			resolve();
-		});
-	});
+	var fs = require('fs');	
+	fs.writeFileSync(filePath, self.toJSON());
 };
+
 /**
  * Transform one or more columns. This is equivalent to extracting a column, calling 'select' on it,
  * then plugging it back in as the same column.
