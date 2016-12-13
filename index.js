@@ -12,7 +12,6 @@ var DataFrame = require('./src/dataframe');
 var Series = require('./src/series');
 var E = require('linq');
 var zip = require('./src/zip');
-var request = require('request-promise');
 
 //
 // Records plugins that have been registered.
@@ -186,135 +185,183 @@ var dataForge = {
 	},
 
 	/**
-	 * Deserialize a DataFrame from a CSV file in the local filesystem.
-	 * Doesn't work in the browser.
-	 * Returns a promise.
+	 * Read a file asynchronously from the file system.
+	 * Works in Nodejs, doesn't work in the browser.
 	 * 
-	 * @param {string} filePath - The path to the CSV file to deserialize.
-	 * @param {object} [config] - Optional configuration for CSV deserialization.
+	 * @param {string} filePath - The path to the file to read.
 	 * 
-	 * @returns {Promise<DataFrame>} Returns a promise of a dataframe loaded from the CSV file. 
+	 * @returns {object} file - Returns an object that represents the file. Use `parseCSV` or `parseJSON` to deserialize to a DataFrame.
 	 */
-	readCSVFile: function (filePath, config) {
-		assert.isString(filePath, "Expected 'filePath' parameter to DataForge.readCSVFile to be a string that specifies the path of the file to write to the local file system.");
+	readFile: function (filePath) {
+		assert.isString(filePath, "Expected 'filePath' parameter to dataForge.readFileSync to be a string that specifies the path of the file to read.");
 
-		return new Promise(function (resolve, reject) {
-			var fs = require('fs');
-			fs.readFile(filePath, 'utf8', function (err, csvData) {
-				if (err) {
-					reject(err);
-					return;
+		return {
+			/**
+			 * Deserialize a CSV file to a DataFrame.
+			 * Returns a promise that later resolves to a DataFrame.
+			 * 
+			 * @param {object} [config] - Optional configuration file for parsing.
+			 * 
+			 * @returns {Promise<DataFrame>} Returns a promise of a dataframe loaded from the file. 
+			 */
+			parseCSV: function (config) {
+				if (config) {
+					assert.isObject(config, "Expected optional 'config' parameter to dataForge.readFile(...).parseCSV(...) to be an object with configuration options for CSV parsing.");
 				}
 
-				resolve(dataForge.fromCSV(csvData, config));
-			});
-		});
-	},
+				return new Promise(function (resolve, reject) {
+					var fs = require('fs');
+					fs.readFile(filePath, 'utf8', function (err, csvData) {
+						if (err) {
+							reject(err);
+							return;
+						}
 
-	/**
-	 * Deserialize a DataFrame from a CSV file in the local filesystem.
-	 * Doesn't work in the browser.
-	 * Works synchronously, returns a DataFrame.
-	 * 
-	 * @param {string} filePath - The path to the CSV file to deserialize.
-	 * @param {object} [config] - Optional configuration for CSV deserialization.
-	 * 
-	 * @returns {DataFrame} Returns a dataframe loaded from the CSV file.
-	 */
-	readCSVFileSync: function (filePath, config) {
-		assert.isString(filePath, "Expected 'filePath' parameter to DataForge.readCSVFileSync to be a string that specifies the path of the file to write to the local file system.");
+						resolve(dataForge.fromCSV(csvData, config));
+					});
+				});
+			},
 
-		var fs = require('fs');
-		return dataForge.fromCSV(fs.readFileSync(filePath, 'utf8'), config);
-	},
-
-	/**
-	 * Deserialize a DataFrame from a JSON file in the local filesystem.
-	 * Doesn't work in the browser.
-	 * Returns a promise.
-	 * 
-	 * @param {string} filePath - The path to the JSON file to deserialize.
-	 * @param {object} [config] - Optional configuration for JSON deserialization.
-	 *
-	 * @returns {Promise<DataFrame>} Returns a promise of a dataframe loaded from the JSON file. 
-	 */
-	readJSONFile: function (filePath, config) {
-		assert.isString(filePath, "Expected 'filePath' parameter to DataForge.readJSONFile to be a string that specifies the path of the file to write to the local file system.");
-
-		return new Promise(function (resolve, reject) {
-			var fs = require('fs');
-			fs.readFile(filePath, 'utf8', function (err, data) {
-				if (err) {
-					reject(err);
-					return;
+			/**
+			 * Deserialize a JSON file to a DataFrame.
+			 * Returns a promise that later resolves to a DataFrame.
+			 * 
+			 * @param {object} [config] - Optional configuration file for parsing.
+			 * 
+			 * @returns {Promise<DataFrame>} Returns a promise of a dataframe loaded from the file. 
+			 */
+			parseJSON: function (config) {
+				if (config) {
+					assert.isObject(config, "Expected optional 'config' parameter to dataForge.readFile(...).parseJSON(...) to be an object with configuration options for JSON parsing.");
 				}
 
-				resolve(dataForge.fromJSON(data, config));
-			});
-		});
+				return new Promise(function (resolve, reject) {
+					var fs = require('fs');
+					fs.readFile(filePath, 'utf8', function (err, data) {
+						if (err) {
+							reject(err);
+							return;
+						}
+
+						resolve(dataForge.fromJSON(data, config));
+					});
+				});
+			} 
+
+		};
 	},
 
 	/**
-	 * Deserialize a DataFrame from a JSON in the local filesystem.
-	 * Doesn't work in the browser.
-	 * Works synchronously, returns a DataFrame.
+	 * Read a file synchronously from the file system.
+	 * Works in Nodejs, doesn't work in the browser.
 	 * 
-	 * @param {string} filePath - The path to the CSV file to deserialize.
-	 * @param {object} [config] - Optional configuration for JSON deserialization.
+	 * @param {string} filePath - The path to the file to read.
 	 * 
-	 * @returns {DataFrame} Returns a dataframe loaded from the JSON file.
+	 * @returns {object} Returns an object that represents the file. Use `parseCSV` or `parseJSON` to deserialize to a DataFrame.
 	 */
-	readJSONFileSync: function (filePath, config) {
-		assert.isString(filePath, "Expected 'filePath' parameter to DataForge.readJSONFileSync to be a string that specifies the path of the file to write to the local file system.");
+	readFileSync: function (filePath) {
+		assert.isString(filePath, "Expected 'filePath' parameter to dataForge.readFileSync to be a string that specifies the path of the file to read.");
 
-		var fs = require('fs');
-		return dataForge.fromJSON(fs.readFileSync(filePath, 'utf8'), config);
+		return {
+			/**
+			 * Deserialize a CSV file to a DataFrame.
+			 * 
+			 * @param {object} [config] - Optional configuration file for parsing.
+			 * 
+			 * @returns {DataFrame} Returns a dataframe that was deserialized from the file.  
+			 */
+			parseCSV: function (config) {
+				if (config) {
+					assert.isObject(config, "Expected optional 'config' parameter to dataForge.readFileSync(...).parseCSV(...) to be an object with configuration options for CSV parsing.");
+				}
+
+				var fs = require('fs');
+				return dataForge.fromCSV(fs.readFileSync(filePath, 'utf8'), config);
+			},
+
+			/**
+			 * Deserialize a JSON file to a DataFrame.
+			 * 
+			 * @param {object} [config] - Optional configuration file for parsing.
+			 * 
+			 * @returns {DataFrame} Returns a dataframe that was deserialized from the file.  
+			 */
+			parseJSON: function (config) {
+				if (config) {
+					assert.isObject(config, "Expected optional 'config' parameter to dataForge.readFileSync(...).parseJSON(...) to be an object with configuration options for JSON parsing.");
+				}
+
+				var fs = require('fs');
+				return dataForge.fromJSON(fs.readFileSync(filePath, 'utf8'), config);
+			} 
+
+		};
 	},
 
 	/**
-	 * Deserialize a DataFrame from a REST API that returns JSON data.
+	 * Deserialize a DataFrame from a REST API that returns data via HTTP GET.
 	 * Works asynchronously, returns a promise.
 	 * 
-	 * @param {string} url - URL for a REST API that returns JSON data.
-	 * @param {object} [config] - Optional configuration for JSON deserialization.
+	 * @param {string} url - URL for a REST API that returns data.
 	 *   
-	 * @returns {Promise<DataFrame>} Returns a promise of a dataframe that will be resolved when the data is received from the REST API.
+	 * @returns {object} Returns an object that represents the response REST API. Use `parseCSV` or `parseJSON` to deserialize to a DataFrame.
 	 */
-	requestJSON: function (url, config) {
-		assert.isString(url, "Expected 'url' parameter to DataForge.requestJSON to be a string that specifies the URL of the REST API from which to request JSON data.");
+	httpGet: function (url) {
+		assert.isString(url, "Expected 'url' parameter to DataForge.httpGet to be a string that specifies the URL of the REST API from which to request data.");
 
-		var requestOptions = {
-			uri: url,
-			json: true,
+		return {
+			/**
+			 * Deserialize a CSV data to a DataFrame.
+			 * 
+			 * @param {object} [config] - Optional configuration file for parsing.
+			 * 
+			 * @returns {Promise<DataFrame>} Returns a promise of a dataframe loaded from the REST API.  
+			 */
+			parseCSV: function (config) {
+				if (config) {
+					assert.isObject(config, "Expected optional 'config' parameter to dataForge.httpGet(...).parseCSV(...) to be an object with configuration options for CSV parsing.");
+				}
+
+				var requestOptions = {
+					uri: url,
+				};
+
+				var request = require('request-promise');
+
+				return request.get(requestOptions)
+					.then(function (data) {
+						return dataForge.fromCSV(data, config);
+					});
+			},
+
+			/**
+			 * Deserialize JSON data to a DataFrame.
+			 * 
+			 * @param {object} [config] - Optional configuration file for parsing.
+			 * 
+			 * @returns {Promise<DataFrame>} Returns a promise of a dataframe loaded from the REST API.  
+			 */
+			parseJSON: function (config) {
+				if (config) {
+					assert.isObject(config, "Expected optional 'config' parameter to dataForge.httpGet(...).parseJSON(...) to be an object with configuration options for JSON parsing.");
+				}
+
+				var requestOptions = {
+					uri: url,
+					json: true,
+				};
+
+				var request = require('request-promise');
+				
+				return request.get(requestOptions)
+					.then(function (data) {
+						assert.isArray(data, "Expected response from REST API to be an array!");
+						var dataFrameOptions = extend({ values: data }, config || {});
+						return new DataFrame(dataFrameOptions);
+					});
+			} 
+
 		};
-		return request.get(requestOptions)
-			.then(function (data) {
-				assert.isArray(data, "Expected response from REST API to be an array!");
-				var dataFrameOptions = extend({ values: data }, config);
-				return new DataFrame(dataFrameOptions);
-			});
-	},
-
-	/**
-	 * Deserialize a DataFrame from a REST API that returns CSV data.
-	 * Works asynchronously, returns a promise.
-	 * 
-	 * @param {string} url - URL for a REST API that returns CSV data. 
-	 * @param {object} [config] - Optional configuration for CSV deserialization.
-	 * 
-	 * @returns {Promise<DataFrame>} Returns a promise of a dataframe that will be resolved when the data is received from the REST API.
-	 */
-	requestCSV: function (url, config) {
-		assert.isString(url, "Expected 'url' parameter to DataForge.requestCSV to be a string that specifies the URL of the REST API from which to request CSV data.");
-
-		var requestOptions = {
-			uri: url,
-		};
-
-		return request.get(requestOptions)
-			.then(function (data) {
-				return dataForge.fromCSV(data, config);
-			});
 	},
 
 	/**

@@ -1014,77 +1014,149 @@ DataFrame.prototype.toCSV = function () {
 };
 
 /**
- * Serialize the data frame to CSV file in the local file system.
- * Asynchronous version.
+ * Treat the dataframe as CSV data for purposes of serialization.
  * 
- *  @returns {Promise} Returns a promise that resolves when the file has been written.   
+ * @returns {object} Returns an object that represents the dataframe for serialization in the CSV format. Call `writeFile`, `writeFileSync` or `httpPost` to output the dataframe via different media.
  */
-DataFrame.prototype.writeCSVFile = function (filePath) {
-
-	assert.isString(filePath, "Expected 'filePath' parameter to DataFrame.writeCSVFile to be a string that specifies the path of the file to write to the local file system.");
+DataFrame.prototype.asCSV = function () {
 
 	var self = this;
-	return new Promise(function (resolve, reject) {
-		var fs = require('fs');	
-		fs.writeFile(filePath, self.toCSV(), function (err) {
-			if (err) {
-				reject(err);
-				return;
-			}
 
-			resolve();
-		});
-	});
+	return {
+		/**
+		 * Serialize the dataframe to a CSV file in the local file system.
+		 * Asynchronous version.
+		 * 
+		 * @param {string} filePath - Specifies the output path for the file. 
+		 * 
+		 *  @returns {Promise} Returns a promise that resolves when the file has been written.   
+		 */
+		writeFile: function (filePath) {
+			assert.isString(filePath, "Expected 'filePath' parameter to DataFrame.asCSV().writeFile to be a string that specifies the path of the file to write to the local file system.");
+
+			return new Promise(function (resolve, reject) {
+				var fs = require('fs');	
+				fs.writeFile(filePath, self.toCSV(), function (err) {
+					if (err) {
+						reject(err);
+						return;
+					}
+
+					resolve();
+				});
+			});
+		},
+
+		/**
+		 * Serialize the dataframe to a CSV file in the local file system.
+		 * Synchronous version.
+		 * 
+		 * @param {string} filePath - Specifies the output path for the file. 
+		 */
+		writeFileSync: function (filePath) {
+			assert.isString(filePath, "Expected 'filePath' parameter to DataFrame.asCSV().writeFileSync to be a string that specifies the path of the file to write to the local file system.");
+
+			var fs = require('fs');	
+			fs.writeFileSync(filePath, self.toCSV());
+		},
+
+		/**
+		 * Serialize the dataframe to CSV and HTTP POST it to the specified REST API.
+		 * 
+		 * @param {string} url - The URL of the REST API.
+		 * 
+		 * @returns {Promise} Returns a promise that resolves when the HTTP request has completed.
+		 */
+		httpPost: function (url) {
+
+			var requestOptions = {
+				uri: url,
+				body: self.toCSV(),
+				headers: {
+					"content-type": "text/csv",
+				},
+			};
+
+			var request = require('request-promise');
+
+			return request.post(requestOptions);
+		},
+	};
+
 };
 
 /**
- * Serialize the data frame to CSV file in the local file system.
- * Synchronous version.
- */
-DataFrame.prototype.writeCSVFileSync = function (filePath) {
-
-	assert.isString(filePath, "Expected 'filePath' parameter to DataFrame.writeCSVFileSync to be a string that specifies the path of the file to write to the local file system.");
-
-	var self = this;
-	var fs = require('fs');	
-	fs.writeFileSync(filePath, self.toCSV());
-};
-
-/**
- * Serialize the data frame to JSON file in the local file system.
- * Asynchronous version.
+ * Treat the dataframe as JSON data for purposes of serialization.
  * 
- *  @returns {Promise} Returns a promise that resolves when the file has been written.   
+ * @returns {object} Returns an object that represents the dataframe for serialization in the JSON format. Call `writeFile`, `writeFileSync` or `httpPost` to output the dataframe via different media.
  */
-DataFrame.prototype.writeJSONFile = function (filePath) {
-
-	assert.isString(filePath, "Expected 'filePath' parameter to DataFrame.writeJSONFile to be a string that specifies the path of the file to write to the local file system.");
+DataFrame.prototype.asJSON = function () {
 
 	var self = this;
-	return new Promise(function (resolve, reject) {
-		var fs = require('fs');	
-		fs.writeFile(filePath, self.toJSON(), function (err) {
-			if (err) {
-				reject(err);
-				return;
-			}
 
-			resolve();
-		});
-	});
-};
+	return {
+		/**
+		 * Serialize the dataframe to a JSON file in the local file system.
+		 * Asynchronous version.
+		 * 
+		 * @param {string} filePath - Specifies the output path for the file. 
+		 * 
+		 *  @returns {Promise} Returns a promise that resolves when the file has been written.   
+		 */
+		writeFile: function (filePath) {
+			assert.isString(filePath, "Expected 'filePath' parameter to DataFrame.asJSON().writeFile to be a string that specifies the path of the file to write to the local file system.");
 
-/**
- * Serialize the data frame to JSON file in the local file system.
- * Synchronous version.
- */
-DataFrame.prototype.writeJSONFileSync = function (filePath) {
+			return new Promise(function (resolve, reject) {
+				var fs = require('fs');	
+				fs.writeFile(filePath, self.toJSON(), function (err) {
+					if (err) {
+						reject(err);
+						return;
+					}
 
-	assert.isString(filePath, "Expected 'filePath' parameter to DataFrame.writeJSONFileSync to be a string that specifies the path of the file to write to the local file system.");
+					resolve();
+				});
+			});
+		},
 
-	var self = this;
-	var fs = require('fs');	
-	fs.writeFileSync(filePath, self.toJSON());
+		/**
+		 * Serialize the dataframe to a JSON file in the local file system.
+		 * Synchronous version.
+		 * 
+		 * @param {string} filePath - Specifies the output path for the file. 
+		 */
+		writeFileSync: function (filePath) {
+			assert.isString(filePath, "Expected 'filePath' parameter to DataFrame.asJSON().writeFile to be a string that specifies the path of the file to write to the local file system.");
+
+			var fs = require('fs');	
+			fs.writeFileSync(filePath, self.toJSON());
+		},
+
+		/**
+		 * Serialize the dataframe to JSON and HTTP POST it to the specified REST API.
+		 * 
+		 * @param {string} url - The URL of the REST API.
+		 * 
+		 * @returns {Promise} Returns a promise that resolves when the HTTP request has completed.
+		 */
+		httpPost: function (url) {
+			var requestOptions = {
+				uri: url,
+				body: self.toArray(),
+				json: true,
+				headers: {
+					"content-type": "application/json",
+				},
+			};
+
+			var request = require('request-promise');
+
+			return request.post(requestOptions);
+		},
+
+
+	};
+
 };
 
 /**
