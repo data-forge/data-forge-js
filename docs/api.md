@@ -1,3 +1,66 @@
+## Objects
+
+<dl>
+<dt><a href="#dataForge">dataForge</a> : <code>object</code></dt>
+<dd><p>Main namespace for Data-Forge.</p>
+<p>Nodejs:</p>
+<pre><code>    npm install --save data-forge
+
+    var dataForge = require(&#39;data-forge&#39;);
+</code></pre><p>Browser:</p>
+<pre><code>    bower install --save data-forge
+
+    &lt;script language=&quot;javascript&quot; type=&quot;text/javascript&quot; src=&quot;bower_components/data-forge/data-forge.js&quot;&gt;&lt;/script&gt;
+</code></pre></dd>
+</dl>
+
+## Functions
+
+<dl>
+<dt><a href="#parseCSV">parseCSV([config])</a> ⇒ <code>Promise.&lt;DataFrame&gt;</code></dt>
+<dd><p>Deserialize a CSV file to a DataFrame.
+Returns a promise that later resolves to a DataFrame.</p>
+</dd>
+<dt><a href="#parseJSON">parseJSON([config])</a> ⇒ <code>Promise.&lt;DataFrame&gt;</code></dt>
+<dd><p>Deserialize a JSON file to a DataFrame.
+Returns a promise that later resolves to a DataFrame.</p>
+</dd>
+<dt><a href="#parseCSV">parseCSV([config])</a> ⇒ <code>DataFrame</code></dt>
+<dd><p>Deserialize a CSV file to a DataFrame.</p>
+</dd>
+<dt><a href="#parseJSON">parseJSON([config])</a> ⇒ <code>DataFrame</code></dt>
+<dd><p>Deserialize a JSON file to a DataFrame.</p>
+</dd>
+<dt><a href="#parseCSV">parseCSV([config])</a> ⇒ <code>Promise.&lt;DataFrame&gt;</code></dt>
+<dd><p>Deserialize a CSV data to a DataFrame.</p>
+</dd>
+<dt><a href="#parseJSON">parseJSON([config])</a> ⇒ <code>Promise.&lt;DataFrame&gt;</code></dt>
+<dd><p>Deserialize JSON data to a DataFrame.</p>
+</dd>
+<dt><a href="#writeFile">writeFile(filePath)</a> ⇒ <code>Promise</code></dt>
+<dd><p>Serialize the dataframe to a CSV file in the local file system.
+Asynchronous version.</p>
+</dd>
+<dt><a href="#writeFileSync">writeFileSync(filePath)</a></dt>
+<dd><p>Serialize the dataframe to a CSV file in the local file system.
+Synchronous version.</p>
+</dd>
+<dt><a href="#httpPost">httpPost(url)</a> ⇒ <code>Promise</code></dt>
+<dd><p>Serialize the dataframe to CSV and HTTP POST it to the specified REST API.</p>
+</dd>
+<dt><a href="#writeFile">writeFile(filePath)</a> ⇒ <code>Promise</code></dt>
+<dd><p>Serialize the dataframe to a JSON file in the local file system.
+Asynchronous version.</p>
+</dd>
+<dt><a href="#writeFileSync">writeFileSync(filePath)</a></dt>
+<dd><p>Serialize the dataframe to a JSON file in the local file system.
+Synchronous version.</p>
+</dd>
+<dt><a href="#httpPost">httpPost(url)</a> ⇒ <code>Promise</code></dt>
+<dd><p>Serialize the dataframe to JSON and HTTP POST it to the specified REST API.</p>
+</dd>
+</dl>
+
 <a name="dataForge"></a>
 
 ## dataForge : <code>object</code>
@@ -46,6 +109,9 @@ Browser:
         * [.renameSeries(newColumnNames|columnsMap)](#dataForge.DataFrame+renameSeries) ⇒ <code>DataFrame</code>
         * [.toJSON()](#dataForge.DataFrame+toJSON) ⇒ <code>string</code>
         * [.toCSV()](#dataForge.DataFrame+toCSV) ⇒ <code>string</code>
+        * [.asCSV()](#dataForge.DataFrame+asCSV) ⇒ <code>object</code>
+        * [.asJSON()](#dataForge.DataFrame+asJSON) ⇒ <code>object</code>
+        * [.toHTML()](#dataForge.DataFrame+toHTML) ⇒ <code>string</code>
         * [.transformSeries(columnSelectors)](#dataForge.DataFrame+transformSeries) ⇒ <code>DataFrame</code>
         * [.generateSeries(generator)](#dataForge.DataFrame+generateSeries) ⇒ <code>DataFrame</code>
         * [.deflate(selector)](#dataForge.DataFrame+deflate) ⇒ <code>Series</code>
@@ -111,8 +177,7 @@ Browser:
         * [.union(other, [comparer])](#dataForge.Series+union) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
         * [.intersection(other, [comparer])](#dataForge.Series+intersection) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
         * [.except(other, [comparer])](#dataForge.Series+except) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
-        * [.asPairs()](#dataForge.Series+asPairs) ⇒ <code>Series</code>
-        * [.asValues()](#dataForge.Series+asValues) ⇒ <code>Series</code>
+        * [.asPairs()](#dataForge.Series+asPairs) ⇒ <code>Pairs</code>
         * [.startAt(indexValue)](#dataForge.Series+startAt) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
         * [.endAt(indexValue)](#dataForge.Series+endAt) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
         * [.before(indexValue)](#dataForge.Series+before) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
@@ -190,8 +255,7 @@ Browser:
         * [.union(other, [comparer])](#dataForge.Series+union) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
         * [.intersection(other, [comparer])](#dataForge.Series+intersection) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
         * [.except(other, [comparer])](#dataForge.Series+except) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
-        * [.asPairs()](#dataForge.Series+asPairs) ⇒ <code>Series</code>
-        * [.asValues()](#dataForge.Series+asValues) ⇒ <code>Series</code>
+        * [.asPairs()](#dataForge.Series+asPairs) ⇒ <code>Pairs</code>
         * [.startAt(indexValue)](#dataForge.Series+startAt) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
         * [.endAt(indexValue)](#dataForge.Series+endAt) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
         * [.before(indexValue)](#dataForge.Series+before) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
@@ -266,8 +330,7 @@ Browser:
         * [.union(other, [comparer])](#dataForge.Series+union) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
         * [.intersection(other, [comparer])](#dataForge.Series+intersection) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
         * [.except(other, [comparer])](#dataForge.Series+except) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
-        * [.asPairs()](#dataForge.Series+asPairs) ⇒ <code>Series</code>
-        * [.asValues()](#dataForge.Series+asValues) ⇒ <code>Series</code>
+        * [.asPairs()](#dataForge.Series+asPairs) ⇒ <code>Pairs</code>
         * [.startAt(indexValue)](#dataForge.Series+startAt) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
         * [.endAt(indexValue)](#dataForge.Series+endAt) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
         * [.before(indexValue)](#dataForge.Series+before) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
@@ -278,6 +341,9 @@ Browser:
     * [.use(plugin)](#dataForge.use) ⇒ <code>[dataForge](#dataForge)</code>
     * [.fromJSON(jsonTextString, [config])](#dataForge.fromJSON) ⇒ <code>DataFrame</code>
     * [.fromCSV(csvTextString, [config])](#dataForge.fromCSV) ⇒ <code>DataFrame</code>
+    * [.readFile(filePath)](#dataForge.readFile) ⇒ <code>object</code>
+    * [.readFileSync(filePath)](#dataForge.readFileSync) ⇒ <code>object</code>
+    * [.httpGet(url)](#dataForge.httpGet) ⇒ <code>object</code>
     * [.range(start, count)](#dataForge.range) ⇒ <code>Series</code>
     * [.matrix(numColumns, numRows, start, increment)](#dataForge.matrix) ⇒ <code>DataFrame</code>
     * [.zipSeries(series, selector)](#dataForge.zipSeries) ⇒ <code>Series</code>
@@ -317,6 +383,9 @@ Browser:
     * [.renameSeries(newColumnNames|columnsMap)](#dataForge.DataFrame+renameSeries) ⇒ <code>DataFrame</code>
     * [.toJSON()](#dataForge.DataFrame+toJSON) ⇒ <code>string</code>
     * [.toCSV()](#dataForge.DataFrame+toCSV) ⇒ <code>string</code>
+    * [.asCSV()](#dataForge.DataFrame+asCSV) ⇒ <code>object</code>
+    * [.asJSON()](#dataForge.DataFrame+asJSON) ⇒ <code>object</code>
+    * [.toHTML()](#dataForge.DataFrame+toHTML) ⇒ <code>string</code>
     * [.transformSeries(columnSelectors)](#dataForge.DataFrame+transformSeries) ⇒ <code>DataFrame</code>
     * [.generateSeries(generator)](#dataForge.DataFrame+generateSeries) ⇒ <code>DataFrame</code>
     * [.deflate(selector)](#dataForge.DataFrame+deflate) ⇒ <code>Series</code>
@@ -382,8 +451,7 @@ Browser:
     * [.union(other, [comparer])](#dataForge.Series+union) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
     * [.intersection(other, [comparer])](#dataForge.Series+intersection) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
     * [.except(other, [comparer])](#dataForge.Series+except) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
-    * [.asPairs()](#dataForge.Series+asPairs) ⇒ <code>Series</code>
-    * [.asValues()](#dataForge.Series+asValues) ⇒ <code>Series</code>
+    * [.asPairs()](#dataForge.Series+asPairs) ⇒ <code>Pairs</code>
     * [.startAt(indexValue)](#dataForge.Series+startAt) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
     * [.endAt(indexValue)](#dataForge.Series+endAt) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
     * [.before(indexValue)](#dataForge.Series+before) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
@@ -688,6 +756,27 @@ Serialize the data frame to CSV.
 
 **Kind**: instance method of <code>[DataFrame](#dataForge.DataFrame)</code>  
 **Returns**: <code>string</code> - Returns a CSV format string representing the dataframe.  
+<a name="dataForge.DataFrame+asCSV"></a>
+
+#### dataFrame.asCSV() ⇒ <code>object</code>
+Treat the dataframe as CSV data for purposes of serialization.
+
+**Kind**: instance method of <code>[DataFrame](#dataForge.DataFrame)</code>  
+**Returns**: <code>object</code> - Returns an object that represents the dataframe for serialization in the CSV format. Call `writeFile`, `writeFileSync` or `httpPost` to output the dataframe via different media.  
+<a name="dataForge.DataFrame+asJSON"></a>
+
+#### dataFrame.asJSON() ⇒ <code>object</code>
+Treat the dataframe as JSON data for purposes of serialization.
+
+**Kind**: instance method of <code>[DataFrame](#dataForge.DataFrame)</code>  
+**Returns**: <code>object</code> - Returns an object that represents the dataframe for serialization in the JSON format. Call `writeFile`, `writeFileSync` or `httpPost` to output the dataframe via different media.  
+<a name="dataForge.DataFrame+toHTML"></a>
+
+#### dataFrame.toHTML() ⇒ <code>string</code>
+Serialize the data frame to HTML.
+
+**Kind**: instance method of <code>[DataFrame](#dataForge.DataFrame)</code>  
+**Returns**: <code>string</code> - Returns a HTML format string representing the dataframe.  
 <a name="dataForge.DataFrame+transformSeries"></a>
 
 #### dataFrame.transformSeries(columnSelectors) ⇒ <code>DataFrame</code>
@@ -1267,7 +1356,7 @@ Append a pair to the end of a Series.
 <a name="dataForge.Series+fillGaps"></a>
 
 #### dataFrame.fillGaps(predicate, generator) ⇒ <code>Series</code>
-Fill gaps in a series.
+Fill gaps in a series or dataframe.
 
 **Kind**: instance method of <code>[DataFrame](#dataForge.DataFrame)</code>  
 **Returns**: <code>Series</code> - Returns a new series with gaps filled in.  
@@ -1439,18 +1528,11 @@ Returns the exception of values between two Series or DataFrames.
 
 <a name="dataForge.Series+asPairs"></a>
 
-#### dataFrame.asPairs() ⇒ <code>Series</code>
+#### dataFrame.asPairs() ⇒ <code>Pairs</code>
 Convert a series or a dataframe to a series of pairs in the form [pair1, pair2, pair3, ...] where each pair is [index, value].
 
 **Kind**: instance method of <code>[DataFrame](#dataForge.DataFrame)</code>  
-**Returns**: <code>Series</code> - Returns a series of pairs for each index and value pair in the input sequence.  
-<a name="dataForge.Series+asValues"></a>
-
-#### dataFrame.asValues() ⇒ <code>Series</code>
-Convert a series of pairs to back to a series of values.
-
-**Kind**: instance method of <code>[DataFrame](#dataForge.DataFrame)</code>  
-**Returns**: <code>Series</code> - Returns a series of values where each pair has been extracted from the value of the input series.  
+**Returns**: <code>Pairs</code> - Returns a series of pairs for each index and value pair in the input sequence.  
 <a name="dataForge.Series+startAt"></a>
 
 #### dataFrame.startAt(indexValue) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
@@ -1590,8 +1672,7 @@ Get a new series or dataframe with all values between the specified index values
     * [.union(other, [comparer])](#dataForge.Series+union) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
     * [.intersection(other, [comparer])](#dataForge.Series+intersection) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
     * [.except(other, [comparer])](#dataForge.Series+except) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
-    * [.asPairs()](#dataForge.Series+asPairs) ⇒ <code>Series</code>
-    * [.asValues()](#dataForge.Series+asValues) ⇒ <code>Series</code>
+    * [.asPairs()](#dataForge.Series+asPairs) ⇒ <code>Pairs</code>
     * [.startAt(indexValue)](#dataForge.Series+startAt) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
     * [.endAt(indexValue)](#dataForge.Series+endAt) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
     * [.before(indexValue)](#dataForge.Series+before) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
@@ -2198,7 +2279,7 @@ Append a pair to the end of a Series.
 <a name="dataForge.Series+fillGaps"></a>
 
 #### index.fillGaps(predicate, generator) ⇒ <code>Series</code>
-Fill gaps in a series.
+Fill gaps in a series or dataframe.
 
 **Kind**: instance method of <code>[Index](#dataForge.Index)</code>  
 **Returns**: <code>Series</code> - Returns a new series with gaps filled in.  
@@ -2382,18 +2463,11 @@ Returns the exception of values between two Series or DataFrames.
 
 <a name="dataForge.Series+asPairs"></a>
 
-#### index.asPairs() ⇒ <code>Series</code>
+#### index.asPairs() ⇒ <code>Pairs</code>
 Convert a series or a dataframe to a series of pairs in the form [pair1, pair2, pair3, ...] where each pair is [index, value].
 
 **Kind**: instance method of <code>[Index](#dataForge.Index)</code>  
-**Returns**: <code>Series</code> - Returns a series of pairs for each index and value pair in the input sequence.  
-<a name="dataForge.Series+asValues"></a>
-
-#### index.asValues() ⇒ <code>Series</code>
-Convert a series of pairs to back to a series of values.
-
-**Kind**: instance method of <code>[Index](#dataForge.Index)</code>  
-**Returns**: <code>Series</code> - Returns a series of values where each pair has been extracted from the value of the input series.  
+**Returns**: <code>Pairs</code> - Returns a series of pairs for each index and value pair in the input sequence.  
 <a name="dataForge.Series+startAt"></a>
 
 #### index.startAt(indexValue) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
@@ -2529,8 +2603,7 @@ Get a new series or dataframe with all values between the specified index values
     * [.union(other, [comparer])](#dataForge.Series+union) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
     * [.intersection(other, [comparer])](#dataForge.Series+intersection) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
     * [.except(other, [comparer])](#dataForge.Series+except) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
-    * [.asPairs()](#dataForge.Series+asPairs) ⇒ <code>Series</code>
-    * [.asValues()](#dataForge.Series+asValues) ⇒ <code>Series</code>
+    * [.asPairs()](#dataForge.Series+asPairs) ⇒ <code>Pairs</code>
     * [.startAt(indexValue)](#dataForge.Series+startAt) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
     * [.endAt(indexValue)](#dataForge.Series+endAt) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
     * [.before(indexValue)](#dataForge.Series+before) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
@@ -3116,7 +3189,7 @@ Append a pair to the end of a Series.
 <a name="dataForge.Series+fillGaps"></a>
 
 #### series.fillGaps(predicate, generator) ⇒ <code>Series</code>
-Fill gaps in a series.
+Fill gaps in a series or dataframe.
 
 **Kind**: instance method of <code>[Series](#dataForge.Series)</code>  
 **Returns**: <code>Series</code> - Returns a new series with gaps filled in.  
@@ -3300,18 +3373,11 @@ Returns the exception of values between two Series or DataFrames.
 
 <a name="dataForge.Series+asPairs"></a>
 
-#### series.asPairs() ⇒ <code>Series</code>
+#### series.asPairs() ⇒ <code>Pairs</code>
 Convert a series or a dataframe to a series of pairs in the form [pair1, pair2, pair3, ...] where each pair is [index, value].
 
 **Kind**: instance method of <code>[Series](#dataForge.Series)</code>  
-**Returns**: <code>Series</code> - Returns a series of pairs for each index and value pair in the input sequence.  
-<a name="dataForge.Series+asValues"></a>
-
-#### series.asValues() ⇒ <code>Series</code>
-Convert a series of pairs to back to a series of values.
-
-**Kind**: instance method of <code>[Series](#dataForge.Series)</code>  
-**Returns**: <code>Series</code> - Returns a series of values where each pair has been extracted from the value of the input series.  
+**Returns**: <code>Pairs</code> - Returns a series of pairs for each index and value pair in the input sequence.  
 <a name="dataForge.Series+startAt"></a>
 
 #### series.startAt(indexValue) ⇒ <code>Series</code> &#124; <code>DataFrame</code>
@@ -3435,6 +3501,45 @@ Deserialize a DataFrame from a CSV text string.
 | csvTextString | <code>string</code> | The CSV text to deserialize. |
 | [config] | <code>config</code> | Optional configuration option to pass to the DataFrame. |
 
+<a name="dataForge.readFile"></a>
+
+### dataForge.readFile(filePath) ⇒ <code>object</code>
+Read a file asynchronously from the file system.
+Works in Nodejs, doesn't work in the browser.
+
+**Kind**: static method of <code>[dataForge](#dataForge)</code>  
+**Returns**: <code>object</code> - file - Returns an object that represents the file. Use `parseCSV` or `parseJSON` to deserialize to a DataFrame.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| filePath | <code>string</code> | The path to the file to read. |
+
+<a name="dataForge.readFileSync"></a>
+
+### dataForge.readFileSync(filePath) ⇒ <code>object</code>
+Read a file synchronously from the file system.
+Works in Nodejs, doesn't work in the browser.
+
+**Kind**: static method of <code>[dataForge](#dataForge)</code>  
+**Returns**: <code>object</code> - Returns an object that represents the file. Use `parseCSV` or `parseJSON` to deserialize to a DataFrame.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| filePath | <code>string</code> | The path to the file to read. |
+
+<a name="dataForge.httpGet"></a>
+
+### dataForge.httpGet(url) ⇒ <code>object</code>
+Deserialize a DataFrame from a REST API that returns data via HTTP GET.
+Works asynchronously, returns a promise.
+
+**Kind**: static method of <code>[dataForge](#dataForge)</code>  
+**Returns**: <code>object</code> - Returns an object that represents the response REST API. Use `parseCSV` or `parseJSON` to deserialize to a DataFrame.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| url | <code>string</code> | URL for a REST API that returns data. |
+
 <a name="dataForge.range"></a>
 
 ### dataForge.range(start, count) ⇒ <code>Series</code>
@@ -3488,4 +3593,148 @@ Zip together multiple data-frames to create a new data-frame.
 | --- | --- | --- |
 | dataFrames | <code>array</code> | Array of data-frames to zip together. |
 | selector | <code>function</code> | Selector function that produces a new data-frame based on the input data-frames. |
+
+<a name="parseCSV"></a>
+
+## parseCSV([config]) ⇒ <code>Promise.&lt;DataFrame&gt;</code>
+Deserialize a CSV file to a DataFrame.
+Returns a promise that later resolves to a DataFrame.
+
+**Kind**: global function  
+**Returns**: <code>Promise.&lt;DataFrame&gt;</code> - Returns a promise of a dataframe loaded from the file.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| [config] | <code>object</code> | Optional configuration file for parsing. |
+
+<a name="parseJSON"></a>
+
+## parseJSON([config]) ⇒ <code>Promise.&lt;DataFrame&gt;</code>
+Deserialize a JSON file to a DataFrame.
+Returns a promise that later resolves to a DataFrame.
+
+**Kind**: global function  
+**Returns**: <code>Promise.&lt;DataFrame&gt;</code> - Returns a promise of a dataframe loaded from the file.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| [config] | <code>object</code> | Optional configuration file for parsing. |
+
+<a name="parseCSV"></a>
+
+## parseCSV([config]) ⇒ <code>DataFrame</code>
+Deserialize a CSV file to a DataFrame.
+
+**Kind**: global function  
+**Returns**: <code>DataFrame</code> - Returns a dataframe that was deserialized from the file.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| [config] | <code>object</code> | Optional configuration file for parsing. |
+
+<a name="parseJSON"></a>
+
+## parseJSON([config]) ⇒ <code>DataFrame</code>
+Deserialize a JSON file to a DataFrame.
+
+**Kind**: global function  
+**Returns**: <code>DataFrame</code> - Returns a dataframe that was deserialized from the file.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| [config] | <code>object</code> | Optional configuration file for parsing. |
+
+<a name="parseCSV"></a>
+
+## parseCSV([config]) ⇒ <code>Promise.&lt;DataFrame&gt;</code>
+Deserialize a CSV data to a DataFrame.
+
+**Kind**: global function  
+**Returns**: <code>Promise.&lt;DataFrame&gt;</code> - Returns a promise of a dataframe loaded from the REST API.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| [config] | <code>object</code> | Optional configuration file for parsing. |
+
+<a name="parseJSON"></a>
+
+## parseJSON([config]) ⇒ <code>Promise.&lt;DataFrame&gt;</code>
+Deserialize JSON data to a DataFrame.
+
+**Kind**: global function  
+**Returns**: <code>Promise.&lt;DataFrame&gt;</code> - Returns a promise of a dataframe loaded from the REST API.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| [config] | <code>object</code> | Optional configuration file for parsing. |
+
+<a name="writeFile"></a>
+
+## writeFile(filePath) ⇒ <code>Promise</code>
+Serialize the dataframe to a CSV file in the local file system.Asynchronous version.
+
+**Kind**: global function  
+**Returns**: <code>Promise</code> - Returns a promise that resolves when the file has been written.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| filePath | <code>string</code> | Specifies the output path for the file. |
+
+<a name="writeFileSync"></a>
+
+## writeFileSync(filePath)
+Serialize the dataframe to a CSV file in the local file system.Synchronous version.
+
+**Kind**: global function  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| filePath | <code>string</code> | Specifies the output path for the file. |
+
+<a name="httpPost"></a>
+
+## httpPost(url) ⇒ <code>Promise</code>
+Serialize the dataframe to CSV and HTTP POST it to the specified REST API.
+
+**Kind**: global function  
+**Returns**: <code>Promise</code> - Returns a promise that resolves when the HTTP request has completed.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| url | <code>string</code> | The URL of the REST API. |
+
+<a name="writeFile"></a>
+
+## writeFile(filePath) ⇒ <code>Promise</code>
+Serialize the dataframe to a JSON file in the local file system.Asynchronous version.
+
+**Kind**: global function  
+**Returns**: <code>Promise</code> - Returns a promise that resolves when the file has been written.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| filePath | <code>string</code> | Specifies the output path for the file. |
+
+<a name="writeFileSync"></a>
+
+## writeFileSync(filePath)
+Serialize the dataframe to a JSON file in the local file system.Synchronous version.
+
+**Kind**: global function  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| filePath | <code>string</code> | Specifies the output path for the file. |
+
+<a name="httpPost"></a>
+
+## httpPost(url) ⇒ <code>Promise</code>
+Serialize the dataframe to JSON and HTTP POST it to the specified REST API.
+
+**Kind**: global function  
+**Returns**: <code>Promise</code> - Returns a promise that resolves when the HTTP request has completed.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| url | <code>string</code> | The URL of the REST API. |
 
