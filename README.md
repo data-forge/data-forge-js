@@ -35,11 +35,19 @@ Examples and some tests have been removed to a [separate repository](https://git
 - [Key Concepts](#key-concepts)
 - [A note about JavaScript anonymous functions](#a-note-about-javascript-anonymous-functions)
 - [Basic Usage](#basic-usage)
+  - [Getting data in](#getting-data-in)
+  - [Get data back out](#get-data-back-out)
+  - [Setting an index](#setting-an-index)
+  - [Working with CSV files](#working-with-csv-files)
+  - [Working with JSON files](#working-with-json-files)
+  - [Working with REST APIs](#working-with-rest-apis)
+  - [Parsing column values](#parsing-column-values)
+  - [Stringifying column values](#stringifying-column-values)
 - [Immutability and Chained Functions](#immutability-and-chained-functions)
-- [Lazy Evaluation](#lazy-evaluation-1)
+- [Lazy Evaluation](#lazy-evaluation)
 - [Working with data](#working-with-data)
 - [Data exploration and visualization](#data-exploration-and-visualization)
-- [Sorting]([#sorting)
+- [Sorting](#sorting)
 - [Transformation](#transformation)
 - [Filtering](#filtering)
 - [Data subsets](#data-subsets)
@@ -48,7 +56,7 @@ Examples and some tests have been removed to a [separate repository](https://git
 - [Groups and windows](#groups-and-windows)
 - [Summarization and Aggregation](#summarization-and-aggregation)
 - [Filling gaps and missing data](#filling-gaps-and-missing-data)
-- [Node.js examples](#nodejs-examples)
+- [Other Node.js examples](#other-nodejs-examples)
 - [Browser examples](#browser-examples)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -391,18 +399,18 @@ You can stringify a dataframe by calling `toCSV`:
 
 NOTE: Data-Forge us the NodeJS `fs` module, this doesn't work in the browser which has no access to the local file system.
 
-## Reading JSON files
+### Reading JSON files
 
 	var dataFrame = dataForge
 		.readFileSync('some-json-file.json')
 		.parseJSON()
 		;
 
-## Writing JSON files
+### Writing JSON files
 
 	dataFrame.asJSON().writeFileSync('some-json-file.json');
 
-## Working with JSON data
+### Working with JSON data
 
 If you already have JSON data (loaded into a string) you can parse it into a dataframe via `fromJSON`:
 
