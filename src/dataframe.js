@@ -1160,6 +1160,76 @@ DataFrame.prototype.asJSON = function () {
 };
 
 /**
+ * Serialize the data frame to HTML.
+ * 
+ *  @returns {string} Returns a HTML format string representing the dataframe.   
+ */
+DataFrame.prototype.toHTML = function () {
+
+	var self = this;
+	var columnNames = self.getColumnNames();
+
+	var pairs = E.from(self.toPairs())
+		.select(function (pair) { // Convert to rows.
+			return [
+				pair[0], 
+				E.from(columnNames) 
+					.select(function (columnName) {
+						return pair[1][columnName];
+					})
+					.toArray()
+			];					
+		})
+		.toArray()
+		;
+	
+	var html = 
+		'<table border="1" class="dataframe">\n' + 
+		'    <thead>\n' +
+		'        <tr style="text-align: right;">\n' +
+		'            <th></th>\n' +
+
+			E.from(columnNames)
+				.select(function (columnName) {
+					return '            <th>' + columnName + '</th>'
+				})
+				.toArray()
+				.join('\n') +
+
+		'\n' +
+		'       </tr>\n' +
+		'    </thead>\n' +
+		'    <tbody>\n' +
+
+			E.from(pairs)
+				.select(function (pair) {
+					var index = pair[0];
+					var row = pair[1];
+					var tableRow = 
+						'        <tr>\n' +
+						'            <th>' + index + '</th>\n' +
+
+						E.from(row)
+								.select(function (cell) {
+									return '            <td>' + cell + '</td>';
+								})
+								.toArray()
+								.join('\n') + 
+						'\n' +
+						'        </tr>'
+						;
+					return tableRow;					
+				})
+				.toArray()
+				.join('\n') +
+        '\n' +
+		'    </tbody>\n' +
+		'</table>'
+		;
+
+	return html;
+};
+/**
  * Transform one or more columns. This is equivalent to extracting a column, calling 'select' on it,
  * then plugging it back in as the same column.
  *
