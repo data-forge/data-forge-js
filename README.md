@@ -10,7 +10,9 @@ Works in both NodeJS and the browser.
 
 **Warning**: This project is a work in progress, the API is now stabilizing and I'm turning my focus to performance. Moving forward I'm making every effort to keep the API backward compatible, however some small changes should still be expected and the version number will be updated appropriately.
 
-Please contribute and help guide the direction of *data-forge*.
+Please contribute or give feedback and help guide the direction of *data-forge*.
+
+I am currently figuring out how plugins should work with data-forge. Please let me know if you have an thoughts on the subject.
 
 **Note**: Data-Forge relies heavily on [linq.js](https://github.com/mihaifm/linq) which I use extensively for all aspects of my JavaScript work. Over time I'll reduce Data-Forge reliance on linq.js although it will remain an invaluable resource.  
 
@@ -71,7 +73,7 @@ The principles that drive decision making and tradeoffs:
 - The API should be simple, easy to learn and easy to use.
 - Minimize the magic, everything should be understandable, the API should be orthogonal.
 - The library should have high performance.
-- Be able to use a similar API in both Javascript and C#.
+- Be able to use a similar API in both Javascript and C# (although I may never get time to work on the C# version).
 - The code you build during interactive data exploration should be transplantable to a webapp, server or microservice.
 
 ## Implementation
@@ -81,7 +83,7 @@ General implementation goals:
 - Immutable: every operation generates a new immutable data set.
 - Lazy evaluation, to make the performance of immutability acceptable.
 - Should be easily extensible.
-- All the core code is created through test driven development.
+- Core code is created through test driven development.
 
 # Installation
 
@@ -115,6 +117,10 @@ You can use functions defined by the plugin, eg
 			// ... use the data returned from Yahoo ...
 		}); 
 
+Or if you have a recent implementation of JavaScript:
+
+	var dataFrame = await dataForge.fromYahoo('MSFT');
+
 ## Browser installation and setup
 
 Install via [Bower](https://en.wikipedia.org/wiki/Bower_(software)):
@@ -125,7 +131,7 @@ Include the main script in your HTML file:
 
 	<script src="bower_components/data-forge/data-forge.js"></script>
 
-You can now access the global `dataForge` variable.
+You can now use data-forge through the global `dataForge` variable.
 
 ### Data-Forge plugins under the browser
 
@@ -344,29 +350,33 @@ Be aware that promoting a column to an index in Data-Forge doesn't remove the co
 
 An index is required for certain operations like `merge`.
 
-## Readingw/writing CSV files
+## Working with CSV files
 
-NOTE: Uses `fs` module, for Nodejs only, doesn't work in browser.
+NOTE: Data-Forge us the NodeJS `fs` module, this doesn't work in the browser which has no access to the local file system.
+
+### Reading CSV files
 
 If your CSV has a header with column names:
 
-	var dataFrame = dataForge.csv.readFileSync('some-csv-file.csv');
+	var dataFrame = dataForge
+		.readFileSync('some-csv-file.csv')
+		.parseCSV()
+		;
 
 If your CSV doesn't have a header:
 
-	var dataFrame = dataForge.csv.readFileSync('some-csv-file.csv', { columnNames: ["some", "explicit", "column", "names"] });
+	var csvOptions = { columnNames: ["some", "explicit", "column", "names"] };
 
-## Writing CSV files
+	var dataFrame = dataForge
+		.readFileSync('some-csv-file.csv')
+		.parseCSV(csvOptions)
+		;
 
-NOTE: Uses `fs` module, for Nodejs only, doesn't work in browser.
+### Writing CSV files
 
-	dataFrame.csv.writeFileSync('some-other-csv-file.csv');
+	dataFrame.asCSV().writeFileSync('some-other-csv-file.csv');
 
-todo: Maybe this:
-
-	dataForge.csv.writeFileSync(dataFrame, 'some-other-csv-file.csv');
-
-## Working with CSV data
+### Working with CSV data
 
 If you already have CSV data (loaded into a string) you can parse it into a dataframe via `fromCSV`:
 
@@ -376,47 +386,21 @@ If you already have CSV data (loaded into a string) you can parse it into a data
 You can stringify a dataframe by calling `toCSV`:
 
 	var outputCsvData = dataFrame.toCSV();
-	fs.writeFileSync('some-other-csv-file.csv', outputCsvData);
 
-## Reading a CSV file from a REST API
+## Working with JSON files
 
-NOTE: Uses `request` and `request-promise` module, for Nodejs only, doesn't work in browser.
-
-	dataForge.requestCSV('http://some-host/some-rest-api')
-		.then(dataFrame => {
-			// You have the data!
-		})
-		.catch(err => {
-			// Handle the error.
-		})
-		;
-
-## Posting a CSV file to a REST API
-
-NOTE: Uses `request` and `request-promise` module, for Nodejs only, doesn't work in browser.
-
-	dataFrame.postCSV('http://some-host/some-rest-api')
-		.then(response) => {
-			// No error!
-		})
-		.catch(err => {
-			// Handle the error.
-		})
-		;
+NOTE: Data-Forge us the NodeJS `fs` module, this doesn't work in the browser which has no access to the local file system.
 
 ## Reading JSON files
 
-NOTE: Uses `fs` module, for Nodejs only, doesn't work in browser.
-
-	var dataFrame = dataForge.json.readFileSync('some-json-file.json');
+	var dataFrame = dataForge
+		.readFileSync('some-json-file.json')
+		.parseJSON()
+		;
 
 ## Writing JSON files
 
-NOTE: Uses `fs` module, for Nodejs only, doesn't work in browser.
-
-	var fs = require('fs');
-	var outputJsonData = dataFrame.toJSON();
-	fs.writeFileSync('some-other-json-file.json', outputJsonData);
+	dataFrame.asJSON().writeFileSync('some-json-file.json');
 
 ## Working with JSON data
 
@@ -429,11 +413,15 @@ You can stringify a dataframe by calling `toJSON`:
 
 	var outputJsonData = dataFrame.toJSON();
 
-## Reading a JSON file from a REST API
+## Working with REST APIs
 
-NOTE: Uses `request` and `request-promise` module, for Nodejs only, doesn't work in browser.
+NOTE: Data-Forge uses `request` and `request-promise` module to implement this, for Nodejs only, this doesn't work in browser.
 
-	dataForge.requestJSON('http://some-host/some-rest-api')
+### Reading a CSV file from a REST API
+
+	dataForge
+		.httpGet('http://some-host/some-rest-api')
+		.parseCSV()
 		.then(dataFrame => {
 			// You have the data!
 		})
@@ -442,11 +430,37 @@ NOTE: Uses `request` and `request-promise` module, for Nodejs only, doesn't work
 		})
 		;
 
-## Posting a JSON file to a REST API
+### Posting a CSV file to a REST API
 
-NOTE: Uses `request` and `request-promise` module, for Nodejs only, doesn't work in browser.
+	dataFrame
+		.asCSV()
+		.httpPost('http://some-host/some-rest-api')
+		.then(response) => {
+			// No error!
+		})
+		.catch(err => {
+			// Handle the error.
+		})
+		;
 
-	dataFrame.postJSON('http://some-host/some-rest-api')
+### Reading a JSON file from a REST API
+
+	dataForge
+		.httpGet('http://some-host/some-rest-api')
+		.parseJSON()
+		.then(dataFrame => {
+			// You have the data!
+		})
+		.catch(err => {
+			// Handle the error.
+		})
+		;
+
+### Posting a JSON file to a REST API
+
+	dataFrame
+		.asJSON()
+		.httpPost('http://some-host/some-rest-api')
 		.then(response) => {
 			// No error!
 		})
@@ -787,6 +801,10 @@ You also probably want to understand the composition of values in the data frame
 	// Create a data frame with the information on the frequency of values from the source data frame.
 	var valuesDf = df.detectValues(); 
 	console.log(valuesDf.toString());
+
+## HTML output
+
+Use the `toHTML` function to output a Series or DataFrame as a HTML table. This is useful when using an exploratory coding tool like Jupyter or for quickly displaying a table in a web app.
 
 ## Visual output
 
@@ -1307,37 +1325,9 @@ For a more concrete example, let's fill gaps in daily share data (with some help
 	var sequenceWithoutGaps = sequenceWithGaps.fillGaps(gapExists, gapFiller);
 	
 
-# Node.js examples
+# Other Node.js examples
 
-## Working with CSV files
-
-	var fs = require('fs');
-	var dataForge = require('data-forge');
-
-	var inputFilePath = "input-file.csv";
-	var outputFilePath = "output-file.csv";
-
-	var inputDataFrame = dataForge.fromCSV(fs.readFileSync(inputFilePath, 'utf8'));
-
-	var outputDataFrame = inputDataFrame.select(... some transformation ...);
-
-	fs.writeFileSync(outputFilePath, outputDataFrame.toCSV()); 
-
-## Working with JSON files
-
-	var fs = require('fs');
-	var dataForge = require('data-forge');
-
-	var inputFilePath = "input-file.json";
-	var outputFilePath = "output-file.json";
-
-	var inputDataFrame = dataForge.fromJSON(fs.readFileSync(inputFilePath, 'utf8'));
-
-	var outputDataFrame = inputDataFrame.select(... some transformation ...);
-
-	fs.writeFileSync(outputFilePath, outputDataFrame.toJSON()); 
-
-## Working a massive CSV file
+## Working with a massive CSV file
 
 WARNING: This section doesn't work yet. I'm look at performance with large files soon. 
 
