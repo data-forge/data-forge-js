@@ -4,7 +4,7 @@ JavaScript data transformation and analysis toolkit inspired by Pandas and LINQ.
 
 Works in both NodeJS and the browser. 
 
-[Also in development for C#](https://github.com/data-forge/data-forge-cs).
+For articles and information please see [The Data Wrangler](http://www.the-data-wrangler.com/).
 
 ----------
 
