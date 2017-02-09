@@ -1268,7 +1268,7 @@ This an example of using `groupBy` and `aggregate` to summarize a dataframe:
 			ClientName: group.first().ClientName,
 
 			// Sum sales per client.
-			Amount: group.deflate(row => row.Sales).sum(),
+			Amount: group.select(row => row.Sales).sum(),
 		}))
 		.inflate() // Series -> dataframe.
 		.toArray(); // Convert to regular JS array.
