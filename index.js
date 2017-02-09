@@ -365,6 +365,37 @@ var dataForge = {
 	},
 
 	/**
+	 * Request a DataFrame from a MongoDB collection.
+	 * 
+	 * @param {string} connectionString - MongoDB connection string that specifies the database to connect to.
+	 * @param {string} collectionName - The name of the MongoDB collection to retreive data from.
+	 *   
+	 * @returns {Promise<DataFrame>} Returns a promise of a dataframe loaded from the database.
+	 */
+	fromMongoDB: function (connectionString, collectionName) {
+		assert.isString(connectionString, "Expected 'connectionString' parameter to dataForge.fromMongoDB to be a string that specifies the database to connect to.");		
+		assert.isString(collectionName, "Expected 'collectionName' parameter to dataForge.fromMongoDB to be a string that specifies the collection to retreive data from.");
+
+		var mongo = require('promised-mongo');
+		var db = mongo(connectionString, [collectionName]);
+
+		return db[collectionName].find()
+			.toArray()
+			.catch(function (err) {
+				return db.close() // An error occurred, but we still need to close the database.
+					.then(function () {
+						throw err; // Rethrow after trying to close database.
+					});
+			})
+			.then(function (data) {
+				return db.close() // Finished with the database connection.
+					.then(function () {
+						return new DataFrame(data);
+					});				
+			});
+	},
+
+	/**
 	 * Concatenate multiple dataframes into a single dataframe.
 	 *
 	 * @param {array} dataFrames - Array of dataframes to concatenate.

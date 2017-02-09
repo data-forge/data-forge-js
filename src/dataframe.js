@@ -1229,6 +1229,35 @@ DataFrame.prototype.toHTML = function () {
 
 	return html;
 };
+
+/**
+ * Store a DataFrame to a MongoDB collection.
+ * 
+ * @param {string} connectionString - MongoDB connection string that specifies the database to connect to.
+ * @param {string} collectionName - The name of the MongoDB collection to store data to.
+ *   
+ * @returns {Promise} Returns a promise that is resolved when the store operation has completed.
+ */
+DataFrame.prototype.toMongoDB = function (connectionString, collectionName) {
+	assert.isString(connectionString, "Expected 'connectionString' parameter to DataFrame.toMongoDB to be a string that specifies the database to connect to.");		
+	assert.isString(collectionName, "Expected 'collectionName' parameter to DataFrame.toMongoDB to be a string that specifies the collection to store data to.");
+
+	var self = this;
+	var mongo = require('promised-mongo');
+	var db = mongo(connectionString, [collectionName]);
+
+	return db[collectionName].insert(self.toArray())
+		.catch(function (err) {
+			return db.close() // An error occurred, but we still need to close the database.
+				.then(function () {
+					throw err; // Rethrow after trying to close database.
+				});
+		})
+		.then(function () {
+			return db.close(); // Finished with the database connection.
+		});
+};
+
 /**
  * Transform one or more columns. This is equivalent to extracting a column, calling 'select' on it,
  * then plugging it back in as the same column.
