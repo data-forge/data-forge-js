@@ -1302,7 +1302,7 @@ For a more concrete example, let's fill gaps in daily share data (with some help
 
 	var moment = require('moment');
 
-	var dailyShareDataWithGaps = ...
+	var sequenceWithGaps = ...
 
 	var gapExists = function (pairA, pairB) {
 		// Return true if there is a gap longer than a day.
