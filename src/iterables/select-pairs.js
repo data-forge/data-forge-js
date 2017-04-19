@@ -1,4 +1,3 @@
-
 'use strict';
 
 var SelectPairsIterable = function (iterable, selector) {
@@ -10,6 +9,7 @@ var SelectPairsIterable = function (iterable, selector) {
 module.exports = SelectPairsIterable;
 
 var SelectIterator = require('../iterators/select');
+var E = require('linq');
 
 SelectPairsIterable.prototype.getIterator = function () {
 
@@ -30,13 +30,19 @@ SelectPairsIterable.prototype.getColumnNames = function () {
 
     var self = this;
 
-    // Have to get the first element to get field names.
     var iterator = self._iterable.getIterator();
-    if (!iterator.moveNext()) {
-        return [];
-    }
 
-    var firstPair = iterator.getCurrent();
-    var transformed = self._selector(firstPair[0], firstPair[1]); // Extract value and get fields.
-    return Object.keys(transformed[1]); 
+    // Consider all rows, this expensive, todo: how do I can make this cheaper!
+    var pairs = [];
+    while (iterator.moveNext()) {
+        pairs.push(iterator.getCurrent());
+    }
+    
+    return E.from(pairs)
+        .selectMany(function (pair) {
+            var transformed = self._selector(pair[0], pair[1]); // Extract value and get fields.
+            return Object.keys(transformed[1]);
+        })
+        .distinct()
+        .toArray();
 };
