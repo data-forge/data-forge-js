@@ -87,7 +87,7 @@ Index.prototype.getLessThan = function () {
             };
 
         default:
-            throw new Error("No less than operation avaiable for type: " + self.getType());
+            throw new Error("No less than operation available for type: " + self.getType());
     }
 };
 
@@ -118,7 +118,7 @@ Index.prototype.getGreaterThan = function () {
             };
 
         default:
-            throw new Error("No greater than operation avaiable for type: " + self.getType());
+            throw new Error("No greater than operation available for type: " + self.getType());
     }
 };
 
