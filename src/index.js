@@ -81,8 +81,13 @@ Index.prototype.getLessThan = function () {
                 return v1 < v2;
             };
 
+        case "empty":
+            return function () {
+                return true; // Series is empty, so this makes no difference.
+            };
+
         default:
-            throw new Error("No less than operation avaiable!");
+            throw new Error("No less than operation avaiable for type: " + self.getType());
     }
 };
 
@@ -107,8 +112,13 @@ Index.prototype.getGreaterThan = function () {
                 return v1 > v2;
             };
 
+        case "empty":
+            return function () {
+                return true; // Series is empty, so this makes no difference.
+            };
+
         default:
-            throw new Error("No greater than operation avaiable!");
+            throw new Error("No greater than operation avaiable for type: " + self.getType());
     }
 };
 
