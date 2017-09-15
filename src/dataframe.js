@@ -536,12 +536,12 @@ DataFrame.prototype.dropSeries = function (columnOrColumns) {
 			getIterator: function () {
 				return new SelectIterator(
 					self.iterable.getIterator(),
-					function (value) {
-						var row = extend({}, value);
+					function (pair) {
+						var row = extend({}, pair[1]);
 						columnOrColumns.forEach(function (columnName) {
 							delete row[columnName];
 						});
-						return row;
+						return [pair[0], row];
 					}
 				);
 

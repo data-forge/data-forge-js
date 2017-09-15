@@ -389,13 +389,31 @@ describe('DataFrame', function () {
 			],
 			[5, 6, 7, 8]
 		);
-		var modified = dataFrame.dropSeries(['Date', 'Value2'])
+        var modified = dataFrame.dropSeries(['Date', 'Value2'])
 		expect(modified.getIndex().toArray()).to.eql([5, 6, 7, 8]);
 		expect(modified.toRows()).to.eql([
 			[300, 3],
 			[200, 1],
 			[20, 22],
 			[100, 4],
+        ]);
+		expect(modified.toArray()).to.eql([
+            {
+                Value1: 300,
+                Value3: 3,
+            },
+            {
+                Value1: 200,
+                Value3: 1,
+            },
+            {
+                Value1: 20,
+                Value3: 22,
+            },
+            {
+                Value1: 100,
+                Value3: 4,
+            },
 		]);
 	});
 
@@ -443,6 +461,24 @@ describe('DataFrame', function () {
 			[200, 1],
 			[20, 22],
 			[100, 4],
+        ]);
+		expect(modified.toArray()).to.eql([
+            {
+                Value1: 300,
+                Value3: 3,
+            },
+            {
+                Value1: 200,
+                Value3: 1,
+            },
+            {
+                Value1: 20,
+                Value3: 22,
+            },
+            {
+                Value1: 100,
+                Value3: 4,
+            },
 		]);
 	});
 
