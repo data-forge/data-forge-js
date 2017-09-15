@@ -12,6 +12,11 @@ var dataForge = require('../index');
 
 describe('data sources - json', function () {
 
+    afterEach(function () {
+        mock.stop('fs');
+        mock.stop('request-promise');
+    });
+    
     it('can read JSON file asynchronously', function () {
 
         var testFilePath = "some/file.json"
