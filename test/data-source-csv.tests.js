@@ -12,6 +12,11 @@ var dataForge = require('../index');
 
 describe('data sources - csv', function () {
 
+    afterEach(function () {
+        mock.stop('fs');
+        mock.stop('request-promise');
+    });
+
     it('can read CSV file asynchronously', function () {
 
         var testFilePath = "some/file.csv"
