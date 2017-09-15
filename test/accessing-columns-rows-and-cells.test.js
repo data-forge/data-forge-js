@@ -1,5 +1,12 @@
 'use strict';
 
+var expect = require('chai').expect;
+
+var dataForge = require('../index');
+
+var fs = require('fs');
+var path = require('path');
+
 //
 // Examples implemented from this blog:
 //
@@ -8,12 +15,7 @@
 
 describe('accessing columns, rows and cells', function () {
 
-    var expect = require('chai').expect;
-
-    var dataForge = require('../index');
-
-    var fs = require('fs');
-    var path = require('path');
+    this.timeout(4000);
 
     var df1;
     var df2;
