@@ -1138,9 +1138,48 @@ describe('DataFrame', function () {
 				},
 			});
 		expect(dataFrame).to.equal(modified);
-		expect(dataFrame.getColumnNames()).to.eql(columnNames);
+        expect(dataFrame.getColumnNames()).to.eql(columnNames);
+        expect(dataFrame.toArray()).to.eql([
+            {
+                Column1: 'A',
+                Column2: 1,
+            },
+            {
+                Column1: 'B',
+                Column2: 2,
+            },
+        ]);
 	});
 
+	it('transforming a normal column and a non-existing column has no additional effect', function () {
+
+		var columnNames = ["Column1", "Column2"];
+		var dataFrame = initDataFrame(
+				columnNames, 
+				[
+					['A', 1],
+					['B', 2],
+				],
+				[10, 11]
+			);
+		var modified = dataFrame.transformSeries({
+                Column2: v => v + 5,
+				"non-existing-column": function (value) {
+					return value + 100;
+				},
+			});
+        expect(modified.toArray()).to.eql([
+            {
+                Column1: 'A',
+                Column2: 6,
+            },
+            {
+                Column1: 'B',
+                Column2: 7,
+            },
+        ]);
+	});
+    
 	//
 	// Generate a data frame for testing.
 	//

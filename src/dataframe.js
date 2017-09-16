@@ -1268,8 +1268,8 @@ DataFrame.prototype.toMongoDB = function (connectionString, collectionName) {
  */
 DataFrame.prototype.transformSeries = function (columnSelectors) {
 
-	assert.isObject(columnSelectors, "Expected 'columnSelectors' parameter of 'transformSeries' function to be an object. Field names should specify columns to transform. Field values should be selector functions that specify the transformation for each column.");
-
+    assert.isObject(columnSelectors, "Expected 'columnSelectors' parameter of 'transformSeries' function to be an object. Field names should specify columns to transform. Field values should be selector functions that specify the transformation for each column.");
+    
 	var self = this;
 	return E.from(Object.keys(columnSelectors))
 		.aggregate(self, function (prevDataFrame, columnName) {
@@ -1281,7 +1281,7 @@ DataFrame.prototype.transformSeries = function (columnSelectors) {
 				);			
 			}
 			else {
-				return self;
+				return prevDataFrame;
 			}	
 		});
 };
