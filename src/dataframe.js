@@ -580,7 +580,7 @@ DataFrame.prototype.withSeries = function (columnNameOrSpec, seriesOrFn) {
 	if (Object.isObject(columnNameOrSpec)) {
 		return E.from(Object.keys(columnNameOrSpec))
 			.aggregate(self, function (dataFrame, columnName) {
-				return self.withSeries(columnName, columnNameOrSpec[columnName]);
+				return dataFrame.withSeries(columnName, columnNameOrSpec[columnName]);
 			});
 	}
 
@@ -738,10 +738,10 @@ DataFrame.prototype.parseDates = function (columnNameOrNames, formatString) {
 	var self = this;
 	if (Object.isArray(columnNameOrNames)) {
 		return E.from(columnNameOrNames)
-			.aggregate(self, function (self, columnName) {
-				return self.withSeries(columnName, self.getSeries(columnName).parseDates(formatString));
+			.aggregate(self, function (input, columnName) {
+				return input.withSeries(columnName, input.getSeries(columnName).parseDates(formatString));
 			});
-	}
+    }
 	else {
 		return self.withSeries(columnNameOrNames, self.getSeries(columnNameOrNames).parseDates(formatString));
 	}

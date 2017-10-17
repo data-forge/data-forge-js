@@ -687,7 +687,7 @@ describe('DataFrame', function () {
 				columnNames: ["A"],
 				values: [[1], [2], [3]],
 			});
-		var withSeries = dataFrame
+		var modified = dataFrame
 			.withSeries("B", function (df) {
 				return df
 					.getSeries("A")
@@ -695,8 +695,8 @@ describe('DataFrame', function () {
 					; 
 			});
 
-		expect(withSeries.getColumnNames()).to.eql(["A", "B"]);
-		expect(withSeries.toRows()).to.eql([
+		expect(modified.getColumnNames()).to.eql(["A", "B"]);
+		expect(modified.toRows()).to.eql([
 			[1, 10],
 			[2, 20],
 			[3, 30],
@@ -709,34 +709,54 @@ describe('DataFrame', function () {
 				columnNames: ["A"],
 				values: [[1], [2], [3]],
 			});
-		var withSeries = dataFrame
+		var modified = dataFrame
 			.withSeries({ 
 				B: new Series({ values: [10, 20, 30] }), 
 			});
 
-		expect(withSeries.getColumnNames()).to.eql(["A", "B"]);
-		expect(withSeries.toRows()).to.eql([
+		expect(modified.getColumnNames()).to.eql(["A", "B"]);
+		expect(modified.toRows()).to.eql([
 			[1, 10],
 			[2, 20],
 			[3, 30],
 		]);
 	});
 
+	it('can set multiple series - using column spec', function () {
+
+		var dataFrame = new dataForge.DataFrame({
+				columnNames: ["A"],
+				values: [[1], [2], [3]],
+			});
+		var modified = dataFrame
+			.withSeries({ 
+                B: new Series({ values: [10, 20, 30] }), 
+                C: new Series({ values: [100, 200, 300] }), 
+			});
+
+		expect(modified.getColumnNames()).to.eql(["A", "B", "C"]);
+		expect(modified.toRows()).to.eql([
+			[1, 10, 100],
+			[2, 20, 200],
+			[3, 30, 300],
+		]);
+    });
+    
 	it('can generate new series - using column spec', function () {
 
 		var dataFrame = new dataForge.DataFrame({
 				columnNames: ["A"],
 				values: [[1], [2], [3]],
 			});
-		var withSeries = dataFrame
+		var modified = dataFrame
 			.withSeries({
 				B: function (df) {
 					return new Series({ values: [10, 20, 30]});				
 				}
 			});
 
-		expect(withSeries.getColumnNames()).to.eql(["A", "B"]);
-		expect(withSeries.toRows()).to.eql([
+		expect(modified.getColumnNames()).to.eql(["A", "B"]);
+		expect(modified.toRows()).to.eql([
 			[1, 10],
 			[2, 20],
 			[3, 30],
@@ -749,7 +769,7 @@ describe('DataFrame', function () {
 				columnNames: ["A"],
 				values: [[1], [2], [3]],
 			});
-		var withSeries = dataFrame
+		var modified = dataFrame
 			.withSeries({
 				B: function (df) {
 					return df
@@ -759,8 +779,8 @@ describe('DataFrame', function () {
 				},
 			});
 
-		expect(withSeries.getColumnNames()).to.eql(["A", "B"]);
-		expect(withSeries.toRows()).to.eql([
+		expect(modified.getColumnNames()).to.eql(["A", "B"]);
+		expect(modified.toRows()).to.eql([
 			[1, 10],
 			[2, 20],
 			[3, 30],
