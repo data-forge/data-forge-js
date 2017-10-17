@@ -578,10 +578,10 @@ DataFrame.prototype.withSeries = function (columnNameOrSpec, seriesOrFn) {
 	var self = this;
 
 	if (Object.isObject(columnNameOrSpec)) {
-		return E.from(Object.keys(columnNameOrSpec))
-			.aggregate(self, function (dataFrame, columnName) {
+		return Object.keys(columnNameOrSpec)
+			.reduce(function (dataFrame, columnName) {
 				return dataFrame.withSeries(columnName, columnNameOrSpec[columnName]);
-			});
+			}, self);
 	}
 
 	var columnName = columnNameOrSpec;
