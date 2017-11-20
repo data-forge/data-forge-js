@@ -754,7 +754,7 @@ Series.prototype.parseDates = function (formatString) {
 Series.prototype.toStrings = function (formatString) {
 
 	if (formatString) {
-		assert.isString(formatString, "Expected optional 'formatString' parameter to parseDates to be a string (if specified).");
+		assert.isString(formatString, "Expected optional 'formatString' parameter to toStrings to be a string (if specified).");
 	}
 
 	var self = this;
