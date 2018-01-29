@@ -526,17 +526,30 @@ Series.prototype.orderByDescending = function (sortSelector) {
  * Use select or selectPairs to aggregate.
  *
  * @param {integer} period - The number of values in the window.
+ * @param {Function} [selector] - Optional selector for transforming each window. 
  * 
  * @returns {Series} Returns a new series, each value of which is a 'window' (or segment) of the original series or dataframe.  
  */
-Series.prototype.window = function (period, obsoleteSelector) {
+Series.prototype.window = function (period, selector) {
 
 	assert.isNumber(period, "Expected 'period' parameter to 'window' to be a number.");
-	assert(!obsoleteSelector, "Selector parameter is obsolete and no longer required.");
 
 	var self = this;
 
-	return new Series({
+    if (selector) {
+        assert.isFunction(selector, "If selector parameter is passed to function Series.window, it is expected to be a function.");
+    }
+
+    if (selector) {
+        return self.window(period)
+            .asPairs()
+            .select(function (pair) {
+                return selector(pair[1]);
+            })
+            .asValues();
+    }
+    
+    return new Series({
 		iterable: {
 			getIterator: function () {
 
@@ -572,15 +585,28 @@ Series.prototype.window = function (period, obsoleteSelector) {
  * Use select or selectPairs to aggregate.
  *
  * @param {integer} period - The number of values in the window.
+ * @param {Function} [selector] - Optional selector for transforming each window. 
  * 
  * @returns {Series} Returns a new series, each value of which is a 'window' (or segment) of the original series or dataframe.
  */
-Series.prototype.rollingWindow = function (period, obsoleteSelector) {
+Series.prototype.rollingWindow = function (period, selector) {
 
-	assert.isNumber(period, "Expected 'period' parameter to 'rollingWindow' to be a number.");
-	assert(!obsoleteSelector, "Selector parameter is obsolete and no longer required.");
+    assert.isNumber(period, "Expected 'period' parameter to 'rollingWindow' to be a number.");
+    
+    if (selector) {
+        assert.isFunction(selector, "If selector parameter is passed to function Series.rollingWindow, it is expected to be a function.");
+    }
 
-	var self = this;
+    var self = this;
+    
+    if (selector) {
+        return self.rollingWindow(period)
+            .asPairs()
+            .select(function (pair) {
+                return selector(pair[1]);
+            })
+            .asValues();
+    }
 
 	return new Series({
 		iterable: { 
@@ -2200,7 +2226,7 @@ Series.prototype.bucket = function (numBuckets) {
     if (self.none()) {
         return new DataFrame();
     }
-    
+
     var min = self.min();
     var max = self.max();
     var range = max - min;

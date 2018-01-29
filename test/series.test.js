@@ -441,7 +441,22 @@ describe('Series', function () {
 
 	});
 
-	it('can compute rolling window - from empty data set', function () {
+	it('can compute window - simplified version', function () {
+
+		var series = new Series({ 
+            values: [1, 2, 3, 4, 5, 6],
+            index: [10, 20, 30, 40, 50, 60],
+        });
+		var windowed = series
+			.window(3, function (window) {
+                return [window.getIndex().last(), window.sum()];
+            });
+
+        expect(windowed.getIndex().toArray()).to.eql([30, 60])
+        expect(windowed.toArray()).to.eql([6, 15]);
+    });
+
+    it('can compute rolling window - from empty data set', function () {
 
 		var series = initSeries([], []);
 		var newSeries = series
@@ -597,7 +612,23 @@ describe('Series', function () {
 		var values = newSeries.toArray();
 		expect(values).to.eql([2, 3, 4, 5]);
 	});
-	
+    
+	it('can compute rolling window - simplified version', function () {
+
+        var series = new Series({
+            values: [0, 1, 2, 3, 4],
+            index: [10, 20, 30, 40, 50],
+        });
+        
+		var newSeries = series
+			.rollingWindow(3, function (window) {
+				return [window.getIndex().last(), window.sum()];
+			});
+
+        expect(newSeries.getIndex().toArray()).to.eql([30, 40, 50]);
+        expect(newSeries.toArray()).to.eql([3, 6, 9]);
+	});
+    
 	it('can compute pct changed', function () {
 
 		var series = initSeries([0, 1, 2, 3], [1, 2, 4, 8]);
