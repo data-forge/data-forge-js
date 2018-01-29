@@ -2186,3 +2186,36 @@ Series.prototype.between = function (startIndexValue, endIndexValue) {
 	var self = this;
 	return self.startAt(startIndexValue).endAt(endIndexValue); 
 };
+
+/**
+ * Organise all values in the series into the specified number of buckets.
+ * 
+ * @param {int} numBuckets - The number of buckets to create.
+ * 
+ * @returns {DataFrame} Returns a dataframe containing bucketed data. The input values are divided up into these buckets.
+ */
+Series.prototype.bucket = function (numBuckets) {
+
+    var self = this;
+    if (self.none()) {
+        return new DataFrame();
+    }
+    
+    var min = self.min();
+    var max = self.max();
+    var range = max - min;
+    var width = range / (numBuckets-1);
+    return self
+        .select(v => {
+            var bucket = Math.floor((v - min) / width);
+            var bucketMin = (bucket * width) + min;
+            return {
+                Value: v,
+                Bucket: bucket,
+                Min: bucketMin,
+                Mid: bucketMin + (width*0.5),
+                Max: bucketMin + width,
+            };
+        })
+        .inflate();
+};

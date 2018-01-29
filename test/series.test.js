@@ -2020,6 +2020,99 @@ describe('Series', function () {
 		expect(reduced.toPairs()).to.eql([
 			[new Date(2016, 5, 5), 2],
 		]); 	
-	});
+    });
+    
+    it('empty series produces zero buckets', function () {
+
+        expect((new Series()).bucket(5).count()).to.eql(0);
+    });
+
+    it('series with one value produces a single bucket', function () {
+
+        expect((new Series([5])).bucket(10).count()).to.eql(1);
+    });
+
+
+    it('can divide values into buckets', function () {
+
+        var series = new Series([1, 1, 3, 4, 5, 5, 6, 9, 10, 10]);
+        expect(series.bucket(5).toArray()).to.eql([
+            {
+                Value: 1, 
+                Bucket: 0,
+                Min: 1,
+                Mid: 2.125,
+                Max: 3.25,
+            },
+
+            {
+                Value: 1, 
+                Bucket: 0,
+                Min: 1,
+                Mid: 2.125,
+                Max: 3.25,
+            },
+            {
+                Value: 3, 
+                Bucket: 0,
+                Min: 1,
+                Mid: 2.125,
+                Max: 3.25,
+            },
+
+            {
+                Value: 4, 
+                Bucket: 1,
+                Min: 3.25,
+                Mid: 4.375,
+                Max: 5.5,
+            },
+            {
+                Value: 5, 
+                Bucket: 1,
+                Min: 3.25,
+                Mid: 4.375,
+                Max: 5.5,
+            },
+            {
+                Value: 5, 
+                Bucket: 1,
+                Min: 3.25,
+                Mid: 4.375,
+                Max: 5.5,
+            },
+
+            {
+                Value: 6, 
+                Bucket: 2,
+                Min: 5.5,
+                Mid: 6.625,
+                Max: 7.75,
+            },
+
+            {
+                Value: 9,
+                Bucket: 3,
+                Min: 7.75,
+                Mid: 8.875,
+                Max: 10,
+            },
+
+            {
+                Value: 10,
+                Bucket: 4,
+                Min: 10,
+                Mid: 11.125,
+                Max: 12.25,
+            },
+            {
+                Value: 10,
+                Bucket: 4,
+                Min: 10,
+                Mid: 11.125,
+                Max: 12.25,
+            },
+        ]);
+    });
 });
 
