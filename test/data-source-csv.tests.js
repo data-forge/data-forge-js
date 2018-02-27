@@ -14,7 +14,6 @@ describe('data sources - csv', function () {
 
     afterEach(function () {
         mock.stop('fs');
-        mock.stop('request-promise');
     });
 
     it('can read CSV file asynchronously', function () {
@@ -66,32 +65,6 @@ describe('data sources - csv', function () {
         expect(dataFrame.toCSV()).to.eql(testCsvData);
     });
 
-    it('can http get CSV file asynchronously', function () {
-
-        var testUrl = "some/url"
-        var testCsvData 
-            = "Col1,Col2\r\n"
-            + "1,2\r\n"
-            + "3,4"
-            ; 
-
-        mock('request-promise', { 
-            get: function(options) {
-                expect(options.uri).to.eql(testUrl);
-
-                return Promise.resolve(testCsvData);
-            },
-        });
-        
-        return dataForge
-            .httpGet(testUrl)
-            .parseCSV()
-            .then(dataFrame => {
-                expect(dataFrame.toCSV()).to.eql(testCsvData);
-            })
-            ;
-    });
-
     it('can write CSV file asynchronously', function () {
 
         var testFilePath = "some/file.csv"
@@ -136,34 +109,6 @@ describe('data sources - csv', function () {
         });
         
         dataFrame.asCSV().writeFileSync(testFilePath);
-    });
-
-    it('can http post CSV file asynchronously', function () {
-
-        var testUrl = "some/url"
-        var testCsvData 
-            = "Col1,Col2\r\n"
-            + "1,2\r\n"
-            + "3,4"
-            ;            
-        var dataFrame = dataForge.fromCSV(testCsvData);
-
-        mock('request-promise', { 
-            post: function(options) {
-                expect(options.uri).to.eql(testUrl);
-                expect(options.body).to.eql(testCsvData);
-                expect(options.headers).to.eql({
-                    "content-type": "text/csv",
-                });
-
-                return Promise.resolve();
-            },
-        });
-        
-        return dataFrame
-            .asCSV()
-            .httpPost(testUrl)
-            ;
     });
 
 });

@@ -421,62 +421,6 @@ You can stringify a dataframe by calling `toJSON`:
 
 	var outputJsonData = dataFrame.toJSON();
 
-## Working with REST APIs
-
-NOTE: Data-Forge uses `request` and `request-promise` module to implement this, for Nodejs only, this doesn't work in browser.
-
-### Reading a CSV file from a REST API
-
-	dataForge
-		.httpGet('http://some-host/some-rest-api')
-		.parseCSV()
-		.then(dataFrame => {
-			// You have the data!
-		})
-		.catch(err => {
-			// Handle the error.
-		})
-		;
-
-### Posting a CSV file to a REST API
-
-	dataFrame
-		.asCSV()
-		.httpPost('http://some-host/some-rest-api')
-		.then(response) => {
-			// No error!
-		})
-		.catch(err => {
-			// Handle the error.
-		})
-		;
-
-### Reading a JSON file from a REST API
-
-	dataForge
-		.httpGet('http://some-host/some-rest-api')
-		.parseJSON()
-		.then(dataFrame => {
-			// You have the data!
-		})
-		.catch(err => {
-			// Handle the error.
-		})
-		;
-
-### Posting a JSON file to a REST API
-
-	dataFrame
-		.asJSON()
-		.httpPost('http://some-host/some-rest-api')
-		.then(response) => {
-			// No error!
-		})
-		.catch(err => {
-			// Handle the error.
-		})
-		;
-
 ## Parsing column values
 
 Often when you load data from a file you will need to parse string values in specific columns to particular types. This is especially true for CSV files which contain only string data once loaded. It is less true for JSON files which can store values as numbers, although the JSON format has no native date format, so when you load JSON files you will still need parse the dates.

@@ -14,7 +14,6 @@ describe('data sources - json', function () {
 
     afterEach(function () {
         mock.stop('fs');
-        mock.stop('request-promise');
     });
     
     it('can read JSON file asynchronously', function () {
@@ -77,38 +76,6 @@ describe('data sources - json', function () {
         expect(dataFrame.toJSON()).to.eql(testJsonData);
     });
 
-    it('can http get JSON file asynchronously', function () {
-
-        var testUrl = "some/url";
-        var testData = [
-            {
-                Col1: 1,
-                Col2: 2,
-            },
-            {
-                Col1: 3,
-                Col2: 4,
-            },
-        ];
-
-        mock('request-promise', { 
-            get: function(options) {
-                expect(options.uri).to.eql(testUrl);
-                expect(options.json).to.eql(true);
-
-                return Promise.resolve(testData);
-            },
-        });
-        
-        return dataForge
-            .httpGet(testUrl)
-            .parseJSON()
-            .then(dataFrame => {
-                expect(dataFrame.toArray()).to.eql(testData);
-            })
-            ;
-    });
-
     it('can write JSON file asynchronously', function () {
 
         var testFilePath = "some/file.json"
@@ -164,39 +131,4 @@ describe('data sources - json', function () {
         
         dataFrame.asJSON().writeFileSync(testFilePath);
     });
-
-    it('can http post JSON file asynchronously', function () {
-
-        var testUrl = "some/url"
-        var testData = [
-            {
-                Col1: 1,
-                Col2: 2,
-            },
-            {
-                Col1: 3,
-                Col2: 4,
-            },
-        ];
-        var dataFrame = new dataForge.DataFrame(testData);
-
-        mock('request-promise', { 
-            post: function(options) {
-                expect(options.uri).to.eql(testUrl);
-                expect(options.body).to.eql(testData);
-                expect(options.json).to.eql(true);
-                expect(options.headers).to.eql({
-                    "content-type": "application/json",
-                });
-
-                return Promise.resolve();
-            },
-        });
-        
-        return dataFrame
-            .asJSON()
-            .httpPost(testUrl)
-            ;
-    });
-
 });

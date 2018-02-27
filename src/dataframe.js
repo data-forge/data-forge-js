@@ -1060,27 +1060,6 @@ DataFrame.prototype.asCSV = function () {
 			fs.writeFileSync(filePath, self.toCSV());
 		},
 
-		/**
-		 * Serialize the dataframe to CSV and HTTP POST it to the specified REST API.
-		 * 
-		 * @param {string} url - The URL of the REST API.
-		 * 
-		 * @returns {Promise} Returns a promise that resolves when the HTTP request has completed.
-		 */
-		httpPost: function (url) {
-
-			var requestOptions = {
-				uri: url,
-				body: self.toCSV(),
-				headers: {
-					"content-type": "text/csv",
-				},
-			};
-
-			var request = require('request-promise');
-
-			return request.post(requestOptions);
-		},
 	};
 
 };
@@ -1131,32 +1110,7 @@ DataFrame.prototype.asJSON = function () {
 			var fs = require('fs');	
 			fs.writeFileSync(filePath, self.toJSON());
 		},
-
-		/**
-		 * Serialize the dataframe to JSON and HTTP POST it to the specified REST API.
-		 * 
-		 * @param {string} url - The URL of the REST API.
-		 * 
-		 * @returns {Promise} Returns a promise that resolves when the HTTP request has completed.
-		 */
-		httpPost: function (url) {
-			var requestOptions = {
-				uri: url,
-				body: self.toArray(),
-				json: true,
-				headers: {
-					"content-type": "application/json",
-				},
-			};
-
-			var request = require('request-promise');
-
-			return request.post(requestOptions);
-		},
-
-
 	};
-
 };
 
 /**
@@ -1228,34 +1182,6 @@ DataFrame.prototype.toHTML = function () {
 		;
 
 	return html;
-};
-
-/**
- * Store a DataFrame to a MongoDB collection.
- * 
- * @param {string} connectionString - MongoDB connection string that specifies the database to connect to.
- * @param {string} collectionName - The name of the MongoDB collection to store data to.
- *   
- * @returns {Promise} Returns a promise that is resolved when the store operation has completed.
- */
-DataFrame.prototype.toMongoDB = function (connectionString, collectionName) {
-	assert.isString(connectionString, "Expected 'connectionString' parameter to DataFrame.toMongoDB to be a string that specifies the database to connect to.");		
-	assert.isString(collectionName, "Expected 'collectionName' parameter to DataFrame.toMongoDB to be a string that specifies the collection to store data to.");
-
-	var self = this;
-	var mongo = require('promised-mongo');
-	var db = mongo(connectionString, [collectionName]);
-
-	return db[collectionName].insert(self.toArray())
-		.catch(function (err) {
-			return db.close() // An error occurred, but we still need to close the database.
-				.then(function () {
-					throw err; // Rethrow after trying to close database.
-				});
-		})
-		.then(function () {
-			return db.close(); // Finished with the database connection.
-		});
 };
 
 /**
