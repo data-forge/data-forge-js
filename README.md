@@ -8,13 +8,21 @@ For articles and information please see [The Data Wrangler](http://www.the-data-
 
 ----------
 
-**Warning**: This project is a work in progress, the API is now stabilizing and I'm turning my focus to performance. Moving forward I'm making every effort to keep the API backward compatible, however some small changes should still be expected and the version number will be updated appropriately.
+**Breaking changes**
 
-Please contribute or give feedback and help guide the direction of *data-forge*.
+I've removed the DataForge functions that apply to MongoDB and REST APIs. Sorry if you were depending on these, but they had to go. 
+They limited DataForge's application and it was my mistake to have added them in the first place. If they belong at all they should live in 
+separate packages (and be plugins to DataForge). If you were relying on these functions please log an issue here and I'll help you rectify the situation.
 
-I am currently figuring out how plugins should work with data-forge. Please let me know if you have an thoughts on the subject.
+**Big update**: 
 
-**Note**: Data-Forge relies heavily on [linq.js](https://github.com/mihaifm/linq) which I use extensively for all aspects of my JavaScript work. Over time I'll reduce Data-Forge reliance on linq.js although it will remain an invaluable resource.  
+The TypeScript version of DataForge is on its way!  Please take a look at the new repo to see what's happening:
+
+https://github.com/data-forge/data-forge-ts
+
+**The book**
+
+If you have an interest in data wrangling and analysis in JavaScript please check out [my new book on the subject!](http://bit.ly/2t2cJu2)
 
 # Generated API docs
 
