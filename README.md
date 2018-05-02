@@ -8,21 +8,23 @@ For articles and information please see [The Data Wrangler](http://www.the-data-
 
 ----------
 
+**The book**
+
+If you have an interest in data wrangling and analysis in JavaScript please check out [my new book on the subject!](http://bit.ly/2t2cJu2)
+
+**This respository is no longer maintained**
+
+For the latest version of Data-Forge please go to the repo for the new TypeScript version: https://github.com/data-forge/data-forge-ts
+
+Still available at the usual place on NPM: 
+https://www.npmjs.com/package/data-forge
+
 **Breaking changes**
 
 I've removed the DataForge functions that apply to MongoDB and REST APIs. Sorry if you were depending on these, but they had to go. 
 They limited DataForge's application and it was my mistake to have added them in the first place. If they belong at all they should live in 
 separate packages (and be plugins to DataForge). If you were relying on these functions please log an issue here and I'll help you rectify the situation.
 
-**Big update**: 
-
-The TypeScript version of DataForge is on its way!  Please take a look at the new repo to see what's happening:
-
-https://github.com/data-forge/data-forge-ts
-
-**The book**
-
-If you have an interest in data wrangling and analysis in JavaScript please check out [my new book on the subject!](http://bit.ly/2t2cJu2)
 
 # Generated API docs
 
