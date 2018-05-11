@@ -12,11 +12,11 @@ For articles and information please see [The Data Wrangler](http://www.the-data-
 
 If you have an interest in data wrangling and analysis in JavaScript please check out [my new book on the subject!](http://bit.ly/2t2cJu2)
 
-**This respository is no longer maintained**
+## This respository is no longer maintained
 
 For the latest version of Data-Forge please go to the repo for the new TypeScript version: https://github.com/data-forge/data-forge-ts
 
-Still available at the usual place on NPM: 
+New version is still available at the usual place on NPM: 
 https://www.npmjs.com/package/data-forge
 
 **Breaking changes**
